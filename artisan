@@ -1,0 +1,116 @@
+#!/usr/bin/env php
+<?php
+/**
+ * artisan — console entry point.
+ *
+ * With dependencies installed this hands over to Laravel's console kernel.
+ * Without them, the handful of commands that make sense for the bundled micro
+ * runtime (serve, routes, lint, cache:clear) run from here instead, so the
+ * repository is usable straight after a clone.
+ */
+
+$root = __DIR__;
+$command = $argv[1] ?? 'help';
+$options = [];
+
+foreach (array_slice($argv, 2) as $arg) {
+    if (preg_match('/^--([^=]+)=(.*)$/', $arg, $m)) {
+        $options[$m[1]] = $m[2];
+    } elseif (preg_match('/^--([^=]+)$/', $arg, $m)) {
+        $options[$m[1]] = true;
+    }
+}
+
+if (is_file($root . '/vendor/autoload.php')) {
+    require $root . '/vendor/autoload.php';
+
+    $kernel = require $root . '/bootstrap/app.php';
+
+    exit($kernel->make(Illuminate\Contracts\Console\Kernel::class)->handle(
+        new Symfony\Component\Console\Input\ArgvInput,
+        new Symfony\Component\Console\Output\ConsoleOutput
+    ));
+}
+
+switch ($command) {
+    case 'serve':
+        $host = $options['host'] ?? '0.0.0.0';
+        $port = $options['port'] ?? '8000';
+
+        echo "  micro runtime listening on http://{$host}:{$port}\n";
+        echo "  (composer install && php artisan serve switches this to Laravel)\n\n";
+
+        passthru(sprintf('php -S %s:%s -t %s', escapeshellarg($host), escapeshellarg($port), escapeshellarg($root . '/public')));
+        exit(0);
+
+    case 'routes':
+        require $root . '/tools/micro/autoload.php';
+        $kernel = new Micro\Kernel($root);
+
+        printf("  %-6s  %-46s  %s\n", 'METHOD', 'URI', 'ACTION');
+        printf("  %-6s  %-46s  %s\n", str_repeat('-', 6), str_repeat('-', 46), str_repeat('-', 34));
+
+        foreach ($kernel->router->routes as $route) {
+            printf(
+                "  %-6s  %-46s  %s\n",
+                implode('|', $route['methods']),
+                $route['pattern'],
+                is_array($route['action']) ? implode('@', $route['action']) : 'closure'
+            );
+        }
+
+        exit(0);
+
+    case 'lint':
+        $files = [];
+        foreach (['app', 'config', 'routes', 'tools/micro', 'bootstrap'] as $dir) {
+            if (!is_dir($root . '/' . $dir)) { continue; }
+            $iterator = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($root . '/' . $dir, FilesystemIterator::SKIP_DOTS)
+            );
+            foreach ($iterator as $file) {
+                if ($file->isFile() && $file->getExtension() === 'php') {
+                    $files[] = $file->getPathname();
+                }
+            }
+        }
+
+        $failed = 0;
+        foreach ($files as $file) {
+            exec(sprintf('php -l %s 2>&1', escapeshellarg($file)), $output, $code);
+            if ($code !== 0) {
+                $failed++;
+                echo implode("\n", $output), "\n";
+            }
+            $output = [];
+        }
+
+        printf("  %d files checked, %d with syntax errors\n", count($files), $failed);
+        exit($failed ? 1 : 0);
+
+    case 'cache:clear':
+        foreach (glob($root . '/storage/framework/views/*.php') ?: [] as $file) {
+            unlink($file);
+        }
+
+        echo "  view cache cleared\n";
+        exit(0);
+
+    default:
+        echo <<<TXT
+
+  Fitzroy clone — micro runtime
+
+  Available without composer install:
+
+    php artisan serve            start php -S on 0.0.0.0:8000 (--port=NNNN)
+    php artisan routes           list the routes registered in routes/web.php
+    php artisan lint             php -l across app/, config/, routes/, tools/
+    php artisan cache:clear      drop compiled Blade cache in storage/framework/views
+
+  After `composer install` this file delegates to Laravel's own console kernel.
+
+TXT;
+        echo "\n";
+        exit(0);
+}

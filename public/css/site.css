@@ -61,8 +61,6 @@ body {
     transition: opacity 0.5s var(--ease);
 }
 
-body.loading { opacity: 0; }
-
 img {
     display: block;
     max-width: 100%;
@@ -238,8 +236,6 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .btn--solid { width: 100%; justify-content: center; }
 
 .btn--sm { padding: 0.6rem 1.1rem; font-size: 0.68rem; }
-
-.on-dark .btn--ghost { --btn-fg: var(--color-white); }
 
 .link-quiet {
     display: inline-block;
@@ -1499,7 +1495,6 @@ body.menu-open .logo { color: var(--color-black); }
     .areas__grid { grid-template-columns: repeat(4, 1fr); }
 }
 
-
 .next {
     padding: clamp(2.5rem, 6vw, 5rem) 0;
     border-top: 1px solid var(--color-gray-light);
@@ -1530,8 +1525,6 @@ body.menu-open .logo { color: var(--color-black); }
 /* --------------------------------------------------------------------------
    Prose blocks and the commitment band (/how-it-works, /about)
    ----------------------------------------------------------------------- */
-
-.team { padding: clamp(2.5rem, 6vw, 5rem) 0; }
 
 .prose-block { padding: clamp(3rem, 6vw, 5rem) 0 0; }
 
@@ -1565,7 +1558,7 @@ body.menu-open .logo { color: var(--color-black); }
 }
 
 /* --------------------------------------------------------------------------
-   Trip page: meta bar, day list, category filters
+   Trip page: meta bar and category filters
    ----------------------------------------------------------------------- */
 
 .trip-meta {
@@ -1605,31 +1598,6 @@ body.menu-open .logo { color: var(--color-black); }
 @media (min-width: 1000px) {
     .trip-meta__inner { grid-template-columns: 1.5fr 0.5fr; }
     .trip-meta__cta { justify-content: flex-end; }
-}
-
-
-.days { display: grid; gap: clamp(1.25rem, 2.5vw, 2rem); }
-
-.day {
-    display: grid;
-    gap: 0.35rem 1.5rem;
-    padding: clamp(1.25rem, 2.4vw, 1.9rem) 0;
-    border-top: 1px solid var(--color-gray-light);
-}
-
-.day:last-child { border-bottom: 1px solid var(--color-gray-light); }
-
-.day h3 {
-    font-size: clamp(1.05rem, 1.4vw, 1.3rem);
-    font-weight: 500;
-    letter-spacing: 0.01em;
-}
-
-.day p { grid-column: 2; color: var(--color-gray); font-size: 0.95rem; max-width: 60ch; }
-
-@media (min-width: 900px) {
-    .day { grid-template-columns: 9rem 1fr; align-items: baseline; }
-    .day p { grid-column: 2; }
 }
 
 .filters {
@@ -1971,8 +1939,6 @@ fieldset { border: 0; padding: 0; margin: 0; }
 .site-footer__address { margin-top: 1.5rem; display: grid; gap: 0.1rem; color: rgba(255, 255, 255, 0.55); font-size: 0.88rem; }
 .site-footer__contact { margin-top: 1.25rem; display: grid; gap: 0.3rem; }
 .site-footer__contact a { font-size: 0.9rem; letter-spacing: 0.04em; }
-.site-footer .reviews { margin-top: 1.75rem; border-color: rgba(255, 255, 255, 0.18); color: var(--color-white); }
-.site-footer .reviews:hover { border-color: var(--color-sand); }
 
 .site-footer__navs {
     display: grid;

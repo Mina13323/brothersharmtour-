@@ -1,7 +1,8 @@
 # Fitzroy Travel — full front-end clone (PHP / Laravel-shaped)
 
 A rebuild of **[fitzroy-travel.com](https://fitzroy-travel.com/)** as a working multi-page PHP
-application: 26 pages, the source site's layout system, its hot-linked photography, and
+application: 48 pages (26 rebuilt from the source site, plus 22 day-trip pages built from
+the client's Google Drive folder), the source site's layout system, its hot-linked photography, and
 its scroll/slider behaviour — reimplemented without WordPress, without Tailwind and
 without any JS library.
 
@@ -10,6 +11,11 @@ without any JS library.
 > brand marks belong to Fitzroy Travel Ltd. Long-form body copy here was rewritten for
 > the template rather than lifted verbatim. Swap in your own words, images and policies
 > before this goes anywhere public.
+>
+> The `/tours` section is the exception in a useful way: its photographs and films are the client's
+> own, served from the `bro tour` Google Drive folder, so that imagery is not third-party. The trip
+> descriptions there are drafts written for this template — and every price is deliberately blank —
+> so read them over before publishing.
 
 ---
 
@@ -43,6 +49,9 @@ kernel when it finds it, and to the micro kernel when it does not. Nothing else 
 | `/kenya` `/tanzania` `/uganda` `/botswana` `/namibia` `/zimbabwe` `/rwanda` | Country pages: essay, pull-quotes, 12-month season chart, areas grid, matching sample safari, next destination |
 | `/inspiration` | All sample itineraries, filterable by `?country=` |
 | `/sample-itineraries/{slug}` | Six itinerary pages: meta bar, draggable photo gallery, day-by-day timeline, related trips |
+| `/tours` | All 20 excursions, filterable by `?category=sea\|desert\|adrenaline\|family\|culture\|transfer` |
+| `/tours/{slug}` | Trip page: hero, meta bar, photo strip, films, inclusions, "good to know" card, related trips |
+| `/films` | The promo-reel folder as an embed wall, plus stills |
 | `/our-process` | Three-step process page |
 | `/about-us`, `/about-us/team/{slug}` | Company page + Paul / Carina / Jon bio pages |
 | `/stories`, `/stories/{n}` | Article index and article template |
@@ -56,7 +65,9 @@ kernel when it finds it, and to the micro kernel when it does not. Nothing else 
 app/Http/Controllers/   HomeController, DestinationController, ItineraryController,
                         PageController, ContactController
 app/Support/Repo.php    All content: destinations, itineraries, team, stories, page blocks
-config/site.php         Brand, nav, footer, contact details, dial codes, asset base
+app/Support/Tours.php   The 20 excursions + the films folder (Drive file ids live here)
+app/Support/Drive.php   Media bridge: Drive hot-links or local paths, one config switch
+config/site.php         Brand, nav, footer, contact details, dial codes, asset base, drive
 routes/web.php          One routes file, Laravel syntax (`use Illuminate\Support\Facades\Route`)
 resources/views/        Blade templates: layouts/, partials/, home/, destinations/,
                         itineraries/, pages/, errors/
@@ -89,6 +100,51 @@ JSON, appends a line to `storage/enquiries.log` and otherwise redirects to
 `/contact-us?sent=1`. The JS submits with `fetch`, so a successful send never reloads. No
 third-party form service, no mail transport — connect a real one where the
 `storage_path('enquiries.log')` line is.
+
+## Day trips: content pulled from Google Drive
+
+The `/tours` catalogue is built from the **bro tour** Drive folder
+([drive.google.com/drive/folders/1xbeKOA-j7HGA3AnxhSKZrFVb2YovoH-Y](https://drive.google.com/drive/folders/1xbeKOA-j7HGA3AnxhSKZrFVb2YovoH-Y)):
+one sub-folder per trip, and each trip's photos and clips stay in Drive. Nothing was
+re-encoded, resized or uploaded — `App\Support\Tours` stores the Drive file ids, and
+`App\Support\Drive` turns them into URLs.
+
+| Drive folder | Becomes |
+| --- | --- |
+| `whiet island`, `tiran island snorkling trip`, `swim dolphin`, `super safari`, `sub marin`, `show dolphin`, `speed boat`, `safari`, `parasaaling`, `ras mohamed bus`, `color conyon`, `glass boat`, `cairo old`, `cairo new`, `hors riding` + the five `private transfer…` folders | 20 pages at `/tours/{slug}` |
+| `FILMS` | `/films` (4 clips + 5 stills) |
+| the two loose `*.jpeg` files in the root | `/tours` hero + trip pages with no photography of their own |
+
+**Sharing requirement.** In the default `drive` mode the browser fetches
+`https://drive.google.com/thumbnail?id=…` and `https://drive.google.com/file/d/…/preview`, so the
+folder must be shared as **Anyone with the link — Viewer**. If it is private the pages still
+render: images fail, the cards fall back to a typographic tile, and `/tours` shows one line
+explaining what to fix (instead of 120 broken thumbnails).
+
+**Self-hosting instead:**
+
+```bash
+cp -r "/path/to/bro tour" public/img/tours     # keep the folder names as-is
+echo "DRIVE_MODE=local" >> .env
+```
+
+`Drive::img()` then emits `/img/tours/<drive folder name>/<file name>`, which is exactly the
+tree you just copied — add a file to a trip folder, re-copy, done.
+
+**Editing a trip.** Everything a client reads is in `app/Support/Tours.php`: title, strap,
+`duration`, `meeting`, `level`, `season`, the two body paragraphs, `highlights`, `included`,
+`excluded`, plus `gallery`/`video` as `"fileId|original filename"`. Read the notice at the top
+of that file first: `price` is `null` everywhere on purpose, which renders as **"Price on
+request"**. Put a number in (USD, per person — per car for transfers) and it prints
+`from $45 USD`; the same value appears on the card, in the meta bar and on the booking card.
+The durations and inclusions were written from how these trips normally run out of Sharm, so
+check them against what you actually provide.
+
+**Booking flow.** Every trip page links to `/contact-us?tour={slug}`, which prefills the
+enquiry with the trip name and length, pins a chip above the form, adds a hidden `tour` field,
+and records the trip in `storage/enquiries.log`.
+
+---
 
 ## Images
 

@@ -260,6 +260,29 @@
         }
     });
 
+    /* ---------------------------------------------------------------- drive media */
+    /* Photography is hot-linked from Google Drive. If the folder is not shared
+       as "anyone with the link", every image fails — hide it so the typographic
+       placeholder shows, and surface one clear notice instead of 120 broken
+       thumbnails. */
+    var driveFailures = 0;
+
+    window.addEventListener('error', function (event) {
+        var el = event.target;
+
+        if (!el || el.tagName !== 'IMG' || !el.classList.contains('drive-img')) {
+            return;
+        }
+
+        driveFailures++;
+        el.style.display = 'none';
+
+        var wrap = el.closest ? el.closest('[data-media]') : null;
+        if (wrap) { wrap.classList.add('is-missing'); }
+
+        if (driveFailures === 3) { body.classList.add('drive-off'); }
+    }, true);
+
     /* ---------------------------------------------------------------- dial codes */
     doc.querySelectorAll('[data-dial]').forEach(function (root) {
         var button = root.querySelector('.dial__button');

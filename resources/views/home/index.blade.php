@@ -110,6 +110,9 @@
     <!-- 6 · Sample itineraries -->
     @include('partials.itinerary-grid', ['itineraries' => $itineraries])
 
+    <!-- 6b · Day trips & excursions (content from the Drive folder) -->
+    @include('partials.tour-grid')
+
     <!-- 7 · Featured gallery -->
     @if (count($featured))
         @php $spot = $featured[0]; @endphp

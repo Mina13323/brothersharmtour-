@@ -3,12 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Support\Repo;
+use App\Support\Tours;
 use Illuminate\Http\Request;
 
 class ContactController extends Controller
 {
     public function index(Request $request)
     {
+        $tour = Tours::find((string) $request->get('tour'));
+
         return $this->view('pages.contact', [
             'title'       => 'Contact us | Fitzroy Travel',
             'description' => 'Talk your trip through with someone who has been. No email consultations — a conversation first.',
@@ -18,6 +21,8 @@ class ContactController extends Controller
                 'lede'    => 'Tell us who is travelling, roughly when, and what you would hate to miss. We will call you back.',
             ],
             'dialCodes'   => config('site.dial_codes'),
+            'tour'        => $tour,
+            'prefill'     => $this->prefillFor($tour),
             'interests'   => [
                 'Botswana', 'Kenya', 'Namibia', 'Rwanda', 'Tanzania', 'Uganda', 'Zimbabwe',
                 'Multi-country', 'Not sure yet',
@@ -57,10 +62,14 @@ class ContactController extends Controller
                 ]);
             }
 
+            $tour = Tours::find((string) (isset($data['tour']) ? $data['tour'] : ''));
+
             return view('pages.contact', $this->share([
                 'title'      => 'Contact us | Fitzroy Travel',
                 'hero'       => ['eyebrow' => 'start the conversation', 'title' => 'contact us'],
                 'dialCodes'  => config('site.dial_codes'),
+                'tour'       => $tour,
+                'prefill'    => isset($data['message']) ? $data['message'] : $this->prefillFor($tour),
                 'interests'  => ['Botswana', 'Kenya', 'Namibia', 'Rwanda', 'Tanzania', 'Uganda', 'Zimbabwe', 'Multi-country', 'Not sure yet'],
                 'errors'     => $errors,
                 'sent'       => false,
@@ -69,13 +78,14 @@ class ContactController extends Controller
         }
 
         $line = sprintf(
-            "[%s] %s <%s> %s | %s | trip: %s\n%s\n%s\n",
+            "[%s] %s <%s> %s | %s | trip: %s | %s\n%s\n%s\n",
             date('Y-m-d H:i:s'),
             $data['name'],
             $data['email'],
             isset($data['phone']) ? trim($data['phone']) : '-',
             isset($data['country']) ? $data['country'] : '-',
             isset($data['travel']) ? $data['travel'] : '-',
+            isset($data['tour']) && $data['tour'] ? 'booking: ' . $data['tour'] : '-',
             isset($data['message']) ? trim($data['message']) : '',
             str_repeat('-', 60)
         );
@@ -88,6 +98,23 @@ class ContactController extends Controller
         }
 
         return redirect('/contact-us?sent=1');
+    }
+
+    /**
+     * Opening line for the message box when somebody arrives from a trip page.
+     */
+    protected function prefillFor($tour)
+    {
+        if (!$tour) {
+            return '';
+        }
+
+        return sprintf(
+            "We would like to do the %s (%s). %s\n\nOur dates: \nHow many of us: \nHotel: ",
+            $tour['title'],
+            $tour['duration'],
+            $tour['price'] ? '' : 'Please send the price for our group.'
+        );
     }
 
     protected function wantsJson(Request $request)

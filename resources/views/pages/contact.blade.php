@@ -55,6 +55,16 @@
                     <form id="enquiry" action="{{ url('/contact-us') }}" method="post" novalidate data-enquiry-form>
                         @csrf
 
+                        @if (isset($tour) && $tour)
+                            <input type="hidden" name="tour" value="{{ $tour['slug'] }}">
+                            <p class="form-card__trip">
+                                <span>enquiry about</span>
+                                <a href="{{ url('/tours/' . $tour['slug']) }}">{{ $tour['title'] }}</a>
+                                <em>{{ $tour['duration'] }}</em>
+                                <a class="link-quiet" href="{{ url('/contact-us') }}">change</a>
+                            </p>
+                        @endif
+
                         <div class="field">
                             <label for="name">Your name <i>*</i></label>
                             <input id="name" name="name" type="text" autocomplete="name" required
@@ -121,7 +131,7 @@
                         <fieldset class="field">
                             <legend>About your trip <i>*</i></legend>
                             <textarea id="message" name="message" rows="6" required
-                                      placeholder="Who is travelling, what you most want to see, anything that must be avoided.">{{ old('message') }}</textarea>
+                                      placeholder="Who is travelling, what you most want to see, anything that must be avoided.">{{ old('message', $prefill ?? '') }}</textarea>
                             <p class="field__error">{{ $errors['message'] ?? '' }}</p>
                         </fieldset>
 

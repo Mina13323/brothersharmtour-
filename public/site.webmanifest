@@ -1,0 +1,22 @@
+{
+    "name": "Brothers Sharm Tour",
+    "short_name": "BRO Sharm",
+    "description": "Sharm el-Sheikh day trips, reef boats and private transfers, run by the guides who lead them.",
+    "start_url": "/",
+    "scope": "/",
+    "display": "browser",
+    "background_color": "#101010",
+    "theme_color": "#101010",
+    "icons": [
+        {
+            "src": "/img/brand/favicon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/img/brand/favicon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

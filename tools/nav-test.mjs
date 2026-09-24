@@ -173,6 +173,57 @@ yes('a wider viewport drops the panel state', !open());
 yes('and leaves nothing expanded', panel.querySelectorAll('.nav__item.sub-open').length === 0);
 yes('the desktop bar keeps its own links', panel.querySelectorAll('.nav__link').length > 4);
 
+
+/* ---------------------------------------------------------------- the stylesheet
+   jsdom has no layout engine, which is exactly how the panel ended up a flex row
+   of five clipped items on a phone: every assertion above passed while the page
+   was unusable. So the rules the menu depends on are read out of the file and
+   checked here, with the same brace matching a browser would do. */
+const css = readFileSync(join(repo, 'public/css/site.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+
+function blockOf(at) {
+  const start = css.indexOf(at);
+  if (start === -1) { return ''; }
+
+  let depth = 0;
+  let i = css.indexOf('{', start);
+
+  for (; i < css.length; i++) {
+    if (css[i] === '{') { depth++; }
+    else if (css[i] === '}' && --depth === 0) { break; }
+  }
+
+  return css.slice(css.indexOf('{', start) + 1, i);
+}
+
+const phone = blockOf('@media (max-width: 1079px)');
+const bar = blockOf('@media (min-width: 1080px)');
+const decl = (block, sel) => {
+  const re = new RegExp('(?:^|[},])\\s*' + sel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*\\{([^}]*)\\}', 'm');
+  const m = block.match(re);
+  return m ? m[1] : '';
+};
+
+yes('the panel is scoped to phones', phone.length > 200 && !/\.nav\s*\{[^}]*display:\s*none/.test(bar));
+yes('the burger is scoped to phones', /display:\s*none/.test(decl(bar, '.menu-toggle')));
+yes('one open panel rule per stack', /\.nav\s*\{[^}]*position:\s*fixed/.test(phone));
+yes('the panel starts under the bar', /inset:\s*var\(--header-h\)/.test(phone) && /top:\s*var\(--header-h\)/.test(phone), 'longhands before inset, for old engines');
+yes('the list is stacked, not a row', /flex-direction:\s*column/.test(decl(phone, '.nav__list')), decl(phone, '.nav__list').trim().slice(0, 40));
+yes('the rows fill the width', /width:\s*100%/.test(decl(phone, '.nav__item')));
+yes('the rows are fingertip height', parseFloat(decl(phone, '.nav__link').match(/min-height:\s*([\d.]+)rem/)?.[1] || 0) >= 3);
+yes('the caret is replaced by the button', /display:\s*none/.test(decl(phone, '.nav__caret')) && !/display:\s*none/.test(decl(phone, '.nav__expander')));
+yes('the dropdown control is a target', parseFloat(decl(phone, '.nav__expander').match(/width:\s*([\d.]+)rem/)?.[1] || 0) >= 2.5);
+yes('the dropdown opens in flow', /position:\s*static/.test(decl(phone, '.nav__sub')));
+yes('no script still reaches every link', /display:\s*block/.test(decl(phone, 'body:not(.js-menu) .nav')));
+yes('the phone-only actions leave the bar', /display:\s*none/.test(decl(phone, '.nav__phone,\n    .nav__whatsapp')) || /display:\s*none/.test(decl(phone, '.nav__phone')));
+yes('the contact block is hidden at base', /^\.nav__foot \{ display: none; \}$/m.test(css), 'outside every media query, so no desktop width can show it');
+yes('the bar keeps its height while open', /body\.menu-open\.scrolled \.site-header/.test(phone));
+yes('the bar does not animate against the panel', /transition:\s*none/.test(phone));
+yes('the page behind is locked', /body\.menu-open \{[^}]*overflow:\s*hidden/.test(phone));
+yes('and locked on iOS too', /html:has\(body\.menu-open\)[^{]*\{[^}]*overflow:\s*hidden/.test(phone));
+yes('the panel stops scroll chaining', /overscroll-behavior:\s*contain/.test(phone));
+yes('the foot clears the home indicator', /env\(safe-area-inset-bottom/.test(phone));
+
 console.log(`\n${base}  (${res.status})\n`);
 for (const [state, label, extra] of check) console.log(` ${state} ${label}${extra ? '  — ' + extra : ''}`);
 if (errors.length) {

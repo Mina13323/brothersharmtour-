@@ -475,30 +475,43 @@ body.scrolled .site-header .btn--ghost { --btn-fg: var(--color-white); }
 /* --------------------------------------------------------------------------
    The burger panel — everything below 1080px, and only there.
 
-   The panel IS the <nav>: the same list, re-laid-out full screen by
-   body.menu-open, with the contact block the bar has no room for. Because of
-   that the whole feature lives inside one media query: at desktop widths the
-   nav is a bar and menu-open simply cannot apply to it, so a menu opened on a
-   phone and then a rotated tablet can never leave the desktop navigation
-   hidden (the trap the previous version fell into, which hid the bar whenever
-   the class survived a resize).
+   The panel IS the <nav>: the same list, re-laid-out full screen. That is why
+   every rule in here is written against the nav's own parts and only the
+   on/off switch reads body.menu-open — a class that survives a rotation then
+   has nothing to say at desktop widths, which is the trap the previous version
+   fell into (its hide-the-nav rule lived at every width, so a menu left open
+   hid the desktop bar with it).
+
+   Two things are easy to get wrong here and are the reason for two of the rules
+   below. The list is a flex ROW in the bar: without switching it to a column
+   the five items squeeze themselves into one clipped line inside the panel. And
+   the dark "scrolled" bar is shorter than the panel's offset, so the open state
+   has to claim the height back from it.
    ----------------------------------------------------------------------- */
 @media (max-width: 1079px) {
 
-    /* The bar stops shrinking while the panel is up. The panel is anchored to
-       --header-h, so a header that changed height mid-gesture would open a gap
-       between the two, and the shorter "scrolled" bar is far too tight for the
-       logo mark anyway. */
-    body.menu-open .site-header {
+    /* The panel is anchored to --header-h, so the bar keeps that height while the
+       panel is up — including over a scrolled page, where the dark bar has three
+       classes of specificity and would otherwise stay short and leave a strip of
+       the page showing between itself and the panel. */
+    body.menu-open .site-header,
+    body.menu-open.scrolled .site-header {
         height: var(--header-h);
         background: var(--color-white);
         color: var(--color-black);
         box-shadow: 0 1px 0 rgba(27, 28, 29, 0.12);
+        /* No height transition either: the panel is pinned to --header-h, so an
+           animating bar would leave the page showing through between the two for
+           the length of the fade. */
+        transition: none;
     }
 
+    /* The bar's own actions fade rather than vanish, so the panel appears to
+       take them over instead of the header losing pieces. */
     body.menu-open .site-header__enquire,
     body.menu-open .nav__whatsapp { opacity: 0; pointer-events: none; }
 
+    /* A full-height bar can carry the mark at its comfortable size again. */
     body.menu-open .logo__mark img { height: clamp(2rem, 6vw, 2.6rem); }
 
     /* The page behind must not scroll — not because the panel would drift, but
@@ -506,8 +519,20 @@ body.scrolled .site-header .btn--ghost { --btn-fg: var(--color-white); }
        most annoying thing a mobile menu does. */
     body.menu-open { overflow: hidden; }
 
+    /* iOS Safari scrolls the document element, not the body, so a lock on the
+       body alone lets the page behind the panel move. :has() is the way to reach
+       up the tree from a class nobody wants to duplicate; where :has() is not
+       understood the rule is dropped and the body lock still holds. */
+    html:has(body.menu-open) { overflow: hidden; height: 100%; }
+
     body.menu-open .nav {
         position: fixed;
+        /* written out, then in one line: `inset` is the shorter form and the
+           older engines this site is read on have no idea what it means */
+        top: var(--header-h);
+        right: 0;
+        bottom: 0;
+        left: 0;
         inset: var(--header-h) 0 0;
         display: flex;
         flex-direction: column;
@@ -519,12 +544,18 @@ body.scrolled .site-header .btn--ghost { --btn-fg: var(--color-white); }
         -webkit-overflow-scrolling: touch;
     }
 
-    body.menu-open .nav__list { flex: 1 1 auto; align-items: flex-start; }
-    body.menu-open .nav__item { width: 100%; border-bottom: 1px solid rgba(0, 0, 0, 0.08); }
+    /* The list, stacked. */
+    .nav__list {
+        flex-direction: column;
+        gap: 0;
+        align-items: stretch;
+    }
+
+    .nav__item { width: 100%; border-bottom: 1px solid rgba(27, 28, 29, 0.08); }
 
     /* Every row is a fingertip: 3.25rem is the smallest height that does not ask
-       for precision a bus window does not allow. */
-    body.menu-open .nav__link {
+       for a precision a bus window does not allow. */
+    .nav__link {
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -535,13 +566,13 @@ body.scrolled .site-header .btn--ghost { --btn-fg: var(--color-white); }
         letter-spacing: 0.1em;
     }
 
-    /* The chevron is decorative here; the button next to it does the work. */
-    body.menu-open .nav__caret { display: none; }
+    /* The chevron is the bar's affordance; here the button below does the work. */
+    .nav__caret { display: none; }
 
-    /* The bar on a phone carries three things and no more: the mark, the
-       enquiry and the burger. The phone number and WhatsApp move into the panel,
-       which is where a thumb can actually reach them — and which, unlike a
-       28px pill squeezed next to a logo, they can be tapped accurately in. */
+    /* The bar on a phone carries three things and no more: the mark, the enquiry
+       and the burger. The phone number and WhatsApp move into the panel, which is
+       where a thumb can actually reach them — and which, unlike a 28px pill
+       squeezed next to a logo, they can be tapped accurately in. */
     .nav__phone,
     .nav__whatsapp { display: none; }
 
@@ -549,18 +580,17 @@ body.scrolled .site-header .btn--ghost { --btn-fg: var(--color-white); }
 
     /* Where a dropdown opens. On a phone a tap on "Day trips" has to mean
        "go to Day trips" — the list gets its own control, so neither is lost. */
-    body.menu-open .nav__item--has-children { position: relative; }
+    .nav__item--has-children > .nav__link { padding-right: 3.4rem; }
 
-    /* Keep the label clear of the round button that sits on the right edge. */
-    body.menu-open .nav__item--has-children > .nav__link { padding-right: 3.4rem; }
+    /* The current section, marked by a band rather than an underline: the row is
+       3.25rem tall and an underline would read as the edge of the row. */
+    .nav__item.is-current > .nav__link { color: var(--color-black); }
 
-    body.menu-open .nav__item.is-current > .nav__link { color: var(--color-black); }
-
-    body.menu-open .nav__item.is-current > .nav__link span {
+    .nav__item.is-current > .nav__link span {
         box-shadow: inset 0 -0.28em 0 rgba(177, 159, 112, 0.42);
     }
 
-    body.menu-open .nav__expander {
+    .nav__expander {
         position: absolute;
         top: 0.35rem;
         right: 0;
@@ -569,13 +599,13 @@ body.scrolled .site-header .btn--ghost { --btn-fg: var(--color-white); }
         width: 2.75rem;
         height: 2.75rem;
         background: none;
-        border: 1px solid rgba(0, 0, 0, 0.18);
+        border: 1px solid rgba(27, 28, 29, 0.18);
         border-radius: 50%;
         color: inherit;
         cursor: pointer;
     }
 
-    body.menu-open .nav__expander::before {
+    .nav__expander::before {
         content: "";
         width: 0.5rem;
         height: 0.5rem;
@@ -585,13 +615,14 @@ body.scrolled .site-header .btn--ghost { --btn-fg: var(--color-white); }
         transition: transform 0.35s var(--ease);
     }
 
-    body.menu-open .nav__expander[aria-expanded="true"]::before { transform: rotate(-135deg) translate(-2px, -2px); }
+    .nav__expander[aria-expanded="true"]::before { transform: rotate(-135deg) translate(-2px, -2px); }
 
-    /* Without JavaScript every list is open and nothing is hidden. Only when
-       site.js adds body.js-menu — i.e. a script is running — does a dropdown
-       start collapsed and wait for the button. */
-    body.menu-open .nav__sub {
+    /* A dropdown in the panel is part of the page flow, not a plate floating
+       over it: the bar's hover styling is all taken back off. */
+    .nav__sub {
         position: static;
+        top: auto;
+        left: auto;
         min-width: 0;
         padding: 0 0 0.9rem;
         background: transparent;
@@ -603,26 +634,29 @@ body.scrolled .site-header .btn--ghost { --btn-fg: var(--color-white); }
         color: inherit;
     }
 
+    /* Without JavaScript every list is open and nothing is hidden. Only once
+       site.js adds body.js-menu — a script is running, so a button will open
+       them again — does a dropdown start collapsed. */
     body.js-menu .nav__sub { display: none; }
+
     body.js-menu .nav__item.sub-open .nav__sub { display: block; }
 
-    body.menu-open .nav__sub li { padding: 0.05rem 2.75rem 0.05rem 1rem; }
+    .nav__sub li { padding: 0.05rem 2.75rem 0.05rem 1rem; }
 
-    body.menu-open .nav__sub a {
+    .nav__sub a {
         display: block;
         padding: 0.55rem 0;
         font-size: 0.92rem;
         letter-spacing: 0.06em;
         text-transform: none;
-        border-bottom: 1px dotted rgba(0, 0, 0, 0.1);
+        border-bottom: 1px dotted rgba(27, 28, 29, 0.14);
     }
 
-    body.menu-open .nav__sub li:last-child a { border-bottom: 0; }
+    .nav__sub li:last-child a { border-bottom: 0; }
 
     /* The contact block: the reason the panel is a menu and not just a list.
-       It is hidden by the base rule below and shown here, so there is exactly one
-       place that decides whether the block exists — and the desktop bar can never
-       inherit it. */
+       Hidden at base, shown here, so there is one place that decides whether the
+       block exists at all and the desktop bar can never inherit it. */
     body.menu-open .nav__foot {
         display: block;
         margin-top: auto;
@@ -637,7 +671,7 @@ body.scrolled .site-header .btn--ghost { --btn-fg: var(--color-white); }
         margin: 0;
         padding: 1.1rem 0 0;
         list-style: none;
-        border-top: 1px solid rgba(0, 0, 0, 0.12);
+        border-top: 1px solid rgba(27, 28, 29, 0.12);
         font-size: 0.95rem;
     }
 
@@ -651,7 +685,14 @@ body.scrolled .site-header .btn--ghost { --btn-fg: var(--color-white); }
         opacity: 0.6;
     }
 
-    .nav__social { display: flex; flex-wrap: wrap; gap: 0.4rem 1.1rem; margin: 1.2rem 0 0; padding: 0; list-style: none; }
+    .nav__social {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem 1.1rem;
+        margin: 1.2rem 0 0;
+        padding: 0;
+        list-style: none;
+    }
 
     .nav__social a {
         font-size: 0.68rem;
@@ -662,6 +703,39 @@ body.scrolled .site-header .btn--ghost { --btn-fg: var(--color-white); }
         opacity: 0.75;
     }
 
+    /* No script at all: nothing will ever set body.menu-open, so the list stops
+       pretending to be an overlay and takes its place under the logo, in a header
+       that scrolls away with the page. Same markup, same links — which is the
+       point of the panel being the navigation and not a copy of it. */
+    body:not(.js-menu) .site-header {
+        position: static;
+        height: auto;
+        padding-block: 0.85rem;
+        background: var(--color-white);
+        color: var(--color-black);
+        box-shadow: 0 1px 0 rgba(27, 28, 29, 0.12);
+    }
+
+    body:not(.js-menu) .site-header__inner { flex-wrap: wrap; }
+
+    body:not(.js-menu) .nav {
+        display: block;
+        flex: 1 0 100%;
+        order: 3;
+        padding: 0.5rem var(--gutter) 1rem;
+    }
+
+    body:not(.js-menu) .nav__link { min-height: 2.9rem; }
+
+    body:not(.js-menu) .nav__sub { display: block; }
+
+    body:not(.js-menu) .nav__foot { display: block; }
+
+    body:not(.js-menu) .nav__item--has-children > .nav__link { padding-right: 0; }
+
+    /* Two controls that only ever hide or show a list nobody can open. */
+    body:not(.js-menu) .menu-toggle,
+    body:not(.js-menu) .nav__expander { display: none; }
 }
 
 @media (min-width: 1080px) {

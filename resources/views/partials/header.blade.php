@@ -7,14 +7,20 @@
 
     One <nav> rather than two copies, so there is a single set of links to keep
     in sync, one place for screen-reader users to find, and no chance of the
-    panel drifting away from the bar. The panel's extras are display:none on a
-    desktop, and the bar's extras are display:none on a phone — the same links
-    either way, just arranged for the width that has them.
+    panel drifting away from the bar. Every panel rule sits inside
+    @media (max-width: 1079px), which is what makes that true: body.menu-open on
+    a wide screen simply has nothing to say. The panel's extras are display:none
+    on a desktop, and the bar's extras are display:none on a phone — the same
+    links either way, just arranged for the width that has them.
 
     Dropdowns: the parent stays a link (Day trips goes to /tours) and a separate
     button opens the list, so nothing on a touchscreen has to choose between
-    visiting a page and seeing what is under it. Without JavaScript every list
-    is simply open, because body.js-menu is what collapses them.
+    visiting a page and seeing what is under it.
+
+    If site.js never runs — a script blocker, a fatal at the top of the file —
+    body.js-menu is never added, so the lists stay open and, because
+    body:not(.js-menu) restyles the header as a static block, the whole menu is
+    printed under the logo instead of hiding behind a burger that does nothing.
 --}}
 @php
     $mark  = \App\Support\Site::brand('mark');

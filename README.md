@@ -119,8 +119,9 @@ Things that are deliberate:
 
 - **A parent stays a link.** Tapping `Day trips` in the panel goes to `/tours`; a separate round
   button beside it opens the list. Nothing on a touchscreen has to guess which of the two you meant.
-- **Without JavaScript every list is open.** The collapsed state hangs on a `js-menu` class the
-  script sets, so a page with no script still has a reachable menu.
+- **Without JavaScript the menu is still there.** `site.js` adds a `js-menu` class, and every rule
+  that hides something — a dropdown, the whole panel — hangs on it. No script, no class, so the list
+  is printed under the logo in a header that scrolls with the page, with every open state visible.
 - **The panel carries the contact block** — enquiry, Call, WhatsApp, Email, Hours, social — because
   those are the links a phone visitor is most likely after and the bar has no room for them. Fill in
   `SITE_PHONE`, `SITE_WHATSAPP`, `SITE_EMAIL`, `SITE_INSTAGRAM` / `SITE_FACEBOOK` and they appear;
@@ -138,8 +139,10 @@ Behaviour is checked, not assumed:
 npm run nav                        # opens, closes, expands, traps focus, survives a resize
 ```
 
-`tools/nav-test.mjs` boots a rendered page with the real `site.js` in jsdom and drives it with
-clicks and keys, so a change that silently breaks the burger fails the run instead of the launch.
+`tools/nav-test.mjs` boots a rendered page with the real `site.js` in jsdom and drives it with clicks
+and keys, then reads the mobile rules out of `site.css` and checks them too — jsdom has no layout
+engine, and the one defect that produced a screenful of clipped one-line text rather than a stacked
+menu was a `flex-direction` that no DOM assertion could see.
 
 ## Media: one Google Drive folder, no uploads
 

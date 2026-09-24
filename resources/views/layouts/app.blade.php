@@ -70,6 +70,10 @@
             document.documentElement.className += ' force-show';
             if (document.body) { document.body.classList.add('loaded'); }
         }, 3000);
+        /* Nothing below the fold may stay hidden because a tween never ran. */
+        window.addEventListener('error', function () {
+            document.documentElement.className += ' force-show';
+        });
     </script>
 </head>
 <body class="{{ $bodyClass ?? '' }} header-{{ $headerTheme ?? 'light' }}">
@@ -89,7 +93,29 @@
 
     @include('partials.footer')
 
-    <script src="{{ asset('js/site.js') }}?v={{ file_exists(public_path('js/site.js')) ? filemtime(public_path('js/site.js')) : 'dev' }}" defer></script>
+    @php
+        /*
+         * Load order matters and every tag is deferred, so the browser runs them
+         * in document order: GSAP core, the plugins animations.js feature-detects,
+         * the dependency-free behaviour layer, then the animation layer. Delete
+         * public/js/vendor and the site still behaves — animations.js bails out
+         * when window.gsap is missing and site.js keeps its own reveals.
+         */
+        $scripts = [
+            'js/vendor/gsap.min.js',
+            'js/vendor/ScrollTrigger.min.js',
+            'js/vendor/SplitText.min.js',
+            'js/vendor/ScrambleTextPlugin.min.js',
+            'js/vendor/ScrollToPlugin.min.js',
+            'js/vendor/Observer.min.js',
+            'js/vendor/CustomEase.min.js',
+            'js/site.js',
+            'js/animations.js',
+        ];
+    @endphp
+    @foreach ($scripts as $script)
+        <script src="{{ asset($script) }}?v={{ file_exists(public_path($script)) ? filemtime(public_path($script)) : 'dev' }}" defer></script>
+    @endforeach
     @stack('scripts')
 </body>
 </html>

@@ -77,7 +77,11 @@
     }
 
     /* ---------------------------------------------------------------- reveals */
-    if ('IntersectionObserver' in window) {
+    /* When GSAP is present, public/js/animations.js owns entrance motion for
+       these same elements (it adds .is-in itself once each tween lands), and it
+       can do so with masks, staggers and scrubbed parallax. This block is the
+       no-GSAP path, so it must not double-animate what that file already set. */
+    if (!window.gsap && 'IntersectionObserver' in window) {
         var revealObserver = new IntersectionObserver(function (entries) {
             entries.forEach(function (entry) {
                 if (!entry.isIntersecting) { return; }

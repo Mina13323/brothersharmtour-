@@ -33,7 +33,7 @@ php artisan serve
 `public/index.php` uses `vendor/autoload.php` when it exists and the micro kernel when it
 does not. Nothing else changes.
 
-## The six things to fill in
+## The things to fill in
 
 All of them are in `config/site.php` (or the matching `.env` key). Anything left empty is
 **hidden** on the pages rather than printed as a placeholder, so you can publish with some
@@ -60,7 +60,12 @@ Also before you go live:
 3. **Policy placeholders.** `[company legal name]` and `[address in Naama Bay]` still
    appear in the booking terms and About page; `Site::legal()` is template language and
    should be read by whoever handles your paperwork.
-4. **`site.name`** is currently *Brothers Sharm Tour* (with `logo_word` / `logo_sub` for the
+4. **Packages.** `/packages` is built but has no rows yet, so it renders an honest
+   "being written now" panel and the trip grid instead of an empty grid of invented cards.
+   Add entries to `Packages::all()` in `app/Support/Packages.php` and the cards, the home
+   band, the nav dropdown, `sitemap.xml` and the day-by-day pages all appear — see
+   "Packages" below for the shape.
+5. **`site.name`** is currently *Brothers Sharm Tour* (with `logo_word` / `logo_sub` for the
    header). Change it once and the wordmark, titles, `og:site_name` and JSON-LD follow.
 
 ## Media: one Google Drive folder, no uploads
@@ -83,6 +88,68 @@ typographic tile, and `/tours` shows one line telling you to check the sharing s
 part of the Drive URL after `/d/`. Trips without photography of their own (the transfers)
 render a placeholder tile and a sentence saying why — add entries and they become cards.
 
+## Packages
+
+The section exists end to end — route, nav entry, footer link, card partial, single-package
+page, structured data, sitemap rows — with **no data in it**:
+
+```php
+// app/Support/Packages.php
+public static function all()
+{
+    return [];            // <- paste rows here; the docblock above has a full copy-paste shape
+}
+```
+
+Until a row exists, `/packages` explains that the weeks are being written and offers the
+single trips, the home-page band stays hidden, and the nav item has no dropdown. Nothing is
+rendered as a placeholder price or a fake itinerary. Each row you add brings: a card
+(`badge`, `featured` sizes the middle one up, `tone` picks the palette), its own page with a
+day list whose entries link to the matching `/tours/{slug}` page, `included` / `excluded`
+lists, a sticky price card, and a `Product` + `Offer` node in the JSON-LD `@graph`.
+
+Prices are formatted exactly like trip prices (`from 940 USD per person`); an empty `price`
+renders "price on request" and leaves the `Offer.price` out of the structured data rather
+than inventing one. `trips` accepts slugs in day order — unknown slugs are skipped, so a
+typo never produces a broken link.
+
+## Motion
+
+GSAP 3.15 is **vendored** in `public/js/vendor/` (seven minified files, self-hosted, refreshed
+with `npm run vendor:js` — the licence is GreenSock's standard "no charge" licence, not MIT, see
+that folder's README). `public/js/animations.js` is the whole motion layer: a curtain lift and
+clip-wipe hero on load, line-mask titles and scrambled eyebrows (SplitText / ScrambleText),
+scrubbed parallax on every media frame, velocity skew on the horizontal strips, staggered grid
+reveals, pointer tilt on the cards, a magnetic press on buttons, a "view trip" disc that follows
+the cursor across the trip grid, counting numbers, a marquee band, a scroll-progress rule that
+names the section you are in, and eased `scrollTo` on in-page anchors.
+
+It is written as a **progressive enhancement**, because a hot-linked font or a missing vendor
+file must never take the site with it:
+
+- nothing is hidden by CSS waiting for a tween — the initial states are set in JS, so if the
+  script never runs, the page is simply already in its final state
+- `html.force-show` in the head still forces `[data-reveal]` visible if the *first* deferred
+  script throws (the failure mode that used to leave the curtain over the page);
+  `html.motion` then hands those properties to GSAP so a CSS `transition` never fights it
+- every effect is individually guarded, and each one is inside a `try/catch` — one broken
+  effect cannot stop the others
+- `prefers-reduced-motion: reduce` skips the tweens and resolves the page to its end state
+- `public/js/site.js` keeps its own IntersectionObserver reveals for the case where GSAP is
+  absent, and stands down when `window.gsap` exists
+
+Check it without a browser:
+
+```bash
+npm i && npm run serve            # in another shell
+npm run motion                    # boots each rendered page in jsdom with the real scripts
+npm run motion:reduced            # same, with reduced-motion on
+npm run motion:no-gsap            # same, with the vendor files missing — content must survive
+```
+
+The test asserts the handshake (no element left invisible, no inline transform stranded on top
+of a stylesheet `:hover`, marquee duplicated, JSON-LD still parseable) rather than pixels.
+
 ## Pages
 
 | Route | Content |
@@ -90,6 +157,8 @@ render a placeholder tile and a sentence saying why — add entries and they bec
 | `/` | Hero, who you book with, numbers, the places slider, six featured trips, the promise, how a booking works, photo strip, why-book-us, approach, CTA |
 | `/tours` | All 20 trips, filterable by `?category=sea\|desert\|adrenaline\|family\|culture\|transfer`, plus prices/pick-ups and an FAQ extract |
 | `/tours/{slug}` | Trip page: hero, meta bar, photo strip, embedded films, what happens, included/not included, planning list, sticky price card, related trips |
+| `/packages` | Multi-day bundles with one price. **Built and empty on purpose** — see "Packages" below |
+| `/packages/{slug}` | A week: day-by-day list linking the real trip pages, inclusions, price card, `Product` structured data |
 | `/films` | The Drive `FILMS` folder: 4 clips + 5 stills |
 | `/areas`, `/areas/{slug}` | Naama Bay, Ras Mohammed, Tiran & the strait, Old Town & the souq, foothills & canyon, Cairo & Giza — each linking the trips that start there |
 | `/guides`, `/guides/{slug}` | Best time to visit (with the month chart and a temperature table), travelling with children, Ras Mohammed vs Tiran, Cairo in a day, what to pack for a boat day, desert evenings |
@@ -142,19 +211,25 @@ or CRM when you have one.
 ## Layout of the code
 
 ```
-app/Http/Controllers/   Home, Tour, Area, Guide, Page, Contact, Sitemap
+app/Http/Controllers/   Home, Tour, Area, Guide, Page, Package, Contact, Sitemap
 app/Support/Tours.php   The 20 trips: copy, highlights, inclusions, Drive file ids
+app/Support/Packages.php The bundles — empty by design, docblock has the row shape
 app/Support/Site.php    Homepage blocks, places, guides, FAQ, promise, policies
 app/Support/Drive.php   Media bridge: Drive hot-links or local paths, one config switch
 app/Support/Seo.php     Canonicals, JSON-LD builders, sitemap and robots
 config/site.php         Brand, contact, navigation, footer, dial codes, drive mode
 routes/web.php          One routes file, Laravel syntax
-resources/views/        Blade: layouts/, partials/, home/, tours/, areas/, guides/, pages/, errors/
+resources/views/        Blade: layouts/, partials/, home/, tours/, packages/, areas/,
+                        guides/, pages/, errors/
 public/css/site.css     Design system (tokens, typography, components, responsive, a11y)
 public/js/site.js       Vanilla behaviour: preloader, header, menu, sliders, reveals,
                         share, dial picker, form validation + fetch, Drive image fallback
+public/js/animations.js The GSAP layer — every effect guarded, all of it optional
+public/js/vendor/        Self-hosted GSAP core + 6 plugins (npm run vendor:js)
 tools/micro/            Dependency-free runtime: Router, Blade subset, Kernel, helpers
 tools/preview-server.mjs  Dev-only preview through WebAssembly PHP
+tools/motion-test.mjs   Boots a rendered page + the real scripts in jsdom and asserts
+                        nothing got stranded (npm run motion)
 artisan                 serve / routes / lint / cache:clear without the framework
 ```
 
@@ -173,7 +248,7 @@ installed, because the files are ordinary `.blade.php`.
 
 ## Accessibility & performance notes
 
-- `prefers-reduced-motion` disables the Ken Burns hero, reveal choreography and smooth scroll
+- `prefers-reduced-motion` disables the whole GSAP layer (curtain, reveals, parallax, tilt, cursor disc, smooth scroll) and resolves the page to its final state
 - every interactive element is a real `button`/`a`, with visible `:focus-visible` rings
 - sliders and galleries are scroll-snap containers: trackpad, drag or arrow keys
 - no render-blocking JS (`defer`), all below-fold images `loading="lazy"`, `<video>`/`<iframe>`

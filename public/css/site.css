@@ -2811,3 +2811,312 @@ html.force-show [data-reveal] { opacity: 1; transform: none; }
 
     .side-toc a { display: inline-block; padding: 0.4rem 0; }
 }
+
+/* ==========================================================================
+   Motion layer (public/js/animations.js) and packages
+   --------------------------------------------------------------------------
+   Two things live here: the components the GSAP layer builds or drives, and
+   the package cards. Nothing in this block restyles an existing component —
+   GSAP applies its own initial states in JS, so an element is only hidden
+   while a tween owns it, and `html.force-show` hands it back if that never
+   happens.
+   ========================================================================== */
+
+/* Handshake with the script ------------------------------------------------ */
+html.motion .fader { transition: none; }
+
+/* Once the motion layer is in charge the CSS reveal machinery steps fully
+   aside. Two reasons: a CSS `transition` on opacity/transform fights GSAP's
+   per-frame writes (the tween reads as smeared, and an interrupted tween can
+   leave an element at its start value), and the hidden initial state should
+   come from JS so that nothing is ever waiting on a class that never arrives. */
+html.motion [data-reveal] { opacity: 1; transform: none; transition: none; }
+html.motion .reveal-up { transition: none; }
+
+/* The head-script failsafe only forces things visible when the motion layer
+   did not start at all — otherwise it would spoil every scroll reveal. */
+html.force-show:not([data-motion="ok"]) [data-reveal] { opacity: 1 !important; transform: none !important; }
+
+/* Tilt: JS owns the transform while the pointer is on the card. */
+.tilt { will-change: transform; }
+
+/* Marquee ----------------------------------------------------------------- */
+.marquee {
+    position: relative;
+    overflow: hidden;
+    padding-block: clamp(0.85rem, 1.8vw, 1.35rem);
+    background: var(--color-black);
+    color: var(--color-white);
+    border-block: 1px solid rgba(255, 255, 255, 0.1);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+}
+
+.marquee__track {
+    display: flex;
+    width: max-content;
+    will-change: transform;
+}
+
+.marquee__row { display: inline-flex; align-items: center; gap: clamp(1.5rem, 3vw, 2.75rem); padding-right: clamp(1.5rem, 3vw, 2.75rem); }
+
+.marquee__item {
+    display: inline-flex;
+    align-items: center;
+    gap: clamp(1.5rem, 3vw, 2.75rem);
+    font-family: var(--font-display);
+    font-size: clamp(1.05rem, 1.7vw, 1.5rem);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.marquee__item i { font-style: normal; font-size: 0.55em; color: var(--color-clay); }
+
+/* The disc that follows the pointer over the trip and package grids --------- */
+.cursor-badge {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1400;
+    display: grid;
+    place-items: center;
+    width: 5.4rem;
+    height: 5.4rem;
+    margin: -2.7rem 0 0 -2.7rem;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    color: var(--color-white);
+}
+
+.cursor-badge__ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: rgba(16, 16, 16, 0.86);
+    border: 1px solid rgba(192, 179, 140, 0.55);
+    backdrop-filter: blur(3px);
+}
+
+.cursor-badge__text {
+    position: relative;
+    font-family: var(--font-display);
+    font-size: 0.82rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
+@media (hover: none), (prefers-reduced-motion: reduce) {
+    .cursor-badge { display: none; }
+}
+
+/* Reading rule -------------------------------------------------------------- */
+.progress-rule {
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 1200;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    height: 2px;
+    background: rgba(16, 16, 16, 0.08);
+    pointer-events: none;
+}
+
+.progress-rule__fill {
+    display: block;
+    flex: 1 1 auto;
+    height: 100%;
+    background: var(--color-clay);
+    transform: scaleX(0);
+    transform-origin: left center;
+}
+
+.progress-rule__label {
+    position: absolute;
+    right: var(--gutter);
+    bottom: 0.7rem;
+    max-width: min(46vw, 26rem);
+    overflow: hidden;
+    color: var(--color-gray);
+    font-size: 0.66rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 62rem) {
+    .progress-rule__label { display: none; }
+}
+
+/* Steps: which one you are on ---------------------------------------------- */
+.steps__list { position: relative; }
+
+.process__progress {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--color-clay), rgba(177, 159, 112, 0.1));
+    transform: scaleY(0);
+    transform-origin: top center;
+    pointer-events: none;
+}
+
+.step.is-current { border-top-color: var(--color-clay); }
+
+/* Packages ---------------------------------------------------------------- */
+.packages {
+    padding: var(--section) 0;
+    background: var(--color-gray-lighter);
+}
+
+.packages--band { background: var(--color-white); border-block: 1px solid var(--color-gray-light); }
+
+.packages__grid { display: grid; gap: clamp(1.25rem, 2.4vw, 2rem); align-items: stretch; }
+
+@media (min-width: 62rem) {
+    .packages__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .packages__grid .package-card.is-featured { margin-block: -1.25rem; }
+}
+
+.package-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    padding: clamp(1.5rem, 2.6vw, 2.3rem);
+    background: var(--color-white);
+    border: 1px solid var(--color-gray-light);
+    color: var(--color-ink);
+    transition: transform 0.55s var(--ease), box-shadow 0.55s var(--ease), border-color 0.4s var(--ease);
+}
+
+.package-card:hover { box-shadow: 0 26px 60px -34px rgba(16, 16, 16, 0.42); }
+
+.package-card--ink { background: var(--color-black); border-color: transparent; color: #f4f4f2; }
+.package-card--ink .package-card__strap,
+.package-card--ink .package-card__meta { color: rgba(244, 244, 242, 0.72); }
+.package-card--ink .eyebrow { color: var(--color-sand); }
+
+.package-card--sand { background: linear-gradient(160deg, #efe9df, #ffffff 62%); }
+.package-card--clay { background: linear-gradient(160deg, rgba(177, 159, 112, 0.16), #ffffff 58%); }
+
+.package-card.is-featured { border-color: var(--color-clay); }
+
+.package-card__badge {
+    position: absolute;
+    top: 0;
+    right: clamp(1.5rem, 2.6vw, 2.3rem);
+    transform: translateY(-50%);
+    margin: 0;
+    padding: 0.3rem 0.7rem;
+    background: var(--color-clay);
+    color: var(--color-white);
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+}
+
+.package-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1rem;
+    margin: 0;
+    color: var(--color-gray);
+    font-size: 0.68rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.package-card__title {
+    margin: 0;
+    font-size: clamp(1.6rem, 2.6vw, 2.3rem);
+    line-height: 1.02;
+    letter-spacing: 0.015em;
+    text-transform: uppercase;
+}
+
+.package-card__strap { margin: 0; color: var(--color-gray); font-size: 0.95rem; max-width: 42ch; }
+
+.package-card__list { margin: 0; }
+.package-card__list--not { opacity: 0.72; }
+
+.package-card__foot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem 1.4rem;
+    align-items: end;
+    justify-content: space-between;
+    margin-top: auto;
+    padding-top: 1.15rem;
+    border-top: 1px solid rgba(27, 28, 29, 0.12);
+}
+
+.package-card--ink .package-card__foot { border-top-color: rgba(244, 244, 242, 0.18); }
+
+.package-card__price {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.15rem, 1.7vw, 1.5rem);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.package-card__actions { display: flex; flex-wrap: wrap; gap: 0.9rem; align-items: center; margin: 0; }
+
+/* The honest empty state --------------------------------------------------- */
+.packages__empty {
+    display: grid;
+    gap: clamp(2rem, 4vw, 3.5rem);
+    padding: clamp(1.75rem, 3.4vw, 3rem);
+    background: var(--color-white);
+    border: 1px dashed rgba(177, 159, 112, 0.7);
+}
+
+@media (min-width: 62rem) {
+    .packages__empty { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); align-items: start; }
+}
+
+.packages__empty-text .display { margin: 0.5rem 0 0.9rem; max-width: 22ch; }
+.packages__empty-actions { display: flex; flex-wrap: wrap; gap: 0.9rem; margin: 1.6rem 0 0; }
+
+.packages__empty-list { display: grid; gap: 1.1rem; margin: 0; padding: 0; list-style: none; }
+
+.packages__empty-list li { padding-top: 1.1rem; border-top: 1px solid var(--color-gray-light); }
+.packages__empty-list h4 { margin: 0 0 0.3rem; font-size: 0.95rem; font-weight: 600; }
+.packages__empty-list p { margin: 0; color: var(--color-gray); font-size: 0.9rem; max-width: 44ch; }
+
+.packages__foot { margin: clamp(1.75rem, 3vw, 2.5rem) 0 0; color: var(--color-gray); }
+
+/* Days inside a package ---------------------------------------------------- */
+.daylist { display: grid; gap: 0; margin: 1.1rem 0 0; padding: 0; list-style: none; }
+
+.daylist__item + .daylist__item { border-top: 1px solid var(--color-gray-light); }
+
+.daylist__item a {
+    display: grid;
+    grid-template-columns: 5.5rem minmax(0, 1fr) 2rem;
+    gap: 0.4rem 1.25rem;
+    align-items: baseline;
+    padding-block: clamp(1rem, 2vw, 1.5rem);
+    color: inherit;
+    text-decoration: none;
+}
+
+.daylist__n {
+    color: var(--color-clay);
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.daylist__body strong { display: block; font-size: 1.05rem; font-weight: 600; }
+.daylist__body em { color: var(--color-gray); font-size: 0.9rem; font-style: normal; }
+.daylist__go { color: var(--color-clay); transition: transform 0.4s var(--ease); }
+
+.daylist__item a:hover .daylist__go { transform: translateX(0.4rem); }

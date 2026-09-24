@@ -4,6 +4,7 @@ use App\Http\Controllers\AreaController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\GuideController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PackageController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\TourController;
@@ -42,6 +43,9 @@ Route::get('/areas/colored-canyon', [PageController::class, 'alias']);
 Route::get('/tours', [TourController::class, 'index']);
 Route::get('/tours/{slug}', [TourController::class, 'show']);
 Route::get('/films', [TourController::class, 'films']);
+
+Route::get('/packages', [PackageController::class, 'index']);
+Route::get('/packages/{slug}', [PackageController::class, 'show']);
 
 Route::get('/areas', [AreaController::class, 'index']);
 Route::get('/areas/{slug}', [AreaController::class, 'show']);

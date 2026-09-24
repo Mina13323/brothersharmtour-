@@ -102,6 +102,19 @@ return [
                 ['label' => 'Films', 'url' => '/films'],
             ],
         ],
+        /*
+         * The Packages item always exists; the dropdown under it only appears
+         * once App\Support\Packages::all() has rows, so nothing links to a
+         * package that has not been written yet.
+         */
+        array_merge(
+            ['label' => 'Packages', 'url' => '/packages'],
+            \App\Support\Packages::has()
+                ? ['children' => array_map(function ($package) {
+                    return ['label' => $package['name'], 'url' => '/packages/' . $package['slug']];
+                }, \App\Support\Packages::featured(4))]
+                : []
+        ),
         [
             'label' => 'Places',
             'url'   => '/areas',
@@ -136,6 +149,7 @@ return [
             ['label' => 'Desert & mountains', 'url' => '/tours?category=desert'],
             ['label' => 'Dolphins & family', 'url' => '/tours?category=family'],
             ['label' => 'Private transfers', 'url' => '/tours?category=transfer'],
+            ['label' => 'Trip packages', 'url' => '/packages'],
             ['label' => 'Films', 'url' => '/films'],
         ],
         'Places' => [

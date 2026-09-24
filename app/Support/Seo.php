@@ -333,6 +333,14 @@ class Seo
 
         $add('/areas', '0.7');
 
+        // The packages index is a real page even while the data file is empty;
+        // individual weeks join as soon as they are written.
+        $add('/packages', '0.8');
+
+        foreach (\App\Support\Packages::all() as $package) {
+            $add('/packages/' . $package['slug'], '0.7');
+        }
+
         foreach (Site::guides() as $guide) {
             $add('/guides/' . $guide['slug'], '0.7');
         }

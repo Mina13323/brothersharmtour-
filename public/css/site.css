@@ -190,19 +190,6 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 .credit--light { color: rgba(255, 255, 255, 0.78); }
 
-.pull {
-    font-family: var(--font-display);
-    font-size: clamp(1.5rem, 2.9vw, 2.75rem);
-    line-height: 1.04;
-    text-transform: uppercase;
-    letter-spacing: 0.015em;
-    color: var(--color-clay);
-    max-width: 26ch;
-    margin: 2.75rem 0;
-    padding-left: 1.65rem;
-    border-left: 1px solid var(--color-sand);
-}
-
 /* --------------------------------------------------------------------------
    Buttons / links
    ----------------------------------------------------------------------- */
@@ -358,13 +345,6 @@ body.loaded .fader { transform: translate3d(0, -100%, 0); }
     gap: 0.45rem;
     margin-right: auto;
     line-height: 1;
-}
-
-.logo__mark svg {
-    display: block;
-    width: clamp(6.5rem, 9vw, 9.5rem);
-    height: auto;
-    overflow: visible;
 }
 
 .logo__type {
@@ -676,17 +656,6 @@ body.menu-open .logo { color: var(--color-black); }
     color: rgba(255, 255, 255, 0.9);
 }
 
-.page-hero__credit {
-    position: absolute;
-    right: var(--gutter);
-    bottom: clamp(2.5rem, 7vh, 5rem);
-    z-index: 3;
-    font-size: 0.7rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.72);
-}
-
 .share {
     display: inline-flex;
     align-items: center;
@@ -810,7 +779,7 @@ body.menu-open .logo { color: var(--color-black); }
 }
 
 /* --------------------------------------------------------------------------
-   Where we operate — destination slider
+   Where we operate — the places slider on home
    ----------------------------------------------------------------------- */
 
 .where {
@@ -868,19 +837,6 @@ body.menu-open .logo { color: var(--color-black); }
     inset: 0;
     background: linear-gradient(200deg, rgba(16, 16, 16, 0.05) 20%, rgba(16, 16, 16, 0.92) 92%);
 }
-
-.where__map {
-    position: absolute;
-    top: 1.25rem;
-    right: 1.25rem;
-    width: 6.5rem;
-    opacity: 0.55;
-    mix-blend-mode: screen;
-    transition: opacity 0.5s var(--ease), transform 0.7s var(--ease);
-}
-
-.where__map img { width: 100%; filter: invert(1); }
-.where__card:hover .where__map { opacity: 0.95; transform: scale(1.06) rotate(-2deg); }
 
 .where__num {
     position: absolute;
@@ -961,7 +917,7 @@ body.menu-open .logo { color: var(--color-black); }
 .arrow:disabled { opacity: 0.3; }
 
 /* --------------------------------------------------------------------------
-   Destinations index
+   Places index — the .dest-row list, reused by /areas
    ----------------------------------------------------------------------- */
 
 .dest-index { padding: clamp(3rem, 7vw, 6rem) 0 var(--section); }
@@ -1190,7 +1146,7 @@ body.menu-open .logo { color: var(--color-black); }
 }
 
 /* --------------------------------------------------------------------------
-   Itinerary cards
+   Trip grids — shared by /tours, home and /areas/{slug}
    ----------------------------------------------------------------------- */
 
 .itn { padding: var(--section) 0; }
@@ -1203,59 +1159,6 @@ body.menu-open .logo { color: var(--color-black); }
     max-width: var(--wrap);
     margin-inline: auto;
 }
-
-.itn-card__media {
-    position: relative;
-    display: block;
-    overflow: hidden;
-}
-
-.itn-card__media img {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    object-fit: cover;
-    transition: transform 1.2s var(--ease);
-}
-
-.itn-card:hover .itn-card__media img { transform: scale(1.055); }
-
-.itn-card__view {
-    position: absolute;
-    inset: auto 0 0 0;
-    display: grid;
-    place-items: center;
-    padding: 1.1rem 0;
-    background: var(--color-black);
-    color: var(--color-white);
-    font-size: 0.68rem;
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
-    transform: translateY(100%);
-    transition: transform 0.45s var(--ease);
-}
-
-.itn-card:hover .itn-card__view { transform: none; }
-
-.itn-card__count {
-    margin-top: 1.1rem;
-    font-size: 0.7rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--color-gray);
-}
-
-.itn-card__count span { color: var(--color-clay); }
-
-.itn-card__title {
-    margin: 0.35rem 0 0.6rem;
-    font-family: var(--font-display);
-    font-size: clamp(1.5rem, 2.3vw, 2.15rem);
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
-    line-height: 1;
-}
-
-.itn-card__summary { color: var(--color-gray); font-size: 0.92rem; max-width: 42ch; }
 
 .itn-meta {
     display: flex;
@@ -1288,11 +1191,10 @@ body.menu-open .logo { color: var(--color-black); }
 
 @media (min-width: 1180px) {
     .itn__grid { grid-template-columns: repeat(3, 1fr); }
-    .itn__grid--three { grid-template-columns: repeat(3, 1fr); }
 }
 
 /* --------------------------------------------------------------------------
-   Featured gallery (home) + itinerary gallery
+   Galleries — home strip, trip page, film page
    ----------------------------------------------------------------------- */
 
 .spot,
@@ -1448,7 +1350,7 @@ body.menu-open .logo { color: var(--color-black); }
 }
 
 /* --------------------------------------------------------------------------
-   Destination essay / areas / season
+   Place essays, area grid, season chart, next-place band
    ----------------------------------------------------------------------- */
 
 .essay { padding: var(--section) 0 clamp(2rem, 4vw, 3rem); }
@@ -1461,34 +1363,11 @@ body.menu-open .logo { color: var(--color-black); }
 
 .essay__side { position: relative; }
 
-.essay__map {
-    display: block;
-    width: min(14rem, 40vw);
-    margin-top: 1.5rem;
-    opacity: 0.9;
-}
-
-.essay__map img { width: 100%; filter: invert(0.15) sepia(1) saturate(1.4) hue-rotate(-12deg); }
-
 .essay__body .display--sm { margin-bottom: 1.5rem; max-width: 22ch; }
-
-.essay__pair {
-    display: grid;
-    gap: clamp(1rem, 2vw, 1.75rem);
-    margin-top: clamp(2rem, 4vw, 3rem);
-}
-
-.essay__pair img {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    object-fit: cover;
-}
 
 @media (min-width: 900px) {
     .essay__grid { grid-template-columns: 0.4fr 1.6fr; }
     .essay__side { position: sticky; top: calc(var(--header-h) + 2rem); }
-    .essay__pair { grid-template-columns: 0.9fr 1.1fr; align-items: end; }
-    .essay__pair figure:first-child img { aspect-ratio: 3 / 4; }
 }
 
 .season {
@@ -1612,42 +1491,14 @@ body.menu-open .logo { color: var(--color-black); }
 
 .area p { color: var(--color-gray); font-size: 0.92rem; }
 
-.areas__pair {
-    display: grid;
-    gap: clamp(1rem, 2vw, 1.75rem);
-    margin-top: clamp(2rem, 4vw, 3.5rem);
-}
-
-.areas__pair img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
-
 @media (min-width: 700px) {
     .areas__grid { grid-template-columns: repeat(2, 1fr); }
-    .areas__pair { grid-template-columns: 0.8fr 1.2fr; align-items: start; }
-    .areas__pair figure:first-child img { aspect-ratio: 4 / 5; }
 }
 
 @media (min-width: 1100px) {
     .areas__grid { grid-template-columns: repeat(4, 1fr); }
 }
 
-.paired { padding: 0 0 var(--section); }
-
-.paired__grid,
-.paired {
-    display: grid;
-    gap: clamp(1.5rem, 4vw, 3.5rem);
-    align-items: center;
-}
-
-.wrap > .paired__text { max-width: 52ch; }
-.paired .display--sm { margin: 0.5rem 0 1rem; }
-.paired__media { overflow: hidden; }
-.paired__media img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
-
-@media (min-width: 900px) {
-    .paired { grid-template-columns: 1.1fr 0.9fr; }
-    .paired__grid { grid-template-columns: 0.9fr 1.1fr; }
-}
 
 .next {
     padding: clamp(2.5rem, 6vw, 5rem) 0;
@@ -1677,58 +1528,10 @@ body.menu-open .logo { color: var(--color-black); }
 .next__media img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; }
 
 /* --------------------------------------------------------------------------
-   Team
+   Prose blocks and the commitment band (/how-it-works, /about)
    ----------------------------------------------------------------------- */
 
 .team { padding: clamp(2.5rem, 6vw, 5rem) 0; }
-.team--strip { background: var(--color-gray-lighter); }
-
-.team__grid {
-    display: grid;
-    gap: clamp(1.5rem, 3vw, 2.5rem);
-    margin-top: clamp(1.5rem, 3vw, 2.5rem);
-}
-
-.team__item a { display: block; }
-
-.team__media { display: block; overflow: hidden; }
-
-.team__media img {
-    width: 100%;
-    aspect-ratio: 4 / 5;
-    object-fit: cover;
-    filter: grayscale(1);
-    transition: filter 0.6s var(--ease), transform 1s var(--ease);
-}
-
-.team__item a:hover .team__media img { filter: none; transform: scale(1.04); }
-
-.team__role {
-    display: block;
-    margin-top: 1.1rem;
-    font-size: 0.68rem;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--color-clay);
-}
-
-.team__name {
-    display: block;
-    margin-top: 0.3rem;
-    font-family: var(--font-display);
-    font-size: clamp(1.6rem, 2.4vw, 2.3rem);
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
-    line-height: 1;
-}
-
-.team__blurb { display: block; margin-top: 0.7rem; color: var(--color-gray); font-size: 0.92rem; max-width: 42ch; }
-.team__more { display: inline-block; margin-top: 0.4rem; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; }
-
-@media (min-width: 820px) {
-    .team__grid { grid-template-columns: repeat(3, 1fr); }
-    .team__grid--small { grid-template-columns: repeat(2, 1fr); max-width: 42rem; }
-}
 
 .prose-block { padding: clamp(3rem, 6vw, 5rem) 0 0; }
 
@@ -1761,30 +1564,8 @@ body.menu-open .logo { color: var(--color-black); }
     .commit__grid { grid-template-columns: 0.8fr 1.2fr; }
 }
 
-.lasting { padding: var(--section) 0; }
-
-.lasting__grid {
-    display: grid;
-    gap: clamp(1.75rem, 4vw, 3.5rem);
-    align-items: end;
-}
-
-.lasting__media { overflow: hidden; }
-.lasting__media img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
-.lasting__media figcaption {
-    margin-top: 0.7rem;
-    font-size: 0.68rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--color-gray);
-}
-
-@media (min-width: 900px) {
-    .lasting__grid { grid-template-columns: 1fr 1fr; }
-}
-
 /* --------------------------------------------------------------------------
-   Itinerary detail
+   Trip page: meta bar, day list, category filters
    ----------------------------------------------------------------------- */
 
 .trip-meta {
@@ -1826,15 +1607,6 @@ body.menu-open .logo { color: var(--color-black); }
     .trip-meta__cta { justify-content: flex-end; }
 }
 
-.itinerary-days { padding: var(--section) 0; }
-
-.itinerary-days__grid {
-    display: grid;
-    gap: clamp(2rem, 5vw, 4rem);
-    align-items: start;
-}
-
-.itinerary-days__intro .display--sm { margin: 0.5rem 0 1rem; }
 
 .days { display: grid; gap: clamp(1.25rem, 2.5vw, 2rem); }
 
@@ -1847,14 +1619,6 @@ body.menu-open .logo { color: var(--color-black); }
 
 .day:last-child { border-bottom: 1px solid var(--color-gray-light); }
 
-.day__tag {
-    font-family: var(--font-display);
-    font-size: 1.15rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--color-clay);
-}
-
 .day h3 {
     font-size: clamp(1.05rem, 1.4vw, 1.3rem);
     font-weight: 500;
@@ -1864,8 +1628,6 @@ body.menu-open .logo { color: var(--color-black); }
 .day p { grid-column: 2; color: var(--color-gray); font-size: 0.95rem; max-width: 60ch; }
 
 @media (min-width: 900px) {
-    .itinerary-days__grid { grid-template-columns: 0.55fr 1.45fr; }
-    .itinerary-days__intro { position: sticky; top: calc(var(--header-h) + 2rem); }
     .day { grid-template-columns: 9rem 1fr; align-items: baseline; }
     .day p { grid-column: 2; }
 }
@@ -1888,11 +1650,17 @@ body.menu-open .logo { color: var(--color-black); }
     text-transform: uppercase;
 }
 
+.filters__list a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.4rem;   /* the chips are 0.7rem type; padding alone is ~35px tall */
+}
+
 .filters__list a:hover { border-color: var(--color-black); }
 .filters__list .is-active { background: var(--color-black); color: var(--color-white); border-color: var(--color-black); }
 
 /* --------------------------------------------------------------------------
-   Stories / article
+   Guides: story cards and the article body
    ----------------------------------------------------------------------- */
 
 .stories { padding: clamp(2.5rem, 5vw, 4rem) 0 var(--section); }
@@ -1923,8 +1691,6 @@ body.menu-open .logo { color: var(--color-black); }
     align-items: baseline;
     margin-top: 1.1rem;
 }
-
-.story-card__date { font-size: 0.72rem; color: var(--color-gray); letter-spacing: 0.08em; }
 
 .story-card__title {
     margin: 0.4rem 0 0.55rem;
@@ -1974,29 +1740,6 @@ body.menu-open .logo { color: var(--color-black); }
     gap: 1rem;
     margin-top: 2.5rem;
 }
-
-.more-stories {
-    padding: clamp(3rem, 6vw, 5rem) 0;
-    background: var(--color-gray-lighter);
-}
-
-.more-stories__grid {
-    display: grid;
-    gap: clamp(1.25rem, 2.5vw, 2rem);
-    margin-top: 1.25rem;
-}
-
-.more-stories__media { display: block; overflow: hidden; }
-.more-stories__media img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; transition: transform 0.9s var(--ease); }
-.more-stories__grid a:hover .more-stories__media img { transform: scale(1.05); }
-.more-stories__title {
-    display: block;
-    margin-top: 0.8rem;
-    font-size: 0.95rem;
-    font-weight: 500;
-}
-
-@media (min-width: 780px) { .more-stories__grid { grid-template-columns: repeat(3, 1fr); } }
 
 /* --------------------------------------------------------------------------
    Contact
@@ -2142,19 +1885,6 @@ fieldset { border: 0; padding: 0; margin: 0; }
 .dial__options em { font-style: normal; color: var(--color-gray); }
 .dial__empty { padding: 0.6rem 0.55rem; font-size: 0.85rem; color: var(--color-gray); }
 
-.reviews {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-top: 2rem;
-    padding: 0.7rem 1rem;
-    border: 1px solid var(--color-gray-light);
-}
-
-.reviews--inline { margin-top: 1.75rem; }
-.reviews__stars { color: var(--color-rust); letter-spacing: 0.1em; }
-.reviews__label { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; }
-
 @media (min-width: 1000px) {
     .contact__grid { grid-template-columns: 0.9fr 1.1fr; }
     .contact__form { position: sticky; top: calc(var(--header-h) + 2rem); }
@@ -2193,7 +1923,6 @@ fieldset { border: 0; padding: 0; margin: 0; }
 
 @media (min-width: 900px) {
     .legal__grid { grid-template-columns: 0.35fr 1.65fr; }
-    .legal__aside { position: sticky; top: calc(var(--header-h) + 2rem); }
 }
 
 .missing { padding: calc(var(--header-h) + 12vh) 0 var(--section); }
@@ -2283,18 +2012,6 @@ fieldset { border: 0; padding: 0; margin: 0; }
 
 @media (min-width: 1000px) {
     .site-footer__grid { grid-template-columns: 0.9fr 1.1fr; }
-}
-
-/* --------------------------------------------------------------------------
-   Utilities
-   ----------------------------------------------------------------------- */
-
-.is-hidden { display: none !important; }
-
-.visually-collapsed {
-    opacity: 0;
-    transform: translate3d(0, 0.5rem, 0);
-    transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
 }
 
 /* --------------------------------------------------------------------------
@@ -2749,8 +2466,6 @@ body.drive-off .drive-notice { display: block; }
     line-height: 1;
 }
 
-.logo__mark { display: none; }
-
 .nav__whatsapp {
     font-size: 0.72rem;
     letter-spacing: 0.16em;
@@ -3104,4 +2819,29 @@ html.force-show [data-reveal] { opacity: 1; transform: none; }
 /* Mobile: the rail drops below the text and stops being sticky ------------ */
 @media (max-width: 61.99rem) {
     .article__side .side-card { position: static; }
+}
+
+/* --------------------------------------------------------------------------
+   Touch targets
+   The filter chips, breadcrumbs and the header's phone/WhatsApp pills are all
+   small uppercase type, which is right on a desktop and thin on a phone. Only
+   pointer-coarse devices get the larger boxes, so the desktop rhythm above is
+   untouched.
+   ----------------------------------------------------------------------- */
+@media (hover: none) and (pointer: coarse) {
+    .filters__list a {
+        min-height: 2.75rem;
+        padding-inline: 1rem;
+    }
+
+    .crumbs a,
+    .crumbs span { display: inline-block; padding: 0.4rem 0.15rem; }
+
+    .nav__phone,
+    .nav__whatsapp { padding-block: 0.6rem; }
+
+    .link-quiet,
+    .link-more { padding-block: 0.45rem; }
+
+    .side-toc a { display: inline-block; padding: 0.4rem 0; }
 }

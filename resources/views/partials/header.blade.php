@@ -1,17 +1,13 @@
-<header class="site-header" id="site-header">
+<header class="site-header site-header--{{ $headerTheme ?? 'light' }}" id="site-header">
     <div class="site-header__inner">
         <a class="logo" href="{{ url('/') }}" aria-label="{{ config('site.name') }} — home">
-            <span class="logo__mark" aria-hidden="true">
-                <svg viewBox="0 0 64 26" role="img">
-                    <text x="0" y="20" class="logo__type">FITZROY</text>
-                </svg>
-            </span>
-            <span class="logo__sub">travel</span>
+            <span class="logo__type">{{ config('site.logo_word') }}</span>
+            <span class="logo__sub">{{ config('site.logo_sub') }}</span>
         </a>
 
         <nav class="nav" id="primary-nav" aria-label="Primary">
             <ul class="nav__list">
-                @foreach ($nav as $item)
+                @foreach (($nav ?? []) as $item)
                     <li class="nav__item{{ isset($item['children']) ? ' nav__item--has-children' : '' }}">
                         <a class="nav__link" href="{{ url($item['url']) }}">
                             {{ $item['label'] }}
@@ -34,8 +30,13 @@
         </nav>
 
         <div class="site-header__actions">
-            <a class="nav__phone" href="{{ url($contact['phone_us']['tel']) }}">{{ $contact['phone_us']['label'] }}</a>
-            <a class="btn btn--ghost btn--sm" href="{{ url('/contact-us') }}"><span>contact us</span></a>
+            @if (!empty($contact['phone']['tel']))
+                <a class="nav__phone" href="{{ url($contact['phone']['tel']) }}">{{ $contact['phone']['label'] }}</a>
+            @endif
+            @if (!empty($contact['whatsapp']))
+                <a class="nav__whatsapp" href="https://wa.me/{{ preg_replace('/\D/', '', $contact['whatsapp']) }}" rel="noopener" target="_blank">WhatsApp</a>
+            @endif
+            <a class="btn btn--ghost btn--sm" href="{{ url('/contact') }}"><span>enquire</span></a>
             <button class="menu-toggle" id="menu-toggle" type="button" aria-controls="primary-nav" aria-expanded="false">
                 <span class="menu-toggle__bar"></span>
                 <span class="menu-toggle__bar"></span>

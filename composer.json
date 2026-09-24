@@ -1,6 +1,6 @@
 {
-    "name": "brothersharm/fitzroy-clone",
-    "description": "Front-end clone of fitzroy-travel.com — Laravel-shaped app that also boots without the framework installed.",
+    "name": "brothersharm/tour-site",
+    "description": "Sharm el-Sheikh day trips, reef boats, desert safaris and transfers — Laravel-shaped app that also boots without the framework",
     "type": "project",
     "license": "MIT",
     "require": {

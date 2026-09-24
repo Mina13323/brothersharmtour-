@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Support\Repo;
+use App\Support\Seo;
+use App\Support\Site;
 use App\Support\Tours;
 use Illuminate\Http\Request;
 
@@ -13,29 +14,43 @@ class ContactController extends Controller
         $tour = Tours::find((string) $request->get('tour'));
 
         return $this->view('pages.contact', [
-            'title'       => 'Contact us | Fitzroy Travel',
-            'description' => 'Talk your trip through with someone who has been. No email consultations — a conversation first.',
+            'title'       => 'Contact & enquiries',
+            'description' => 'Send your dates and the number of people and we will price the trip the same day. Phone, WhatsApp or the form — answered by the person who will run your day.',
             'hero'        => [
-                'eyebrow' => 'start the conversation',
-                'title'   => 'contact us',
-                'lede'    => 'Tell us who is travelling, roughly when, and what you would hate to miss. We will call you back.',
+                'eyebrow' => 'start here',
+                'title'   => 'tell us the day you want',
+                'lede'    => Site::contactCopy()['lede'],
             ],
             'dialCodes'   => config('site.dial_codes'),
+            'trips'       => array_column(Tours::all(), 'title', 'slug'),
             'tour'        => $tour,
             'prefill'     => $this->prefillFor($tour),
-            'interests'   => [
-                'Botswana', 'Kenya', 'Namibia', 'Rwanda', 'Tanzania', 'Uganda', 'Zimbabwe',
-                'Multi-country', 'Not sure yet',
-            ],
+            'copy'        => Site::contactCopy(),
             'bodyClass'   => 'contact',
             'sent'        => (bool) $request->get('sent'),
+            'breadcrumb'  => [$this->crumb('Contact', '/contact')],
+            'seoNodes'    => [
+                Seo::breadcrumb([
+                    ['name' => 'Home', 'url' => '/'],
+                    ['name' => 'Contact', 'url' => '/contact'],
+                ]),
+            ],
         ]);
     }
 
     /**
-     * Enquiry endpoint. The source site posts into Gravity Forms; this writes a
-     * line to storage/enquiries.log and answers, so the front end is fully wired
-     * without a third-party dependency.
+     * /contact doubles as /contact-us so links from the older pages keep working.
+     */
+    public function legacy(Request $request)
+    {
+        // 301, not 302: the old path is gone for good.
+        return redirect('/contact' . ($request->get('tour') ? '?tour=' . $request->get('tour') : ''), 301);
+    }
+
+    /**
+     * Enquiry endpoint. Writes a line to storage/enquiries.log and answers, so
+     * the front end is fully wired without a third-party dependency. Point the
+     * marked line at your mail transport or CRM when you have one.
      */
     public function store(Request $request)
     {
@@ -62,30 +77,18 @@ class ContactController extends Controller
                 ]);
             }
 
-            $tour = Tours::find((string) (isset($data['tour']) ? $data['tour'] : ''));
-
-            return view('pages.contact', $this->share([
-                'title'      => 'Contact us | Fitzroy Travel',
-                'hero'       => ['eyebrow' => 'start the conversation', 'title' => 'contact us'],
-                'dialCodes'  => config('site.dial_codes'),
-                'tour'       => $tour,
-                'prefill'    => isset($data['message']) ? $data['message'] : $this->prefillFor($tour),
-                'interests'  => ['Botswana', 'Kenya', 'Namibia', 'Rwanda', 'Tanzania', 'Uganda', 'Zimbabwe', 'Multi-country', 'Not sure yet'],
-                'errors'     => $errors,
-                'sent'       => false,
-                'bodyClass'  => 'contact',
-            ]));
+            return $this->renderWithError($data, $errors);
         }
 
         $line = sprintf(
-            "[%s] %s <%s> %s | %s | trip: %s | %s\n%s\n%s\n",
+            "[%s] %s <%s> %s%s | trip: %s%s\n%s\n%s\n",
             date('Y-m-d H:i:s'),
             $data['name'],
             $data['email'],
             isset($data['phone']) ? trim($data['phone']) : '-',
-            isset($data['country']) ? $data['country'] : '-',
-            isset($data['travel']) ? $data['travel'] : '-',
-            isset($data['tour']) && $data['tour'] ? 'booking: ' . $data['tour'] : '-',
+            !empty($data['dial']) ? ' (' . $data['dial'] . ')' : '',
+            !empty($data['tour']) ? $data['tour'] : '-',
+            !empty($data['travel']) ? ' | dates: ' . $data['travel'] : '',
             isset($data['message']) ? trim($data['message']) : '',
             str_repeat('-', 60)
         );
@@ -97,7 +100,26 @@ class ContactController extends Controller
             return response(json_encode(['ok' => true]), 200, ['Content-Type' => 'application/json']);
         }
 
-        return redirect('/contact-us?sent=1');
+        return redirect('/contact?sent=1');
+    }
+
+    protected function renderWithError(array $data, array $errors)
+    {
+        $tour = Tours::find((string) (isset($data['tour']) ? $data['tour'] : ''));
+
+        return view('pages.contact', $this->share([
+            'title'      => 'Contact & enquiries',
+            'hero'       => ['eyebrow' => 'start here', 'title' => 'tell us the day you want'],
+            'dialCodes'  => config('site.dial_codes'),
+            'trips'      => array_column(Tours::all(), 'title', 'slug'),
+            'tour'       => $tour,
+            'copy'       => Site::contactCopy(),
+            'prefill'    => isset($data['message']) ? $data['message'] : $this->prefillFor($tour),
+            'errors'     => $errors,
+            'sent'       => false,
+            'bodyClass'  => 'contact',
+            'breadcrumb' => [$this->crumb('Contact', '/contact')],
+        ]));
     }
 
     /**
@@ -110,10 +132,10 @@ class ContactController extends Controller
         }
 
         return sprintf(
-            "We would like to do the %s (%s). %s\n\nOur dates: \nHow many of us: \nHotel: ",
+            "We would like to do the %s (%s).%s\n\nOur dates: \nHow many of us: \nHotel: ",
             $tour['title'],
             $tour['duration'],
-            $tour['price'] ? '' : 'Please send the price for our group.'
+            $tour['price'] ? '' : ' Please send the price for our group.'
         );
     }
 

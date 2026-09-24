@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Fitzroy Travel — front-end clone
+   Brothers Sharm Tour — design system
    Design system + components. No framework, no build step.
    ========================================================================== */
 
@@ -2726,4 +2726,467 @@ body.drive-off .drive-notice { display: block; }
 .films .gallery__frame {
     background: linear-gradient(140deg, #1b1c1d, #3a3b3d 60%, #b19f70);
     min-height: 12rem;
+}
+
+/* --------------------------------------------------------------------------
+   Brothers Sharm Tour — brand, navigation and content components
+   ----------------------------------------------------------------------- */
+
+/* Text wordmark instead of the old SVG lockup */
+.logo__type {
+    font-family: var(--font-display);
+    font-size: clamp(1.35rem, 2vw, 1.75rem);
+    letter-spacing: 0.14em;
+    line-height: 1;
+}
+
+.logo__mark { display: none; }
+
+.nav__whatsapp {
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    padding: 0.45rem 0.7rem;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    opacity: 0.85;
+}
+
+.nav__whatsapp:hover { opacity: 1; }
+
+/* Breadcrumbs */
+.crumbs { font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; }
+
+.crumbs ol { display: flex; flex-wrap: wrap; gap: 0.4rem; list-style: none; }
+
+.crumbs li:not(:last-child)::after {
+    content: "/";
+    margin-left: 0.4rem;
+    opacity: 0.45;
+}
+
+.crumbs a { color: inherit; opacity: 0.72; }
+
+.crumbs li:last-child a { opacity: 1; }
+
+.crumbs--onhero {
+    margin-bottom: clamp(1rem, 2vw, 1.6rem);
+    color: var(--color-white);
+}
+
+.site-main > .crumbs {
+    padding-top: calc(var(--header-h) + 1.5rem);
+    padding-inline: var(--gutter);
+}
+
+/* Hero actions */
+.hero__actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: clamp(1.5rem, 3vw, 2.25rem); }
+
+/* Numbers band */
+.stats { padding: clamp(2.5rem, 5vw, 4rem) 0; background: var(--color-black); color: var(--color-white); }
+
+.stats__grid {
+    display: grid;
+    gap: clamp(1.25rem, 3vw, 2rem);
+    list-style: none;
+}
+
+.stat__value {
+    display: block;
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    line-height: 0.9;
+    color: var(--color-sand);
+}
+
+.stat__label {
+    display: block;
+    margin-top: 0.6rem;
+    max-width: 26ch;
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.66);
+}
+
+@media (min-width: 780px) {
+    .stats__grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* Service assurances */
+.assurances { display: grid; gap: 0.5rem; margin-top: 1.5rem; list-style: none; }
+
+.assurances li {
+    position: relative;
+    padding-left: 1.4rem;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.72);
+}
+
+.assurances li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.35em;
+    width: 0.8rem;
+    height: 0.45rem;
+    border-left: 1.5px solid var(--color-sand);
+    border-bottom: 1.5px solid var(--color-sand);
+    transform: rotate(-45deg);
+}
+
+.assurances--inline li { color: var(--color-ink); }
+
+.assurances--inline li::before { border-color: var(--color-clay); }
+
+/* Filters on /tours */
+.filter-note {
+    margin-top: clamp(1rem, 2vw, 1.5rem);
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-gray);
+}
+
+/* FAQ */
+.faq-strip { padding: var(--section) 0; }
+
+.faq-strip--page { padding-top: clamp(2.5rem, 5vw, 4rem); }
+
+.faq-list { display: grid; gap: 0; margin-top: clamp(1.5rem, 3vw, 2.5rem); }
+
+.faq-item { border-top: 1px solid var(--color-gray-light); }
+
+.faq-item:last-child { border-bottom: 1px solid var(--color-gray-light); }
+
+.faq-item dt {
+    padding: 1.25rem 0 0.6rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.15rem, 1.7vw, 1.5rem);
+    letter-spacing: 0.02em;
+    line-height: 1.15;
+}
+
+.faq-item dd {
+    max-width: 78ch;
+    padding-bottom: 1.4rem;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--color-gray);
+}
+
+.faq-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-top: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+/* Area / guide trip link lists */
+.area-trips { display: grid; gap: 0; margin-top: 1.25rem; list-style: none; }
+
+.area-trips a {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.35rem 1.5rem;
+    padding: 1rem 0;
+    border-top: 1px solid var(--color-gray-light);
+}
+
+.area-trips li:last-child a { border-bottom: 1px solid var(--color-gray-light); }
+
+.area-trips__title {
+    font-family: var(--font-display);
+    font-size: clamp(1.1rem, 1.6vw, 1.4rem);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.area-trips__meta {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-gray);
+}
+
+/* Essay side facts */
+.essay__facts { display: grid; gap: 1rem; margin-top: 1.5rem; list-style: none; }
+
+.essay__facts li {
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--color-gray-light);
+    font-size: 0.9rem;
+}
+
+.essay__facts span {
+    display: block;
+    margin-bottom: 0.2rem;
+    font-size: 0.62rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-clay);
+}
+
+/* Sticky card table of contents */
+.side-toc { display: grid; gap: 0.6rem; margin-top: 1rem; list-style: none; }
+
+.side-toc a {
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.78);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+    padding-bottom: 0.2rem;
+}
+
+.side-toc a:hover { color: var(--color-white); }
+
+/* Season table */
+.season-table { margin-top: clamp(2rem, 4vw, 3rem); overflow-x: auto; }
+
+.season-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    text-align: left;
+}
+
+.season-table th,
+.season-table td {
+    padding: 0.75rem 1rem 0.75rem 0;
+    border-bottom: 1px solid var(--color-gray-light);
+    vertical-align: top;
+}
+
+.season-table thead th {
+    font-size: 0.64rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-clay);
+    border-bottom-color: var(--color-black);
+}
+
+.season-table tbody th {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    letter-spacing: 0.06em;
+    font-weight: 400;
+}
+
+.season-table td:last-child { color: var(--color-gray); max-width: 46ch; }
+
+/* Guide cards on /guides */
+.story-card__strap { margin-top: 0.5rem; font-size: 0.9rem; color: var(--color-gray); max-width: 46ch; }
+
+/* Legal nav current item */
+.legal__nav .is-current { color: var(--color-black); border-bottom: 1px solid var(--color-clay); }
+
+/* Commitment numbers on /about */
+.commit__num {
+    display: block;
+    margin-bottom: 0.6rem;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    letter-spacing: 0.08em;
+    color: var(--color-clay);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .crumbs--onhero { transform: none; }
+}
+
+/* ==========================================================================
+   Trip, guide and film components
+   The pieces the newer templates lean on: media frames that survive a Drive
+   outage, the trip hero badges, and the two-column bodies under articles.
+   ========================================================================== */
+
+/* Media boxes ------------------------------------------------------------- */
+[data-media] {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(140deg, #1b1c1d, #3a3b3d 55%, var(--color-clay));
+}
+
+[data-media] img,
+.drive-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    object-fit: cover;
+}
+
+[data-media].is-missing img { visibility: hidden; }
+
+[data-media].is-missing::after {
+    content: "photo";
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    color: rgba(244, 244, 242, 0.55);
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    letter-spacing: var(--eyebrow-space);
+    text-transform: uppercase;
+}
+
+/* Trip hero --------------------------------------------------------------- */
+.tour-hero { min-height: clamp(30rem, 72vh, 44rem); }
+
+.tour-hero__badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: clamp(1.1rem, 2.4vw, 1.8rem) 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.tour-hero__badges li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.85rem;
+    border: 1px solid rgba(244, 244, 242, 0.28);
+    border-radius: 999px;
+    color: rgba(244, 244, 242, 0.92);
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    backdrop-filter: blur(6px);
+}
+
+.tour-hero__badge--film { color: var(--color-sand); }
+
+/* Trip: included / not included ------------------------------------------- */
+.incl__col { min-width: 0; }
+
+.incl__col .ticklist { margin: 0.6rem 0 0; }
+
+@media (min-width: 40rem) {
+    .incl {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: clamp(1.5rem, 4vw, 3.5rem);
+    }
+}
+
+/* Trip body with the sticky price card ------------------------------------ */
+@media (min-width: 62rem) {
+    .tour-body__side { position: static; }
+
+    .tour-body__side .side-card {
+        position: sticky;
+        top: calc(var(--header-h) + 1.5rem);
+    }
+}
+
+/* Films ------------------------------------------------------------------- */
+.film { margin: 0; }
+
+.film__frame {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: #0b0b0c;
+}
+
+.film__frame iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+.films__grid--inline { margin-top: clamp(1.5rem, 3vw, 2.5rem); }
+
+.gallery__count {
+    margin: 0.75rem 0 0;
+    color: rgba(244, 244, 242, 0.6);
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    letter-spacing: var(--eyebrow-space);
+}
+
+.gallery__count i { font-style: normal; opacity: 0.5; }
+
+/* Guides ------------------------------------------------------------------ */
+@media (min-width: 62rem) {
+    .article__body {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 19rem;
+        gap: clamp(2rem, 5vw, 4.5rem);
+        align-items: start;
+    }
+
+    .article__text { max-width: 46rem; }
+    .article__side { position: sticky; top: calc(var(--header-h) + 1.5rem); }
+}
+
+.stories--strip { padding-block: clamp(3.5rem, 7vw, 6rem); }
+
+/* FAQ --------------------------------------------------------------------- */
+/* The /faq page renders every answer open, so it reads as a document rather
+   than an accordion: wider gaps and a slightly larger answer. */
+.faq-list--open .faq-item { padding-block: clamp(1.1rem, 2.4vw, 1.75rem); }
+
+.faq-list--open .faq-item dt { font-size: clamp(1.05rem, 1.4vw, 1.35rem); }
+
+.faq-list--open .faq-item dd {
+    max-width: 62ch;
+    margin-top: 0.5rem;
+    font-size: 1rem;
+}
+
+/* Home numbers ------------------------------------------------------------ */
+.stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: clamp(1rem, 2.4vw, 1.6rem) 0;
+    border-top: 1px solid rgba(27, 28, 29, 0.14);
+    list-style: none;
+}
+
+/* Tour grid bands and the index page side-panels -------------------------- */
+.tours-band { padding-block: clamp(3.5rem, 8vw, 7rem); }
+
+@media (min-width: 62rem) {
+    .practical {
+        display: grid;
+        grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+        gap: clamp(2rem, 5vw, 4.5rem);
+        align-items: start;
+    }
+
+    .practical__grid { display: block; }
+    .practical__text { max-width: 40rem; }
+}
+
+/* Header on light pages --------------------------------------------------- */
+.site-header--solid {
+    background: var(--color-white);
+    box-shadow: 0 1px 0 rgba(27, 28, 29, 0.1);
+}
+
+.site-header--solid .site-header__inner,
+.site-header--solid .nav__link { color: var(--color-ink); }
+
+.site-header--solid .logo__mark { color: var(--color-ink); }
+
+/* Mega menu --------------------------------------------------------------- */
+.nav__item--has-children:hover .nav__sub,
+.nav__item--has-children:focus-within .nav__sub { opacity: 1; pointer-events: auto; }
+
+/* Footer ------------------------------------------------------------------ */
+.site-footer__brand { max-width: 30rem; }
+
+@media (min-width: 90rem) {
+    .site-footer__brand { grid-column: span 2; }
 }

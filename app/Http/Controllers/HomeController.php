@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Support\Repo;
+use App\Support\Seo;
+use App\Support\Site;
+use App\Support\Tours;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -10,17 +12,23 @@ class HomeController extends Controller
     public function index(Request $request)
     {
         return $this->view('home.index', [
-            'title'        => 'Tailor-made luxury African safaris | Fitzroy Travel',
+            'title'       => 'Sharm el-Sheikh day trips & reef boats',
             'description' => config('site.description'),
-            'bodyClass'    => 'home',
-            'headerTheme'  => 'transparent',
-            'hero'         => Repo::hero(),
-            'intro'        => Repo::intro(),
-            'operating'    => Repo::operatingLede(),
-            'why'          => Repo::whyFitzroy(),
-            'featured'     => array_values(array_filter(Repo::itineraries(), function ($i) {
-                return $i['slug'] === 'botswana-helicopters-through-the-delta';
-            })),
+            'hero'        => Site::hero(),
+            'intro'       => Site::intro(),
+            'operating'   => Site::operating(),
+            'why'         => Site::why(),
+            'tours'       => Tours::featured(6),
+            'featured'    => array_slice(Tours::all(), 0, 1),
+            'headerTheme' => 'transparent',
+            'bodyClass'   => 'home',
+            'breadcrumb'  => [],
+            'seoNodes'    => [
+                Seo::website(),
+                Seo::itemList('Day trips from Sharm el-Sheikh', array_map(function ($tour) {
+                    return ['name' => $tour['title'], 'url' => '/tours/' . $tour['slug']];
+                }, Tours::featured(6))),
+            ],
         ]);
     }
 }

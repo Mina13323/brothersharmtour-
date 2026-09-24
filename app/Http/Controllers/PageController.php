@@ -2,109 +2,180 @@
 
 namespace App\Http\Controllers;
 
-use App\Support\Repo;
+use App\Support\Seo;
+use App\Support\Site;
+use App\Support\Tours;
 use Illuminate\Http\Request;
 
+/**
+ * Company pages, the FAQ and the policies.
+ */
 class PageController extends Controller
 {
-    public function process(Request $request)
+
+    /**
+     * Paths that were published before the restructure. They redirect (301)
+     * instead of rendering, so /excursions and /tours are never two indexable
+     * copies of the same page.
+     */
+    protected static $aliases = [
+        '/excursions'    => '/tours',
+        '/day-trips'     => '/tours',
+        '/places'        => '/areas',
+        '/blog'          => '/guides',
+        '/our-process'   => '/how-it-works',
+        '/about-us'      => '/about',
+        '/contact-us'    => '/contact',
+        '/guides/best-time-to-visit'                 => '/guides/best-time-to-visit-sharm-el-sheikh',
+        '/guides/best-time-to-visit-sharm'           => '/guides/best-time-to-visit-sharm-el-sheikh',
+        '/guides/packing-for-a-boat-day'             => '/guides/what-to-pack-for-a-red-sea-boat-day',
+        '/guides/cairo'                              => '/guides/one-day-in-cairo-from-sharm',
+        '/areas/ras-mohammed-national-park'          => '/areas/ras-mohammed',
+        '/areas/colored-canyon'                      => '/areas/sinai-backcountry',
+    ];
+    public function how(Request $request)
     {
-        return $this->view('pages.process', [
-            'title'       => 'Our process | Fitzroy Travel',
-            'description' => 'How a Fitzroy safari is built: a conversation first, then the boring parts handled properly, then someone on call while you travel.',
+        return $this->view('pages.how', [
+            'title'       => 'How booking a day trip works',
+            'description' => 'Send the date, get a real price for the trip as it will run, confirm, pay at the end of the day. Pick-up from your hotel, free cancellation up to 24 hours before.',
             'hero'        => [
-                'eyebrow' => 'travelling with fitzroy',
-                'title'   => 'our process',
-                'lede'    => 'Creating the right safari takes time, careful planning and a clear understanding of what matters most to you.',
-                'image'   => Repo::THEME . '/ophero-mobile.webp',
+                'eyebrow' => 'booking with us',
+                'title'   => 'four steps, usually inside a day',
+                'lede'    => 'No cart, no account, no deposit unless we need one for a flight seat. One person answers, prices and runs your day.',
+                'image'   => Tours::img('super-safari', 5, 1800),
+                'alt'     => 'Guides loading quad bikes at the start of a desert evening',
             ],
-            'bodyClass'   => 'process',
+            'process'     => Site::process(),
+            'faq'         => array_slice(Site::faq(), 0, 4),
+            'ogImage'     => Tours::img('super-safari', 5, 1200),
+            'headerTheme' => 'transparent',
+            'bodyClass'   => 'how',
+            'breadcrumb'  => [$this->crumb('How it works', '/how-it-works')],
+            'seoNodes'    => [
+                Seo::faq(array_slice(Site::faq(), 0, 4)),
+                Seo::breadcrumb([
+                    ['name' => 'Home', 'url' => '/'],
+                    ['name' => 'How it works', 'url' => '/how-it-works'],
+                ]),
+            ],
         ]);
     }
 
     public function about(Request $request)
     {
+        $about = Site::about();
+
         return $this->view('pages.about', [
-            'title'       => 'About us | Fitzroy Travel',
-            'description' => 'A small, completely independent tour operator building immersive journeys into remote parts of Africa.',
+            'title'       => 'About us: who runs your trip in Sharm',
+            'description' => 'A small outfit in Naama Bay: guides, boat captains and drivers who run twenty day trips and every transfer between them, and answer their own messages.',
             'hero'        => [
-                'eyebrow' => 'about fitzroy',
-                'title'   => 'the team behind the adventures',
-                'image'   => Repo::THEME . '/auteam-paul-2026.webp',
+                'eyebrow' => $about['eyebrow'],
+                'title'   => $about['title'],
+                'lede'    => $about['body'][0],
+                'image'   => Tours::img('bedouin-safari', 2, 1800),
+                'alt'     => 'Camels and quad bikes at the bedouin camp above Naama Bay',
             ],
-            'team'        => Repo::team(),
+            'about'       => $about,
+            'commitment'  => Site::commitment(),
+            'areas'       => Site::areas(),
+            'ogImage'     => Tours::img('bedouin-safari', 2, 1200),
+            'headerTheme' => 'transparent',
             'bodyClass'   => 'about',
-        ]);
-    }
-
-    public function team(Request $request, $slug = null)
-    {
-        $member = Repo::member((string) $slug);
-
-        if (!$member) {
-            abort(404, 'No team member at that address.');
-        }
-
-        return $this->view('pages.team', [
-            'title'       => $member['name'] . ' | Fitzroy Travel',
-            'description' => $member['blurb'],
-            'member'      => $member,
-            'team'        => Repo::team(),
-            'bodyClass'   => 'team-member',
-        ]);
-    }
-
-    public function stories(Request $request)
-    {
-        return $this->view('pages.stories', [
-            'title'       => 'Stories | Fitzroy Travel',
-            'description' => 'Field notes, planning guides and logistics explainers from the team.',
-            'hero'        => [
-                'eyebrow' => 'from the team',
-                'title'   => 'stories & field notes',
-                'lede'    => 'Notes written between trips: what a season really does to an itinerary, what a bed-night funds, and what to pack for a walk.',
-                'image'   => '/uploads/2026/06/african-elephant-b96130-sq.webp',
+            'breadcrumb'  => [$this->crumb('About', '/about')],
+            'seoNodes'    => [
+                Seo::breadcrumb([
+                    ['name' => 'Home', 'url' => '/'],
+                    ['name' => 'About', 'url' => '/about'],
+                ]),
             ],
-            'stories'     => Repo::stories(),
-            'bodyClass'   => 'stories',
         ]);
     }
 
-    public function story(Request $request, $slug = null)
+    public function faq(Request $request)
     {
-        $stories = Repo::stories();
-        $story   = $stories[(int) $slug] ?? null;
+        $faq = Site::faq();
 
-        if (!$story) {
-            abort(404, 'No story at that address.');
+        return $this->view('pages.faq', [
+            'title'       => 'Booking FAQ: prices, pick-up, weather',
+            'description' => 'Answers to the questions we get every day: how far ahead to book, what is included, private boats, wind cancellations, swimming, payment and delayed flights.',
+            'hero'        => [
+                'eyebrow' => 'asked every week',
+                'title'   => 'the questions, answered',
+                'lede'    => 'If yours is not here, message it to us — the answer usually ends up on this page.',
+                'image'   => Tours::img('glass-bottom-boat', 3, 1800),
+                'alt'     => 'Glass-bottom boat at the Naama Bay pier',
+            ],
+            'faq'         => $faq,
+            'ogImage'     => Tours::img('glass-bottom-boat', 3, 1200),
+            'headerTheme' => 'transparent',
+            'bodyClass'   => 'faq',
+            'breadcrumb'  => [$this->crumb('FAQ', '/faq')],
+            'seoNodes'    => [
+                Seo::faq($faq),
+                Seo::breadcrumb([
+                    ['name' => 'Home', 'url' => '/'],
+                    ['name' => 'FAQ', 'url' => '/faq'],
+                ]),
+            ],
+        ]);
+    }
+
+    public function alias(Request $request)
+    {
+        $uri  = isset($_SERVER['REQUEST_URI']) ? (string) $_SERVER['REQUEST_URI'] : '';
+        $path = '/' . trim((string) parse_url($uri, PHP_URL_PATH), '/');
+        $tail = [];
+
+        if (preg_match('#^/trips/(.+)$#', $path, $m)) {
+            $tail[] = $m[1];
+            $path   = '/tours';
         }
 
-        return $this->view('pages.story', [
-            'title'       => $story['title'] . ' | Fitzroy Travel',
-            'description' => $story['excerpt'],
-            'story'       => $story,
-            'stories'     => array_values(array_filter($stories, function ($s) use ($story) {
-                return $s['title'] !== $story['title'];
-            })),
-            'bodyClass'   => 'story',
-        ]);
+        $to = isset(self::$aliases[$path]) ? self::$aliases[$path] : $path;
+
+        // A legacy path with a slug on the end (/trips/white-island) keeps that
+        // slug, so the redirect lands on the same page, not the index.
+        if ($tail) {
+            $to .= '/' . $tail[0];
+        }
+
+        $query = isset($_SERVER['QUERY_STRING']) && $_SERVER['QUERY_STRING'] !== ''
+            ? '?' . $_SERVER['QUERY_STRING']
+            : '';
+
+        return redirect($to . $query, 301);
     }
 
     public function legal(Request $request, $slug = null)
     {
-        $slug = $slug ?: trim(parse_url($request->url(), PHP_URL_PATH), '/');
-        $page = config('site') ? Repo::legal()[$slug] ?? null : null;
+        if (!$slug) {
+            // The routes mount each policy at its own path with no parameter, so
+            // take the slug from the request path — works in Laravel and micro.
+            $uri  = isset($_SERVER['REQUEST_URI']) ? (string) $_SERVER['REQUEST_URI'] : '';
+            $path = trim((string) parse_url($uri, PHP_URL_PATH), '/');
+            $slug = $path !== '' ? $path : null;
+        }
+
+        $page = Site::legalPage((string) $slug);
 
         if (!$page) {
-            abort(404, 'No policy at that address.');
+            abort(404, 'That page does not exist.');
         }
 
         return $this->view('pages.legal', [
-            'title'       => $page['title'] . ' | Fitzroy Travel',
-            'description' => $page['lede'],
+            'title'       => $page['title'],
+            'description' => $page['excerpt'],
             'page'        => $page,
-            'slug'        => $slug,
+            'pages'       => Site::legal(),
+            'headerTheme' => 'solid',
             'bodyClass'   => 'legal',
+            'breadcrumb'  => [$this->crumb($page['title'], '/' . $slug)],
+            'seoNodes'    => [
+                Seo::breadcrumb(array_merge(
+                    [['name' => 'Home', 'url' => '/']],
+                    [['name' => $page['title'], 'url' => '/' . $slug]]
+                )),
+            ],
         ]);
     }
 }

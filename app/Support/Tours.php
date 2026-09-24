@@ -905,6 +905,83 @@ class Tours
         return $out;
     }
 
+    /*
+    | Media shortcuts. Every page on the site pulls its photography from the
+    | Drive folders listed above, so views can ask for "the third boat photo of
+    | the Tiran trip" instead of repeating file ids around the template.
+    */
+
+    public static function media(string $slug, int $index = 0, string $kind = 'gallery')
+    {
+        $tour = self::find($slug);
+
+        if (!$tour) {
+            return null;
+        }
+
+        $list = $kind === 'video' ? $tour['video'] : $tour['gallery'];
+
+        if (isset($list[$index])) {
+            return $list[$index];
+        }
+
+        return isset($list[0]) ? $list[0] : null;
+    }
+
+    public static function img(string $slug, int $index = 0, int $width = 1200, string $kind = 'gallery')
+    {
+        $tour   = self::find($slug);
+        $media  = self::media($slug, $index, $kind);
+
+        if (!$media) {
+            $media = self::cover($index % 2);
+
+            return Drive::img($media, $width, self::ROOT_FOLDER);
+        }
+
+        return Drive::img($media, $width, $tour['folder']);
+    }
+
+    public static function alt(string $slug, int $index = 0, string $kind = 'gallery')
+    {
+        $tour  = self::find($slug);
+        $media = self::media($slug, $index, $kind);
+
+        if (!$tour) {
+            return '';
+        }
+
+        $label = $media ? Drive::label($media) : '';
+
+        return $label !== '' && !preg_match('/^(caption|oip|\d)/i', $label)
+            ? $tour['title'] . ' — ' . $label
+            : $tour['title'] . ', Sharm el-Sheikh';
+    }
+
+    public static function embed(string $slug, int $index = 0)
+    {
+        $tour  = self::find($slug);
+        $media = self::media($slug, $index, 'video');
+
+        return $media ? Drive::embed($media, $tour['folder']) : null;
+    }
+
+    /** Trips belonging to a place/area, in the order the area lists them. */
+    public static function in(array $slugs): array
+    {
+        $out = [];
+
+        foreach ($slugs as $slug) {
+            $tour = self::find($slug);
+
+            if ($tour) {
+                $out[] = $tour;
+            }
+        }
+
+        return $out;
+    }
+
     public static function price($tour): string
     {
         return empty($tour['price'])

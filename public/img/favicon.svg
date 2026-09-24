@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Brothers Sharm Tour">
+  <rect width="64" height="64" fill="#101010"/>
+  <path d="M6 43c6.5 0 6.5-5 13-5s6.5 5 13 5 6.5-5 13-5 6.5 5 13 5" fill="none" stroke="#c0b38c" stroke-width="3.2" stroke-linecap="round"/>
+  <text x="32" y="32" text-anchor="middle" fill="#f4f2ef" font-family="Helvetica, Arial, sans-serif" font-size="22" font-weight="700" letter-spacing="1.5">BST</text>
+</svg>

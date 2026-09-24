@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Fitzroy clone — behaviour layer
+   Brothers Sharm Tour — behaviour layer
    No dependencies: preloader, header state, menu, sliders, reveals,
    season chart, share, dial-code picker and the enquiry form.
    ========================================================================== */
@@ -243,7 +243,7 @@
     /* ---------------------------------------------------------------- share */
     on(doc, 'click', '[data-share]', function (event, button) {
         event.preventDefault();
-        var label = button.getAttribute('data-share') || 'Fitzroy Travel';
+        var label = button.getAttribute('data-share') || doc.title;
         var url = window.location.href;
 
         if (navigator.share) {

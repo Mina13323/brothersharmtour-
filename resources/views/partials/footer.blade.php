@@ -3,29 +3,39 @@
 
     <div class="wrap site-footer__grid">
         <div class="site-footer__brand">
-            <p class="footer-logo">fitzroy <span>travel</span></p>
+            <p class="footer-logo">{{ config('site.logo_word') }} <span>{{ config('site.logo_sub') }}</span></p>
             <p class="site-footer__strap">{{ config('site.tagline') }}</p>
 
             <address class="site-footer__address">
-                @foreach ($contact['address_lines'] as $line)
+                @foreach (($contact['address_lines'] ?? []) as $line)
                     <span>{{ $line }}</span>
                 @endforeach
+                @if (!empty($contact['hours']))
+                    <span>{{ $contact['hours'] }}</span>
+                @endif
             </address>
 
             <p class="site-footer__contact">
-                <a href="{{ url($contact['phone_uk']['tel']) }}">{{ $contact['phone_uk']['label'] }}</a>
-                <a href="{{ url($contact['phone_us']['tel']) }}">{{ $contact['phone_us']['label'] }}</a>
-                <a href="mailto:{{ $contact['email'] }}">{{ $contact['email'] }}</a>
+                @if (!empty($contact['phone']['tel']))
+                    <a href="{{ url($contact['phone']['tel']) }}">{{ $contact['phone']['label'] }}</a>
+                @endif
+                @if (!empty($contact['whatsapp']))
+                    <a href="https://wa.me/{{ preg_replace('/\D/', '', $contact['whatsapp']) }}" rel="noopener" target="_blank">WhatsApp us</a>
+                @endif
+                @if (!empty($contact['email']))
+                    <a href="mailto:{{ $contact['email'] }}">{{ $contact['email'] }}</a>
+                @endif
             </p>
 
-            <a class="reviews" href="{{ $contact['reviews']['url'] }}" rel="noopener" target="_blank">
-                <span class="reviews__stars" aria-hidden="true">★★★★★</span>
-                <span class="reviews__label">{{ $contact['reviews']['label'] }}</span>
-            </a>
+            <ul class="assurances">
+                @foreach (($contact['assurances'] ?? []) as $assurance)
+                    <li>{{ $assurance }}</li>
+                @endforeach
+            </ul>
         </div>
 
         <div class="site-footer__navs">
-            @foreach ($footerNav as $heading => $links)
+            @foreach (($footerNav ?? []) as $heading => $links)
                 <nav class="footer-col" aria-label="{{ $heading }}">
                     <p class="eyebrow">{{ $heading }}</p>
                     <ul>
@@ -40,20 +50,32 @@
 
     <div class="wrap site-footer__base">
         <p class="site-footer__social">
-            @foreach ($contact['social'] as $network)
-                <a href="{{ $network['url'] }}" rel="noopener" target="_blank">{{ $network['label'] }}</a>
+            @php $rows = 0; @endphp
+            @foreach (($contact['social'] ?? []) as $network)
+                @if (!empty($network['url']))
+                    @php $rows++; @endphp
+                    <a href="{{ $network['url'] }}" rel="noopener me" target="_blank">{{ $network['label'] }}</a>
+                @endif
             @endforeach
+            @if (!$rows)
+                <a href="{{ url('/contact') }}">Send us a message</a>
+            @endif
         </p>
         <p class="site-footer__legal">
-            <span>&copy; {{ date('Y') }} {{ config('site.name') }} Ltd</span>
-            <a href="{{ url('/financial-protection') }}">Financial protection</a>
+            <span>&copy; {{ date('Y') }} {{ config('site.name') }}</span>
+            @if (!empty($site['legal_name']))
+                <span>{{ $site['legal_name'] }}</span>
+            @endif
+            <a href="{{ url('/booking-terms') }}">Booking terms</a>
+            <a href="{{ url('/cancellation-policy') }}">Cancellation</a>
             <a href="{{ url('/privacy-policy') }}">Privacy</a>
-            <a href="{{ url('/terms-conditions') }}">Terms</a>
+            <a href="{{ url('/sitemap.xml') }}">Sitemap</a>
         </p>
     </div>
 
     <p class="wrap site-footer__note">
-        Front-end study: layout and typography recreated for development use. Photography is hot-linked from
-        fitzroy-travel.com and all copy, images and marks remain the property of their owners.
+        {{ count(\App\Support\Tours::all()) }} day trips, reef boats, desert evenings and private transfers, run out of
+        Naama Bay by the guides and captains who lead them. Every photograph and film on this site was taken on our own
+        trips — if you appear in one and would rather not, tell us and it comes down.
     </p>
 </footer>

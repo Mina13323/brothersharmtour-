@@ -99,7 +99,7 @@ switch ($command) {
     default:
         echo <<<TXT
 
-  Fitzroy clone — micro runtime
+  Brothers Sharm Tour — micro runtime
 
   Available without composer install:
 

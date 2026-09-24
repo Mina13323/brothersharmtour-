@@ -779,11 +779,22 @@ class Kernel
     {
         try {
             $html = $this->view->make('errors.404', [
-                'title'        => 'Page not found | ' . $this->config('site.name'),
-                'destinations' => \App\Support\Repo::destinations(),
-                'nav'          => $this->config('site.nav'),
-                'contact'      => $this->config('site.contact'),
-                'footerNav'    => $this->config('site.footer_nav'),
+                'title'        => \App\Support\Seo::title('Page not found'),
+                'description' => \App\Support\Seo::describe(
+                    'That page has moved or never existed. All twenty Sharm el-Sheikh day trips, the films, the places and the guides are one click away.'
+                ),
+                // A 404 should never be indexed, and should never canonicalise
+                // onto something it is not.
+                'noindex'     => true,
+                'canonical'   => null,
+                'tours'       => \App\Support\Tours::featured(6),
+                'nav'         => $this->config('site.nav'),
+                'contact'     => $this->config('site.contact'),
+                'footerNav'   => $this->config('site.footer_nav'),
+                'promise'     => \App\Support\Site::promise(),
+                'stats'       => \App\Support\Site::stats(),
+                'tripCount'   => count(\App\Support\Tours::all()),
+                'site'        => $this->config('site'),
             ]);
         } catch (\Throwable $e) {
             $html = '<!doctype html><meta charset="utf-8"><title>404</title><body style="font:16px/1.6 system-ui;padding:4rem;background:#101010;color:#f4f4f2"><h1>404 — page not found</h1><p><a style="color:#c0b38c" href="/">Back to the homepage</a></p>';

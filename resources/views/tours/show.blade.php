@@ -8,19 +8,25 @@
 @section('content')
 
     <section class="page-hero page-hero--tall tour-hero">
-        <div class="page-hero__media">
-            <img class="drive-img" src="{{ $heroImage }}" alt="{{ $tour['title'] }}" fetchpriority="high" width="1800" height="1200">
+        <div class="page-hero__media" data-media>
+            <img class="drive-img" src="{{ $heroImage }}" alt="{{ $heroAlt }}" fetchpriority="high" width="1800" height="1200">
             <span class="page-hero__scrim" aria-hidden="true"></span>
         </div>
         <div class="wrap page-hero__inner">
+            @include('partials.breadcrumb', ['crumbClass' => 'crumbs--onhero'])
+
             <p class="eyebrow reveal-up" data-reveal>{{ $categoryLabel }}</p>
             <h1 class="display reveal-up" data-reveal>{{ $tour['title'] }}</h1>
             <p class="page-hero__lede reveal-up" data-reveal>{{ $tour['strap'] }}</p>
             <ul class="tour-hero__badges reveal-up" data-reveal>
                 <li>{{ $tour['duration'] }}</li>
                 <li>{{ \App\Support\Tours::price($tour) }}</li>
+                <li>hotel pick-up included</li>
                 @if ($hasClips)
-                    <li class="tour-hero__badge--film">{{ count($clips) }} film{{ count($clips) > 1 ? 's' : '' }}</li>
+                    <li class="tour-hero__badge--film">
+                        <svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>
+                        {{ count($clips) }} film{{ count($clips) > 1 ? 's' : '' }}
+                    </li>
                 @endif
             </ul>
         </div>
@@ -41,8 +47,10 @@
                 @endif
             </dl>
             <p class="trip-meta__cta">
-                <a class="btn" href="{{ url('/contact-us?tour=' . $tour['slug']) }}"><span>enquire about this trip</span></a>
-                <a class="btn btn--ghost" href="{{ url($contact['phone_us']['tel']) }}"><span>{{ $contact['phone_us']['label'] }}</span></a>
+                <a class="btn" href="{{ url('/contact?tour=' . $tour['slug']) }}"><span>enquire about this trip</span></a>
+                @if (!empty($contact['phone']['tel']))
+                    <a class="btn btn--ghost" href="{{ url($contact['phone']['tel']) }}"><span>{{ $contact['phone']['label'] }}</span></a>
+                @endif
             </p>
         </div>
     </section>
@@ -52,18 +60,16 @@
             <div class="gallery__strip" data-gallery-strip>
                 @foreach ($gallery as $index => $shot)
                     <figure class="gallery__frame">
-                        <a href="{{ $shot['full'] }}" target="_blank" rel="noopener">
-                            <img class="drive-img" src="{{ $shot['src'] }}"
-                                 alt="{{ $tour['title'] }} — {{ $shot['alt'] }}"
-                                 width="1350" height="900"
-                                 loading="{{ $index < 3 ? 'eager' : 'lazy' }}">
-                        </a>
+                        <img class="drive-img" src="{{ $shot['src'] }}"
+                             alt="{{ $shot['alt'] }}"
+                             width="1350" height="900"
+                             loading="{{ $index < 3 ? 'eager' : 'lazy' }}">
                     </figure>
                 @endforeach
             </div>
             <div class="wrap gallery__bar">
                 <p class="gallery__count"><span data-gallery-index>01</span> <i>/</i> {{ str_pad((string) count($gallery), 2, '0', STR_PAD_LEFT) }}</p>
-                <p class="gallery__hint">drag, scroll or use the arrow keys — tap a photo for the original file</p>
+                <p class="gallery__hint">drag, scroll or use the arrow keys — {{ count($gallery) }} frames from the trip</p>
             </div>
         </section>
     @endif
@@ -78,9 +84,9 @@
                 @endforeach
 
                 @if (!$hasShots)
-                    <p class="prose prose--quiet">
-                        Photography for this trip is still being edited — ask us and we will send a few of the
-                        last ones across before you decide.
+                    <p class="prose prose--quiet reveal-up" data-reveal>
+                        This one is a transfer rather than a trip, so there is nothing to photograph — the car, the driver and
+                        the time you give us are the whole product.
                     </p>
                 @endif
 
@@ -93,7 +99,7 @@
 
                 @if ($hasClips)
                     <h2 class="h2">watch it</h2>
-                    <p class="prose">Shot on the trip itself, nothing added but a caption.</p>
+                    <p class="prose">Filmed on the trip itself, nothing added but a caption.</p>
                     <div class="films__grid films__grid--inline">
                         @php $clipNo = 0; @endphp
                         @foreach ($clips as $clip)
@@ -105,7 +111,7 @@
                                 </div>
                                 <figcaption class="film__cap">
                                     <span>{{ $clip['name'] ?: 'Clip ' . $clipNo }}</span>
-                                    <a class="link-quiet" href="{{ $clip['file'] }}" target="_blank" rel="noopener">open file</a>
+                                    <a class="link-quiet" href="{{ url('/contact?tour=' . $tour['slug']) }}">ask about this trip</a>
                                 </figcaption>
                             </figure>
                         @endforeach
@@ -131,6 +137,16 @@
                         </ul>
                     </div>
                 </div>
+
+                <h2 class="h2">planning it</h2>
+                <ul class="ticklist">
+                    <li>{{ $tour['meeting'] }}</li>
+                    <li>{{ $tour['level'] }}</li>
+                    @if (isset($tour['season']))
+                        <li>Runs {{ strtolower($tour['season']) }}</li>
+                    @endif
+                    <li>Cancelling is free until 24 hours before pick-up</li>
+                </ul>
             </div>
 
             <aside class="tour-body__side">
@@ -142,7 +158,7 @@
                         <p class="side-card__line"><span>Season</span>{{ $tour['season'] }}</p>
                     @endif
                     <p class="side-card__price">{{ \App\Support\Tours::price($tour) }}</p>
-                    <p><a class="btn btn--solid" href="{{ url('/contact-us?tour=' . $tour['slug']) }}"><span>ask about this trip</span></a></p>
+                    <p><a class="btn btn--solid" href="{{ url('/contact?tour=' . $tour['slug']) }}"><span>ask about this trip</span></a></p>
                     <button class="link-quiet" type="button" data-share="{{ $tour['title'] }}">Share this trip</button>
                 </div>
             </aside>
@@ -154,7 +170,7 @@
             <div class="wrap">
                 <header class="section-head">
                     <p class="eyebrow">goes well with</p>
-                    <h2 class="display">also worth a day</h2>
+                    <h2 class="display display--sm">also worth a day</h2>
                 </header>
             </div>
             <div class="itn__grid">

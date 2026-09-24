@@ -1,8 +1,9 @@
-{{-- One excursion in the /tours grid. $item = a Tours::all() row. --}}
+{{-- One excursion in a grid. $item = a row from App\Support\Tours::all(). --}}
 @php
     $cover    = isset($item['gallery'][0]) ? $item['gallery'][0] : (isset($item['video'][0]) ? $item['video'][0] : null);
     $hasFilm  = !empty($item['video']);
     $catLabel = isset(\App\Support\Tours::CATEGORIES[$item['category']]) ? \App\Support\Tours::CATEGORIES[$item['category']] : '';
+    $alt      = \App\Support\Tours::alt($item['slug'], 0);
 @endphp
 
 <article class="tour-card">
@@ -12,7 +13,7 @@
         </span>
         @if ($cover)
             <img class="drive-img" src="{{ \App\Support\Drive::img($cover, 900, $item['folder']) }}"
-                 alt="{{ $item['title'] }}" loading="lazy" width="900" height="700">
+                 alt="{{ $alt }}" loading="lazy" width="900" height="700">
         @endif
 
         @if ($hasFilm)
@@ -44,6 +45,6 @@
 
     <p class="tour-card__foot">
         <a class="btn btn--sm btn--ghost" href="{{ url('/tours/' . $item['slug']) }}"><span>view trip</span></a>
-        <a class="link-quiet" href="{{ url('/contact-us?tour=' . $item['slug']) }}">ask about it</a>
+        <a class="link-quiet" href="{{ url('/contact?tour=' . $item['slug']) }}">ask about it</a>
     </p>
 </article>

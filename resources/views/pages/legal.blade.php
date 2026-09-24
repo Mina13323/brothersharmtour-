@@ -4,28 +4,31 @@
 
     <section class="legal">
         <div class="wrap legal__grid">
-            <aside class="legal__aside">
-                <p class="eyebrow">the small print</p>
-                <nav class="legal__nav" aria-label="Policies">
-                    <ul>
-                        @foreach (config('site.footer_nav.Legal') as $link)
-                            <li><a class="{{ rtrim(url($link['url']), '/') === url('/' . $slug) ? 'is-active' : '' }}" href="{{ url($link['url']) }}">{{ $link['label'] }}</a></li>
-                        @endforeach
-                    </ul>
-                </nav>
-            </aside>
+            <nav class="legal__nav" aria-label="Policies">
+                <p class="eyebrow">the paperwork</p>
+                <ul>
+                    @foreach ($pages as $slug => $item)
+                        <li>
+                            <a class="{{ $item['title'] === $page['title'] ? 'is-current' : '' }}" href="{{ url('/' . $slug) }}">{{ $item['title'] }}</a>
+                        </li>
+                    @endforeach
+                </ul>
+                <p class="legal__note">
+                    Updated {{ $page['updated'] }}. These pages are the operating terms for the trips listed on this site; ask
+                    before you book if anything needs spelling out for your group.
+                </p>
+            </nav>
 
             <article class="legal__body">
-                <h1 class="display">{{ $page['title'] }}</h1>
-                <p class="lead">{{ $page['lede'] }}</p>
-                @foreach ($page['body'] as $paragraph)
-                    <p class="prose">{{ $paragraph }}</p>
-                @endforeach
+                @include('partials.breadcrumb')
 
-                <p class="legal__note">
-                    This page is placeholder language written for the template. Replace it with your own reviewed policy before
-                    publishing anything commercially.
-                </p>
+                <h1 class="display">{{ $page['title'] }}</h1>
+                @foreach ($page['blocks'] as $block)
+                    <h2 class="h2">{{ $block['h'] }}</h2>
+                    @foreach ($block['p'] as $paragraph)
+                        <p class="prose">{{ $paragraph }}</p>
+                    @endforeach
+                @endforeach
             </article>
         </div>
     </section>

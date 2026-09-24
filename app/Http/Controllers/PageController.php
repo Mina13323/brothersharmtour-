@@ -167,7 +167,7 @@ class PageController extends Controller
             'description' => $page['excerpt'],
             'page'        => $page,
             'pages'       => Site::legal(),
-            'headerTheme' => 'solid',
+            'headerTheme' => 'transparent',
             'bodyClass'   => 'legal',
             'breadcrumb'  => [$this->crumb($page['title'], '/' . $slug)],
             'seoNodes'    => [

@@ -15,6 +15,7 @@ class ContactController extends Controller
 
         return $this->view('pages.contact', [
             'title'       => 'Contact & enquiries',
+            'headerTheme' => 'transparent',
             'description' => 'Send your dates and the number of people and we will price the trip the same day. Phone, WhatsApp or the form — answered by the person who will run your day.',
             'hero'        => [
                 'eyebrow' => 'start here',

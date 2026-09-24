@@ -32,7 +32,7 @@ class Controller
             'process'     => Site::process(),
             'stats'       => Site::stats(),
             'bodyClass'   => '',
-            'headerTheme' => 'light',
+            'headerTheme' => 'transparent',
             'canonical'   => $this->canonical(),
             'ogImage'     => Site::hero()['image'],
             'jsonLd'      => [],

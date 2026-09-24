@@ -1,4 +1,4 @@
-<header class="site-header site-header--{{ $headerTheme ?? 'light' }}" id="site-header">
+<header class="site-header" id="site-header">
     <div class="site-header__inner">
         <a class="logo" href="{{ url('/') }}" aria-label="{{ config('site.name') }} — home">
             <span class="logo__type">{{ config('site.logo_word') }}</span>

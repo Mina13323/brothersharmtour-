@@ -61,7 +61,16 @@
         <script type="application/ld+json">{!! \App\Support\Seo::json($jsonLd) !!}</script>
     @endif
 
-    <script>document.documentElement.className += ' js';</script>
+    <script>
+        document.documentElement.className += ' js';
+        /* If the deferred script never runs — blocked, offline, a 404 on this
+           host — the curtain must still come up and the revealed content must
+           still show. Three seconds, then the CSS takes over. */
+        setTimeout(function () {
+            document.documentElement.className += ' force-show';
+            if (document.body) { document.body.classList.add('loaded'); }
+        }, 3000);
+    </script>
 </head>
 <body class="{{ $bodyClass ?? '' }} header-{{ $headerTheme ?? 'light' }}">
     <div id="fader" class="fader" aria-hidden="true">

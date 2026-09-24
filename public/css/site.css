@@ -470,10 +470,19 @@ body.loaded .fader { transform: translate3d(0, -100%, 0); }
 body.menu-open .menu-toggle__bar:first-child { transform: translate3d(0, 3.75px, 0) rotate(45deg); }
 body.menu-open .menu-toggle__bar:last-child { transform: translate3d(0, -3.75px, 0) rotate(-45deg); }
 
-/* transparent variant (hero pages) */
+/* transparent variant (every page in this site opens on a dark hero, so this
+   is the default the controllers set; see Controller::share()). The scrim keeps
+   the wordmark legible over a pale photograph without hiding it. */
 body.header-transparent .site-header {
-    background: transparent;
+    background: linear-gradient(180deg, rgba(16, 16, 16, 0.55), rgba(16, 16, 16, 0) 72%);
     color: var(--color-white);
+}
+
+/* The opt-out, for any future page that opens on a light block. */
+body.header-solid .site-header {
+    background: var(--color-white);
+    color: var(--color-black);
+    box-shadow: 0 1px 0 rgba(27, 28, 29, 0.12);
 }
 
 body.header-transparent .site-header .btn--ghost { --btn-fg: var(--color-white); }
@@ -2999,141 +3008,70 @@ body.drive-off .drive-notice { display: block; }
 }
 
 /* ==========================================================================
-   Trip, guide and film components
-   The pieces the newer templates lean on: media frames that survive a Drive
-   outage, the trip hero badges, and the two-column bodies under articles.
+   Gaps, not overrides
+   --------------------------------------------------------------------------
+   Every rule here exists because a template uses a class the file did not
+   define yet — checked by diffing resources/views against the selectors
+   above. Nothing in this block restyles a component that already had a rule:
+   the media boxes, the trip-hero badges, .side-card (already sticky) and
+   .film__frame all live further up, and re-declaring them here is how the
+   previous pass broke the card grid and the /tours column.
    ========================================================================== */
 
-/* Media boxes ------------------------------------------------------------- */
-[data-media] {
-    position: relative;
-    overflow: hidden;
-    background: linear-gradient(140deg, #1b1c1d, #3a3b3d 55%, var(--color-clay));
-}
+/* Guides: text column and the contents rail ------------------------------- */
+.article__text,
+.article__side { min-width: 0; }
 
-[data-media] img,
-.drive-img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    max-width: 100%;
-    object-fit: cover;
-}
+.article__side { margin-top: clamp(2rem, 4vw, 3rem); }
 
-[data-media].is-missing img { visibility: hidden; }
-
-[data-media].is-missing::after {
-    content: "photo";
-    position: absolute;
-    inset: 0;
-    display: grid;
-    place-content: center;
-    color: rgba(244, 244, 242, 0.55);
-    font-family: var(--font-display);
-    font-size: 0.95rem;
-    letter-spacing: var(--eyebrow-space);
-    text-transform: uppercase;
-}
-
-/* Trip hero --------------------------------------------------------------- */
-.tour-hero { min-height: clamp(30rem, 72vh, 44rem); }
-
-.tour-hero__badges {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin: clamp(1.1rem, 2.4vw, 1.8rem) 0 0;
-    padding: 0;
-    list-style: none;
-}
-
-.tour-hero__badges li {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.4rem 0.85rem;
-    border: 1px solid rgba(244, 244, 242, 0.28);
-    border-radius: 999px;
-    color: rgba(244, 244, 242, 0.92);
-    font-size: 0.78rem;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    backdrop-filter: blur(6px);
-}
-
-.tour-hero__badge--film { color: var(--color-sand); }
-
-/* Trip: included / not included ------------------------------------------- */
-.incl__col { min-width: 0; }
-
-.incl__col .ticklist { margin: 0.6rem 0 0; }
-
-@media (min-width: 40rem) {
-    .incl {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: clamp(1.5rem, 4vw, 3.5rem);
-    }
-}
-
-/* Trip body with the sticky price card ------------------------------------ */
 @media (min-width: 62rem) {
-    .tour-body__side { position: static; }
-
-    .tour-body__side .side-card {
-        position: sticky;
-        top: calc(var(--header-h) + 1.5rem);
-    }
-}
-
-/* Films ------------------------------------------------------------------- */
-.film { margin: 0; }
-
-.film__frame {
-    position: relative;
-    aspect-ratio: 16 / 9;
-    overflow: hidden;
-    background: #0b0b0c;
-}
-
-.film__frame iframe {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    border: 0;
-}
-
-.films__grid--inline { margin-top: clamp(1.5rem, 3vw, 2.5rem); }
-
-.gallery__count {
-    margin: 0.75rem 0 0;
-    color: rgba(244, 244, 242, 0.6);
-    font-family: var(--font-display);
-    font-size: 0.95rem;
-    letter-spacing: var(--eyebrow-space);
-}
-
-.gallery__count i { font-style: normal; opacity: 0.5; }
-
-/* Guides ------------------------------------------------------------------ */
-@media (min-width: 62rem) {
+    /* .article__body carries a 46rem reading measure for the one-column case.
+       Once the rail joins it, the measure has to move onto the text, or the
+       grid squeezes both columns inside 46rem. */
     .article__body {
+        max-width: none;
         display: grid;
-        grid-template-columns: minmax(0, 1fr) 19rem;
+        grid-template-columns: minmax(0, 1fr) 18rem;
         gap: clamp(2rem, 5vw, 4.5rem);
         align-items: start;
     }
 
-    .article__text { max-width: 46rem; }
-    .article__side { position: sticky; top: calc(var(--header-h) + 1.5rem); }
+    .article__text { max-width: 44rem; }
+
+    .article__side {
+        margin-top: 0;
+        padding-top: 0.35rem;
+    }
+
+    /* The rail is a list of links, not a price card: same box, lighter. */
+    .article__side .side-card { background: var(--color-gray-lighter); color: var(--color-ink); }
+    .article__side .side-card .eyebrow { color: var(--color-clay); }
+    .article__side .side-card a { color: var(--color-ink); }
 }
 
-.stories--strip { padding-block: clamp(3.5rem, 7vw, 6rem); }
+/* Trip: what you get -------------------------------------------------------- */
+.incl__col { min-width: 0; }
 
-/* FAQ --------------------------------------------------------------------- */
-/* The /faq page renders every answer open, so it reads as a document rather
-   than an accordion: wider gaps and a slightly larger answer. */
+/* /tours: prices and pick-ups ---------------------------------------------- */
+.practical__text .prose { max-width: 54ch; }
+
+/* Guides index on a guide page -------------------------------------------- */
+.stories--strip { padding-block: clamp(2.5rem, 5vw, 4rem); }
+
+/* Films: the figure around an embed --------------------------------------- */
+.film { min-width: 0; margin: 0; }
+
+/* Home: the numbers row sits on black, so the hairline has to be light ---- */
+.stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding-top: clamp(1rem, 2.4vw, 1.6rem);
+    border-top: 1px solid rgba(244, 244, 242, 0.16);
+    list-style: none;
+}
+
+/* /faq: answers are all open, so it reads as a document, not an accordion -- */
 .faq-list--open .faq-item { padding-block: clamp(1.1rem, 2.4vw, 1.75rem); }
 
 .faq-list--open .faq-item dt { font-size: clamp(1.05rem, 1.4vw, 1.35rem); }
@@ -3144,49 +3082,26 @@ body.drive-off .drive-notice { display: block; }
     font-size: 1rem;
 }
 
-/* Home numbers ------------------------------------------------------------ */
-.stat {
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-    padding: clamp(1rem, 2.4vw, 1.6rem) 0;
-    border-top: 1px solid rgba(27, 28, 29, 0.14);
-    list-style: none;
+/* Footer: the brand column should not stretch the strap line forever ------- */
+.site-footer__brand { min-width: 0; max-width: 32rem; }
+
+/* Failsafe: the curtain and the reveals are JS-driven, so they have to expire
+   on their own if site.js is blocked or fails — see the inline script in the
+   layout head. Without these two rules a script error means a black screen. */
+html.force-show .fader { display: none; }
+
+html.force-show [data-reveal] { opacity: 1; transform: none; }
+
+/* Drive media that fails to load: keep the frame, lose the broken-image icon
+   (the tour cards handle this themselves with .tour-card__blank) ---------- */
+[data-media].is-missing {
+    background:
+        linear-gradient(140deg, #1b1c1d, #3a3b3d 55%, var(--color-clay));
 }
 
-/* Tour grid bands and the index page side-panels -------------------------- */
-.tours-band { padding-block: clamp(3.5rem, 8vw, 7rem); }
+[data-media].is-missing img { visibility: hidden; }
 
-@media (min-width: 62rem) {
-    .practical {
-        display: grid;
-        grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-        gap: clamp(2rem, 5vw, 4.5rem);
-        align-items: start;
-    }
-
-    .practical__grid { display: block; }
-    .practical__text { max-width: 40rem; }
-}
-
-/* Header on light pages --------------------------------------------------- */
-.site-header--solid {
-    background: var(--color-white);
-    box-shadow: 0 1px 0 rgba(27, 28, 29, 0.1);
-}
-
-.site-header--solid .site-header__inner,
-.site-header--solid .nav__link { color: var(--color-ink); }
-
-.site-header--solid .logo__mark { color: var(--color-ink); }
-
-/* Mega menu --------------------------------------------------------------- */
-.nav__item--has-children:hover .nav__sub,
-.nav__item--has-children:focus-within .nav__sub { opacity: 1; pointer-events: auto; }
-
-/* Footer ------------------------------------------------------------------ */
-.site-footer__brand { max-width: 30rem; }
-
-@media (min-width: 90rem) {
-    .site-footer__brand { grid-column: span 2; }
+/* Mobile: the rail drops below the text and stops being sticky ------------ */
+@media (max-width: 61.99rem) {
+    .article__side .side-card { position: static; }
 }

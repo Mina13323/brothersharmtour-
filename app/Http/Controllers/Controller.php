@@ -33,6 +33,8 @@ class Controller
             'stats'       => Site::stats(),
             'bodyClass'   => '',
             'headerTheme' => 'transparent',
+            'currentPath'  => $this->path(),
+            'currentQuery' => $this->query(),
             'canonical'   => $this->canonical(),
             'ogImage'     => Site::hero()['image'],
             'jsonLd'      => [],
@@ -69,6 +71,27 @@ class Controller
         unset($merged['seoNodes']);
 
         return $merged;
+    }
+
+    /**
+     * The path being served, without the query string — what the header matches
+     * a nav url against. Kept separate from canonical(), which returns an
+     * absolute url for the <link> tag and is the wrong shape for comparing.
+     */
+    protected function path()
+    {
+        $uri  = isset($_SERVER['REQUEST_URI']) ? (string) $_SERVER['REQUEST_URI'] : '/';
+        $path = parse_url($uri, PHP_URL_PATH);
+
+        return $path ? $path : '/';
+    }
+
+    /** The live query string, for nav links that carry one. */
+    protected function query()
+    {
+        $uri = isset($_SERVER['REQUEST_URI']) ? (string) $_SERVER['REQUEST_URI'] : '';
+
+        return parse_url($uri, PHP_URL_QUERY) ?: '';
     }
 
     protected function canonical($override = null)

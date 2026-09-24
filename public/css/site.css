@@ -472,39 +472,236 @@ body:not(.header-transparent).scrolled .site-header {
 
 body.scrolled .site-header .btn--ghost { --btn-fg: var(--color-white); }
 
-/* mobile menu */
-body.menu-open .nav {
-    position: fixed;
-    inset: var(--header-h) 0 0;
-    display: block;
-    padding: clamp(1.5rem, 6vh, 4rem) var(--gutter) 3rem;
-    background: var(--color-gray-lighter);
-    color: var(--color-black);
-    overflow-y: auto;
-}
+/* --------------------------------------------------------------------------
+   The burger panel — everything below 1080px, and only there.
 
-body.menu-open .nav__list { flex-direction: column; align-items: flex-start; gap: 0; }
-body.menu-open .nav__item { width: 100%; border-bottom: 1px solid rgba(0, 0, 0, 0.08); }
-body.menu-open .nav__link { padding: 1.15rem 0; font-size: 1rem; }
-body.menu-open .nav__sub {
-    position: static;
-    opacity: 1;
-    visibility: visible;
-    transform: none;
-    box-shadow: none;
-    background: transparent;
-    padding: 0 0 1rem;
-    min-width: 0;
+   The panel IS the <nav>: the same list, re-laid-out full screen by
+   body.menu-open, with the contact block the bar has no room for. Because of
+   that the whole feature lives inside one media query: at desktop widths the
+   nav is a bar and menu-open simply cannot apply to it, so a menu opened on a
+   phone and then a rotated tablet can never leave the desktop navigation
+   hidden (the trap the previous version fell into, which hid the bar whenever
+   the class survived a resize).
+   ----------------------------------------------------------------------- */
+@media (max-width: 1079px) {
+
+    /* The bar stops shrinking while the panel is up. The panel is anchored to
+       --header-h, so a header that changed height mid-gesture would open a gap
+       between the two, and the shorter "scrolled" bar is far too tight for the
+       logo mark anyway. */
+    body.menu-open .site-header {
+        height: var(--header-h);
+        background: var(--color-white);
+        color: var(--color-black);
+        box-shadow: 0 1px 0 rgba(27, 28, 29, 0.12);
+    }
+
+    body.menu-open .site-header__enquire,
+    body.menu-open .nav__whatsapp { opacity: 0; pointer-events: none; }
+
+    body.menu-open .logo__mark img { height: clamp(2rem, 6vw, 2.6rem); }
+
+    /* The page behind must not scroll — not because the panel would drift, but
+       because a panel you can push out of the way with a thumb is the single
+       most annoying thing a mobile menu does. */
+    body.menu-open { overflow: hidden; }
+
+    body.menu-open .nav {
+        position: fixed;
+        inset: var(--header-h) 0 0;
+        display: flex;
+        flex-direction: column;
+        padding: clamp(1.25rem, 4vh, 2.5rem) var(--gutter) 0;
+        background: var(--color-gray-lighter);
+        color: var(--color-black);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    body.menu-open .nav__list { flex: 1 1 auto; align-items: flex-start; }
+    body.menu-open .nav__item { width: 100%; border-bottom: 1px solid rgba(0, 0, 0, 0.08); }
+
+    /* Every row is a fingertip: 3.25rem is the smallest height that does not ask
+       for precision a bus window does not allow. */
+    body.menu-open .nav__link {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        min-height: 3.25rem;
+        padding: 0.5rem 0;
+        font-size: 1.05rem;
+        letter-spacing: 0.1em;
+    }
+
+    /* The chevron is decorative here; the button next to it does the work. */
+    body.menu-open .nav__caret { display: none; }
+
+    /* The bar on a phone carries three things and no more: the mark, the
+       enquiry and the burger. The phone number and WhatsApp move into the panel,
+       which is where a thumb can actually reach them — and which, unlike a
+       28px pill squeezed next to a logo, they can be tapped accurately in. */
+    .nav__phone,
+    .nav__whatsapp { display: none; }
+
+    .site-header__actions { gap: 0.45rem; }
+
+    /* Where a dropdown opens. On a phone a tap on "Day trips" has to mean
+       "go to Day trips" — the list gets its own control, so neither is lost. */
+    body.menu-open .nav__item--has-children { position: relative; }
+
+    /* Keep the label clear of the round button that sits on the right edge. */
+    body.menu-open .nav__item--has-children > .nav__link { padding-right: 3.4rem; }
+
+    body.menu-open .nav__item.is-current > .nav__link { color: var(--color-black); }
+
+    body.menu-open .nav__item.is-current > .nav__link span {
+        box-shadow: inset 0 -0.28em 0 rgba(177, 159, 112, 0.42);
+    }
+
+    body.menu-open .nav__expander {
+        position: absolute;
+        top: 0.35rem;
+        right: 0;
+        display: grid;
+        place-items: center;
+        width: 2.75rem;
+        height: 2.75rem;
+        background: none;
+        border: 1px solid rgba(0, 0, 0, 0.18);
+        border-radius: 50%;
+        color: inherit;
+        cursor: pointer;
+    }
+
+    body.menu-open .nav__expander::before {
+        content: "";
+        width: 0.5rem;
+        height: 0.5rem;
+        border-right: 1.5px solid currentColor;
+        border-bottom: 1.5px solid currentColor;
+        transform: rotate(45deg) translate(-1px, -1px);
+        transition: transform 0.35s var(--ease);
+    }
+
+    body.menu-open .nav__expander[aria-expanded="true"]::before { transform: rotate(-135deg) translate(-2px, -2px); }
+
+    /* Without JavaScript every list is open and nothing is hidden. Only when
+       site.js adds body.js-menu — i.e. a script is running — does a dropdown
+       start collapsed and wait for the button. */
+    body.menu-open .nav__sub {
+        position: static;
+        min-width: 0;
+        padding: 0 0 0.9rem;
+        background: transparent;
+        box-shadow: none;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        transition: none;
+        color: inherit;
+    }
+
+    body.js-menu .nav__sub { display: none; }
+    body.js-menu .nav__item.sub-open .nav__sub { display: block; }
+
+    body.menu-open .nav__sub li { padding: 0.05rem 2.75rem 0.05rem 1rem; }
+
+    body.menu-open .nav__sub a {
+        display: block;
+        padding: 0.55rem 0;
+        font-size: 0.92rem;
+        letter-spacing: 0.06em;
+        text-transform: none;
+        border-bottom: 1px dotted rgba(0, 0, 0, 0.1);
+    }
+
+    body.menu-open .nav__sub li:last-child a { border-bottom: 0; }
+
+    /* The contact block: the reason the panel is a menu and not just a list.
+       It is hidden by the base rule below and shown here, so there is exactly one
+       place that decides whether the block exists — and the desktop bar can never
+       inherit it. */
+    body.menu-open .nav__foot {
+        display: block;
+        margin-top: auto;
+        padding: clamp(1.25rem, 3vh, 2rem) 0 calc(1.5rem + env(safe-area-inset-bottom, 0px));
+    }
+
+    .nav__foot-cta { margin: 0 0 1.4rem; }
+
+    .nav__contact {
+        display: grid;
+        gap: 0.55rem;
+        margin: 0;
+        padding: 1.1rem 0 0;
+        list-style: none;
+        border-top: 1px solid rgba(0, 0, 0, 0.12);
+        font-size: 0.95rem;
+    }
+
+    .nav__contact li { display: flex; flex-wrap: wrap; gap: 0.2rem 0.8rem; align-items: baseline; }
+
+    .nav__contact span {
+        flex: 0 0 5.5rem;
+        font-size: 0.62rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        opacity: 0.6;
+    }
+
+    .nav__social { display: flex; flex-wrap: wrap; gap: 0.4rem 1.1rem; margin: 1.2rem 0 0; padding: 0; list-style: none; }
+
+    .nav__social a {
+        font-size: 0.68rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        text-decoration: none;
+        border-bottom: 1px solid currentColor;
+        opacity: 0.75;
+    }
+
 }
-body.menu-open .nav__sub li { padding: 0.1rem 0 0.1rem 1rem; }
-body.menu-open .logo { color: var(--color-black); }
 
 @media (min-width: 1080px) {
     .nav { display: block; }
     .menu-toggle { display: none; }
     .nav__phone { display: inline-block; }
-    body.menu-open .nav { display: none; }
+    .nav__expander { display: none; }
 }
+
+/* The bar on a phone, where the mark arrived next to the wordmark and there was
+   no extra room for it. Below ~520px the scene, the name, the enquiry and the
+   burger together are wider than the screen, and a logo that squeezes a menu
+   button off the edge is worse than a shorter wordmark — so the type gives
+   ground first: the mark comes down, "sharm" steps out, and the enquiry, which
+   is the one thing here someone actually taps, keeps its full size. */
+@media (max-width: 519px) {
+    .logo--mark { gap: 0.45rem; }
+
+    .logo__mark img { height: 1.7rem; }
+
+    .logo__sub { display: none; }
+
+    .site-header__inner { gap: 0.75rem; }
+}
+
+/* On the narrowest phones even that is one item too many, and a clipped burger
+   is not a recoverable mistake. The panel carries the same enquiry link, so
+   nothing is lost — it is one tap further away. */
+@media (max-width: 360px) {
+    .site-header__enquire { display: none; }
+}
+
+/* The bar gets shorter as it goes dark; the mark follows it down, or the scene
+   ends up taller than the strip of header it is standing in. */
+body.scrolled .logo__mark img { height: clamp(1.6rem, 3vw, 2rem); }
+
+/* The panel's contact block exists nowhere except inside an open panel: at base
+   level so the desktop bar cannot show it, and so that a stray `menu-open` on a
+   wide screen reveals nothing. */
+.nav__foot { display: none; }
 
 /* --------------------------------------------------------------------------
    Hero
@@ -3141,4 +3338,35 @@ html.force-show:not([data-motion="ok"]) [data-reveal] { opacity: 1 !important; t
     }
 
     .postcard a:hover .postcard__frame img { transform: scale(1.04); }
+}
+
+/* --------------------------------------------------------------------------
+   Which page you are on
+   --------------------------------------------------------------------------
+   The nav markup marks the current item (`is-current`, plus aria-current="page"
+   on the link itself) and these are the only two rules that draw it. The
+   underline lives on the link rather than on the header, so it survives every
+   header state — transparent over a hero, solid, or the dark scrolled bar —
+   without a variant rule per state, and it is a background rather than a border
+   so it does not shift the row it sits on. */
+
+.nav__link { position: relative; }
+
+.nav__item.is-current > .nav__link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: var(--color-clay);
+    opacity: 0.9;
+}
+
+/* A dropdown that contains the page you are reading is also marked, so the
+   bar never goes blank about where you are. */
+.nav__sub a[aria-current="page"] { font-weight: 600; }
+
+@media (max-width: 1079px) {
+    .nav__item.is-current > .nav__link::after { display: none; }
 }

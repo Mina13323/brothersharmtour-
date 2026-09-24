@@ -43,9 +43,9 @@ of them and add the rest later:
 | --- | --- |
 | `site.url` / `APP_URL` | canonical URLs, `og:url`, JSON-LD ids, `sitemap.xml`, `robots.txt` |
 | `contact.email` | footer, contact page, `TravelAgency.email` |
-| `contact.phone` + `phone.tel` | header button, every CTA band, `telephone` + `contactPoint` |
-| `contact.whatsapp` | WhatsApp buttons (header, footer, CTAs) and `wa.me` links |
-| `contact.social` | footer links and `TravelAgency.sameAs` |
+| `contact.phone` + `phone.tel` | header button, the burger panel, every CTA band, `telephone` + `contactPoint` |
+| `contact.whatsapp` | WhatsApp buttons (header, footer, CTAs), the burger panel, `wa.me` links |
+| `contact.social` | footer links, the burger panel and `TravelAgency.sameAs` |
 | `contact.address_lines`, `site.legal_name` | footer address, `TravelAgency.address`, booking terms |
 
 Also before you go live:
@@ -102,6 +102,44 @@ logo never becomes a hole in the page.
 Two names, deliberately: the mark reads **BRO Sharm**, which is what the header and footer show,
 while `site.name` stays **Brothers Sharm Tour** because it is the trading name in the page titles,
 the JSON-LD and the policies. Change one line each if that should become uniform.
+
+## Navigation
+
+`config/site.php` → `navigation` is the whole menu: five top-level items, three with dropdowns,
+in the order you want them in the bar. Add a row (or a `children` list) and the desktop bar, the
+burger panel, the current-page marks and the footer columns all follow — the menu is generated from
+that array and nowhere else. Removing the `All 20 trips` style duplicate rows matters: the parent
+link already goes to `/tours`.
+
+The bar and the full-screen panel are **one `<nav>`**. Below 1080px the same list is re-laid-out by
+`body.menu-open`, which means there is no second copy to drift out of date, and it means the desktop
+rules can never be affected by a menu left open on a rotated tablet.
+
+Things that are deliberate:
+
+- **A parent stays a link.** Tapping `Day trips` in the panel goes to `/tours`; a separate round
+  button beside it opens the list. Nothing on a touchscreen has to guess which of the two you meant.
+- **Without JavaScript every list is open.** The collapsed state hangs on a `js-menu` class the
+  script sets, so a page with no script still has a reachable menu.
+- **The panel carries the contact block** — enquiry, Call, WhatsApp, Email, Hours, social — because
+  those are the links a phone visitor is most likely after and the bar has no room for them. Fill in
+  `SITE_PHONE`, `SITE_WHATSAPP`, `SITE_EMAIL`, `SITE_INSTAGRAM` / `SITE_FACEBOOK` and they appear;
+  leave them empty and the rows disappear. `tel:` and `mailto:` hrefs are built from those values,
+  not passed through `url()` (which would write `href="/+2010…"`, a 404 in a pocket).
+- **Escape closes it, and so does clicking any link** — a `tel:` link often leaves the page where it
+  is, and a menu that stays open over a scroll-locked page is a dead end. Focus starts on the first
+  link when the panel opens, stays inside it while it is open, and returns to the burger.
+- **The current section is underlined** (`aria-current="page"` plus `App\Support\Nav`); a filter page
+  like `/tours?category=sea` marks both the section and the filter that matches.
+
+Behaviour is checked, not assumed:
+
+```bash
+npm run nav                        # opens, closes, expands, traps focus, survives a resize
+```
+
+`tools/nav-test.mjs` boots a rendered page with the real `site.js` in jsdom and drives it with
+clicks and keys, so a change that silently breaks the burger fails the run instead of the launch.
 
 ## Media: one Google Drive folder, no uploads
 
@@ -258,6 +296,7 @@ app/Support/Tours.php   The 20 trips: copy, highlights, inclusions, Drive file i
 app/Support/Packages.php The bundles — empty by design, docblock has the row shape
 app/Support/Site.php    Homepage blocks, places, guides, FAQ, promise, policies
 app/Support/Drive.php   Media bridge: Drive hot-links or local paths, one config switch
+app/Support/Nav.php     Which menu item the current URL belongs to
 app/Support/Seo.php     Canonicals, JSON-LD builders, sitemap and robots
 config/site.php         Brand, contact, navigation, footer, dial codes, drive mode
 routes/web.php          One routes file, Laravel syntax
@@ -272,6 +311,8 @@ public/js/vendor/        Self-hosted GSAP core + 6 plugins (npm run vendor:js)
 tools/micro/            Dependency-free runtime: Router, Blade subset, Kernel, helpers
 tools/preview-server.mjs  Dev-only preview through WebAssembly PHP
 tools/brand.sh          Rebuilds public/img/brand + the favicons from the source artwork
+tools/nav-test.mjs      The same harness for the header: burger, dropdowns, escape, focus
+                        (npm run nav)
 tools/motion-test.mjs   Boots a rendered page + the real scripts in jsdom and asserts
                         nothing got stranded (npm run motion)
 artisan                 serve / routes / lint / cache:clear without the framework
@@ -294,6 +335,10 @@ installed, because the files are ordinary `.blade.php`.
 
 - `prefers-reduced-motion` skips both behaviours in `animations.js` and resolves the page to its final state
 - every interactive element is a real `button`/`a`, with visible `:focus-visible` rings
+- the mobile menu locks the page behind it, closes on `Escape` or on any link, keeps `Tab` inside
+  itself, and hands focus back to the burger — and it is the same `<nav>` as the desktop bar, so
+  there is one set of links in the accessibility tree rather than two
+- the current page is marked in the navigation with `aria-current="page"`, not by colour alone
 - sliders and galleries are scroll-snap containers: trackpad, drag or arrow keys
 - no render-blocking JS (`defer`), all below-fold images `loading="lazy"`, `<video>`/`<iframe>`
   embeds lazy-load too

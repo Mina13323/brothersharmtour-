@@ -29,52 +29,139 @@
     setTimeout(function () { body.classList.add('loaded'); }, 3500);
 
     /* ---------------------------------------------------------------- header */
-    var lastY = 0;
+    var header = doc.getElementById('site-header');
+    var toggle = doc.getElementById('menu-toggle');
+    var panel  = doc.getElementById('primary-nav');
+    var wide   = window.matchMedia('(min-width: 1080px)');
 
-    function onScroll() {
-        var y = window.scrollY || doc.documentElement.scrollTop;
-        body.classList.toggle('scrolled', y > 40);
-        lastY = y;
+    function every(list, fn) { Array.prototype.forEach.call(list, fn); }
+
+    /* The panel collapses each dropdown only once a script is here to open it
+       again: body.js-menu is what the rules below hang on, so with JS switched
+       off every list stays visible and nothing in the menu is unreachable. */
+    body.classList.add('js-menu');
+
+    function isOpen() { return body.classList.contains('menu-open'); }
+
+    function setSub(item, open) {
+        item.classList.toggle('sub-open', open);
+
+        var button = item.querySelector('.nav__expander');
+        if (button) {
+            /* aria-expanded plus display:none in the stylesheet is all a submenu
+               needs — an explicit hidden attribute would survive a resize onto a
+               desktop and silence the hover dropdown. */
+            button.setAttribute('aria-expanded', open ? 'true' : 'false');
+
+            // Same word the label starts with, so the two can never drift apart.
+            var label = button.getAttribute('data-label') || 'section';
+            button.setAttribute('aria-label', (open ? 'Hide the ' : 'Show the ') + label.toLowerCase() + ' list');
+        }
     }
 
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
+    function closeMenu(refocus) {
+        if (!isOpen()) { return; }
 
-    var toggle = doc.getElementById('menu-toggle');
+        body.classList.remove('menu-open');
+        if (toggle) { toggle.setAttribute('aria-expanded', 'false'); }
+        every(doc.querySelectorAll('.nav__item.sub-open'), function (item) { setSub(item, false); });
+
+        if (refocus && toggle) { toggle.focus(); }
+    }
+
+    function openMenu() {
+        if (isOpen()) { return; }
+
+        body.classList.add('menu-open');
+        if (toggle) { toggle.setAttribute('aria-expanded', 'true'); }
+
+        /* Start the reader on the first link rather than at the top of the page.
+           preventScroll keeps the viewport where it was: focusing a fixed panel
+           must not shove the page behind it. */
+        var first = panel && panel.querySelector('.nav__link');
+        if (first && first.focus) {
+            try { first.focus({ preventScroll: true }); } catch (e) { first.focus(); }
+        }
+    }
+
     if (toggle) {
         toggle.addEventListener('click', function () {
-            var open = body.classList.toggle('menu-open');
-            toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-        });
-
-        on(doc.getElementById('primary-nav') || doc, 'click', '.nav__sub a', function () {
-            body.classList.remove('menu-open');
-            toggle.setAttribute('aria-expanded', 'false');
+            if (isOpen()) { closeMenu(true); } else { openMenu(); }
         });
     }
 
-    // Mobile: tap the parent label to reveal its submenu instead of navigating.
-    if (window.matchMedia('(max-width: 1079px)').matches) {
-        on(doc, 'click', '.nav__item--has-children > .nav__link', function (event, link) {
-            if (!body.classList.contains('menu-open')) { return; }
-            var item = link.parentElement;
-            var isOpen = item.classList.contains('sub-open');
+    doc.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' || event.key === 'Esc') { closeMenu(true); }
+    });
 
-            doc.querySelectorAll('.nav__item--has-children').forEach(function (el) {
-                el.classList.remove('sub-open');
-                var sub = el.querySelector('.nav__sub');
-                if (sub) { sub.style.display = ''; }
+    /* Any link inside the panel closes it before the browser does anything else.
+       Not only for tidiness: tel: and mailto: links often leave the page where
+       it is, and a menu that stays open over a locked page is a dead end. */
+    if (panel) {
+        on(panel, 'click', 'a', function () { closeMenu(false); });
+
+        on(panel, 'click', '.nav__expander', function (event, button) {
+            var item = button.closest('.nav__item');
+            if (!item) { return; }
+
+            var open = !item.classList.contains('sub-open');
+
+            /* One list at a time. Day trips has seven rows, Places six and the
+               guides five, and a panel that lets all three open is longer than
+               the screen it is on — which is the same problem as no accordion at
+               all, only further down the page. */
+            every(panel.querySelectorAll('.nav__item.sub-open'), function (other) {
+                if (other !== item) { setSub(other, false); }
             });
 
-            if (!isOpen) {
-                item.classList.add('sub-open');
-                var sub = item.querySelector('.nav__sub');
-                if (sub) { sub.style.display = 'block'; }
-            }
-
             event.preventDefault();
+            setSub(item, open);
+        });
+
+        // An action in the bar closes the panel too, so the two never compete.
+        on(doc, 'click', '.site-header__actions a', function () { closeMenu(false); });
+
+        // A full-screen menu should not let Tab walk out into the page behind it.
+        panel.addEventListener('keydown', function (event) {
+            if (event.key !== 'Tab' || !isOpen() || wide.matches) { return; }
+
+            var items = panel.querySelectorAll('a[href], button:not([disabled])');
+            if (!items.length) { return; }
+
+            var first = items[0];
+            var last = items[items.length - 1];
+
+            if (event.shiftKey && doc.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+            } else if (!event.shiftKey && doc.activeElement === last) {
+                event.preventDefault();
+                (toggle || first).focus();
+            }
         });
     }
+
+    // Rotating a tablet, or dragging a window wider, must not leave the panel's
+    // state — or its scroll lock — sitting on a desktop layout.
+    function onWidthChange(event) { if (event.matches) { closeMenu(false); } }
+
+    if (wide.addEventListener) { wide.addEventListener('change', onWidthChange); }
+    else if (wide.addListener) { wide.addListener(onWidthChange); }
+
+    window.addEventListener('resize', function () { if (wide.matches) { closeMenu(false); } });
+
+    /* Everything above is inside the header; the header hides itself on the way
+       down and comes back on the way up, and that is the only scroll behaviour it
+       has. Nothing here rewrites the scrolled state. */
+    if (header) {
+        function onScroll() {
+            body.classList.toggle('scrolled', (window.scrollY || doc.documentElement.scrollTop) > 40);
+        }
+
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+    }
+
 
     /* ---------------------------------------------------------------- reveals */
     /* When GSAP is present, public/js/animations.js owns entrance motion for

@@ -6,6 +6,7 @@
         "serve": "node tools/preview-server.mjs 8000",
         "brand": "./tools/brand.sh",
         "vendor:js": "mkdir -p public/js/vendor && for f in gsap ScrollTrigger; do cp node_modules/gsap/dist/$f.min.js public/js/vendor/; done",
+        "nav": "node tools/nav-test.mjs http://127.0.0.1:8000/",
         "motion": "node tools/motion-test.mjs http://127.0.0.1:8000/",
         "motion:reduced": "REDUCE=1 node tools/motion-test.mjs http://127.0.0.1:8000/",
         "motion:no-gsap": "NOGSAP=1 node tools/motion-test.mjs http://127.0.0.1:8000/"

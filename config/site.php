@@ -109,15 +109,16 @@ return [
         [
             'label' => 'Day trips',
             'url'   => '/tours',
+            // No "All trips" row here: the parent link already is /tours, and a
+            // dropdown that repeats its own heading is noise in the mobile panel.
             'children' => [
-                ['label' => 'All 20 trips', 'url' => '/tours'],
                 ['label' => 'Sea & reef', 'url' => '/tours?category=sea'],
                 ['label' => 'Desert & mountains', 'url' => '/tours?category=desert'],
                 ['label' => 'Adrenaline', 'url' => '/tours?category=adrenaline'],
                 ['label' => 'Dolphins & family', 'url' => '/tours?category=family'],
                 ['label' => 'Cairo & culture', 'url' => '/tours?category=culture'],
                 ['label' => 'Private transfers', 'url' => '/tours?category=transfer'],
-                ['label' => 'Films', 'url' => '/films'],
+                ['label' => 'Films from the boats', 'url' => '/films'],
             ],
         ],
         /*

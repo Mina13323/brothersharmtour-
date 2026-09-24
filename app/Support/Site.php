@@ -428,9 +428,38 @@ class Site
             ],
             'second'  => [
                 'What we do not do: no trips we have not done, no boat we have not been on, no shop stop for a commission, and no price that changes when you are standing on the pier with your wallet out.',
-                'The office is at [address in Naama Bay], the number is on every page, and [company legal name, registration] is on the booking terms if you want the paperwork. Most of what we do is by message and word of mouth, which is why the trip pages here are written by the people who run the days rather than by a marketing department.',
+                self::officeLine() . ' Most of what we do is by message and word of mouth, which is why the trip pages here are written by the people who run the days rather than by a marketing department.',
             ],
         ];
+    }
+
+    /**
+     * The office sentence is assembled from config, and shrinks to whatever you
+     * have actually filled in — a published page should never show square
+     * brackets to a customer.
+     */
+    public static function officeLine(): string
+    {
+        $lines   = (array) (config('site.contact.address_lines') ?: []);
+
+        foreach ($lines as $line) {
+            if (trim((string) $line) !== '' && !preg_match('/^(?:Sharm el-Sheikh|South Sinai|Egypt)/i', trim((string) $line))) {
+                $address = trim((string) $line);
+                break;
+            }
+        }
+
+        $legal = trim((string) (config('site.legal_name') ?: ''));
+
+        if ($address && $legal !== '') {
+            return sprintf('The office is at %s, the number is on every page, and %s is on the booking terms if you want the paperwork.', $address, $legal);
+        }
+
+        if ($address) {
+            return 'The office is at ' . $address . ' and the number is on every page.';
+        }
+
+        return 'The number is on every page, and the paperwork is on the booking terms.';
     }
 
     public static function commitment(): array

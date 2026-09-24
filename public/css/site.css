@@ -2813,19 +2813,18 @@ html.force-show [data-reveal] { opacity: 1; transform: none; }
 }
 
 /* ==========================================================================
-   Motion layer (public/js/animations.js) and packages
+   Motion handshake (public/js/animations.js) and packages
    --------------------------------------------------------------------------
-   Two things live here: the components the GSAP layer builds or drives, and
-   the package cards. Nothing in this block restyles an existing component —
-   GSAP applies its own initial states in JS, so an element is only hidden
-   while a tween owns it, and `html.force-show` hands it back if that never
-   happens.
+   Deliberately small: the only motion components on the site are the package
+   cards, and everything the script animates resolves through the two reveal
+   rules below. Nothing here restyles an existing component.
    ========================================================================== */
 
 /* Handshake with the script ------------------------------------------------ */
-html.motion .fader { transition: none; }
+/* The curtain belongs to public/js/site.js and the stylesheet — this file does
+   not touch it, so the load sequence stays one animation, not two.
 
-/* Once the motion layer is in charge the CSS reveal machinery steps fully
+   Once the motion layer is in charge the CSS reveal machinery steps fully
    aside. Two reasons: a CSS `transition` on opacity/transform fights GSAP's
    per-frame writes (the tween reads as smeared, and an interrupted tween can
    leave an element at its start value), and the hidden initial state should
@@ -2836,137 +2835,6 @@ html.motion .reveal-up { transition: none; }
 /* The head-script failsafe only forces things visible when the motion layer
    did not start at all — otherwise it would spoil every scroll reveal. */
 html.force-show:not([data-motion="ok"]) [data-reveal] { opacity: 1 !important; transform: none !important; }
-
-/* Tilt: JS owns the transform while the pointer is on the card. */
-.tilt { will-change: transform; }
-
-/* Marquee ----------------------------------------------------------------- */
-.marquee {
-    position: relative;
-    overflow: hidden;
-    padding-block: clamp(0.85rem, 1.8vw, 1.35rem);
-    background: var(--color-black);
-    color: var(--color-white);
-    border-block: 1px solid rgba(255, 255, 255, 0.1);
-    -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
-    mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
-}
-
-.marquee__track {
-    display: flex;
-    width: max-content;
-    will-change: transform;
-}
-
-.marquee__row { display: inline-flex; align-items: center; gap: clamp(1.5rem, 3vw, 2.75rem); padding-right: clamp(1.5rem, 3vw, 2.75rem); }
-
-.marquee__item {
-    display: inline-flex;
-    align-items: center;
-    gap: clamp(1.5rem, 3vw, 2.75rem);
-    font-family: var(--font-display);
-    font-size: clamp(1.05rem, 1.7vw, 1.5rem);
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    white-space: nowrap;
-}
-
-.marquee__item i { font-style: normal; font-size: 0.55em; color: var(--color-clay); }
-
-/* The disc that follows the pointer over the trip and package grids --------- */
-.cursor-badge {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1400;
-    display: grid;
-    place-items: center;
-    width: 5.4rem;
-    height: 5.4rem;
-    margin: -2.7rem 0 0 -2.7rem;
-    pointer-events: none;
-    opacity: 0;
-    visibility: hidden;
-    color: var(--color-white);
-}
-
-.cursor-badge__ring {
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    background: rgba(16, 16, 16, 0.86);
-    border: 1px solid rgba(192, 179, 140, 0.55);
-    backdrop-filter: blur(3px);
-}
-
-.cursor-badge__text {
-    position: relative;
-    font-family: var(--font-display);
-    font-size: 0.82rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-}
-
-@media (hover: none), (prefers-reduced-motion: reduce) {
-    .cursor-badge { display: none; }
-}
-
-/* Reading rule -------------------------------------------------------------- */
-.progress-rule {
-    position: fixed;
-    inset: auto 0 0 0;
-    z-index: 1200;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    height: 2px;
-    background: rgba(16, 16, 16, 0.08);
-    pointer-events: none;
-}
-
-.progress-rule__fill {
-    display: block;
-    flex: 1 1 auto;
-    height: 100%;
-    background: var(--color-clay);
-    transform: scaleX(0);
-    transform-origin: left center;
-}
-
-.progress-rule__label {
-    position: absolute;
-    right: var(--gutter);
-    bottom: 0.7rem;
-    max-width: min(46vw, 26rem);
-    overflow: hidden;
-    color: var(--color-gray);
-    font-size: 0.66rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
-@media (max-width: 62rem) {
-    .progress-rule__label { display: none; }
-}
-
-/* Steps: which one you are on ---------------------------------------------- */
-.steps__list { position: relative; }
-
-.process__progress {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 1px;
-    height: 100%;
-    background: linear-gradient(180deg, var(--color-clay), rgba(177, 159, 112, 0.1));
-    transform: scaleY(0);
-    transform-origin: top center;
-    pointer-events: none;
-}
-
-.step.is-current { border-top-color: var(--color-clay); }
 
 /* Packages ---------------------------------------------------------------- */
 .packages {

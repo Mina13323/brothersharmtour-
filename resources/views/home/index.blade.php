@@ -42,23 +42,7 @@
         </div>
     </section>
 
-    <!-- 2a · The ticker: what actually runs this season. Rendered in Blade so it
-         is here without JS; public/js/animations.js clones the row and drives it
-         from scroll velocity when GSAP is available. -->
-    @php $ticker = array_column(\App\Support\Tours::all(), 'title'); @endphp
-    @if (count($ticker))
-        <section class="marquee" data-marquee aria-hidden="true">
-            <div class="marquee__track">
-                <span class="marquee__row">
-                    @foreach ($ticker as $name)
-                        <span class="marquee__item">{{ $name }}<i>◆</i></span>
-                    @endforeach
-                </span>
-            </div>
-        </section>
-    @endif
-
-    <!-- 2b · Who you book with -->
+    <!-- 2 · Who you book with -->
     <section class="split">
         <div class="wrap split__grid">
             <div class="split__text">

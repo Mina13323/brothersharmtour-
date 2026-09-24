@@ -115,40 +115,47 @@ typo never produces a broken link.
 
 ## Motion
 
-GSAP 3.15 is **vendored** in `public/js/vendor/` (seven minified files, self-hosted, refreshed
-with `npm run vendor:js` — the licence is GreenSock's standard "no charge" licence, not MIT, see
-that folder's README). `public/js/animations.js` is the whole motion layer: a curtain lift and
-clip-wipe hero on load, line-mask titles and scrambled eyebrows (SplitText / ScrambleText),
-scrubbed parallax on every media frame, velocity skew on the horizontal strips, staggered grid
-reveals, pointer tilt on the cards, a magnetic press on buttons, a "view trip" disc that follows
-the cursor across the trip grid, counting numbers, a marquee band, a scroll-progress rule that
-names the section you are in, and eased `scrollTo` on in-page anchors.
+One file — `public/js/animations.js` — and two vendored scripts, `gsap.min.js` and
+`ScrollTrigger.min.js` in `public/js/vendor/` (`npm run vendor:js`). It is intentionally small,
+because the site is a catalogue of photographs and plain information about them:
 
-It is written as a **progressive enhancement**, because a hot-linked font or a missing vendor
-file must never take the site with it:
+- the first screen fades up and the hero photograph slows to a standstill over 1.3s
+- every block marked `data-reveal` rises 14 px into place, once, as you reach it
 
-- nothing is hidden by CSS waiting for a tween — the initial states are set in JS, so if the
-  script never runs, the page is simply already in its final state
-- `html.force-show` in the head still forces `[data-reveal]` visible if the *first* deferred
-  script throws (the failure mode that used to leave the curtain over the page);
-  `html.motion` then hands those properties to GSAP so a CSS `transition` never fights it
-- every effect is individually guarded, and each one is inside a `try/catch` — one broken
-  effect cannot stop the others
-- `prefers-reduced-motion: reduce` skips the tweens and resolves the page to its end state
-- `public/js/site.js` keeps its own IntersectionObserver reveals for the case where GSAP is
-  absent, and stands down when `window.gsap` exists
+That is all of it. No cursor effects, no parallax scrubbing, no split-text or scramble titles,
+no marquee, no counters, no tilt. Hover states, the curtain, the header, the sliders and the
+mobile menu are all CSS plus `public/js/site.js`, as they were before.
 
-Check it without a browser:
+What makes it safe rather than clever:
+
+- nothing is hidden by CSS waiting for a tween: the initial states are written in JS, so a dead
+  or blocked script leaves the page in its finished state instead of under a curtain
+- `html.force-show` (a head timer plus a `window` error listener) forces `[data-reveal]` visible
+  if the motion layer never started; `html.motion` then hands `opacity`/`transform` to GSAP so a
+  CSS `transition` cannot fight a per-frame tween write
+- each reveal ends by removing its own inline transform, because a leftover `translate()` would
+  outlive the animation and override `:hover` rules such as `.step:hover`
+- `prefers-reduced-motion: reduce` resolves the page to its end state and writes no styles
+- if GSAP is missing, this file returns immediately and `site.js` keeps its own reveals
+- on `load`, anything already on screen that no trigger claimed is revealed — webfonts and
+  Drive thumbnails move the page around while it loads; below the fold the triggers keep their
+  timing, so it never spoils a scroll
+
+Check it without a browser (it runs the real scripts against a rendered page):
 
 ```bash
 npm i && npm run serve            # in another shell
-npm run motion                    # boots each rendered page in jsdom with the real scripts
-npm run motion:reduced            # same, with reduced-motion on
-npm run motion:no-gsap            # same, with the vendor files missing — content must survive
+npm run motion                    # normal
+npm run motion:reduced            # with prefers-reduced-motion on
+npm run motion:no-gsap            # with public/js/vendor missing — content must survive
 ```
 
-The test asserts the handshake (no element left invisible, no inline transform stranded on top
-of a stylesheet `:hover`, marquee duplicated, JSON-LD still parseable) rather than pixels.
+It asserts behaviour, not pixels: nothing left invisible, no stranded inline transform, the
+JSON-LD still parseable, and none of the removed furniture coming back.
+
+GSAP's core and ScrollTrigger are under the GreenSock standard "no-charge" licence (see
+`public/js/vendor/README.md`); the Club GreenSock plugins are not licensed for this and are not
+used.
 
 ## Pages
 
@@ -248,7 +255,7 @@ installed, because the files are ordinary `.blade.php`.
 
 ## Accessibility & performance notes
 
-- `prefers-reduced-motion` disables the whole GSAP layer (curtain, reveals, parallax, tilt, cursor disc, smooth scroll) and resolves the page to its final state
+- `prefers-reduced-motion` skips both behaviours in `animations.js` and resolves the page to its final state
 - every interactive element is a real `button`/`a`, with visible `:focus-visible` rings
 - sliders and galleries are scroll-snap containers: trackpad, drag or arrow keys
 - no render-blocking JS (`defer`), all below-fold images `loading="lazy"`, `<video>`/`<iframe>`

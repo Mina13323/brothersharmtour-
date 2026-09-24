@@ -7,7 +7,7 @@
 @endphp
 
 <article class="tour-card">
-    <a class="tour-card__media" data-media data-badge="view trip" href="{{ url('/tours/' . $item['slug']) }}" tabindex="-1" aria-hidden="true">
+    <a class="tour-card__media" data-media href="{{ url('/tours/' . $item['slug']) }}" tabindex="-1" aria-hidden="true">
         <span class="tour-card__blank" aria-hidden="true">
             <span class="tour-card__blank-word">{{ $item['title'] }}</span>
         </span>

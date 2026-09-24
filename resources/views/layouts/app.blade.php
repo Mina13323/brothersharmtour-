@@ -96,19 +96,15 @@
     @php
         /*
          * Load order matters and every tag is deferred, so the browser runs them
-         * in document order: GSAP core, the plugins animations.js feature-detects,
-         * the dependency-free behaviour layer, then the animation layer. Delete
+         * in document order: GSAP core and ScrollTrigger — the only two this site
+         * needs — then the dependency-free behaviour layer, then the animation
+         * layer. Delete
          * public/js/vendor and the site still behaves — animations.js bails out
          * when window.gsap is missing and site.js keeps its own reveals.
          */
         $scripts = [
             'js/vendor/gsap.min.js',
             'js/vendor/ScrollTrigger.min.js',
-            'js/vendor/SplitText.min.js',
-            'js/vendor/ScrambleTextPlugin.min.js',
-            'js/vendor/ScrollToPlugin.min.js',
-            'js/vendor/Observer.min.js',
-            'js/vendor/CustomEase.min.js',
             'js/site.js',
             'js/animations.js',
         ];

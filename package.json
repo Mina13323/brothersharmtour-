@@ -1,0 +1,11 @@
+{
+    "name": "brothersharm-tour-preview",
+    "private": true,
+    "description": "Dev-only: node_modules for tools/preview-server.mjs (WebAssembly PHP), so the site can be served without a PHP binary. The site itself needs no node packages — npm install here is optional.",
+    "scripts": {
+        "serve": "node tools/preview-server.mjs 8000"
+    },
+    "dependencies": {
+        "@php-wasm/node": "^3.1.55"
+    }
+}

@@ -127,6 +127,11 @@ Things that are deliberate:
   `SITE_PHONE`, `SITE_WHATSAPP`, `SITE_EMAIL`, `SITE_INSTAGRAM` / `SITE_FACEBOOK` and they appear;
   leave them empty and the rows disappear. `tel:` and `mailto:` hrefs are built from those values,
   not passed through `url()` (which would write `href="/+2010…"`, a 404 in a pocket).
+- **Aim is designed for.** A top-level row and a trip inside a dropdown are both 3rem tall, the
+  dropdown control is a 2.75rem circle, and the header opts out of the double-tap gesture
+  (`touch-action: manipulation`) so Android Chrome fires the click instead of waiting to see whether
+  the tap was the first half of a zoom. Opening a list scrolls it into view instantly — smoothly
+  would slide the trip out from under a finger already on its way.
 - **Escape closes it, and so does clicking any link** — a `tel:` link often leaves the page where it
   is, and a menu that stays open over a scroll-locked page is a dead end. Focus starts on the first
   link when the panel opens, stays inside it while it is open, and returns to the burger.

@@ -19,10 +19,13 @@ const base = process.argv[2] || 'http://127.0.0.1:8000/';
 const repo = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 const errors = [];
-// jsdom has no browsing context to navigate in, so clicking a link reports
-// "Not implemented: navigation to another Document" — that IS the test passing:
-// the link was followed as far as a headless document can follow one.
-const ignored = /navigation to another Document|Could not parse CSS/;
+// jsdom has no browsing context, so following a link reports a stub instead:
+// "Not implemented: navigation (except hash changes)" or the "another Document"
+// phrasing, depending on where the link points. That IS the test passing — the
+// link was followed as far as a headless document can follow one. Every other
+// "Not implemented" stub is ignored on the same grounds, and only those: a real
+// fault in site.js arrives as an uncaught error, and that is reported.
+const ignored = /^Not implemented:|Could not parse CSS/;
 const vc = new VirtualConsole();
 vc.on('jsdomError', (e) => {
   const message = e.detail?.message || e.message || '';
@@ -214,6 +217,9 @@ yes('the rows are fingertip height', parseFloat(decl(phone, '.nav__link').match(
 yes('the caret is replaced by the button', /display:\s*none/.test(decl(phone, '.nav__caret')) && !/display:\s*none/.test(decl(phone, '.nav__expander')));
 yes('the dropdown control is a target', parseFloat(decl(phone, '.nav__expander').match(/width:\s*([\d.]+)rem/)?.[1] || 0) >= 2.5);
 yes('the dropdown opens in flow', /position:\s*static/.test(decl(phone, '.nav__sub')));
+yes('a trip row is a target, not a text line', parseFloat(decl(phone, '.nav__sub a').match(/min-height:\s*([\d.]+)rem/)?.[1] || 0) >= 3);
+yes('so is a contact row', parseFloat(decl(phone, '.nav__contact li').match(/min-height:\s*([\d.]+)rem/)?.[1] || 0) >= 2.75);
+yes('and the panel opts out of tap delay', /touch-action:\s*manipulation/.test(phone));
 yes('no script still reaches every link', /display:\s*block/.test(decl(phone, 'body:not(.js-menu) .nav')));
 yes('the phone-only actions leave the bar', /display:\s*none/.test(decl(phone, '.nav__phone,\n    .nav__whatsapp')) || /display:\s*none/.test(decl(phone, '.nav__phone')));
 yes('the contact block is hidden at base', /^\.nav__foot \{ display: none; \}$/m.test(css), 'outside every media query, so no desktop width can show it');

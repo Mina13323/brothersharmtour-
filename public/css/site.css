@@ -566,6 +566,12 @@ body.scrolled .site-header .btn--ghost { --btn-fg: var(--color-white); }
         letter-spacing: 0.1em;
     }
 
+    /* Android holds a click back while it decides whether the tap was the first
+       half of a double-tap-to-zoom. On a menu that reads as a dead button, and
+       on the burger it reads as a menu that will not open, so the whole header
+       opts out of the gesture. */
+    .site-header { touch-action: manipulation; }
+
     /* The chevron is the bar's affordance; here the button below does the work. */
     .nav__caret { display: none; }
 
@@ -643,9 +649,14 @@ body.scrolled .site-header .btn--ghost { --btn-fg: var(--color-white); }
 
     .nav__sub li { padding: 0.05rem 2.75rem 0.05rem 1rem; }
 
+    /* The trip links. A dropdown row is the thing a finger is actually aiming at
+       on this panel, so it gets the same 3rem as a top-level row: 0.55rem of
+       padding around 0.92rem text is a 40px target, which on a phone in sunlight
+       is a tap that lands on the dotted line between two trips. */
     .nav__sub a {
-        display: block;
-        padding: 0.55rem 0;
+        display: flex;
+        align-items: center;
+        min-height: 3rem;
         font-size: 0.92rem;
         letter-spacing: 0.06em;
         text-transform: none;
@@ -675,7 +686,13 @@ body.scrolled .site-header .btn--ghost { --btn-fg: var(--color-white); }
         font-size: 0.95rem;
     }
 
-    .nav__contact li { display: flex; flex-wrap: wrap; gap: 0.2rem 0.8rem; align-items: baseline; }
+    .nav__contact li {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.2rem 0.8rem;
+        align-items: center;
+        min-height: 2.75rem;
+    }
 
     .nav__contact span {
         flex: 0 0 5.5rem;
@@ -695,6 +712,9 @@ body.scrolled .site-header .btn--ghost { --btn-fg: var(--color-white); }
     }
 
     .nav__social a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 2.5rem;
         font-size: 0.68rem;
         letter-spacing: 0.18em;
         text-transform: uppercase;

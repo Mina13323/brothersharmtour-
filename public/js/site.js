@@ -116,6 +116,21 @@
 
             event.preventDefault();
             setSub(item, open);
+
+            /* An opened list can start below the fold — Day trips has seven rows,
+               and the panel is a scroll container, not a page — so the list, not
+               the row, is what has to be in view afterwards. Instantly, and only
+               as far as the nearest edge: a smooth scroll would move the trip out
+               from under a finger that is already on its way to it, which is the
+               exact gesture this panel exists to support. */
+            var sub = open ? item.querySelector('.nav__sub') : null;
+            if (sub && sub.scrollIntoView) {
+                try {
+                    sub.scrollIntoView({ block: 'nearest', behavior: 'auto' });
+                } catch (e) {
+                    sub.scrollIntoView();
+                }
+            }
         });
 
         // An action in the bar closes the panel too, so the two never compete.

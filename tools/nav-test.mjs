@@ -78,6 +78,10 @@ await new Promise((r) => setTimeout(r, 60));
 const check = [];
 const yes = (label, cond, extra = '') => check.push([cond ? 'ok  ' : 'FAIL', label, extra]);
 const click = (el) => el && el.dispatchEvent(new window.MouseEvent('click', { bubbles: true, cancelable: true }));
+/* Every section below starts from an open panel. A plain click on the burger
+   would sometimes close it instead — the panel now survives a navigating click
+   on purpose, so "open it" has to be stated rather than implied. */
+const openPanel = () => { if (!open()) { click(toggle); } };
 const key = (k, target, opts = {}) => (target || d).dispatchEvent(new window.KeyboardEvent('keydown', { key: k, bubbles: true, cancelable: true, ...opts }));
 
 const body = d.body;
@@ -91,6 +95,7 @@ yes('burger controls it', toggle && toggle.getAttribute('aria-controls') === 'pr
 yes('burger starts collapsed', toggle && toggle.getAttribute('aria-expanded') === 'false');
 yes('panel is labelled', panel && panel.getAttribute('aria-label') === 'Primary');
 yes('the panel has contact content', !!(panel && panel.querySelector('.nav__foot a')));
+yes('the foot exists to hold it', !!(panel && panel.querySelector('.nav__foot')));
 yes('no contact link is empty', [...(panel?.querySelectorAll('.nav__foot a') ?? [])].every((a) => (a.getAttribute('href') || '').length > 1));
 
 const expanders = [...d.querySelectorAll('.nav__expander')];
@@ -106,7 +111,7 @@ yes('parents stay navigable', [...d.querySelectorAll('.nav__item--has-children >
 yes('js-menu is what collapses lists', body.classList.contains('js-menu'));
 
 /* --------------------------------------------------------------- opening */
-click(toggle);
+openPanel();
 yes('click opens the panel', open());
 yes('aria-expanded follows', toggle.getAttribute('aria-expanded') === 'true');
 yes('focus moves into the panel', panel.contains(d.activeElement), d.activeElement?.className || d.activeElement?.tagName);
@@ -123,9 +128,13 @@ const parentLink = item.querySelector('.nav__link');
 const nav = new window.Event('click', { bubbles: true, cancelable: true });
 parentLink.dispatchEvent(nav);
 yes('the parent link is not intercepted', !nav.defaultPrevented, parentLink.getAttribute('href'));
-yes('and its click closes the panel', !open());
+// A link that leaves the page is left alone: the panel is not pulled out from
+// under a browser that has not finished acting on the tap.
+yes('and a navigating click is not fought', open());
+key('Escape');
+yes('escape still clears it afterwards', !open());
 
-click(toggle);
+openPanel();
 const others = [...panel.querySelectorAll('.nav__expander')].filter((b) => b !== button);
 if (others.length) {
   click(button);
@@ -135,26 +144,38 @@ if (others.length) {
 }
 
 /* --------------------------------------------------------- closing paths */
-click(toggle);
+openPanel();
 key('Escape');
 yes('escape closes it', !open());
 
-click(toggle);
-const telLink = panel.querySelector('.nav__contact a[href^="tel"], .nav__foot a[href^="tel"]');
-if (telLink) {
-  click(telLink);
-  yes('a tel: link releases the scroll lock', !open(), telLink.getAttribute('href'));
-} else {
-  yes('a tel: link releases the scroll lock', true, 'no phone configured — nothing to trap');
-}
+/* A tel: link often leaves the document where it is, so the panel must close on
+   the click itself — the difference between this and a page link, and the whole
+   point of reading the href rather than assuming a page change. */
+openPanel();
+const tel = d.createElement('a');
+tel.href = 'tel:+20000000000';
+tel.className = 'nav__phone';
+panel.querySelector('.nav__foot').appendChild(tel);
+click(tel);
+yes('a tel: link releases the scroll lock', !open());
 
-click(toggle);
+openPanel();
+const mail = d.createElement('a');
+mail.href = '#nav-contact';
+panel.querySelector('.nav__foot').appendChild(mail);
+click(mail);
+yes('a fragment link closes it too', !open());
+
+openPanel();
 const subLink = panel.querySelector('.nav__sub a');
 click(subLink);
-yes('choosing from a list closes the panel', !open());
+yes('a trip link is left for the browser', open() && !subLink.closest('.nav__sub').classList.contains('gone'));
+// The two synthetic links go back out of the document; subLink stays, because
+// the keyboard checks below count the panel's real focusable rows.
+tel.remove(); mail.remove();
 
 /* --------------------------------------------------------- keyboard walk */
-click(toggle);
+openPanel();
 const focusables = [...panel.querySelectorAll('a[href], button:not([disabled])')];
 focusables[focusables.length - 1].focus();
 const tab = new window.KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true });
@@ -167,7 +188,7 @@ panel.dispatchEvent(shiftTab);
 yes('shift-tab from the first wraps to the end', shiftTab.defaultPrevented && d.activeElement === focusables[focusables.length - 1]);
 
 /* ------------------------------------------------------------ widen up */
-click(toggle);
+openPanel();
 wide = true;
 window.dispatchEvent(new window.Event('resize'));
 listeners.forEach((fn) => fn({ matches: true, media: '(min-width: 1080px)' }));
@@ -201,11 +222,23 @@ function blockOf(at) {
 
 const phone = blockOf('@media (max-width: 1079px)');
 const bar = blockOf('@media (min-width: 1080px)');
-const decl = (block, sel) => {
-  const re = new RegExp('(?:^|[},])\\s*' + sel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*\\{([^}]*)\\}', 'm');
-  const m = block.match(re);
-  return m ? m[1] : '';
-};
+// The rules of one block, split the way a browser does: a selector LIST and a
+// declaration block. Matching on the whole list is the part that matters here —
+// a reset written as `.nav__sub, .nav__item:hover .nav__sub { …}` is one rule,
+// and a helper that only finds `sel {` would report it missing.
+function ruleOf(block, sel) {
+  for (const chunk of block.split('}')) {
+    const at = chunk.lastIndexOf('{');
+    if (at === -1) { continue; }
+
+    const sels = chunk.slice(0, at).split(',').map((x) => x.replace(/\s+/g, ' ').trim());
+    if (sels.includes(sel)) { return { sels, body: chunk.slice(at + 1) }; }
+  }
+
+  return { sels: [], body: '' };
+}
+
+const decl = (block, sel) => ruleOf(block, sel).body;
 
 yes('the panel is scoped to phones', phone.length > 200 && !/\.nav\s*\{[^}]*display:\s*none/.test(bar));
 yes('the burger is scoped to phones', /display:\s*none/.test(decl(bar, '.menu-toggle')));
@@ -217,6 +250,13 @@ yes('the rows are fingertip height', parseFloat(decl(phone, '.nav__link').match(
 yes('the caret is replaced by the button', /display:\s*none/.test(decl(phone, '.nav__caret')) && !/display:\s*none/.test(decl(phone, '.nav__expander')));
 yes('the dropdown control is a target', parseFloat(decl(phone, '.nav__expander').match(/width:\s*([\d.]+)rem/)?.[1] || 0) >= 2.5);
 yes('the dropdown opens in flow', /position:\s*static/.test(decl(phone, '.nav__sub')));
+// The bug this guards: `.nav__item:hover .nav__sub` (three classes) survives a
+// weaker reset, keeps its translate3d(-50%) and a phone's stuck :hover slides
+// the list off the screen the moment you tap into it.
+const subRule = ruleOf(phone, '.nav__sub');
+yes('a stuck :hover cannot slide the list away', subRule.sels.includes('.nav__item:hover .nav__sub') && /transform:\s*none/.test(subRule.body), subRule.sels.join(', ').slice(0, 60));
+yes('and neither can a focused row', subRule.sels.includes('.nav__item:focus-within .nav__sub'));
+yes('the open bar out-specifies every scrolled spelling', /body:not\(\.header-transparent\)\.menu-open\.scrolled \.site-header/.test(phone));
 yes('a trip row is a target, not a text line', parseFloat(decl(phone, '.nav__sub a').match(/min-height:\s*([\d.]+)rem/)?.[1] || 0) >= 3);
 yes('so is a contact row', parseFloat(decl(phone, '.nav__contact li').match(/min-height:\s*([\d.]+)rem/)?.[1] || 0) >= 2.75);
 yes('and the panel opts out of tap delay', /touch-action:\s*manipulation/.test(phone));

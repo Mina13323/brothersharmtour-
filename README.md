@@ -127,14 +127,22 @@ Things that are deliberate:
   `SITE_PHONE`, `SITE_WHATSAPP`, `SITE_EMAIL`, `SITE_INSTAGRAM` / `SITE_FACEBOOK` and they appear;
   leave them empty and the rows disappear. `tel:` and `mailto:` hrefs are built from those values,
   not passed through `url()` (which would write `href="/+2010…"`, a 404 in a pocket).
+- **A stuck `:hover` is planned for, not hoped away.** The bar reveals a dropdown with `:hover`, and a
+  phone leaves `:hover` stuck on whatever you last tapped. At this width that rule is matched *by name*
+  and emptied — `.nav__sub, .nav__item:hover .nav__sub, .nav__item:focus-within .nav__sub` share one
+  reset — because its `translate3d(-50%, …)` would otherwise slide the open list off the screen mid-tap,
+  and a weaker selector cannot overrule three classes of specificity.
 - **Aim is designed for.** A top-level row and a trip inside a dropdown are both 3rem tall, the
   dropdown control is a 2.75rem circle, and the header opts out of the double-tap gesture
   (`touch-action: manipulation`) so Android Chrome fires the click instead of waiting to see whether
   the tap was the first half of a zoom. Opening a list scrolls it into view instantly — smoothly
   would slide the trip out from under a finger already on its way.
-- **Escape closes it, and so does clicking any link** — a `tel:` link often leaves the page where it
-  is, and a menu that stays open over a scroll-locked page is a dead end. Focus starts on the first
-  link when the panel opens, stays inside it while it is open, and returns to the burger.
+- **Only the links that stay on the page close it.** A trip, a section — anything that unloads this
+  document — is left alone: the next page arrives closed and unlocked, and pulling the panel out from
+  under a browser that has not finished hit-testing the tap is how a menu ends up "tapping hides it
+  instead of opening the trip". `tel:`, `mailto:` and `#` links do close it, because there is no unload
+  to do it for them. `Escape` always closes. Focus starts on the first link when the panel opens, stays
+  inside it while it is open, and returns to the burger on close.
 - **The current section is underlined** (`aria-current="page"` plus `App\Support\Nav`); a filter page
   like `/tours?category=sea` marks both the section and the filter that matches.
 

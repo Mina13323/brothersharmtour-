@@ -492,10 +492,14 @@ body.scrolled .site-header .btn--ghost { --btn-fg: var(--color-white); }
 
     /* The panel is anchored to --header-h, so the bar keeps that height while the
        panel is up — including over a scrolled page, where the dark bar has three
-       classes of specificity and would otherwise stay short and leave a strip of
-       the page showing between itself and the panel. */
+       classes of specificity (four, on the pages with no hero) and would
+       otherwise stay short, leaving a strip of the page between itself and the
+       panel — which is anchored to --header-h and so opens below it. Every
+       spelling that rule has is spelled out here to match. */
     body.menu-open .site-header,
-    body.menu-open.scrolled .site-header {
+    body.menu-open.scrolled .site-header,
+    body.header-transparent.menu-open.scrolled .site-header,
+    body:not(.header-transparent).menu-open.scrolled .site-header {
         height: var(--header-h);
         background: var(--color-white);
         color: var(--color-black);
@@ -624,8 +628,17 @@ body.scrolled .site-header .btn--ghost { --btn-fg: var(--color-white); }
     .nav__expander[aria-expanded="true"]::before { transform: rotate(-135deg) translate(-2px, -2px); }
 
     /* A dropdown in the panel is part of the page flow, not a plate floating
-       over it: the bar's hover styling is all taken back off. */
-    .nav__sub {
+       over it, so the bar's styling is taken back off. The two hover spellings
+       are written into the SAME rule rather than left to this one, and that is
+       the whole point: `.nav__item:hover .nav__sub` is three classes and beats a
+       plain class, and on a touch screen a tap leaves :hover stuck on the row you
+       tapped — so a reset that only names .nav__sub loses to it, and its
+       translate3d(-50%, …) slides the list half its width off the screen the
+       instant you aim at it. Specificity is per selector in a list, so naming
+       those two here is what makes the reset stick. */
+    .nav__sub,
+    .nav__item:hover .nav__sub,
+    .nav__item:focus-within .nav__sub {
         position: static;
         top: auto;
         left: auto;

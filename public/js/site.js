@@ -84,6 +84,12 @@
         }
     }
 
+    function staysOnPage(link) {
+        var href = link.getAttribute('href') || '';
+
+        return link.target === '_blank' || /^(tel:|mailto:|sms:|fax:|#)/i.test(href);
+    }
+
     if (toggle) {
         toggle.addEventListener('click', function () {
             if (isOpen()) { closeMenu(true); } else { openMenu(); }
@@ -94,11 +100,19 @@
         if (event.key === 'Escape' || event.key === 'Esc') { closeMenu(true); }
     });
 
-    /* Any link inside the panel closes it before the browser does anything else.
-       Not only for tidiness: tel: and mailto: links often leave the page where
-       it is, and a menu that stays open over a locked page is a dead end. */
     if (panel) {
-        on(panel, 'click', 'a', function () { closeMenu(false); });
+        /* Which links have to close the panel themselves.
+
+           A link that leaves the page does not: the browser unloads this
+           document, the next one arrives with nothing open and nothing locked,
+           and taking the panel away in the same click is only another chance for
+           a browser to finish hit-testing something it has just hidden — which
+           is how "I tapped a trip and the menu vanished instead of opening it"
+           gets written. A tel:, mailto: or # link stays put, and *there* a panel
+           left open over a scroll-locked page is a dead end, so those close it. */
+        on(panel, 'click', 'a', function (event, link) {
+            if (staysOnPage(link)) { closeMenu(false); }
+        });
 
         on(panel, 'click', '.nav__expander', function (event, button) {
             var item = button.closest('.nav__item');
@@ -132,9 +146,6 @@
                 }
             }
         });
-
-        // An action in the bar closes the panel too, so the two never compete.
-        on(doc, 'click', '.site-header__actions a', function () { closeMenu(false); });
 
         // A full-screen menu should not let Tab walk out into the page behind it.
         panel.addEventListener('keydown', function (event) {
@@ -534,7 +545,12 @@
 
         if (target) {
             event.preventDefault();
-            target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+            /* Guarded, because jsdom and a few older webviews have no such
+               method and this runs on a click path the rest of the page survives
+               fine without — a missing scroll must not take the focus with it. */
+            if (target.scrollIntoView) {
+                target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+            }
         }
     });
 })();

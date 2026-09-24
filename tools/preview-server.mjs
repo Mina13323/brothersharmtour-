@@ -30,6 +30,8 @@ const MIME = {
 	'.png': 'image/png',
 	'.jpg': 'image/jpeg',
 	'.ico': 'image/x-icon',
+	'.webmanifest': 'application/manifest+json',
+	'.avif': 'image/avif',
 	'.woff2': 'font/woff2',
 };
 

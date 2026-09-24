@@ -3,7 +3,17 @@
 
     <div class="wrap site-footer__grid">
         <div class="site-footer__brand">
-            <p class="footer-logo">{{ config('site.logo_word') }} <span>{{ config('site.logo_sub') }}</span></p>
+            @php $brand = \App\Support\Site::brand('on-dark'); @endphp
+            @if ($brand)
+                <p class="site-footer__logo">
+                    <picture>
+                        @if ($brand['webp'])<source type="image/webp" srcset="{{ $brand['webp'] }}">@endif
+                        <img src="{{ $brand['png'] }}" width="{{ $brand['w'] }}" height="{{ $brand['h'] }}" alt="{{ $brand['alt'] }}" loading="lazy" decoding="async">
+                    </picture>
+                </p>
+            @else
+                <p class="footer-logo">{{ config('site.logo_word') }} <span>{{ config('site.logo_sub') }}</span></p>
+            @endif
             <p class="site-footer__strap">{{ config('site.tagline') }}</p>
 
             <address class="site-footer__address">

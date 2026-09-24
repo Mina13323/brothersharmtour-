@@ -1,4 +1,12 @@
-<section class="cta-band">
+<section class="cta-band{{ isset($bg) && $bg ? ' cta-band--photo' : '' }}">
+    @if (isset($bg) && $bg)
+        {{-- A frame from the same Drive folder, held far enough back that the
+             buttons keep their contrast. Optional: pages that pass no $bg get
+             the plain band they always had. --}}
+        <figure class="photo-band__bg" aria-hidden="true">
+            <img class="drive-img" src="{{ $bg }}" alt="" loading="lazy" decoding="async">
+        </figure>
+    @endif
     <div class="wrap cta-band__inner">
         <div>
             <h2 class="display display--sm">{{ $heading }}</h2>

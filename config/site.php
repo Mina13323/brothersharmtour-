@@ -25,8 +25,26 @@ return [
     'name'    => 'Brothers Sharm Tour',
     'legal_name' => env('SITE_LEGAL_NAME', ''),      // e.g. "Brothers Sharm Tour for Tourism"
     'published'  => '2026-09-23',                     // date the media folder was assembled
-    'logo_word' => 'BROTHERS',
-    'logo_sub'  => 'sharm tour',
+    'logo_word' => 'BRO',
+    'logo_sub'  => 'sharm',
+
+    /* ── The logo ──────────────────────────────────────────────────────────
+     * The artwork is the client's own, from Drive; every size and the favicons
+     * are generated from it by `tools/brand.sh`, which reads the source file
+     * below and writes public/img/brand/. Templates ask Site::brand() for a
+     * file and quietly fall back to the typographic name if none is there.
+     *   mark     the scene, cropped — the header, next to the words
+     *   full     the whole lockup — for light surfaces
+     *   on-dark  the lockup with the navy knocked out to white — footer, bands
+     */
+    'brand' => [
+        'alt'  => 'BRO Sharm — day trips from Sharm el-Sheikh',
+        'word' => 'BRO SHARM',                     // the loading screen
+        'source' => [
+            'file'     => 'resources/brand/bro-sharm-logo.jpg',
+            'drive_id' => '143gac66Zu2dPXs0bllwEkpLtPK_Pd7hO',
+        ],
+    ],
 
     /* Canonical base URL. Empty = derived from the request (local dev). */
     'url' => env('APP_URL', ''),

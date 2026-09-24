@@ -1,6 +1,13 @@
 <header class="site-header" id="site-header">
     <div class="site-header__inner">
-        <a class="logo" href="{{ url('/') }}" aria-label="{{ config('site.name') }} — home">
+        @php $mark = \App\Support\Site::brand('mark'); @endphp
+        <a class="logo{{ $mark ? ' logo--mark' : '' }}" href="{{ url('/') }}" aria-label="{{ config('site.name') }} — home">
+            @if ($mark)
+                <picture class="logo__mark">
+                    @if ($mark['webp'])<source type="image/webp" srcset="{{ $mark['webp'] }}">@endif
+                    <img src="{{ $mark['png'] }}" width="{{ $mark['w'] }}" height="{{ $mark['h'] }}" alt="" loading="eager" fetchpriority="high" decoding="async">
+                </picture>
+            @endif
             <span class="logo__type">{{ config('site.logo_word') }}</span>
             <span class="logo__sub">{{ config('site.logo_sub') }}</span>
         </a>

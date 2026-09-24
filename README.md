@@ -50,23 +50,58 @@ of them and add the rest later:
 
 Also before you go live:
 
-1. **Prices.** Every trip has `price => null`, which renders "Price on request". Put a
+1. **The wordmark.** The header reads `site.logo_word` + `site.logo_sub` next to the logo mark, and
+   the loading screen reads `site.brand.word`. They are set to match the artwork (*BRO Sharm*) while
+   `site.name` stays *Brothers Sharm Tour* for titles and structured data — say the word and both
+   become the same.
+2. **Prices.** Every trip has `price => null`, which renders "Price on request". Put a
    number in `app/Support/Tours.php` (USD per person, or per car for transfers) and it
    prints `from $45 USD` on the card, the trip meta bar, the booking card and in the
    `Product.offers` structured data — one value, four places.
-2. **Copy check.** Trip descriptions, durations and inclusions were drafted for this
+3. **Copy check.** Trip descriptions, durations and inclusions were drafted for this
    template from how these trips generally run out of Sharm. They are yours to correct —
    especially `included` / `excluded`, `duration` and `meeting`.
-3. **Policy placeholders.** `[company legal name]` and `[address in Naama Bay]` still
+4. **Policy placeholders.** `[company legal name]` and `[address in Naama Bay]` still
    appear in the booking terms and About page; `Site::legal()` is template language and
    should be read by whoever handles your paperwork.
-4. **Packages.** `/packages` is built but has no rows yet, so it renders an honest
+5. **Packages.** `/packages` is built but has no rows yet, so it renders an honest
    "being written now" panel and the trip grid instead of an empty grid of invented cards.
    Add entries to `Packages::all()` in `app/Support/Packages.php` and the cards, the home
    band, the nav dropdown, `sitemap.xml` and the day-by-day pages all appear — see
    "Packages" below for the shape.
-5. **`site.name`** is currently *Brothers Sharm Tour* (with `logo_word` / `logo_sub` for the
+6. **`site.name`** is currently *Brothers Sharm Tour* (with `logo_word` / `logo_sub` for the
    header). Change it once and the wordmark, titles, `og:site_name` and JSON-LD follow.
+
+## Brand: the logo and the favicons
+
+The artwork is the client's own — `site.brand.source` in `config/site.php` records both the Drive
+file id and the local copy at `resources/brand/bro-sharm-logo.jpg`. It arrives as a JPEG, which
+cannot carry transparency, so every usable derivative is generated from it:
+
+```bash
+npm run brand                       # or ./tools/brand.sh path/to/new-artwork.png
+```
+
+`tools/brand.sh` knocks the near-white plate out to real alpha, trims the artwork, and writes
+`public/img/brand/`:
+
+| File | Where it is used |
+| --- | --- |
+| `mark.webp/.png` | The scene above the lettering, cropped. Header, beside the name. |
+| `logo.webp/.png` | The whole lockup, as drawn. Light surfaces, `TravelAgency.logo`. |
+| `logo-white.webp/.png` | The lockup with the brand navy (`srgb(0,36,70)`) pushed to white. Footer and any dark band — the navy lettering is unreadable on black otherwise. |
+| `favicon-32.png`, `favicon-192.png`, `favicon-512.png`, `apple-touch-icon.png`, `favicon.svg` | The mark centred on navy. The `.svg` wraps a 64 px raster so a browser asking for a vector still scales cleanly. |
+| `public/site.webmanifest` | Name, theme colour and the two square icons. |
+
+Templates never name those files directly: `Site::brand('mark')` returns the paths, the WebP only
+when the file exists, and the intrinsic width and height read from the PNG, so the markup cannot
+drift and shift the header while the image loads. If the folder is emptied the header falls back
+to the typographic name (`site.logo_word` / `site.logo_sub`) and nothing else changes — a missing
+logo never becomes a hole in the page.
+
+Two names, deliberately: the mark reads **BRO Sharm**, which is what the header and footer show,
+while `site.name` stays **Brothers Sharm Tour** because it is the trading name in the page titles,
+the JSON-LD and the policies. Change one line each if that should become uniform.
 
 ## Media: one Google Drive folder, no uploads
 
@@ -161,7 +196,7 @@ used.
 
 | Route | Content |
 | --- | --- |
-| `/` | Hero, who you book with, numbers, the places slider, six featured trips, the promise, how a booking works, photo strip, why-book-us, approach, CTA |
+| `/` | Hero, who you book with, numbers over a reef frame, the places slider, six featured trips, the promise, how a booking works, photo strip, the postcard wall, why-book-us, approach, CTA over a desert frame |
 | `/tours` | All 20 trips, filterable by `?category=sea\|desert\|adrenaline\|family\|culture\|transfer`, plus prices/pick-ups and an FAQ extract |
 | `/tours/{slug}` | Trip page: hero, meta bar, photo strip, embedded films, what happens, included/not included, planning list, sticky price card, related trips |
 | `/packages` | Multi-day bundles with one price. **Built and empty on purpose** — see "Packages" below |
@@ -231,10 +266,12 @@ resources/views/        Blade: layouts/, partials/, home/, tours/, packages/, ar
 public/css/site.css     Design system (tokens, typography, components, responsive, a11y)
 public/js/site.js       Vanilla behaviour: preloader, header, menu, sliders, reveals,
                         share, dial picker, form validation + fetch, Drive image fallback
+public/img/brand/      Generated logo derivatives — rebuild with npm run brand
 public/js/animations.js The GSAP layer — every effect guarded, all of it optional
 public/js/vendor/        Self-hosted GSAP core + 6 plugins (npm run vendor:js)
 tools/micro/            Dependency-free runtime: Router, Blade subset, Kernel, helpers
 tools/preview-server.mjs  Dev-only preview through WebAssembly PHP
+tools/brand.sh          Rebuilds public/img/brand + the favicons from the source artwork
 tools/motion-test.mjs   Boots a rendered page + the real scripts in jsdom and asserts
                         nothing got stranded (npm run motion)
 artisan                 serve / routes / lint / cache:clear without the framework

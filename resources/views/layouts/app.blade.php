@@ -42,8 +42,10 @@
         <meta name="twitter:site" content="{{ config('site.twitter') }}">
     @endif
 
+    <link rel="icon" href="{{ asset('img/brand/favicon-32.png') }}" sizes="32x32" type="image/png">
     <link rel="icon" href="{{ asset('img/favicon.svg') }}" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="{{ asset('img/favicon.svg') }}">
+    <link rel="apple-touch-icon" href="{{ asset('img/brand/apple-touch-icon.png') }}">
+    <link rel="manifest" href="{{ asset('site.webmanifest') }}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -79,7 +81,7 @@
 <body class="{{ $bodyClass ?? '' }} header-{{ $headerTheme ?? 'light' }}">
     <div id="fader" class="fader" aria-hidden="true">
         <div class="fader__bar"></div>
-        <p class="fader__word">{{ strtolower(config('site.logo_word')) }}</p>
+        <p class="fader__word">{{ strtolower(config('site.brand.word') ?: config('site.logo_word') . ' ' . config('site.logo_sub')) }}</p>
     </div>
 
     <a class="skip-link" href="#main">Skip to content</a>

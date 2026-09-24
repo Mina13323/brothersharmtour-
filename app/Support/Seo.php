@@ -103,7 +103,8 @@ class Seo
             'url'         => self::canonical('/'),
             'description' => (string) config('site.description'),
             'image'       => Tours::img('tiran-island-snorkelling', 2, 1200),
-            'logo'        => self::canonical('/img/favicon.svg'),
+            'logo'        => self::canonical('/img/brand/logo.png'),
+            'slogan'      => (string) config('site.tagline'),
             'slogan'      => (string) config('site.tagline'),
             'areaServed'  => [
                 ['@type' => 'City', 'name' => 'Sharm el-Sheikh'],

@@ -584,6 +584,48 @@ class Site
         return $page;
     }
 
+    /**
+     * The brand artwork, from public/img/brand, for the header and the footer.
+     *
+     * Returns the paths a template needs: the PNG, the WebP next to it when one
+     * exists, the intrinsic size read from the file itself (so the markup can
+     * never drift out of sync and shift the layout while the image loads) and a
+     * cache-busting version. Null when the artwork is missing — the templates
+     * then fall back to the typographic name, which is what they did before the
+     * logo existed, so a missing file never leaves a hole in the header.
+     *
+     * Do not edit the images by hand: tools/brand.sh rebuilds every derivative,
+     * including the favicons, from the client's source artwork in
+     * resources/brand.
+     */
+    public static function brand($what = 'mark')
+    {
+        // The name a template asks for → the file tools/brand.sh writes.
+        $files = ['mark' => 'mark', 'full' => 'logo', 'on-dark' => 'logo-white'];
+
+        if (!isset($files[$what])) {
+            return null;
+        }
+
+        $dir = dirname(__DIR__, 2) . '/public/img/brand';
+        $png = $dir . '/' . $files[$what] . '.png';
+
+        if (!file_exists($png)) {
+            return null;
+        }
+
+        $size = @getimagesize($png);
+        $webp = $dir . '/' . $files[$what] . '.webp';
+
+        return [
+            'png'  => '/img/brand/' . $files[$what] . '.png?v=' . filemtime($png),
+            'webp' => file_exists($webp) ? '/img/brand/' . $files[$what] . '.webp?v=' . filemtime($webp) : null,
+            'w'    => $size ? (int) $size[0] : 560,
+            'h'    => $size ? (int) $size[1] : 270,
+            'alt'  => (string) config('site.brand.alt'),
+        ];
+    }
+
     /** Site-wide footer note + enquiries copy, in one place. */
     public static function contactCopy(): array
     {

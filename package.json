@@ -4,6 +4,7 @@
     "description": "Dev-only tooling: @php-wasm/node powers tools/preview-server.mjs, and gsap is the source for the vendored files in public/js/vendor (npm run vendor:js); jsdom runs tools/motion-test.mjs, which boots a rendered page and the animation code together. The site itself needs no build step.",
     "scripts": {
         "serve": "node tools/preview-server.mjs 8000",
+        "brand": "./tools/brand.sh",
         "vendor:js": "mkdir -p public/js/vendor && for f in gsap ScrollTrigger; do cp node_modules/gsap/dist/$f.min.js public/js/vendor/; done",
         "motion": "node tools/motion-test.mjs http://127.0.0.1:8000/",
         "motion:reduced": "REDUCE=1 node tools/motion-test.mjs http://127.0.0.1:8000/",

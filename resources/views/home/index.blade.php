@@ -73,8 +73,11 @@
         </div>
     </section>
 
-    <!-- 3 · Numbers -->
-    <section class="stats">
+    <!-- 3 · Numbers, on a frame from one of the reef days -->
+    <section class="stats stats--photo">
+        <figure class="photo-band__bg" aria-hidden="true">
+            <img class="drive-img" src="{{ \App\Support\Tours::img('swim-with-dolphins', 2, 1800) }}" alt="" loading="lazy" decoding="async">
+        </figure>
         <ul class="wrap stats__grid">
             @foreach ($stats as $stat)
                 <li class="stat reveal-up" data-reveal>
@@ -171,6 +174,20 @@
         </div>
     </section>
 
+    <!-- 8b · The frames themselves -->
+    @include('partials.postcards', ['frames' => [
+        ['slug' => 'white-island',              'i' => 2, 'note' => 'the sandbar, low tide',   'ar' => '4 / 5'],
+        ['slug' => 'tiran-island-snorkelling',  'i' => 4, 'note' => 'reef stop, first hour',   'ar' => '1 / 1'],
+        ['slug' => 'colored-canyon',            'i' => 1, 'note' => 'three hours on foot',     'ar' => '4 / 5'],
+        ['slug' => 'super-safari',              'i' => 3, 'note' => 'quads, twenty past five', 'ar' => '3 / 4'],
+        ['slug' => 'swim-with-dolphins',        'i' => 0, 'note' => 'open water, no nets',     'ar' => '4 / 5'],
+        ['slug' => 'bedouin-safari',            'i' => 2, 'note' => 'tea in the camp',         'ar' => '1 / 1'],
+        ['slug' => 'ras-mohammed-bus-trip',     'i' => 1, 'note' => 'the strait, from the top','ar' => '4 / 5'],
+        ['slug' => 'parasailing',               'i' => 0, 'note' => 'naama bay, from the air', 'ar' => '3 / 4'],
+        ['slug' => 'horse-riding',              'i' => 1, 'note' => 'beach ride at dusk',      'ar' => '4 / 5'],
+        ['slug' => 'glass-bottom-boat',         'i' => 0, 'note' => 'for those who stay dry',  'ar' => '1 / 1'],
+    ]])
+
     <!-- 9 · Why it is like this -->
     <section class="why">
         <div class="wrap why__grid">
@@ -200,6 +217,7 @@
     @include('partials.cta-band', [
         'heading' => 'ready to pick a day?',
         'text'    => 'Send us the date and the number of you. We will come back with the price for that day, what is on it, and the pick-up time — usually within the hour.',
+        'bg'      => \App\Support\Tours::img('super-safari', 5, 1800),
     ])
 
 @endsection

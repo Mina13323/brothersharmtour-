@@ -2988,3 +2988,157 @@ html.force-show:not([data-motion="ok"]) [data-reveal] { opacity: 1 !important; t
 .daylist__go { color: var(--color-clay); transition: transform 0.4s var(--ease); }
 
 .daylist__item a:hover .daylist__go { transform: translateX(0.4rem); }
+
+/* ==========================================================================
+   Brand mark, photo bands, postcard wall
+   ========================================================================== */
+
+/* The header lockup, once Site::brand('mark') finds artwork: the scene sits
+   beside the name instead of replacing it, so the type still carries the brand
+   if the image ever fails. Only the new classes are declared here — the base
+   .logo rule above is left alone. */
+.logo--mark { align-items: center; gap: 0.65rem; }
+
+.logo__mark { display: block; flex: 0 0 auto; }
+
+.logo__mark img {
+    display: block;
+    height: clamp(2rem, 3.6vw, 2.6rem);
+    width: auto;
+}
+
+/* The scene is bright in the middle and dark at the edges, so it holds up over
+   the hero photograph and on the solid header alike — no plate, no second
+   file, no inversion. */
+.logo__mark img { border-radius: 3px; }
+
+.site-footer__logo { margin: 0 0 1.5rem; }
+
+.site-footer__logo img {
+    display: block;
+    width: min(11rem, 52%);
+    height: auto;
+}
+
+/* Photo bands ---------------------------------------------------------------
+   The two text-only sections on the home page get a frame from the same Drive
+   folder behind them. The figure is absolutely positioned inside a *modifier*
+   class, so the base .stats and .cta-band rules above are untouched, and the
+   scrim is part of the figure rather than a filter on the text.
+   ------------------------------------------------------------------------- */
+.stats--photo,
+.cta-band--photo { position: relative; overflow: clip; }
+
+.photo-band__bg {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    pointer-events: none;
+}
+
+.photo-band__bg img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.3;
+    filter: saturate(0.62) contrast(1.04);
+}
+
+.photo-band__bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(16, 16, 16, 0.42), rgba(16, 16, 16, 0.86));
+}
+
+.stats--photo .wrap,
+.cta-band--photo .wrap { position: relative; z-index: 1; }
+
+.stats--photo { padding: clamp(3.5rem, 7vw, 6rem) 0; }
+
+/* The postcard wall --------------------------------------------------------
+   A staggered grid of photographs, each one a link to the trip it belongs to.
+   No slider and no JavaScript: the offsets are margins, so it reflows to two
+   columns on a tablet and one on a phone without anything being clipped.
+   ------------------------------------------------------------------------- */
+.postcards {
+    padding: var(--section) 0;
+    background: var(--color-gray-lighter);
+}
+
+.postcards__wall {
+    display: grid;
+    gap: clamp(1.1rem, 2.6vw, 2rem);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+    list-style: none;
+    margin: clamp(1.75rem, 3.4vw, 2.75rem) 0 0;
+    padding: 0;
+}
+
+.postcard a {
+    display: block;
+    padding: 0.55rem 0.55rem 0.2rem;
+    background: var(--color-white);
+    border: 1px solid rgba(16, 16, 16, 0.07);
+    color: inherit;
+    text-decoration: none;
+    box-shadow: 0 20px 44px -30px rgba(16, 16, 16, 0.5);
+}
+
+/* The box the photograph is cropped to. Declaring the ratio is what keeps the
+   wall still while a Drive thumbnail is on its way in. */
+.postcard__frame {
+    display: block;
+    overflow: hidden;
+    aspect-ratio: var(--ar, 4 / 5);
+    background: rgba(16, 16, 16, 0.06);
+}
+
+.postcard__frame img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.postcard__cap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.15rem 0.6rem;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 0.6rem 0.1rem 0.45rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.postcard__cap strong { font-weight: 600; }
+
+.postcard__cap em {
+    color: var(--color-gray);
+    font-style: normal;
+    font-size: 0.66rem;
+    letter-spacing: 0.14em;
+}
+
+.postcards__foot { margin: clamp(1.75rem, 3.4vw, 2.75rem) 0 0; }
+
+@media (min-width: 48rem) {
+    .postcard:nth-child(even) { margin-top: clamp(1.25rem, 3.4vw, 3rem); }
+    .postcard:nth-child(4n + 1) { margin-bottom: clamp(1rem, 2.4vw, 2rem); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .postcard a { transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease); }
+    .postcard__frame img { transition: transform 1.4s var(--ease); }
+
+    .postcard a:hover,
+    .postcard a:focus-visible {
+        transform: translateY(-0.3rem);
+        box-shadow: 0 28px 54px -30px rgba(16, 16, 16, 0.55);
+    }
+
+    .postcard a:hover .postcard__frame img { transform: scale(1.04); }
+}

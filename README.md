@@ -149,6 +149,14 @@ into this environment. Every image currently in `public/media/**` is
 
 - Real originals go in `media-src/`, then `npm run media`.
 - The script prints which slots are still running a stand-in.
+- 20 subjects have a matched generated source. **2 slots still borrow another
+  subject's image** and should be replaced first: `dolphin-swim` (currently
+  showing the reef image) and `soho-square` (currently showing the desert
+  camp).
+- Four of the generated subjects are **generic equivalents, not the actual
+  venues** — *Farsha Cafe, Soho Square, Old Market, Naama Bay*. They are a
+  cliffside lantern-lit cafe, a plaza, a bazaar alley and a resort bay
+  respectively. Do not present them as photographs of those specific places.
 - Five subjects have **no source imagery at all** in the client library and
   will need a shoot or a licensed image: *private airport transfer, Farsha
   Cafe, Soho Square, Old Market, Naama Bay*.

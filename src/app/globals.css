@@ -110,6 +110,18 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
+    /* A single long token — an email, a URL, an unbroken place name — is the
+       most common cause of horizontal overflow on narrow screens. Break it
+       rather than letting it push the page sideways. */
+    overflow-wrap: break-word;
+  }
+
+  /* Flex and grid children default to min-width/min-height:auto, which means
+     they refuse to shrink below their content and blow out the track instead.
+     This is the classic source of "it overflows at 375px" bugs. */
+  .shell *,
+  .rail > * {
+    min-width: 0;
   }
 
   h1,
@@ -242,6 +254,9 @@
     letter-spacing: 0.14em;
     text-transform: uppercase;
     white-space: nowrap;
+    /* nowrap keeps labels on one line, but without this a long label would
+       push past its container at 320-375px instead of staying inside it. */
+    max-width: 100%;
     transition: background-color 0.4s var(--ease-editorial),
       color 0.4s var(--ease-editorial), border-color 0.4s var(--ease-editorial),
       transform 0.4s var(--ease-out-expo);

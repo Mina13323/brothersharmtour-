@@ -112,7 +112,9 @@ export function DestinationSwitcher({
         role="tablist"
         aria-label="Choose a destination"
         onKeyDown={onKeyDown}
-        className="flex gap-4 lg:col-span-4 lg:flex-col"
+        /* flex-wrap so the tabs drop to a second line on very narrow screens
+           instead of overflowing the row. */
+        className="flex flex-wrap gap-3 sm:gap-4 lg:col-span-4 lg:flex-col lg:flex-nowrap"
       >
         {destinations.map((destination, i) => (
           <button

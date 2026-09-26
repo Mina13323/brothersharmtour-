@@ -44,14 +44,14 @@ export function TourCard({
           ) : null}
         </div>
 
-        <div className="flex grow flex-col pt-4">
+        <div className="card-shift flex grow flex-col pt-4">
           <p className="eyebrow text-stone">
             {experienceName(tour.category)}
             <span className="mx-2 opacity-40">·</span>
             {destinationName(tour.destination)}
           </p>
 
-          <h3 className="mt-2.5 font-display text-[1.5rem] leading-[1.1] transition-colors duration-400 group-hover:text-reef">
+          <h3 className="mt-2.5 font-display text-[1.5rem] leading-[1.1] transition-colors duration-[var(--duration-ui)] group-hover:text-reef">
             {tour.title}
           </h3>
 
@@ -59,6 +59,7 @@ export function TourCard({
             {tour.summary}
           </p>
 
+          {/* Baseline meta row — duration left, price right, never a coloured badge. */}
           <div className="mt-auto flex items-end justify-between gap-4 pt-5">
             <span className="text-[0.75rem] uppercase tracking-[0.12em] text-stone">
               {tour.duration ?? "Flexible"}
@@ -81,7 +82,15 @@ export function TourCard({
             </span>
           </div>
 
-          <span className="mt-4 h-px w-full origin-left scale-x-0 bg-ink transition-transform duration-700 [transition-timing-function:var(--ease-out-expo)] group-hover:scale-x-100" />
+          {/* Rule wipes in and the CTA arrow slides — the only hover motion. */}
+          <span className="mt-4 h-px w-full origin-left scale-x-0 bg-ink transition-transform duration-500 [transition-timing-function:var(--ease-premium)] group-hover:scale-x-100" />
+
+          <span className="mt-3 flex items-center justify-between text-[0.6875rem] font-semibold uppercase tracking-[0.16em] opacity-0 transition-opacity duration-[var(--duration-ui)] group-hover:opacity-100">
+            Explore
+            <span className="arrow" aria-hidden>
+              →
+            </span>
+          </span>
         </div>
       </Link>
     </article>

@@ -47,6 +47,7 @@ export default function ExperiencesPage() {
                     className="group grid items-center gap-6 py-8 md:grid-cols-12 md:gap-10 md:py-10"
                   >
                     <Reveal
+                      variant="clip"
                       className={`md:col-span-4 ${reverse ? "md:order-2" : ""}`}
                     >
                       <div className="media aspect-[16/10] w-full md:aspect-[4/3]">

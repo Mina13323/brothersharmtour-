@@ -107,7 +107,7 @@ export default function AboutPage() {
       {/* ─────────── Editorial image break ─────────── */}
       <section>
         <div className="shell">
-          <Reveal className="media aspect-[4/3] w-full md:aspect-[21/9]">
+          <Reveal variant="clip" className="media aspect-[4/3] w-full md:aspect-[21/9]">
             <Image
               src={media.sharmHero.src}
               alt={media.sharmHero.alt}

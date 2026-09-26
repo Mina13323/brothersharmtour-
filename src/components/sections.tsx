@@ -53,7 +53,7 @@ export function SectionHeading({
           )}
         >
           {action.label}
-          <ArrowRight />
+          <ArrowRight className="arrow" />
         </Link>
       ) : null}
     </Reveal>
@@ -136,7 +136,7 @@ export function CTASection({
         alt=""
         fill
         sizes="100vw"
-        className="object-cover opacity-35"
+        className="slow-zoom object-cover opacity-35"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/70 to-ink/40" />
 
@@ -151,6 +151,9 @@ export function CTASection({
           <div className="mt-10 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
             <BookButton tourSlug={tourSlug} className="btn btn-primary">
               Plan my trip
+              <span className="arrow" aria-hidden>
+                →
+              </span>
             </BookButton>
             <a
               href={whatsappLink()}

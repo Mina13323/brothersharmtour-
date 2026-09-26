@@ -1,409 +1,279 @@
-import Image from "next/image";
-import Link from "next/link";
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { Hero } from "@/components/Hero";
-import { Reveal } from "@/components/Reveal";
-import { DestinationCard, ExperienceCard, TourCard } from "@/components/cards";
-import { SectionHeading, CTASection, ArrowRight } from "@/components/sections";
+import { Reveal, SplitHeadline } from "@/components/Reveal";
+import { SectionHeading, CTASection } from "@/components/sections";
+import { DestinationSwitcher } from "@/components/DestinationSwitcher";
+import { ExperienceDiscovery } from "@/components/ExperienceFeature";
+import { EditorialFeature } from "@/components/EditorialFeature";
+import { TourRail } from "@/components/TourRail";
+import { TrustSignals } from "@/components/TrustSignals";
 import { TestimonialSlider } from "@/components/TestimonialSlider";
 import { VideoSection } from "@/components/VideoSection";
 import { BookButton } from "@/components/BookingProvider";
 
-import { destinationBySlug } from "@/data/destinations";
+import { destinations } from "@/data/destinations";
 import { experiences } from "@/data/experiences";
-import { featuredTours, toursByCategory } from "@/data/tours";
+import { featuredTours, tours, tourBySlug } from "@/data/tours";
 import { media, videoAvailable } from "@/lib/media";
 
 export const metadata: Metadata = {
-  title: "Bro Tour — Explore Egypt Differently",
+  title: "Bro Tour — Discover Egypt Differently",
   description:
-    "Curated Red Sea excursions, Sinai desert adventures and Cairo day trips from a team based in Sharm El Sheikh. Snorkelling, safaris, dolphins and private transfers.",
+    "Red Sea excursions, Sinai desert adventures and Cairo day trips, run by a local team in Sharm El Sheikh. Explore island snorkelling, safaris, dolphins and private transfers.",
   alternates: { canonical: "/" },
 };
 
-const whyBroTour = [
-  {
-    title: "Local experts",
-    body: "We're based in Sharm, not a call centre. The person who plans your day has been on it.",
-  },
-  {
-    title: "Curated experiences",
-    body: "We run a short list of trips we'd send our own family on, rather than reselling everything on the market.",
-  },
-  {
-    title: "Easy booking",
-    body: "A message is enough. No accounts, no card details up front, no fifteen-step checkout.",
-  },
-  {
-    title: "Private options",
-    body: "Almost everything we run can become a private trip — your group, your pace, your start time.",
-  },
-  {
-    title: "Local support",
-    body: "One number for the whole trip. If something changes at 6am, someone answers.",
-  },
-  {
-    title: "Authentic experiences",
-    body: "Bedouin hosts, local restaurants and captains who've worked these reefs for years.",
-  },
-];
+/** Tour counts per destination and per category — used as card metadata. */
+const tourCountByDestination = tours.reduce<Record<string, number>>((acc, tour) => {
+  acc[tour.destination] = (acc[tour.destination] ?? 0) + 1;
+  return acc;
+}, {});
+
+const tourCountByCategory = tours.reduce<Record<string, number>>((acc, tour) => {
+  acc[tour.category] = (acc[tour.category] ?? 0) + 1;
+  return acc;
+}, {});
 
 const howItWorks = [
   {
-    step: "01",
-    title: "Choose your experience",
-    body: "Browse by destination or by the kind of day you want — water, desert, culture or a car and a driver.",
+    title: "Tell us your dates",
+    body: "Send a request or a WhatsApp message with your dates, group and what you're curious about.",
   },
   {
-    step: "02",
-    title: "Select your date",
-    body: "Tell us when you're in Egypt and how many of you there are. We'll confirm what's available.",
+    title: "We come back with a plan",
+    body: "Availability, honest advice on what's worth doing that week, and a final price in writing.",
   },
   {
-    step: "03",
-    title: "Book or contact us",
-    body: "Send a request or message us on WhatsApp. We reply with pickup times and a final price.",
+    title: "We confirm the detail",
+    body: "Pickup time for your hotel, what to bring, and what happens if the weather turns.",
   },
   {
-    step: "04",
-    title: "Enjoy Egypt",
-    body: "We collect you from your hotel. From that point, the logistics are ours.",
+    title: "You enjoy the day",
+    body: "We're there on the morning, and on the end of a phone for the rest of your trip.",
   },
 ];
 
 export default function HomePage() {
-  const sharm = destinationBySlug("sharm-el-sheikh")!;
-  const cairo = destinationBySlug("cairo")!;
-  const popular = featuredTours().slice(0, 6);
-  const discoveryCategories = experiences.filter((e) => e.slug !== "private-transfers");
+  const sharm = destinations.find((d) => d.slug === "sharm-el-sheikh");
+  const cairo = destinations.find((d) => d.slug === "cairo");
+  const whiteIsland = tourBySlug("white-island");
 
   return (
     <>
-      {/* ═════════════════════════ HERO ═════════════════════════ */}
+      {/* ═════════ 01 · HERO — dark, cinematic ═════════ */}
       <Hero
         image={media.heroFilm.poster}
         video={videoAvailable ? media.heroFilm : undefined}
-        eyebrow="Sharm El Sheikh · Cairo · Egypt"
-        title={
-          <>
-            Discover Egypt
-            <br />
-            <span className="italic text-sun">Differently</span>
-          </>
-        }
-        subtitle="Explore the Red Sea, ancient wonders, desert adventures and unforgettable local experiences with Bro Tour."
+        size="full"
+        align="start"
+        eyebrow="Bro Tour · Sharm El Sheikh"
+        title={<SplitHeadline lines={["Discover Egypt", "differently"]} />}
+        subtitle="Explore the Red Sea, ancient wonders, desert adventures and unforgettable local experiences — with a team that lives here."
       >
         <Link href="/tours" className="btn btn-primary">
           Explore tours
+          <span className="arrow" aria-hidden>
+            →
+          </span>
         </Link>
         <BookButton className="btn btn-ghost-light">Plan your trip</BookButton>
       </Hero>
 
-      {/* ═══════════════════ DESTINATION DISCOVERY ═══════════════════ */}
+      {/* ═════════ 02 · DESTINATION DISCOVERY — light ═════════ */}
       <section className="band">
         <div className="shell">
           <SectionHeading
-            eyebrow="Destinations"
-            title="Where do you want to go?"
-            intro="Two very different sides of Egypt. One coastline built for the water and the desert behind it, one city built on four thousand years of history."
-            action={{ label: "All destinations", href: "/destinations" }}
+            eyebrow="Where do you want to go?"
+            title="Two destinations, properly covered"
+            intro="We don't sell all of Egypt. We run the Red Sea and Sinai from our own doorstep, and take you to Cairo for the day when you want the Pyramids."
           />
-
-          <div className="mt-12 grid gap-4 md:mt-16 md:grid-cols-12 md:gap-6">
-            <Reveal className="md:col-span-7">
-              <DestinationCard destination={sharm} primary priority />
-            </Reveal>
-            <Reveal className="md:col-span-5" delay={120}>
-              <DestinationCard destination={cairo} />
-            </Reveal>
+          <div className="mt-12 md:mt-16">
+            <DestinationSwitcher
+              destinations={destinations}
+              tourCounts={tourCountByDestination}
+            />
           </div>
         </div>
       </section>
 
-      {/* ═══════════════════ EXPERIENCE DISCOVERY ═══════════════════ */}
-      <section className="band-tight bg-paper-warm">
-        <div className="shell">
-          <SectionHeading
-            eyebrow="Experiences"
-            title="Experience Egypt"
-            intro="Start with the kind of day you're after. Every category leads to the trips we actually run."
-            action={{ label: "All experiences", href: "/experiences" }}
-          />
-
-          <div className="mt-12 md:mt-14">
-            {/* Mobile: horizontal rail. Desktop: 3 / 6-up grid. */}
-            <div className="rail md:hidden">
-              {discoveryCategories.map((experience) => (
-                <ExperienceCard
-                  key={experience.slug}
-                  experience={experience}
-                  tourCount={toursByCategory(experience.slug).length}
-                  sizes="78vw"
-                />
-              ))}
-            </div>
-
-            <div className="hidden gap-4 md:grid md:grid-cols-3 lg:grid-cols-6">
-              {discoveryCategories.map((experience, i) => (
-                <Reveal key={experience.slug} delay={i * 60}>
-                  <ExperienceCard
-                    experience={experience}
-                    tourCount={toursByCategory(experience.slug).length}
-                    sizes="(max-width: 1024px) 30vw, 16vw"
-                  />
-                </Reveal>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ═════════════════════ POPULAR TOURS ═════════════════════ */}
-      <section className="band">
-        <div className="shell">
-          <SectionHeading
-            eyebrow="Most booked"
-            title="Popular experiences"
-            intro="The trips people come back for — and the ones we'd book first if we were visiting."
-            action={{ label: "View all tours", href: "/tours" }}
-          />
-
-          <div className="mt-12 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:mt-16 lg:grid-cols-3">
-            {popular.map((tour, i) => (
-              <Reveal key={tour.slug} delay={(i % 3) * 90}>
-                <TourCard tour={tour} />
-              </Reveal>
-            ))}
-          </div>
-
-          <Reveal className="mt-14 flex justify-center">
-            <Link href="/tours" className="btn btn-outline">
-              View all tours
-            </Link>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ═══════════════════ SHARM FEATURE ═══════════════════ */}
-      <FeatureBand
-        eyebrow="Discover Sharm El Sheikh"
-        title="More than a beach destination."
-        text="Discover the Red Sea, desert landscapes, unforgettable adventures and the local soul of Sharm El Sheikh."
-        image={media.sharmHero}
-        secondary={media.colorCanyon.card}
-        href="/destinations/sharm-el-sheikh"
-        cta="Explore Sharm"
-        stats={[
-          { value: "15+", label: "Experiences in Sharm" },
-          { value: "3", label: "Marine parks & island reefs" },
-          { value: "24/7", label: "Local support on WhatsApp" },
-        ]}
-      />
-
-      {/* ═══════════════════ WHY BRO TOUR ═══════════════════ */}
+      {/* ═════════ 03 · EXPERIENCE DISCOVERY — warm ═════════ */}
       <section className="band bg-paper-warm">
         <div className="shell">
-          <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
+          <SectionHeading
+            eyebrow="Experience Egypt"
+            title="Choose the kind of day you want"
+            action={{ label: "All experiences", href: "/experiences" }}
+          />
+          <div className="mt-12 md:mt-16">
+            <ExperienceDiscovery
+              experiences={experiences}
+              counts={tourCountByCategory}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* ═════════ 04 · FEATURED TOUR EDITORIAL — dark ═════════ */}
+      {whiteIsland ? (
+        <EditorialFeature
+          tone="dark"
+          index="01"
+          eyebrow="Signature experience"
+          headlineLines={["The Red Sea at its", "most improbable."]}
+          body="A sandbank that only exists at low tide, sitting in the middle of open water between two reef walls. You step off the boat onto an island that will be gone by evening."
+          image={media.whiteIsland.hero}
+          secondaryImage={media.whiteIsland.card}
+          href={`/tours/${whiteIsland.slug}`}
+          cta="Discover experience"
+          meta={[
+            { label: "Duration", value: whiteIsland.duration ?? "Full day" },
+            { label: "Departs", value: "Sharm El Sheikh" },
+          ]}
+        />
+      ) : null}
+
+      {/* ═════════ 05 · POPULAR TOURS — light, rail ═════════ */}
+      <section className="band">
+        <div className="shell">
+          <SectionHeading
+            eyebrow="Popular experiences"
+            title="Most booked this season"
+            action={{ label: "All tours", href: "/tours" }}
+          />
+        </div>
+        {/* Rail breaks the container on purpose so cards bleed off the edge. */}
+        <div className="shell mt-12 md:mt-16">
+          <TourRail tours={featuredTours().slice(0, 8)} />
+        </div>
+      </section>
+
+      {/* ═════════ 06 · SHARM STORY — warm editorial ═════════ */}
+      {sharm ? (
+        <EditorialFeature
+          index="02"
+          eyebrow="Discover Sharm El Sheikh"
+          headlineLines={["More than a", "beach destination."]}
+          body="Between the reef and the mountains there's a national park, a canyon of banded sandstone, a Bedouin desert that turns gold at dusk, and a town that still does its own shopping. Most visitors never leave the hotel strip."
+          image={media.sharmHero}
+          secondaryImage={media.colorCanyon.card}
+          href="/destinations/sharm-el-sheikh"
+          cta="Explore Sharm El Sheikh"
+          meta={[
+            {
+              label: "Experiences",
+              value: String(tourCountByDestination["sharm-el-sheikh"] ?? 0),
+            },
+            { label: "Our base", value: "South Sinai" },
+          ]}
+        />
+      ) : null}
+
+      {/* ═════════ 07 · CAIRO STORY — dark, contrasting ═════════ */}
+      {cairo ? (
+        <EditorialFeature
+          tone="dark"
+          reverse
+          index="03"
+          eyebrow="Discover Cairo"
+          headlineLines={["The heart of", "ancient Egypt."]}
+          body="Giza, the Grand Egyptian Museum and the old city — reachable as a single long day from Sharm, without changing hotels or repacking your case."
+          image={media.pyramids.hero}
+          secondaryImage={media.gem.card}
+          href="/destinations/cairo"
+          cta="Explore Cairo"
+          meta={[
+            {
+              label: "Experiences",
+              value: String(tourCountByDestination["cairo"] ?? 0),
+            },
+            { label: "From Sharm", value: "Day trip" },
+          ]}
+        />
+      ) : null}
+
+      {/* ═════════ 08 · WHY BRO TOUR — light, trust ═════════ */}
+      <section className="band">
+        <div className="shell">
+          <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
             <div className="lg:col-span-4">
               <Reveal>
-                <p className="eyebrow text-reef">Why us</p>
-                <h2 className="headline mt-4">Why travel with Bro Tour?</h2>
-                <p className="lede mt-5">
-                  We&apos;re a small operation on the Red Sea. That&apos;s the whole
-                  proposition — you deal with the people who run the trips.
+                <p className="eyebrow text-reef">Why travel with Bro Tour?</p>
+                <h2 className="headline mt-4">
+                  <SplitHeadline lines={["Small operation.", "Short list.", "Real answers."]} />
+                </h2>
+                <p className="lede mt-6">
+                  We only claim what we can stand behind. No invented ratings, no
+                  award badges — just how we actually work.
                 </p>
                 <BookButton className="btn btn-ink mt-8">
                   Start planning
+                  <span className="arrow" aria-hidden>
+                    →
+                  </span>
                 </BookButton>
               </Reveal>
             </div>
 
             <div className="lg:col-span-8">
-              <div className="grid gap-x-10 sm:grid-cols-2">
-                {whyBroTour.map((item, i) => (
-                  <Reveal
-                    key={item.title}
-                    delay={(i % 2) * 80}
-                    className="border-t border-sand py-6"
-                  >
-                    <div className="flex items-baseline gap-4">
-                      <span className="font-display text-[0.9375rem] text-sun">
-                        {String(i + 1).padStart(2, "0")}
-                      </span>
-                      <div>
-                        <h3 className="font-display text-[1.375rem] leading-tight">
-                          {item.title}
-                        </h3>
-                        <p className="mt-2 text-[0.875rem] leading-relaxed text-stone">
-                          {item.body}
-                        </p>
-                      </div>
-                    </div>
-                  </Reveal>
-                ))}
-              </div>
+              {/*
+                verifiedStats is intentionally empty. See TrustSignals and
+                docs/design-research.md §6 — no numeric claim ships until the
+                client confirms it.
+              */}
+              <TrustSignals />
             </div>
           </div>
         </div>
       </section>
 
-      {/* ═══════════════════ CAIRO FEATURE ═══════════════════ */}
-      <FeatureBand
-        reverse
-        eyebrow="Discover Cairo"
-        title="The heart of Ancient Egypt."
-        text="The Pyramids, the Sphinx, the Grand Egyptian Museum and the old streets behind them — as a day trip by air from Sharm, or as a stay in its own right."
-        image={media.pyramids.hero}
-        secondary={media.gem.card}
-        href="/destinations/cairo"
-        cta="Explore Cairo"
-        stats={[
-          { value: "4", label: "Landmark sites in one day" },
-          { value: "GEM", label: "Grand Egyptian Museum included" },
-          { value: "1 day", label: "Return trip from Sharm by air" },
-        ]}
-      />
-
-      {/* ═══════════════════ HOW IT WORKS ═══════════════════ */}
-      <section className="band">
+      {/* ═════════ How it works — warm, numbered ═════════ */}
+      <section className="band-tight bg-paper-warm">
         <div className="shell">
-          <SectionHeading
-            eyebrow="Booking"
-            title="How it works"
-            intro="Four steps, no accounts and no payment until everything is confirmed."
-          />
-
-          <ol className="mt-12 grid gap-px overflow-hidden border border-sand bg-sand md:mt-16 md:grid-cols-2 lg:grid-cols-4">
-            {howItWorks.map((item, i) => (
-              <li key={item.step} className="bg-paper">
-                <Reveal delay={i * 80} className="group h-full p-7 lg:p-9">
-                  <span className="font-display text-[2.75rem] leading-none text-sand transition-colors duration-500 group-hover:text-sun">
-                    {item.step}
+          <SectionHeading eyebrow="How it works" title="Four steps, no friction" />
+          <ol className="mt-12 grid gap-x-8 sm:grid-cols-2 lg:grid-cols-4">
+            {howItWorks.map((step, i) => (
+              <Reveal as="li" key={step.title} delay={i * 80}>
+                <div className="border-t border-sand pt-6">
+                  <span className="font-display text-[2.5rem] leading-none text-sand">
+                    {String(i + 1).padStart(2, "0")}
                   </span>
-                  <h3 className="mt-6 font-display text-[1.375rem] leading-tight">
-                    {item.title}
+                  <h3 className="mt-5 font-display text-[1.375rem] leading-tight">
+                    {step.title}
                   </h3>
-                  <p className="mt-3 text-[0.875rem] leading-relaxed text-stone">
-                    {item.body}
+                  <p className="mt-2.5 text-[0.9375rem] leading-relaxed text-stone">
+                    {step.body}
                   </p>
-                </Reveal>
-              </li>
+                </div>
+              </Reveal>
             ))}
           </ol>
         </div>
       </section>
 
-      {/* ═══════════════════ FILM ═══════════════════ */}
+      {/* ═════════ 09 · FILM — dark ═════════ */}
       <VideoSection
         video={media.film}
-        eyebrow="Film"
+        eyebrow="Our lens"
         title="Experience Egypt through our lens"
-        text="Shot on our own trips — the reefs, the desert and the evenings in between."
+        text="Shot on our own trips, across the Red Sea and the Sinai desert."
       />
 
-      {/* ═══════════════════ TESTIMONIALS ═══════════════════ */}
-      <section className="band">
+      {/* ═════════ 10 · SOCIAL PROOF — warm ═════════ */}
+      <section className="band bg-paper-warm">
         <div className="shell">
           <TestimonialSlider />
         </div>
       </section>
 
-      {/* ═══════════════════ FINAL CTA ═══════════════════ */}
-      <CTASection image={media.whiteIsland.hero} />
+      {/* ═════════ 11 · FINAL CTA — dark ═════════ */}
+      <CTASection
+        image={media.tiranIsland.hero}
+        eyebrow="Start planning"
+        title="Ready to discover Egypt?"
+        text="Send us your dates and we'll come back with a plan, a price and your pickup time."
+      />
     </>
-  );
-}
-
-/* ═══════════════ Editorial destination feature band ═══════════════ */
-
-function FeatureBand({
-  eyebrow,
-  title,
-  text,
-  image,
-  secondary,
-  href,
-  cta,
-  stats,
-  reverse = false,
-}: {
-  eyebrow: string;
-  title: string;
-  text: string;
-  image: (typeof media)["sharmHero"];
-  secondary: (typeof media)["sharmHero"];
-  href: string;
-  cta: string;
-  stats: { value: string; label: string }[];
-  reverse?: boolean;
-}) {
-  return (
-    <section className="band-tight">
-      <div className="shell">
-        <div className="grid items-center gap-8 lg:grid-cols-12 lg:gap-14">
-          {/* Imagery */}
-          <Reveal
-            className={`relative lg:col-span-7 ${reverse ? "lg:order-2" : ""}`}
-          >
-            <div className="media aspect-[4/3] w-full md:aspect-[16/10]">
-              <Image
-                src={image.src}
-                alt={image.alt}
-                fill
-                sizes="(max-width: 1024px) 100vw, 58vw"
-                className="object-cover"
-              />
-            </div>
-
-            {/* Offset secondary frame — the editorial signature of this band */}
-            <div
-              className={`media absolute -bottom-8 hidden aspect-[3/4] w-[9.5rem] border-4 border-paper md:block lg:w-[11rem] ${
-                reverse ? "-left-6" : "-right-6"
-              }`}
-            >
-              <Image
-                src={secondary.src}
-                alt={secondary.alt}
-                fill
-                sizes="176px"
-                className="object-cover"
-              />
-            </div>
-          </Reveal>
-
-          {/* Copy */}
-          <Reveal
-            delay={120}
-            className={`lg:col-span-5 ${reverse ? "lg:order-1 lg:pr-6" : "lg:pl-6"}`}
-          >
-            <p className="eyebrow text-reef">{eyebrow}</p>
-            <h2 className="headline mt-4">{title}</h2>
-            <p className="lede mt-5">{text}</p>
-
-            <dl className="mt-9 grid grid-cols-3 gap-4 border-t border-sand pt-7">
-              {stats.map((stat) => (
-                <div key={stat.label}>
-                  <dt className="sr-only">{stat.label}</dt>
-                  <dd>
-                    <span className="block font-display text-[1.75rem] leading-none">
-                      {stat.value}
-                    </span>
-                    <span className="mt-2 block text-[0.6875rem] uppercase leading-snug tracking-[0.12em] text-stone">
-                      {stat.label}
-                    </span>
-                  </dd>
-                </div>
-              ))}
-            </dl>
-
-            <Link href={href} className="btn btn-ink mt-9">
-              {cta}
-              <ArrowRight />
-            </Link>
-          </Reveal>
-        </div>
-      </div>
-    </section>
   );
 }

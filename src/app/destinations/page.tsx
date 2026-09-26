@@ -42,7 +42,10 @@ export default function DestinationsPage() {
                   key={destination.slug}
                   className="grid items-center gap-8 lg:grid-cols-12 lg:gap-16"
                 >
-                  <Reveal className={`lg:col-span-7 ${reverse ? "lg:order-2" : ""}`}>
+                  <Reveal
+                    variant="clip"
+                    className={`lg:col-span-7 ${reverse ? "lg:order-2" : ""}`}
+                  >
                     <DestinationCard
                       destination={destination}
                       primary={destination.priority === 1}

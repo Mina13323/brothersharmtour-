@@ -65,9 +65,25 @@
   --radius-card: 2px;
   --radius-pill: 999px;
 
-  /* ---- Motion -------------------------------------------------------- */
+  /* ---- Elevation — restrained; depth comes from layering, not shadows -- */
+  --shadow-lift: 0 18px 40px -24px rgb(11 15 20 / 0.45);
+  --shadow-panel: 0 40px 90px -50px rgb(11 15 20 / 0.6);
+
+  /* ---- Motion ---------------------------------------------------------
+     One vocabulary, three speeds. See docs/design-research.md §8.
+       ui        200–300ms  buttons, links, chips, form states
+       content   500–800ms  text blocks, cards, list items
+       editorial 700–1200ms full-bleed imagery, feature blocks            */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-editorial: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-premium: cubic-bezier(0.22, 1, 0.36, 1); /* primary curve */
+
+  --duration-ui: 260ms;
+  --duration-content: 680ms;
+  --duration-editorial: 1000ms;
+
+  /* Line-by-line headline reveal */
+  --stagger-line: 70ms;
 }
 
 /* ==========================================================================
@@ -132,6 +148,17 @@
       animation-duration: 0.001ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.001ms !important;
+    }
+    /* Force the resolved end-state, so nothing is clipped or offset when
+       transitions are suppressed. */
+    .reveal,
+    .reveal[data-variant] {
+      opacity: 1 !important;
+      transform: none !important;
+      clip-path: none !important;
+    }
+    .lines > .line > span {
+      transform: none !important;
     }
   }
 }
@@ -275,7 +302,9 @@
   }
 
   /* --- Link with editorial underline ---------------------------------- */
+  /* Underline wipes in from the left rather than simply appearing. */
   .link-rule {
+    position: relative;
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
@@ -284,11 +313,55 @@
     letter-spacing: 0.14em;
     text-transform: uppercase;
     padding-bottom: 0.35rem;
-    border-bottom: 1px solid currentColor;
-    transition: gap 0.4s var(--ease-out-expo), opacity 0.3s ease;
+    transition: gap var(--duration-ui) var(--ease-premium);
+  }
+  .link-rule::before {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.28;
+  }
+  .link-rule::after {
+    content: "";
+    position: absolute;
+    inset-inline-start: 0;
+    bottom: 0;
+    height: 1px;
+    width: 100%;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--duration-ui) var(--ease-premium);
+  }
+  .link-rule:hover::after,
+  .group:hover .link-rule::after {
+    transform: scaleX(1);
   }
   .link-rule:hover {
     gap: 0.9rem;
+  }
+
+  /* Arrow that slides on hover of the link *or* its parent card. */
+  .arrow {
+    display: inline-block;
+    transition: transform var(--duration-ui) var(--ease-premium);
+  }
+  .group:hover .arrow,
+  .btn:hover .arrow,
+  a:hover > .arrow,
+  button:hover > .arrow {
+    transform: translateX(5px);
+  }
+
+  /* Card metadata lifts slightly while the card is hovered. */
+  .card-shift {
+    transition: transform var(--duration-ui) var(--ease-premium);
+  }
+  .group:hover .card-shift {
+    transform: translateY(-5px);
   }
 
   /* --- Media ---------------------------------------------------------- */
@@ -450,18 +523,80 @@
   }
 
   /* Scroll reveal — progressive enhancement, visible by default if JS is off */
+  /* --- Motion primitives ----------------------------------------------
+     Every variant animates only transform / opacity / clip-path, so each
+     one stays on the compositor. `data-shown` is set by <Reveal>.        */
   .reveal {
     opacity: 0;
     transform: translateY(18px);
-    transition: opacity 0.9s var(--ease-editorial),
-      transform 0.9s var(--ease-out-expo);
+    transition: opacity var(--duration-content) var(--ease-premium),
+      transform var(--duration-content) var(--ease-premium);
   }
   .reveal[data-shown="true"] {
     opacity: 1;
     transform: none;
   }
-  .no-js .reveal {
+
+  /* Cinematic horizontal wipe — the image is uncovered, not faded in. */
+  .reveal[data-variant="clip"] {
     opacity: 1;
+    transform: none;
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path var(--duration-editorial) var(--ease-premium);
+  }
+  .reveal[data-variant="clip"][data-shown="true"] {
+    clip-path: inset(0 0 0 0);
+  }
+
+  /* Vertical uncover — for stacked editorial imagery. */
+  .reveal[data-variant="clip-up"] {
+    opacity: 1;
+    transform: none;
+    clip-path: inset(100% 0 0 0);
+    transition: clip-path var(--duration-editorial) var(--ease-premium);
+  }
+  .reveal[data-variant="clip-up"][data-shown="true"] {
+    clip-path: inset(0 0 0 0);
+  }
+
+  /* Settle — pairs with a slow-zoom child for feature blocks. */
+  .reveal[data-variant="rise"] {
+    opacity: 0;
+    transform: translateY(34px) scale(0.985);
+    transition: opacity var(--duration-editorial) var(--ease-premium),
+      transform var(--duration-editorial) var(--ease-premium);
+  }
+  .reveal[data-variant="rise"][data-shown="true"] {
+    opacity: 1;
+    transform: none;
+  }
+
+  .no-js .reveal,
+  .no-js .reveal[data-variant] {
+    opacity: 1;
+    transform: none;
+    clip-path: none;
+  }
+
+  /* Line-by-line headline reveal. Each line is masked by its wrapper and
+     slides up; only major headlines should use this. */
+  .lines {
+    display: block;
+  }
+  .lines > .line {
+    display: block;
+    overflow: hidden;
+  }
+  .lines > .line > span {
+    display: block;
+    transform: translateY(105%);
+    transition: transform var(--duration-content) var(--ease-premium);
+    transition-delay: calc(var(--i, 0) * var(--stagger-line));
+  }
+  .lines[data-shown="true"] > .line > span {
+    transform: none;
+  }
+  .no-js .lines > .line > span {
     transform: none;
   }
 

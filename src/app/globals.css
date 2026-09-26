@@ -599,10 +599,20 @@
   .lines > .line {
     display: block;
     overflow: hidden;
+    /* The mask that hides the slide-up is the line box itself, and the display
+       face runs a 0.94 line-height — tighter than the em box. Descenders (g,
+       y, p, j) therefore fall below the box and get clipped. Pad the mask down
+       to clear them, then pull the same amount back off the layout so the
+       visual rhythm between lines is unchanged. */
+    padding-bottom: 0.22em;
+    margin-bottom: -0.22em;
   }
   .lines > .line > span {
     display: block;
-    transform: translateY(105%);
+    /* Must clear the mask's full height, which is now the line box plus the
+       0.22em descender padding above. 105% of the span would leave the text
+       peeking into that padding, so translate further than the old value. */
+    transform: translateY(130%);
     transition: transform var(--duration-content) var(--ease-premium);
     transition-delay: calc(var(--i, 0) * var(--stagger-line));
   }

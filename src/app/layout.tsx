@@ -107,16 +107,31 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className="no-js">
+    <html lang="en">
       <head>
-        <script
-          // Flips the no-js flag before paint so reveal animations only apply
-          // when JS can actually drive them.
-           
-          dangerouslySetInnerHTML={{
-            __html: `document.documentElement.classList.remove('no-js')`,
-          }}
-        />
+        {/*
+          No-JS fallback for the scroll-reveal system.
+
+          `.reveal` starts at opacity 0 and `.lines > span` starts pushed down
+          behind a mask; both are resolved by IntersectionObserver. With
+          scripting disabled that never happens, so this forces the end state.
+
+          This used to be a `no-js` class on <html> stripped by an inline
+          script. That mutates the DOM before React hydrates, so the server
+          markup and the client tree disagree and React reports a hydration
+          mismatch. A <noscript> block needs no script, mutates nothing, and
+          applies in exactly the case it is meant to.
+        */}
+        <noscript>
+          <style>{`
+            .reveal, .reveal[data-variant] {
+              opacity: 1 !important;
+              transform: none !important;
+              clip-path: none !important;
+            }
+            .lines > .line > span { transform: none !important; }
+          `}</style>
+        </noscript>
         <OrganisationSchema />
       </head>
       <body>

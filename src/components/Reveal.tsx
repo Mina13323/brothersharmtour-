@@ -25,9 +25,9 @@ interface RevealProps {
 
 /**
  * Scroll reveal. Progressive enhancement only: `.reveal` is inert without JS
- * (see the `.no-js` guard in globals.css), the observer disconnects after the
- * first intersection, and `prefers-reduced-motion` short-circuits to the end
- * state before any observer is created.
+ * (a <noscript> style block in layout.tsx forces the end state), the observer
+ * disconnects after the first intersection, and `prefers-reduced-motion`
+ * short-circuits to the end state before any observer is created.
  */
 export function Reveal({
   children,

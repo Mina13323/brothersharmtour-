@@ -571,12 +571,10 @@
     transform: none;
   }
 
-  .no-js .reveal,
-  .no-js .reveal[data-variant] {
-    opacity: 1;
-    transform: none;
-    clip-path: none;
-  }
+  /* No-JS fallback is delivered by a <noscript> style block in layout.tsx
+     rather than a class toggled on <html>. Toggling a class before hydration
+     makes the server and client markup disagree, which React reports as a
+     hydration mismatch. */
 
   /* Line-by-line headline reveal. Each line is masked by its wrapper and
      slides up; only major headlines should use this. */
@@ -594,9 +592,6 @@
     transition-delay: calc(var(--i, 0) * var(--stagger-line));
   }
   .lines[data-shown="true"] > .line > span {
-    transform: none;
-  }
-  .no-js .lines > .line > span {
     transform: none;
   }
 

@@ -73,12 +73,15 @@ export function EditorialFeature({
               </div>
             </Reveal>
 
+            {/* Sits inside the image on its OUTER edge. It used to hang off
+                the inner edge with a negative offset, which collided with the
+                text panel (covering the CTA) and could overflow the shell. */}
             {secondaryImage ? (
               <Reveal
                 delay={220}
                 className={cn(
-                  "absolute hidden aspect-square w-[22%] lg:block",
-                  reverse ? "-bottom-10 -left-10" : "-bottom-10 -right-10",
+                  "absolute bottom-6 hidden aspect-square w-[20%] shadow-[var(--shadow-panel)] lg:block",
+                  reverse ? "right-6" : "left-6",
                 )}
               >
                 <div className="media size-full">
@@ -94,10 +97,13 @@ export function EditorialFeature({
             ) : null}
           </div>
 
-          {/* ---------- Text, overlapping the image ---------- */}
+          {/* ---------- Text, overlapping the image ----------
+              `relative z-10` is load-bearing: the image wrapper above is
+              positioned, and positioned elements paint above static ones no
+              matter the DOM order. Without this the photo covers the copy. */}
           <div
             className={cn(
-              "lg:col-span-5 lg:row-start-1",
+              "relative z-10 lg:col-span-5 lg:row-start-1",
               reverse ? "lg:col-start-1 lg:pr-8" : "lg:col-start-8 lg:pl-8",
             )}
           >

@@ -89,7 +89,7 @@ export default function HomePage() {
             title="Two destinations, properly covered"
             intro="We don't sell all of Egypt. We run the Red Sea and Sinai from our own doorstep, and take you to Cairo for the day when you want the Pyramids."
           />
-          <div className="mt-12 md:mt-16">
+          <div className="mt-10 md:mt-12">
             <DestinationSwitcher
               destinations={destinations}
               tourCounts={tourCountByDestination}
@@ -106,7 +106,7 @@ export default function HomePage() {
             title="Choose the kind of day you want"
             action={{ label: "All experiences", href: "/experiences" }}
           />
-          <div className="mt-12 md:mt-16">
+          <div className="mt-10 md:mt-12">
             <ExperienceDiscovery
               experiences={experiences}
               counts={tourCountByCategory}
@@ -144,7 +144,7 @@ export default function HomePage() {
           />
         </div>
         {/* Rail breaks the container on purpose so cards bleed off the edge. */}
-        <div className="shell mt-12 md:mt-16">
+        <div className="shell mt-10 md:mt-12">
           <TourRail tours={featuredTours().slice(0, 8)} />
         </div>
       </section>

@@ -45,8 +45,8 @@ export function Reveal({
     if (!node) return;
 
     if (
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      typeof IntersectionObserver === "undefined"
     ) {
       setShown(true);
       return;
@@ -63,7 +63,19 @@ export function Reveal({
     );
 
     observer.observe(node);
-    return () => observer.disconnect();
+
+    /**
+     * Safety net. `.reveal` starts at opacity 0, so if the observer never
+     * fires — an element taller than the viewport that can't reach the
+     * threshold, a browser quirk, a hydration hiccup — the content would stay
+     * invisible and leave a blank gap on the page. Never let that happen.
+     */
+    const fallback = window.setTimeout(() => setShown(true), 1200);
+
+    return () => {
+      observer.disconnect();
+      window.clearTimeout(fallback);
+    };
   }, [threshold]);
 
   return (
@@ -111,8 +123,8 @@ export function SplitHeadline({
     if (!node) return;
 
     if (
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      typeof IntersectionObserver === "undefined"
     ) {
       setShown(true);
       return;
@@ -129,7 +141,15 @@ export function SplitHeadline({
     );
 
     observer.observe(node);
-    return () => observer.disconnect();
+
+    /* Same safety net as <Reveal> — a headline masked at translateY(105%)
+       that never resolves would render as an empty band of whitespace. */
+    const fallback = window.setTimeout(() => setShown(true), 1200);
+
+    return () => {
+      observer.disconnect();
+      window.clearTimeout(fallback);
+    };
   }, [threshold]);
 
   return (

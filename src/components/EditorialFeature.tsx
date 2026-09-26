@@ -44,56 +44,61 @@ export function EditorialFeature({
   return (
     <section className={cn(dark && "on-ink bg-ink text-paper")}>
       <div className="shell band">
-        <div
-          className={cn(
-            "grid items-center gap-10 lg:grid-cols-12 lg:gap-0",
-            reverse && "lg:[direction:rtl]",
-          )}
-        >
-          {/* ---------- Image ---------- */}
-          <Reveal
-            variant="clip"
+        {/*
+          Deterministic 12-column placement. An earlier version flipped the
+          row with `direction: rtl` while also setting explicit column starts —
+          the two fight each other, so the columns are now simply swapped.
+        */}
+        <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-0">
+          {/* ---------- Image ----------
+              `relative` lives on this wrapper, NOT on the clipped element:
+              clip-path crops to the border box, so an offset child inside it
+              would be clipped away and leave a blank corner. */}
+          <div
             className={cn(
-              "relative lg:col-span-8",
-              reverse ? "lg:col-start-5" : "lg:col-start-1",
+              "relative lg:row-start-1",
+              reverse ? "lg:col-span-8 lg:col-start-5" : "lg:col-span-8 lg:col-start-1",
             )}
           >
-            <div className="media aspect-[4/5] w-full sm:aspect-[3/2]">
-              <Image
-                src={image.src}
-                alt={image.alt}
-                fill
-                sizes="(max-width: 1024px) 100vw, 66vw"
-                className="object-cover"
-                style={image.position ? { objectPosition: image.position } : undefined}
-              />
-            </div>
-
-            {secondaryImage ? (
-              <div
-                className={cn(
-                  "media absolute hidden aspect-square w-[22%] lg:block",
-                  reverse ? "-left-10 -bottom-10" : "-right-10 -bottom-10",
-                )}
-              >
+            <Reveal variant="clip">
+              <div className="media aspect-[4/5] w-full sm:aspect-[3/2]">
                 <Image
-                  src={secondaryImage.src}
-                  alt={secondaryImage.alt}
+                  src={image.src}
+                  alt={image.alt}
                   fill
-                  sizes="22vw"
+                  sizes="(max-width: 1024px) 100vw, 66vw"
                   className="object-cover"
+                  style={image.position ? { objectPosition: image.position } : undefined}
                 />
               </div>
+            </Reveal>
+
+            {secondaryImage ? (
+              <Reveal
+                delay={220}
+                className={cn(
+                  "absolute hidden aspect-square w-[22%] lg:block",
+                  reverse ? "-bottom-10 -left-10" : "-bottom-10 -right-10",
+                )}
+              >
+                <div className="media size-full">
+                  <Image
+                    src={secondaryImage.src}
+                    alt={secondaryImage.alt}
+                    fill
+                    sizes="22vw"
+                    className="object-cover"
+                  />
+                </div>
+              </Reveal>
             ) : null}
-          </Reveal>
+          </div>
 
           {/* ---------- Text, overlapping the image ---------- */}
           <div
             className={cn(
-              "lg:col-span-5 lg:[direction:ltr]",
-              reverse
-                ? "lg:col-start-1 lg:row-start-1 lg:pr-8"
-                : "lg:col-start-8 lg:row-start-1 lg:pl-8",
+              "lg:col-span-5 lg:row-start-1",
+              reverse ? "lg:col-start-1 lg:pr-8" : "lg:col-start-8 lg:pl-8",
             )}
           >
             <Reveal

@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+
+import { buildMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { Reveal } from "@/components/Reveal";
 import { Accordion } from "@/components/Accordion";
@@ -7,12 +9,13 @@ import { generalFaq } from "@/data/testimonials";
 import { site, whatsappLink } from "@/data/site";
 import { media } from "@/lib/media";
 
-export const metadata: Metadata = {
-  title: "Frequently Asked Questions",
-  description:
-    "How booking with Bro Tour works — hotel pickups, payment, weather cancellations, private tours, families and Cairo day trips from Sharm El Sheikh.",
-  alternates: { canonical: "/faq" },
-};
+export const metadata: Metadata = buildMetadata({
+  fallbackTitle: "Booking FAQ \u2014 Sharm El Sheikh Tours",
+  fallbackDescription:
+    "Answers about booking Bro Tour excursions in Sharm El Sheikh: how to request a tour, hotel pickup, private options, group sizes and Cairo day trips.",
+  path: "/faq",
+  image: media.sharmHero,
+});
 
 export default function FaqPage() {
   const schema = {

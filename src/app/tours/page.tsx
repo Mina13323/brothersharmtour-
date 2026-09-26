@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+
+import { buildMetadata } from "@/lib/seo";
 import { Hero } from "@/components/Hero";
 import { ToursExplorer } from "@/components/ToursExplorer";
 import { Breadcrumbs, CTASection } from "@/components/sections";
@@ -7,12 +9,13 @@ import { tours } from "@/data/tours";
 import { site } from "@/data/site";
 import { media } from "@/lib/media";
 
-export const metadata: Metadata = {
-  title: "All Tours & Experiences",
-  description:
-    "Every Bro Tour experience in one place — Red Sea snorkelling, island boat days, desert safaris, dolphin experiences, Cairo day trips and private transfers. Filter by destination, type, duration and price.",
-  alternates: { canonical: "/tours" },
-};
+export const metadata: Metadata = buildMetadata({
+  fallbackTitle: "Egypt Tours & Excursions",
+  fallbackDescription:
+    "Browse every Bro Tour excursion: Red Sea snorkelling and boat trips, desert safari, dolphin experiences, Cairo day trips and private transfers. Filter by destination, type and duration.",
+  path: "/tours",
+  image: media.sharmHero,
+});
 
 export default function ToursPage() {
   const schema = {

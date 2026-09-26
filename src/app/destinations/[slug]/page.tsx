@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+
+import { buildMetadata } from "@/lib/seo";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -33,17 +35,13 @@ export async function generateMetadata({
   const destination = destinationBySlug(slug);
   if (!destination) return {};
 
-  return {
-    title: `${destination.name} — Tours & Things To Do`,
-    description: destination.intro,
-    alternates: { canonical: `/destinations/${destination.slug}` },
-    openGraph: {
-      title: `Discover ${destination.name} with Bro Tour`,
-      description: destination.intro,
-      url: `${site.url}/destinations/${destination.slug}`,
-      images: [{ url: destination.heroImage.src, width: 1200, height: 630 }],
-    },
-  };
+  return buildMetadata({
+    seo: destination.seo,
+    fallbackTitle: `${destination.name} Tours & Excursions`,
+    fallbackDescription: destination.intro,
+    path: `/destinations/${destination.slug}`,
+    image: destination.heroImage,
+  });
 }
 
 export default async function DestinationPage({

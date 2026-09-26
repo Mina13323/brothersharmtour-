@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+
+import { buildMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -26,17 +28,13 @@ export async function generateMetadata({
   const experience = experienceBySlug(slug);
   if (!experience) return {};
 
-  return {
-    title: `${experience.name} Experiences in Egypt`,
-    description: experience.description,
-    alternates: { canonical: `/experiences/${experience.slug}` },
-    openGraph: {
-      title: `${experience.name} with Bro Tour`,
-      description: experience.description,
-      url: `${site.url}/experiences/${experience.slug}`,
-      images: [{ url: experience.image.src, width: 1200, height: 630 }],
-    },
-  };
+  return buildMetadata({
+    seo: experience.seo,
+    fallbackTitle: `${experience.name} Experiences in Egypt`,
+    fallbackDescription: experience.description,
+    path: `/experiences/${experience.slug}`,
+    image: experience.image,
+  });
 }
 
 export default async function ExperienceCategoryPage({

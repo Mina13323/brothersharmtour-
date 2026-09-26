@@ -95,6 +95,18 @@ export const destinations: Destination[] = [
       { label: "Language", value: "Arabic, with English spoken throughout the tourism sector" },
       { label: "Best for", value: "Snorkelling, desert trips, family travel and diving" },
     ],
+    seo: {
+      title: "Sharm El Sheikh Tours & Excursions",
+      description:
+        "Book Sharm El Sheikh tours and Red Sea excursions with Bro Tour: White Island, Ras Mohamed, Tiran Island, desert safari, Color Canyon and private transfers.",
+      keywords: [
+        "sharm el sheikh tours",
+        "sharm el sheikh excursions",
+        "things to do in sharm el sheikh",
+        "sharm el sheikh activities",
+        "red sea tours",
+      ],
+    },
     priority: 1,
   },
   {
@@ -147,6 +159,18 @@ export const destinations: Destination[] = [
       { label: "Dress", value: "Shoulders and knees covered at religious sites" },
       { label: "Best for", value: "Ancient sites, museums and city walking" },
     ],
+    seo: {
+      title: "Cairo Tours & Pyramids Day Trips from Sharm El Sheikh",
+      description:
+        "Cairo tours with Bro Tour covering the Pyramids of Giza, the Grand Egyptian Museum and Old Cairo, available as a day trip from Sharm El Sheikh.",
+      keywords: [
+        "cairo tours",
+        "cairo day trips",
+        "giza pyramids tours",
+        "grand egyptian museum tour",
+        "old cairo tour",
+      ],
+    },
     priority: 2,
   },
 ];

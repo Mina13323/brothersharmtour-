@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+
+import { buildMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { Hero } from "@/components/Hero";
 import { Reveal } from "@/components/Reveal";
@@ -8,12 +10,13 @@ import { destinations } from "@/data/destinations";
 import { toursByDestination } from "@/data/tours";
 import { media } from "@/lib/media";
 
-export const metadata: Metadata = {
-  title: "Destinations in Egypt",
-  description:
-    "Where Bro Tour operates: Sharm El Sheikh on the Red Sea, our home base, and Cairo for the Pyramids, the Grand Egyptian Museum and the historic quarters.",
-  alternates: { canonical: "/destinations" },
-};
+export const metadata: Metadata = buildMetadata({
+  fallbackTitle: "Egypt Destinations: Sharm El Sheikh & Cairo",
+  fallbackDescription:
+    "Where Bro Tour operates \u2014 Sharm El Sheikh on the Red Sea, our base for excursions and safari, and Cairo for the Pyramids of Giza and the Grand Egyptian Museum.",
+  path: "/destinations",
+  image: media.sharmHero,
+});
 
 export default function DestinationsPage() {
   return (

@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+
+import { buildMetadata } from "@/lib/seo";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -10,12 +12,13 @@ import { BookButton } from "@/components/BookingProvider";
 import { media } from "@/lib/media";
 import { site } from "@/data/site";
 
-export const metadata: Metadata = {
-  title: "Our Story",
-  description:
-    "Bro Tour is a Sharm El Sheikh–based travel company running curated Red Sea excursions, Sinai desert trips, Cairo day tours and private transfers across Egypt.",
-  alternates: { canonical: "/about" },
-};
+export const metadata: Metadata = buildMetadata({
+  fallbackTitle: "About Bro Tour \u2014 Sharm El Sheikh Tour Operator",
+  fallbackDescription:
+    "Bro Tour is a tour operator based in Sharm El Sheikh, South Sinai, running Red Sea excursions, desert safari, Cairo day trips and private transfers across Egypt.",
+  path: "/about",
+  image: media.about,
+});
 
 const approach = [
   {

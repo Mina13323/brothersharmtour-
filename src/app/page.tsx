@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+
+import { buildMetadata } from "@/lib/seo";
 import Link from "next/link";
 
 import { Hero } from "@/components/Hero";
@@ -18,12 +20,14 @@ import { experiences } from "@/data/experiences";
 import { featuredTours, tours, tourBySlug } from "@/data/tours";
 import { media, videoAvailable } from "@/lib/media";
 
-export const metadata: Metadata = {
-  title: "Bro Tour — Discover Egypt Differently",
-  description:
-    "Red Sea excursions, Sinai desert adventures and Cairo day trips, run by a local team in Sharm El Sheikh. Explore island snorkelling, safaris, dolphins and private transfers.",
-  alternates: { canonical: "/" },
-};
+export const metadata: Metadata = buildMetadata({
+  fallbackTitle: "Egypt Tours & Experiences",
+  fallbackDescription:
+    "Bro Tour runs Red Sea excursions from Sharm El Sheikh \u2014 White Island, Ras Mohamed, Tiran Island \u2014 plus Sinai desert safari and Cairo day trips to the Pyramids.",
+  path: "/",
+  absoluteTitle: true,
+  image: media.heroFilm.poster,
+});
 
 /** Tour counts per destination and per category — used as card metadata. */
 const tourCountByDestination = tours.reduce<Record<string, number>>((acc, tour) => {
@@ -70,7 +74,7 @@ export default function HomePage() {
         align="start"
         eyebrow="Bro Tour · Sharm El Sheikh"
         title={<SplitHeadline lines={["Discover Egypt", "differently"]} />}
-        subtitle="Explore the Red Sea, ancient wonders, desert adventures and unforgettable local experiences — with a team that lives here."
+        subtitle="Red Sea snorkelling trips, Sinai desert safari and Cairo day trips, run from Sharm El Sheikh by a team that lives here."
       >
         <Link href="/tours" className="btn btn-primary">
           Explore tours

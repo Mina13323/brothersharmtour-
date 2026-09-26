@@ -38,6 +38,28 @@ export interface MediaVideo {
   label?: string;
 }
 
+/**
+ * Per-record search metadata.
+ *
+ * Metadata is derived automatically where a generated string is genuinely
+ * adequate, but commercial pages should not depend on that: their title and
+ * description are what appears in the search result, so they are authored
+ * here alongside the content they describe and travel with it into a CMS.
+ *
+ * `keywords` documents the intended search intent for editors. It is not
+ * emitted as a meta keywords tag — search engines ignore that tag.
+ */
+export interface SeoMeta {
+  /** Page title, without the brand suffix — the layout template appends it. */
+  title: string;
+  /** 140–160 chars. Written to be read by a human in a search result. */
+  description: string;
+  /** Primary intent first. Editorial reference only, never rendered. */
+  keywords?: string[];
+  /** Overrides the record's hero/card image for social sharing. */
+  ogImage?: MediaImage;
+}
+
 export interface Destination {
   name: string;
   slug: DestinationSlug;
@@ -58,6 +80,8 @@ export interface Destination {
   /** Practical panel. Facts only — no invented specifics. */
   travelInfo: { label: string; value: string }[];
   priority: number;
+  /** Authored search metadata. Falls back to derived text when absent. */
+  seo?: SeoMeta;
 }
 
 export interface Experience {
@@ -69,6 +93,8 @@ export interface Experience {
   image: MediaImage;
   destinations: DestinationSlug[];
   priority: number;
+  /** Authored search metadata. Falls back to derived text when absent. */
+  seo?: SeoMeta;
 }
 
 export interface ItineraryStop {
@@ -119,6 +145,8 @@ export interface Tour {
   verified: boolean;
   featured: boolean;
   priority: number;
+  /** Authored search metadata. Falls back to derived text when absent. */
+  seo?: SeoMeta;
 }
 
 export interface Testimonial {

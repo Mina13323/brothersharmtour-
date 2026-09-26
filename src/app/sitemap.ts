@@ -8,6 +8,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
   const url = (path: string) => `${site.url}${path}`;
 
+  /* Only canonical, indexable URLs belong here. /book is a transactional
+     form marked noindex, so listing it would invite crawl waste. */
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: url("/"), lastModified: now, changeFrequency: "weekly", priority: 1 },
     { url: url("/tours"), lastModified: now, changeFrequency: "weekly", priority: 0.9 },
@@ -16,7 +18,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: url("/about"), lastModified: now, changeFrequency: "yearly", priority: 0.5 },
     { url: url("/contact"), lastModified: now, changeFrequency: "yearly", priority: 0.5 },
     { url: url("/faq"), lastModified: now, changeFrequency: "monthly", priority: 0.5 },
-    { url: url("/book"), lastModified: now, changeFrequency: "monthly", priority: 0.7 },
   ];
 
   return [

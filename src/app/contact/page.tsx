@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
+
+import { buildMetadata } from "@/lib/seo";
 import { Reveal } from "@/components/Reveal";
 import { ContactForm } from "@/components/ContactForm";
 import { Breadcrumbs, WhatsAppIcon } from "@/components/sections";
 import { site, whatsappLink } from "@/data/site";
 
-export const metadata: Metadata = {
-  title: "Contact Us",
-  description:
-    "Get in touch with Bro Tour in Sharm El Sheikh — WhatsApp, phone or email. We answer quickly, every day.",
-  alternates: { canonical: "/contact" },
-};
+export const metadata: Metadata = buildMetadata({
+  fallbackTitle: "Contact Bro Tour in Sharm El Sheikh",
+  fallbackDescription:
+    "Contact Bro Tour to plan a Sharm El Sheikh excursion or Cairo day trip. Message us on WhatsApp, call, or send an enquiry and we will reply with availability.",
+  path: "/contact",
+});
 
 export default function ContactPage() {
   return (

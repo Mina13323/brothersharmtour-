@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+
+import { buildMetadata } from "@/lib/seo";
 import Image from "next/image";
 import { Suspense } from "react";
 import { Reveal } from "@/components/Reveal";
@@ -7,12 +9,14 @@ import { Breadcrumbs, WhatsAppIcon } from "@/components/sections";
 import { site, whatsappLink } from "@/data/site";
 import { media } from "@/lib/media";
 
-export const metadata: Metadata = {
-  title: "Book Your Experience",
-  description:
-    "Send a booking request to Bro Tour. Tell us your experience, dates and group size — we reply with availability, your hotel pickup time and a final price.",
-  alternates: { canonical: "/book" },
-};
+export const metadata: Metadata = buildMetadata({
+  fallbackTitle: "Request a Booking",
+  fallbackDescription:
+    "Send a booking request to Bro Tour. Tell us your experience, dates and group size and we will reply with availability, your pickup time and a final price.",
+  path: "/book",
+  // Transactional form: thin for search, but still followed.
+  noindex: true,
+});
 
 const reassurance = [
   {

@@ -1,0 +1,65 @@
+import type { Metadata } from "next";
+import { Hero } from "@/components/Hero";
+import { ToursExplorer } from "@/components/ToursExplorer";
+import { Breadcrumbs, CTASection } from "@/components/sections";
+import { BookButton } from "@/components/BookingProvider";
+import { tours } from "@/data/tours";
+import { site } from "@/data/site";
+import { media } from "@/lib/media";
+
+export const metadata: Metadata = {
+  title: "All Tours & Experiences",
+  description:
+    "Every Bro Tour experience in one place — Red Sea snorkelling, island boat days, desert safaris, dolphin experiences, Cairo day trips and private transfers. Filter by destination, type, duration and price.",
+  alternates: { canonical: "/tours" },
+};
+
+export default function ToursPage() {
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Bro Tour experiences in Egypt",
+    numberOfItems: tours.length,
+    itemListElement: tours.map((tour, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: tour.title,
+      url: `${site.url}/tours/${tour.slug}`,
+    })),
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+         
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      />
+
+      <Hero
+        image={media.whiteIsland.hero}
+        size="short"
+        eyebrow={`${tours.length} experiences · Sharm El Sheikh & Cairo`}
+        title="Find your Egypt experience"
+        subtitle="Filter by destination, the kind of day you want, how long you have and what you'd like to spend."
+      >
+        <BookButton className="btn btn-primary">Ask us to plan it</BookButton>
+      </Hero>
+
+      <section className="pb-24 pt-10 md:pt-14">
+        <div className="shell">
+          <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Tours" }]} />
+          <div className="mt-8">
+            <ToursExplorer tours={tours} />
+          </div>
+        </div>
+      </section>
+
+      <CTASection
+        image={media.superSafari.hero}
+        title="Can't find the right day?"
+        text="We build private itineraries too. Tell us what you had in mind."
+      />
+    </>
+  );
+}

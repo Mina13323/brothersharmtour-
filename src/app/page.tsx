@@ -4,6 +4,7 @@ import { buildMetadata } from "@/lib/seo";
 import Link from "next/link";
 
 import { Hero } from "@/components/Hero";
+import { HeroSearch } from "@/components/HeroSearch";
 import { Reveal, SplitHeadline } from "@/components/Reveal";
 import { SectionHeading, CTASection } from "@/components/sections";
 import { DestinationSwitcher } from "@/components/DestinationSwitcher";
@@ -83,6 +84,12 @@ export default function HomePage() {
           </span>
         </Link>
         <BookButton className="btn btn-ghost-light">Plan your trip</BookButton>
+
+        {/* Search panel sits below the CTAs and hands off to /tours with the
+            filters already applied. */}
+        <div className="mt-10 w-full max-w-4xl lg:mt-12">
+          <HeroSearch />
+        </div>
       </Hero>
 
       {/* ═════════ 02 · DESTINATION DISCOVERY — light ═════════ */}

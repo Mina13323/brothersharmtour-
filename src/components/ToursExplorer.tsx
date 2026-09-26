@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { destinations } from "@/data/destinations";
 import { experiences } from "@/data/experiences";
 import { durationBuckets } from "@/data/tours";
@@ -34,19 +34,58 @@ export function ToursExplorer({
   tours,
   lockedDestination,
   lockedCategory,
+  initial,
 }: {
   tours: Tour[];
   lockedDestination?: string;
   lockedCategory?: string;
+  /**
+   * Seed values from the URL, so the hero search can hand off to this page
+   * with its filters already applied. A locked value always wins — those come
+   * from the route itself (e.g. /destinations/cairo) and must not be
+   * overridden by a query string.
+   */
+  initial?: {
+    destination?: string;
+    category?: string;
+    duration?: string;
+    type?: string;
+  };
 }) {
   const [query, setQuery] = useState("");
-  const [destination, setDestination] = useState(lockedDestination ?? "all");
-  const [category, setCategory] = useState(lockedCategory ?? "all");
-  const [duration, setDuration] = useState("all");
-  const [type, setType] = useState("all");
+  const [destination, setDestination] = useState(
+    lockedDestination ?? initial?.destination ?? "all",
+  );
+  const [category, setCategory] = useState(
+    lockedCategory ?? initial?.category ?? "all",
+  );
+  const [duration, setDuration] = useState(initial?.duration ?? "all");
+  const [type, setType] = useState(initial?.type ?? "all");
   const [maxPrice, setMaxPrice] = useState(0); // 0 = no cap
   const [sort, setSort] = useState<SortKey>("recommended");
   const [filtersOpen, setFiltersOpen] = useState(false);
+
+  /* The drawer overlays the page below lg, so the page behind it must not
+     scroll. The lock is skipped at lg and above, where the same markup is a
+     static sidebar and nothing is overlaid. */
+  useEffect(() => {
+    if (!filtersOpen) return;
+    const desktop = window.matchMedia("(min-width: 64rem)");
+    if (desktop.matches) return;
+
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setFiltersOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+
+    return () => {
+      document.body.style.overflow = previous;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [filtersOpen]);
 
   const priceCeiling = useMemo(() => {
     const prices = tours.map((t) => t.priceFrom).filter((p): p is number => p !== null);
@@ -192,14 +231,53 @@ export function ToursExplorer({
 
       <div className="grid gap-10 pt-8 lg:grid-cols-[17rem_1fr] lg:gap-14">
         {/* ───────── Filters ───────── */}
-        <aside
+        {/* Scrim — mobile only, closes the drawer on tap. */}
+        <button
+          type="button"
+          tabIndex={-1}
+          aria-hidden={!filtersOpen}
+          onClick={() => setFiltersOpen(false)}
           className={cn(
-            "lg:block",
-            filtersOpen ? "block" : "hidden",
+            "fixed inset-0 z-[110] bg-ink/45 backdrop-blur-[2px] transition-opacity duration-[var(--duration-ui)] lg:hidden",
+            filtersOpen
+              ? "visible opacity-100"
+              : "invisible opacity-0",
           )}
         >
-          <div className="flex flex-col gap-8 lg:sticky lg:top-[10.5rem]">
-            <div className="flex items-center justify-between">
+          <span className="sr-only">Close filters</span>
+        </button>
+
+        {/*
+          Below lg this is a slide-out drawer with its own Reset / Apply
+          footer. At lg and above the same markup is a static sidebar, so the
+          filter controls exist once rather than being duplicated per layout.
+        */}
+        <aside
+          role="dialog"
+          aria-modal={filtersOpen ? true : undefined}
+          aria-label="Refine tours"
+          className={cn(
+            "fixed inset-y-0 right-0 z-[120] flex w-[min(22rem,88vw)] flex-col bg-paper shadow-[var(--shadow-panel)] transition-transform duration-400 [transition-timing-function:var(--ease-premium)]",
+            "lg:static lg:z-auto lg:w-auto lg:translate-x-0 lg:shadow-none lg:transition-none",
+            filtersOpen ? "translate-x-0" : "translate-x-full",
+          )}
+        >
+          <div className="flex items-center justify-between border-b border-sand px-5 py-4 lg:hidden">
+            <h2 className="eyebrow text-stone">Refine</h2>
+            <button
+              type="button"
+              onClick={() => setFiltersOpen(false)}
+              aria-label="Close filters"
+              className="grid size-9 place-items-center rounded-pill border border-sand text-ink"
+            >
+              <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden>
+                <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" strokeWidth="1.4" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="flex grow flex-col gap-8 overflow-y-auto overscroll-contain px-5 py-6 lg:sticky lg:top-[10.5rem] lg:overflow-visible lg:px-0 lg:py-0">
+            <div className="hidden items-center justify-between lg:flex">
               <h2 className="eyebrow text-stone">Refine</h2>
               {activeCount > 0 || query ? (
                 <button
@@ -295,6 +373,26 @@ export function ToursExplorer({
                 ))}
               </select>
             </label>
+          </div>
+
+          {/* Drawer footer — mobile only. Filtering is live, so Apply simply
+              dismisses the drawer and reveals the results behind it. */}
+          <div className="flex items-center gap-3 border-t border-sand px-5 py-4 lg:hidden">
+            <button
+              type="button"
+              onClick={reset}
+              className="btn btn-outline flex-1"
+            >
+              Reset
+            </button>
+            <button
+              type="button"
+              onClick={() => setFiltersOpen(false)}
+              className="btn btn-ink flex-[1.4]"
+            >
+              Show {results.length}{" "}
+              {results.length === 1 ? "result" : "results"}
+            </button>
           </div>
         </aside>
 

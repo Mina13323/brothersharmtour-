@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
 import { buildMetadata } from "@/lib/seo";
 import { Hero } from "@/components/Hero";
-import { ToursExplorer } from "@/components/ToursExplorer";
+import { ToursExplorerWithQuery } from "@/components/ToursExplorerWithQuery";
 import { Breadcrumbs, CTASection } from "@/components/sections";
 import { BookButton } from "@/components/BookingProvider";
 import { tours } from "@/data/tours";
@@ -53,7 +54,11 @@ export default function ToursPage() {
         <div className="shell">
           <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Tours" }]} />
           <div className="mt-8">
-            <ToursExplorer tours={tours} />
+            {/* Suspense boundary: the explorer reads the hero search hand-off
+                from the query string, which opts its subtree into CSR. */}
+            <Suspense fallback={<div className="min-h-[60vh]" />}>
+              <ToursExplorerWithQuery tours={tours} />
+            </Suspense>
           </div>
         </div>
       </section>

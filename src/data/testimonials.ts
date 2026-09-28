@@ -4,7 +4,7 @@ import type { FaqItem, Testimonial } from "@/lib/types";
  * ─────────────────────────────────────────────────────────────────────────────
  * PLACEHOLDER REVIEW DATA
  *
- * Bro Tour has not supplied real review content, and inventing customer
+ * Brother Sharm Tour has not supplied real review content, and inventing customer
  * testimonials would be dishonest. Every record below is flagged
  * `placeholder: true` and exists only to prove out the component's data shape,
  * character counts and layout behaviour.
@@ -26,7 +26,7 @@ export const testimonials: Testimonial[] = [
   },
   {
     quote:
-      "A second slot for a verified review, ideally about a desert experience so the carousel covers more than one side of what Bro Tour runs.",
+      "A second slot for a verified review, ideally about a desert experience so the carousel covers more than one side of what Brother Sharm Tour runs.",
     author: "Traveller name",
     origin: "Country",
     tourSlug: "super-safari",
@@ -49,7 +49,7 @@ export const hasRealTestimonials = testimonials.some((t) => !t.placeholder);
 /** General FAQ — booking, payment and logistics. */
 export const generalFaq: FaqItem[] = [
   {
-    question: "How do I book with Bro Tour?",
+    question: "How do I book with Brother Sharm Tour?",
     answer:
       "Send a request through any Book Now button or message us on WhatsApp. Tell us the experience, your date and how many people are travelling. We reply with availability, your hotel's pickup time and a final price. Nothing is charged until you confirm.",
   },

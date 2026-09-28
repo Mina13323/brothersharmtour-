@@ -80,7 +80,7 @@ export function BookingForm({
           <a
             href={whatsappLink(
               selected
-                ? `Hi Bro Tour — I've just sent a request for ${selected.title}.`
+                ? `Hi Brother Sharm Tour — I've just sent a request for ${selected.title}.`
                 : undefined,
             )}
             target="_blank"
@@ -240,7 +240,7 @@ export function BookingForm({
         </button>
         <a
           href={whatsappLink(
-            selected ? `Hi Bro Tour — I'm interested in ${selected.title}.` : undefined,
+            selected ? `Hi Brother Sharm Tour — I'm interested in ${selected.title}.` : undefined,
           )}
           target="_blank"
           rel="noopener noreferrer"

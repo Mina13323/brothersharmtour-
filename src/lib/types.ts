@@ -1,5 +1,5 @@
 /**
- * BRO TOUR — content model
+ * BROTHER SHARM TOUR — content model
  *
  * These types describe the shape of every piece of editorial content on the
  * site. Each collection in `src/data` is a plain, serialisable array that maps
@@ -127,6 +127,20 @@ export interface Tour {
   /** "From" price per adult in USD. Null renders as "Price on request". */
   priceFrom: number | null;
   currency: "USD";
+  /** Optional original ("was") price for a struck-through discount display. */
+  priceOriginal?: number | null;
+  /** Star rating shown on cards and the detail page, e.g. 4.9. */
+  rating?: number;
+  /** Number of reviews behind the rating. */
+  reviewCount?: number;
+  /** Human schedule shown in the meta row, e.g. "Daily", "Mon · Wed · Sat". */
+  schedule?: string;
+  /** Pricing unit label, e.g. "per person", "per boat". */
+  priceUnit?: string;
+  /** Price per child (5–10). Falls back to ~80% of the adult price. */
+  childPrice?: number | null;
+  /** Optional paid extras shown as counters in the booking widget. */
+  addons?: { label: string; price: number; unit?: string }[];
   highlights: string[];
   included: string[];
   excluded: string[];
@@ -138,7 +152,7 @@ export interface Tour {
   related: string[];
   /**
    * Editorial status flag. `false` means the commercial details (price,
-   * duration, itinerary timings) still need sign-off from Bro Tour operations
+   * duration, itinerary timings) still need sign-off from Brother Sharm Tour operations
    * before launch. The UI never hides content based on this — it exists so the
    * team can query unverified records from the CMS.
    */

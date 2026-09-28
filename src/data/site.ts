@@ -1,30 +1,30 @@
 /** Global site configuration — brand, contact channels, navigation. */
 
 export const site = {
-  name: "Bro Tour",
-  legalName: "Bro Tour Egypt",
+  name: "Brother Sharm Tour",
+  legalName: "Brother Sharm Tour Egypt",
   tagline: "Explore Egypt Differently.",
   description:
-    "Bro Tour runs curated tours, excursions and private transfers across Sharm El Sheikh and Cairo — the Red Sea, the Sinai desert and Egypt's ancient wonders, guided by people who live there.",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://brotour.com",
+    "Brother Sharm Tour runs curated tours, excursions and private transfers across Sharm El Sheikh and Cairo — the Red Sea, the Sinai desert and Egypt's ancient wonders, guided by people who live there.",
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://brothersharmtour.com",
   locale: "en",
   contact: {
     whatsapp: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "201000000000",
     phone: process.env.NEXT_PUBLIC_PHONE ?? "+20 100 000 0000",
-    email: process.env.NEXT_PUBLIC_EMAIL ?? "hello@brotour.com",
+    email: process.env.NEXT_PUBLIC_EMAIL ?? "hello@brothersharmtour.com",
     base: "Sharm El Sheikh, South Sinai, Egypt",
     hours: "Daily · 08:00 – 23:00 (EET)",
   },
   social: {
-    instagram: "https://instagram.com/brotour",
-    facebook: "https://facebook.com/brotour",
+    instagram: "https://instagram.com/brothersharmtour",
+    facebook: "https://facebook.com/brothersharmtour",
   },
 } as const;
 
 /** Builds a pre-filled WhatsApp deep link. */
 export function whatsappLink(message?: string) {
   const text = encodeURIComponent(
-    message ?? "Hi Bro Tour — I'd like to plan a trip in Egypt.",
+    message ?? "Hi Brother Sharm Tour — I'd like to plan a trip in Egypt.",
   );
   return `https://wa.me/${site.contact.whatsapp}?text=${text}`;
 }
@@ -108,6 +108,7 @@ export const mainNav: NavItem[] = [
     ],
   },
   { label: "Tours", href: "/tours" },
+  { label: "Video", href: "/video" },
   { label: "About", href: "/about" },
 ];
 
@@ -129,5 +130,6 @@ export const footerNav = {
     { label: "Contact", href: "/contact" },
     { label: "FAQ", href: "/faq" },
     { label: "All Tours", href: "/tours" },
+    { label: "Video", href: "/video" },
   ],
 };

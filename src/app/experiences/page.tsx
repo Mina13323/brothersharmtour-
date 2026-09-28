@@ -15,7 +15,7 @@ import { media } from "@/lib/media";
 export const metadata: Metadata = buildMetadata({
   fallbackTitle: "Egypt Tour Experiences & Activity Types",
   fallbackDescription:
-    "Browse Bro Tour by the kind of day you want: Red Sea sea trips, adventure, desert safari, culture, marine wildlife, leisure and private transfers in Sharm El Sheikh and Cairo.",
+    "Browse Brother Sharm Tour by the kind of day you want: Red Sea sea trips, adventure, desert safari, culture, marine wildlife, leisure and private transfers in Sharm El Sheikh and Cairo.",
   path: "/experiences",
   image: media.sharmHero,
 });

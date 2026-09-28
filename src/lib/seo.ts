@@ -4,7 +4,7 @@ import { site } from "@/data/site";
 import type { MediaImage, SeoMeta } from "./types";
 
 /**
- * BRO TOUR — metadata builder
+ * BROTHER SHARM TOUR — metadata builder
  *
  * One place that assembles title, description, canonical, OpenGraph and
  * Twitter metadata so every indexable route is consistent and none of them
@@ -30,7 +30,7 @@ export function buildMetadata({
   image?: MediaImage;
   noindex?: boolean;
   /**
-   * Emit the title verbatim, bypassing the layout's `%s · Bro Tour` template.
+   * Emit the title verbatim, bypassing the layout's `%s · Brother Sharm Tour` template.
    * The template only decorates child segments, so the root page would
    * otherwise ship a title with no brand in it at all.
    */

@@ -33,7 +33,7 @@ export function FloatingActions() {
         href={whatsappLink()}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="Chat with Bro Tour on WhatsApp"
+        aria-label="Chat with Brother Sharm Tour on WhatsApp"
         className={cn(
           "fixed bottom-7 right-7 z-[90] hidden size-14 place-items-center rounded-pill bg-[#1faa54] text-white shadow-lg transition-all duration-500 hover:scale-105 md:grid",
           visible && !isOpen

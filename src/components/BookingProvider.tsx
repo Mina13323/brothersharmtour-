@@ -9,7 +9,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { BookingForm } from "./BookingForm";
+import { BookingWidget } from "./BookingWidget";
 
 interface BookingContextValue {
   open: (tourSlug?: string) => void;
@@ -87,8 +87,8 @@ export function BookingProvider({ children }: { children: ReactNode }) {
         >
           <header className="flex items-start justify-between gap-6 border-b border-sand px-6 py-6 md:px-9">
             <div>
-              <p className="eyebrow text-reef">Booking request</p>
-              <h2 className="headline mt-2 text-[1.75rem]">Plan your trip</h2>
+              <p className="eyebrow text-reef">Book in 3 minutes</p>
+              <h2 className="headline mt-2 text-[1.75rem]">Reserve your trip</h2>
             </div>
             <button
               onClick={close}
@@ -102,7 +102,9 @@ export function BookingProvider({ children }: { children: ReactNode }) {
           </header>
 
           <div className="grow overflow-y-auto px-6 py-8 md:px-9">
-            {isOpen ? <BookingForm initialTour={tourSlug} compact /> : null}
+            {isOpen ? (
+              <BookingWidget initialTour={tourSlug} onClose={close} />
+            ) : null}
           </div>
         </div>
       </div>

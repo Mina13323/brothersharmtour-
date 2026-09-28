@@ -7,7 +7,7 @@ import type { Tour } from "@/lib/types";
  *
  * Prices, durations and itinerary timings below are STRUCTURAL PLACEHOLDERS.
  * They exist so the interface can be designed and tested against realistic
- * data shapes. Every record is flagged `verified: false` until Bro Tour
+ * data shapes. Every record is flagged `verified: false` until Brother Sharm Tour
  * operations confirms the commercial detail.
  *
  * Nothing here should go live unchanged. Query `tours.filter(t => !t.verified)`
@@ -18,10 +18,10 @@ import type { Tour } from "@/lib/types";
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
-/** Terms that apply to every Bro Tour booking unless a tour overrides them. */
+/** Terms that apply to every Brother Sharm Tour booking unless a tour overrides them. */
 const baseIncluded = [
   "Hotel pickup and drop-off in an air-conditioned vehicle",
-  "English-speaking Bro Tour guide",
+  "English-speaking Brother Sharm Tour guide",
   "All entrance fees and permits listed in the itinerary",
   "Bottled water",
 ];
@@ -118,6 +118,11 @@ export const tours: Tour[] = [
     ],
     faq: baseFaq,
     related: ["ras-mohamed", "tiran-island", "glass-boat"],
+    childPrice: 25,
+    addons: [
+      { label: "Intro diving session", price: 20, unit: "per person" },
+      { label: "Underwater photos", price: 15, unit: "per booking" },
+    ],
     verified: false,
     featured: true,
     priority: 1,
@@ -486,6 +491,11 @@ export const tours: Tour[] = [
     ],
     faq: baseFaq,
     related: ["desert-safari", "color-canyon", "horse-riding"],
+    childPrice: 18,
+    addons: [
+      { label: "Camel ride", price: 10, unit: "per person" },
+      { label: "Extra quad bike", price: 15, unit: "each" },
+    ],
     verified: false,
     featured: true,
     priority: 4,
@@ -878,6 +888,12 @@ export const tours: Tour[] = [
     ],
     faq: baseFaq,
     related: ["old-cairo", "old-market", "airport-transfer"],
+    childPrice: 70,
+    addons: [
+      { label: "Egypt entry visa", price: 35, unit: "per person" },
+      { label: "Camel ride at the pyramids", price: 15, unit: "per person" },
+      { label: "Lunch upgrade", price: 12, unit: "per person" },
+    ],
     verified: false,
     featured: true,
     priority: 8,
@@ -954,7 +970,7 @@ export const tours: Tour[] = [
     included: ["Private air-conditioned vehicle", "Driver", "Meet and greet in arrivals", "Bottled water"],
     excluded: [...baseExcluded, "Extended waiting beyond the included window"],
     itinerary: [
-      { title: "Arrival", detail: "Driver meets you in arrivals with a Bro Tour name board." },
+      { title: "Arrival", detail: "Driver meets you in arrivals with a Brother Sharm Tour name board." },
       { title: "Transfer", detail: "Direct to your hotel in an air-conditioned vehicle." },
       { title: "Departure", detail: "Return pickup timed to your outbound flight." },
     ],

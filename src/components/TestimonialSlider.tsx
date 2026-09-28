@@ -45,7 +45,7 @@ export function TestimonialSlider() {
             <strong className="font-semibold text-ink">
               Placeholder content.
             </strong>{" "}
-            Bro Tour&apos;s verified reviews haven&apos;t been supplied yet, so
+            Brother Sharm Tour&apos;s verified reviews haven&apos;t been supplied yet, so
             this carousel is running on structural sample data. It&apos;s wired
             to a CMS collection and will populate as soon as real reviews are
             connected.

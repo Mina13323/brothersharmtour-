@@ -60,7 +60,7 @@ export function Hero({
   return (
     <section
       className={cn(
-        "relative isolate flex w-full overflow-hidden bg-ink text-white",
+        "on-ink relative isolate flex w-full overflow-hidden bg-ink text-white",
         size === "full" && "min-h-[100svh]",
         size === "tall" && "min-h-[76svh] md:min-h-[82svh]",
         size === "short" && "min-h-[58svh] md:min-h-[62svh]",

@@ -13,7 +13,7 @@ import { media } from "@/lib/media";
 export const metadata: Metadata = buildMetadata({
   fallbackTitle: "Egypt Destinations: Sharm El Sheikh & Cairo",
   fallbackDescription:
-    "Where Bro Tour operates \u2014 Sharm El Sheikh on the Red Sea, our base for excursions and safari, and Cairo for the Pyramids of Giza and the Grand Egyptian Museum.",
+    "Where Brother Sharm Tour operates \u2014 Sharm El Sheikh on the Red Sea, our base for excursions and safari, and Cairo for the Pyramids of Giza and the Grand Egyptian Museum.",
   path: "/destinations",
   image: media.sharmHero,
 });

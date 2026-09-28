@@ -18,7 +18,7 @@ export const experiences: Experience[] = [
     seo: {
       title: "Sharm El Sheikh Sea Trips & Snorkelling",
       description:
-        "Red Sea boat trips and snorkelling from Sharm El Sheikh with Bro Tour, including White Island, Ras Mohamed National Park and Tiran Island.",
+        "Red Sea boat trips and snorkelling from Sharm El Sheikh with Brother Sharm Tour, including White Island, Ras Mohamed National Park and Tiran Island.",
       keywords: [
         "sharm el sheikh sea trips",
         "sharm el sheikh snorkeling",
@@ -40,7 +40,7 @@ export const experiences: Experience[] = [
     seo: {
       title: "Sharm El Sheikh Adventure Tours",
       description:
-        "Adventure tours from Sharm El Sheikh with Bro Tour: quad biking, Color Canyon, horse riding and Super Safari across the Sinai desert.",
+        "Adventure tours from Sharm El Sheikh with Brother Sharm Tour: quad biking, Color Canyon, horse riding and Super Safari across the Sinai desert.",
       keywords: [
         "sharm el sheikh adventure tours",
         "quad biking sharm el sheikh",
@@ -61,7 +61,7 @@ export const experiences: Experience[] = [
     seo: {
       title: "Sharm El Sheikh Desert Safari Tours",
       description:
-        "Desert safari from Sharm El Sheikh with Bro Tour, crossing the Sinai interior to Bedouin camps, with Safari and Super Safari options.",
+        "Desert safari from Sharm El Sheikh with Brother Sharm Tour, crossing the Sinai interior to Bedouin camps, with Safari and Super Safari options.",
       keywords: [
         "sharm el sheikh desert safari",
         "sinai desert tours",
@@ -82,7 +82,7 @@ export const experiences: Experience[] = [
     seo: {
       title: "Egypt Cultural Tours from Sharm El Sheikh",
       description:
-        "Cultural tours with Bro Tour taking in the Pyramids of Giza, the Grand Egyptian Museum and Old Cairo, reachable from Sharm El Sheikh.",
+        "Cultural tours with Brother Sharm Tour taking in the Pyramids of Giza, the Grand Egyptian Museum and Old Cairo, reachable from Sharm El Sheikh.",
       keywords: [
         "egypt cultural tours",
         "pyramids tours",
@@ -103,7 +103,7 @@ export const experiences: Experience[] = [
     seo: {
       title: "Red Sea Marine Life & Dolphin Experiences",
       description:
-        "Marine life experiences in Sharm El Sheikh with Bro Tour, including dolphin encounters, the submarine and glass boat trips over the reef.",
+        "Marine life experiences in Sharm El Sheikh with Brother Sharm Tour, including dolphin encounters, the submarine and glass boat trips over the reef.",
       keywords: [
         "dolphin experiences sharm el sheikh",
         "swimming with dolphins egypt",
@@ -124,7 +124,7 @@ export const experiences: Experience[] = [
     seo: {
       title: "Sharm El Sheikh Leisure & Evening Experiences",
       description:
-        "Relaxed Sharm El Sheikh outings with Bro Tour: Naama Bay, the Old Market, Soho Square and the cliffside Farsha Cafe.",
+        "Relaxed Sharm El Sheikh outings with Brother Sharm Tour: Naama Bay, the Old Market, Soho Square and the cliffside Farsha Cafe.",
       keywords: [
         "things to do in sharm el sheikh at night",
         "naama bay",
@@ -145,7 +145,7 @@ export const experiences: Experience[] = [
     seo: {
       title: "Sharm El Sheikh Airport Transfers & Private Transport",
       description:
-        "Private transfers and Sharm El Sheikh airport transport with Bro Tour, arranged for your arrival, departure and trips between hotels.",
+        "Private transfers and Sharm El Sheikh airport transport with Brother Sharm Tour, arranged for your arrival, departure and trips between hotels.",
       keywords: [
         "sharm el sheikh airport transfers",
         "private transfers egypt",

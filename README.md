@@ -1,6 +1,6 @@
-# BRO TOUR
+# BROTHER SHARM TOUR
 
-Premium tourism website for **Bro Tour**, an Egyptian tour operator based in
+Premium tourism website for **Brother Sharm Tour**, an Egyptian tour operator based in
 Sharm El Sheikh (primary destination) with Cairo as the secondary destination.
 
 Built with **Next.js 15 (App Router)**, **TypeScript** and **Tailwind CSS v4**.
@@ -73,8 +73,10 @@ The whole visual language lives in `src/app/globals.css` as Tailwind v4
 `@theme` tokens plus a small set of component classes — no utility soup
 duplicated across files.
 
-- **Palette** — ink `#0b0f14`, paper, paper-warm, sand, stone, reef teal
-  `#0e6f76`, sun gold `#c2872c`.
+- **Palette** — the Brother Sharm Tour five-colour system: Midnight Blue
+  `#0F414A` (ink / dark surfaces), Alabaster `#EFE8DF` (paper), Tan `#D8BA98`
+  (sand / warm fill), Maroon `#7F0303` (primary CTA / “sun”) and Light Blue
+  `#96C0CE` (soft “reef” accent), plus tints derived from those five.
 - **Type** — Cormorant Garamond (display) + Inter (text), both self-hosted via
   `@fontsource-variable/*`. Fluid `clamp()` scale, no breakpoint jumps.
 - **Geometry** — `--radius-card: 2px`. Sharp, editorial, deliberately *not*
@@ -143,7 +145,7 @@ live — all are isolated and flagged in code.
 
 ### 1. Photography and film — **placeholder**
 
-The real Bro Tour library (180 files across 17 folders) could not be pulled
+The real Brother Sharm Tour library (180 files across 17 folders) could not be pulled
 into this environment. Every image currently in `public/media/**` is
 **AI-generated placeholder imagery** standing in for the real shoot.
 
@@ -197,7 +199,7 @@ The UI surfaces a notice while the flag is false.
 
 ## SEO
 
-- Unique title (templated `%s · Bro Tour`), description and canonical per page.
+- Unique title (templated `%s · Brother Sharm Tour`), description and canonical per page.
 - Open Graph + Twitter card metadata, shared OG image.
 - JSON-LD: `TravelAgency` (root), `TouristDestination`, `CollectionPage`,
   `TouristTrip` with `offers` and `itinerary`, `FAQPage`, `BreadcrumbList`,
@@ -212,5 +214,5 @@ The UI surfaces a notice while the flag is false.
 The UX structure and visual hierarchy were informed by studying modern premium
 travel sites. All copy, branding, the logo mark, the colour and type system,
 the component library and the imagery in this repository are **original work
-produced for Bro Tour** — no third-party branding, text or photography has
+produced for Brother Sharm Tour** — no third-party branding, text or photography has
 been copied.

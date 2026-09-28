@@ -1,8 +1,8 @@
 /**
- * BRO TOUR — asset manifest
+ * BROTHER SHARM TOUR — asset manifest
  *
  * Every image and video used on the site resolves through this file. The
- * folder names under `public/media` intentionally mirror Bro Tour's own asset
+ * folder names under `public/media` intentionally mirror Brother Sharm Tour's own asset
  * folders (white-island, tiran-island, super-safari, films, …) so that dropping
  * in a new batch of photography is a file copy, not a code change.
  *
@@ -295,12 +295,12 @@ export const media = {
   ),
   about: img(
     "/media/brand/about.jpg",
-    "A Bro Tour guide leading travellers along the Red Sea shore",
+    "A Brother Sharm Tour guide leading travellers along the Red Sea shore",
     WIDE,
   ),
   aboutPortrait: img(
     "/media/brand/about-portrait.jpg",
-    "Bro Tour guide preparing snorkelling gear on a boat deck",
+    "Brother Sharm Tour guide preparing snorkelling gear on a boat deck",
     TALL,
   ),
 
@@ -309,16 +309,16 @@ export const media = {
     src: "/media/films/reel.mp4",
     poster: img(
       "/media/films/reel-poster.jpg",
-      "Still frame from the Bro Tour film: a boat crossing the Red Sea at golden hour",
+      "Still frame from the Brother Sharm Tour film: a boat crossing the Red Sea at golden hour",
       WIDE,
     ),
-    label: "Bro Tour — Egypt through our lens",
+    label: "Brother Sharm Tour — Egypt through our lens",
   },
   heroFilm: {
     src: "/media/films/hero.mp4",
     poster: img(
       "/media/films/hero-poster.jpg",
-      "The Red Sea seen from a Bro Tour boat at sunrise",
+      "The Red Sea seen from a Brother Sharm Tour boat at sunrise",
       WIDE,
     ),
     label: "Sharm El Sheikh from the water",
@@ -331,10 +331,10 @@ export const OG_IMAGE = "/media/brand/og.jpg";
 /**
  * Master switch for the two film assets above.
  *
- * The Bro Tour films live with the client and are not yet in the repo. While
+ * The Brother Sharm Tour films live with the client and are not yet in the repo. While
  * this is `false` the Hero and the film section render their poster stills as
  * finished, intentional full-bleed imagery — no dead play buttons, no 404
  * requests, no layout shift. Drop `reel.mp4` and `hero.mp4` into
  * `public/media/films/` and flip this to `true`; nothing else changes.
  */
-export const videoAvailable = false;
+export const videoAvailable = true;

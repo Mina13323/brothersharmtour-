@@ -71,7 +71,7 @@ export function Footer() {
                   href={site.social.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Bro Tour on Instagram"
+                  aria-label="Brother Sharm Tour on Instagram"
                   className="grid size-10 place-items-center rounded-pill border border-ink-line transition-colors hover:border-sun hover:text-sun"
                 >
                   <svg viewBox="0 0 24 24" fill="currentColor" className="size-4" aria-hidden>
@@ -84,7 +84,7 @@ export function Footer() {
                   href={site.social.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Bro Tour on Facebook"
+                  aria-label="Brother Sharm Tour on Facebook"
                   className="grid size-10 place-items-center rounded-pill border border-ink-line transition-colors hover:border-sun hover:text-sun"
                 >
                   <svg viewBox="0 0 24 24" fill="currentColor" className="size-4" aria-hidden>

@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
  * Trust system.
  *
  * BINDING CONSTRAINT (docs/design-research.md §6): every claim rendered here
- * must be true by construction — a statement about how Bro Tour operates, not
+ * must be true by construction — a statement about how Brother Sharm Tour operates, not
  * a number that would need auditing.
  *
  * Competitors in this segment routinely publish unverifiable counts, ratings

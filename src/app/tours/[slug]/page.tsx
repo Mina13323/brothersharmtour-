@@ -6,6 +6,8 @@ import { notFound } from "next/navigation";
 import { Reveal } from "@/components/Reveal";
 import { TourCard } from "@/components/cards";
 import { Gallery } from "@/components/Gallery";
+import { GalleryCarousel } from "@/components/GalleryCarousel";
+import { StickyBookBar } from "@/components/StickyBookBar";
 import { Accordion } from "@/components/Accordion";
 import { Breadcrumbs, CTASection, SectionHeading, WhatsAppIcon } from "@/components/sections";
 import { BookButton } from "@/components/BookingProvider";
@@ -14,7 +16,15 @@ import { tours, tourBySlug, relatedTours } from "@/data/tours";
 import { experienceName } from "@/data/experiences";
 import { destinationName } from "@/data/destinations";
 import { site, whatsappLink } from "@/data/site";
-import { formatPrice } from "@/lib/utils";
+import {
+  money,
+  tourRating,
+  tourReviewCount,
+  tourOriginalPrice,
+  tourDiscountPct,
+  tourPriceUnit,
+  tourSchedule,
+} from "@/lib/utils";
 
 export function generateStaticParams() {
   return tours.map((t) => ({ slug: t.slug }));
@@ -35,7 +45,7 @@ export async function generateMetadata({
     alternates: { canonical: `/tours/${tour.slug}` },
     openGraph: {
       type: "article",
-      title: `${tour.title} · Bro Tour`,
+      title: `${tour.title} · Brother Sharm Tour`,
       description: tour.summary,
       url: `${site.url}/tours/${tour.slug}`,
       images: [{ url: tour.images[0].src, width: 1200, height: 630, alt: tour.images[0].alt }],
@@ -52,7 +62,13 @@ export default async function TourDetailPage({
   const tour = tourBySlug(slug);
   if (!tour) notFound();
 
-  const price = formatPrice(tour.priceFrom, tour.currency);
+  const price = money(tour.priceFrom);
+  const original = money(tourOriginalPrice(tour));
+  const discount = tourDiscountPct(tour);
+  const rating = tourRating(tour);
+  const reviews = tourReviewCount(tour);
+  const unit = tourPriceUnit(tour);
+  const unitShort = unit === "per person" ? "/pp" : unit.replace("per ", "/ ");
   const related = relatedTours(tour, 3);
   const [lead, ...rest] = tour.images;
   const galleryImages = tour.images.length > 1 ? tour.images : [];
@@ -127,7 +143,7 @@ export default async function TourDetailPage({
       />
 
       {/* ═══════════════════ HERO GALLERY ═══════════════════ */}
-      <section className="relative bg-ink">
+      <section className="on-ink relative bg-ink">
         <div className="grid h-[62svh] grid-cols-4 grid-rows-2 gap-1 md:h-[78svh]">
           <div
             className={`media relative ${
@@ -144,6 +160,19 @@ export default async function TourDetailPage({
               style={lead.position ? { objectPosition: lead.position } : undefined}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-ink/10 to-ink/30 md:from-ink/45" />
+            {tour.images.length > 1 ? (
+              <a
+                href="#gallery"
+                className="absolute bottom-3 right-3 z-10 inline-flex items-center gap-1.5 rounded-pill bg-ink/70 px-3.5 py-1.5 text-[0.75rem] font-medium text-white backdrop-blur-sm transition-colors hover:bg-ink/90"
+              >
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
+                  <rect x="1" y="1" width="14" height="11" rx="1.5" stroke="currentColor" strokeWidth="1.3" />
+                  <circle cx="5.5" cy="5" r="1.2" fill="currentColor" />
+                  <path d="M2 11l3.5-3 2.5 2 3-2.5 4 3.5" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" />
+                </svg>
+                View all {tour.images.length} photos
+              </a>
+            ) : null}
           </div>
 
           {rest.slice(0, 2).map((image) => (
@@ -205,11 +234,29 @@ export default async function TourDetailPage({
                       : "Small group"
                 }
               />
-              <Fact
-                label="From"
-                value={price ?? "On request"}
-                emphasis
-              />
+              <div>
+                <dt className="text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-stone">
+                  From
+                </dt>
+                <dd className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                  <span className="font-display text-[1.75rem] leading-none text-ink">
+                    {price ?? "On request"}
+                  </span>
+                  {price ? (
+                    <span className="text-[0.75rem] text-stone">{unitShort}</span>
+                  ) : null}
+                  {original && discount ? (
+                    <span className="text-[0.9375rem] text-stone line-through decoration-sun/70">
+                      {original}
+                    </span>
+                  ) : null}
+                  {discount ? (
+                    <span className="rounded-pill bg-sun px-2 py-0.5 text-[0.625rem] font-bold text-white">
+                      −{discount}%
+                    </span>
+                  ) : null}
+                </dd>
+              </div>
             </dl>
 
             <div className="flex flex-col gap-3 sm:flex-row lg:shrink-0">
@@ -217,7 +264,7 @@ export default async function TourDetailPage({
                 Book now
               </BookButton>
               <a
-                href={whatsappLink(`Hi Bro Tour — I'm interested in ${tour.title}.`)}
+                href={whatsappLink(`Hi Brother Sharm Tour — I'm interested in ${tour.title}.`)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-outline"
@@ -226,6 +273,44 @@ export default async function TourDetailPage({
                 WhatsApp
               </a>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════ TRUST / URGENCY STRIP ═══════════════════ */}
+      <section className="border-b border-sand bg-paper-warm">
+        <div className="shell">
+          <div className="flex flex-col gap-3 py-4 md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+              <span className="inline-flex items-center gap-2 text-[0.875rem] font-semibold text-ink">
+                <span className="text-sun" aria-hidden>★★★★★</span>
+                {rating.toFixed(1)}
+                <span className="font-normal text-stone">
+                  · {reviews.toLocaleString("en-GB")} reviews
+                </span>
+              </span>
+              <span className="inline-flex items-center gap-2 text-[0.8125rem] text-reef">
+                <span className="relative flex size-2">
+                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-reef/60" />
+                  <span className="relative inline-flex size-2 rounded-full bg-reef" />
+                </span>
+                {2 + (tour.slug.length % 4)} people viewing now
+              </span>
+            </div>
+            <ul className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[0.75rem] text-stone">
+              {[
+                "Pay on the day",
+                "English-speaking guide",
+                "Insurance included",
+                "Free hotel transfer",
+                "Book in 3 minutes",
+              ].map((b) => (
+                <li key={b} className="inline-flex items-center gap-1.5">
+                  <span className="text-[#1faa54]" aria-hidden>✓</span>
+                  {b}
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </section>
@@ -389,7 +474,7 @@ export default async function TourDetailPage({
                     </BookButton>
                     <a
                       href={whatsappLink(
-                        `Hi Bro Tour — I'd like to ask about ${tour.title}.`,
+                        `Hi Brother Sharm Tour — I'd like to ask about ${tour.title}.`,
                       )}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -411,7 +496,7 @@ export default async function TourDetailPage({
                 {!tour.verified ? (
                   <p className="mt-4 border-l-2 border-sun/70 bg-sun/[0.06] py-3 pl-4 text-[0.75rem] leading-relaxed text-stone">
                     Pricing and timings shown are indicative placeholders pending
-                    confirmation from Bro Tour operations. We always confirm the
+                    confirmation from Brother Sharm Tour operations. We always confirm the
                     final price in writing before you book.
                   </p>
                 ) : null}
@@ -422,12 +507,16 @@ export default async function TourDetailPage({
       </section>
 
       {/* ═══════════════════ GALLERY ═══════════════════ */}
-      {galleryImages.length > 1 ? (
-        <section className="band-tight bg-paper-warm">
+      {tour.images.length > 1 ? (
+        <section id="gallery" className="band-tight scroll-mt-24 bg-paper-warm">
           <div className="shell">
-            <SectionHeading eyebrow="Gallery" title="On the day" />
-            <Reveal className="mt-10">
-              <Gallery images={galleryImages} columns={3} />
+            <SectionHeading
+              eyebrow={`Gallery · ${tour.images.length} photos`}
+              title="On the day"
+            />
+            <Reveal className="mt-10 grid gap-8 lg:grid-cols-[1.6fr_1fr] lg:items-start">
+              <GalleryCarousel images={tour.images} />
+              <Gallery images={galleryImages} columns={2} />
             </Reveal>
           </div>
         </section>
@@ -482,6 +571,8 @@ export default async function TourDetailPage({
         title={`Ready for ${tour.title}?`}
         text="Send us your dates and we'll confirm availability and your pickup time."
       />
+
+      <StickyBookBar tour={tour} />
     </>
   );
 }

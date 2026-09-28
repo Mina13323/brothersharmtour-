@@ -3,14 +3,23 @@ import Link from "next/link";
 import { experienceName } from "@/data/experiences";
 import { destinationName } from "@/data/destinations";
 import type { Destination, Experience, MediaImage, Tour } from "@/lib/types";
-import { cn, formatPrice } from "@/lib/utils";
+import {
+  cn,
+  money,
+  tourRating,
+  tourSchedule,
+  tourPriceUnit,
+  tourOriginalPrice,
+  tourDiscountPct,
+} from "@/lib/utils";
 
 /* ═══════════════════════════ Tour card ═══════════════════════════ */
 
 /**
- * The workhorse of the site. Editorial rather than e-commerce: the image is
- * the subject, the meta line is quiet, and the price sits on the baseline
- * instead of in a coloured badge.
+ * The workhorse of the site. Conversion-style card modelled on the reference:
+ * an image with an overlaid category tag + star rating, a compact meta row
+ * (duration · schedule), a "from £X /pp" price with a struck-through original
+ * and a discount badge, and a clear "View details" button.
  */
 export function TourCard({
   tour,
@@ -21,75 +30,92 @@ export function TourCard({
   priority?: boolean;
   sizes?: string;
 }) {
-  const price = formatPrice(tour.priceFrom, tour.currency);
+  const price = money(tour.priceFrom);
+  const original = money(tourOriginalPrice(tour));
+  const discount = tourDiscountPct(tour);
+  const rating = tourRating(tour);
+  const unit = tourPriceUnit(tour);
+  const unitShort = unit === "per person" ? "/pp" : unit.replace("per ", "/ ");
   const image = tour.images[0];
 
   return (
-    <article className="group flex h-full flex-col">
+    <article className="group flex h-full flex-col overflow-hidden rounded-[10px] border border-sand bg-paper shadow-[var(--shadow-lift)] transition-shadow duration-[var(--duration-ui)] hover:shadow-[var(--shadow-panel)]">
       <Link href={`/tours/${tour.slug}`} className="flex h-full flex-col">
-        <div className="media aspect-[3/2] w-full">
+        <div className="media aspect-[3/2] w-full !rounded-none">
           <Image
             src={image.src}
             alt={image.alt}
             fill
             sizes={sizes}
             priority={priority}
-            className="object-cover"
+            className="object-cover transition-transform duration-[900ms] [transition-timing-function:var(--ease-premium)] group-hover:scale-[1.05]"
             style={image.position ? { objectPosition: image.position } : undefined}
           />
-          {tour.type === "private" ? (
-            <span className="absolute left-3 top-3 rounded-pill bg-paper/95 px-3 py-1 text-[0.625rem] font-semibold uppercase tracking-[0.16em]">
-              Private
+          {/* Category tag — top left */}
+          <span className="absolute left-3 top-3 rounded-pill bg-ink/85 px-3 py-1 text-[0.625rem] font-semibold uppercase tracking-[0.16em] text-white backdrop-blur-sm">
+            {experienceName(tour.category)}
+          </span>
+          {/* Rating pill — top right */}
+          <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-pill bg-paper/95 px-2.5 py-1 text-[0.6875rem] font-semibold text-ink">
+            <span className="text-sun" aria-hidden>★</span>
+            {rating.toFixed(1)}
+          </span>
+          {discount ? (
+            <span className="absolute bottom-3 right-3 rounded-pill bg-sun px-2.5 py-1 text-[0.6875rem] font-bold text-white shadow-sm">
+              −{discount}%
             </span>
           ) : null}
         </div>
 
-        <div className="card-shift flex grow flex-col pt-4">
-          <p className="eyebrow text-stone">
-            {experienceName(tour.category)}
-            <span className="mx-2 opacity-40">·</span>
-            {destinationName(tour.destination)}
-          </p>
-
-          <h3 className="mt-2.5 font-display text-[1.5rem] leading-[1.1] transition-colors duration-[var(--duration-ui)] group-hover:text-reef">
+        <div className="flex grow flex-col p-4 md:p-5">
+          <h3 className="font-display text-[1.375rem] leading-[1.12] transition-colors duration-[var(--duration-ui)] group-hover:text-reef">
             {tour.title}
           </h3>
 
-          <p className="mt-2 line-clamp-2 text-[0.875rem] leading-relaxed text-stone">
+          {/* Meta row — duration · schedule */}
+          <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.75rem] uppercase tracking-[0.1em] text-stone">
+            <span>{tour.duration ?? "Flexible"}</span>
+            <span className="opacity-40">·</span>
+            <span>{tourSchedule(tour)}</span>
+          </p>
+
+          <p className="mt-2.5 line-clamp-2 text-[0.8125rem] leading-relaxed text-stone">
             {tour.summary}
           </p>
 
-          {/* Baseline meta row — duration left, price right, never a coloured badge. */}
-          <div className="mt-auto flex items-end justify-between gap-4 pt-5">
-            <span className="text-[0.75rem] uppercase tracking-[0.12em] text-stone">
-              {tour.duration ?? "Flexible"}
-            </span>
-            <span className="text-right">
+          {/* Price + CTA */}
+          <div className="mt-auto flex items-end justify-between gap-3 pt-5">
+            <div>
               {price ? (
                 <>
                   <span className="block text-[0.625rem] uppercase tracking-[0.18em] text-stone">
-                    From
+                    from
                   </span>
-                  <span className="font-display text-[1.375rem] leading-none">
-                    {price}
+                  <span className="flex items-baseline gap-1.5">
+                    <span className="font-display text-[1.5rem] leading-none text-ink">
+                      {price}
+                    </span>
+                    <span className="text-[0.6875rem] text-stone">{unitShort}</span>
+                    {original && discount ? (
+                      <span className="text-[0.8125rem] text-stone line-through decoration-sun/70">
+                        {original}
+                      </span>
+                    ) : null}
                   </span>
                 </>
               ) : (
-                <span className="text-[0.75rem] uppercase tracking-[0.12em] text-reef">
+                <span className="text-[0.8125rem] font-semibold uppercase tracking-[0.1em] text-reef">
                   Price on request
                 </span>
               )}
-            </span>
+            </div>
+
+            <span className="btn btn-primary btn-sm shrink-0">View details</span>
           </div>
 
-          {/* Rule wipes in and the CTA arrow slides — the only hover motion. */}
-          <span className="mt-4 h-px w-full origin-left scale-x-0 bg-ink transition-transform duration-500 [transition-timing-function:var(--ease-premium)] group-hover:scale-x-100" />
-
-          <span className="mt-3 flex items-center justify-between text-[0.6875rem] font-semibold uppercase tracking-[0.16em] opacity-0 transition-opacity duration-[var(--duration-ui)] group-hover:opacity-100">
-            Explore
-            <span className="arrow" aria-hidden>
-              →
-            </span>
+          <span className="mt-3 flex items-center gap-1.5 text-[0.6875rem] text-stone">
+            <span className="text-[#1faa54]" aria-hidden>✓</span>
+            No prepayment · pay on the day
           </span>
         </div>
       </Link>

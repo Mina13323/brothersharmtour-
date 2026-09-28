@@ -13,7 +13,7 @@ import { media } from "@/lib/media";
 export const metadata: Metadata = buildMetadata({
   fallbackTitle: "Egypt Tours & Excursions",
   fallbackDescription:
-    "Browse every Bro Tour excursion: Red Sea snorkelling and boat trips, desert safari, dolphin experiences, Cairo day trips and private transfers. Filter by destination, type and duration.",
+    "Browse every Brother Sharm Tour excursion: Red Sea snorkelling and boat trips, desert safari, dolphin experiences, Cairo day trips and private transfers. Filter by destination, type and duration.",
   path: "/tours",
   image: media.sharmHero,
 });
@@ -22,7 +22,7 @@ export default function ToursPage() {
   const schema = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    name: "Bro Tour experiences in Egypt",
+    name: "Brother Sharm Tour experiences in Egypt",
     numberOfItems: tours.length,
     itemListElement: tours.map((tour, i) => ({
       "@type": "ListItem",

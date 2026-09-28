@@ -12,7 +12,7 @@ import { media } from "@/lib/media";
 export const metadata: Metadata = buildMetadata({
   fallbackTitle: "Booking FAQ \u2014 Sharm El Sheikh Tours",
   fallbackDescription:
-    "Answers about booking Bro Tour excursions in Sharm El Sheikh: how to request a tour, hotel pickup, private options, group sizes and Cairo day trips.",
+    "Answers about booking Brother Sharm Tour excursions in Sharm El Sheikh: how to request a tour, hotel pickup, private options, group sizes and Cairo day trips.",
   path: "/faq",
   image: media.sharmHero,
 });

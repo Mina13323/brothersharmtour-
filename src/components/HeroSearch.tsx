@@ -9,7 +9,7 @@ import { durationBuckets } from "@/data/tours";
 import { cn } from "@/lib/utils";
 
 /**
- * BRO TOUR — hero search
+ * BROTHER SHARM TOUR — hero search
  *
  * A tabbed search panel that sits over the hero and hands off to /tours with
  * the filters pre-applied.

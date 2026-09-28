@@ -3,7 +3,7 @@ import type { Destination } from "@/lib/types";
 
 /**
  * Destinations. Sharm El Sheikh is the primary destination (priority 1) —
- * it is Bro Tour's home base and where the majority of experiences run.
+ * it is Brother Sharm Tour's home base and where the majority of experiences run.
  * Cairo is secondary, reached as a day trip or as a stay in its own right.
  */
 export const destinations: Destination[] = [
@@ -12,7 +12,7 @@ export const destinations: Destination[] = [
     slug: "sharm-el-sheikh",
     tagline: "Explore the Red Sea",
     intro:
-      "Reefs that start a few metres from the shore, a desert that begins where the hotels end, and a town that runs late. Sharm is where Bro Tour is based and where most of what we run takes place.",
+      "Reefs that start a few metres from the shore, a desert that begins where the hotels end, and a town that runs late. Sharm is where Brother Sharm Tour is based and where most of what we run takes place.",
     overview: [
       "Sharm El Sheikh sits at the southern tip of the Sinai peninsula, on the strip of coast where the Gulf of Aqaba opens into the Red Sea. That position is the reason for everything else: deep water close inshore, reefs in extraordinary condition, and mountains directly behind the town.",
       "Most visitors see the beach and the hotel. The town is considerably more than that — Ras Mohamed National Park to the south, the reefs of the Strait of Tiran to the north-east, the Sinai interior inland, and the Old Market, where Sharm does its own shopping.",
@@ -98,7 +98,7 @@ export const destinations: Destination[] = [
     seo: {
       title: "Sharm El Sheikh Tours & Excursions",
       description:
-        "Book Sharm El Sheikh tours and Red Sea excursions with Bro Tour: White Island, Ras Mohamed, Tiran Island, desert safari, Color Canyon and private transfers.",
+        "Book Sharm El Sheikh tours and Red Sea excursions with Brother Sharm Tour: White Island, Ras Mohamed, Tiran Island, desert safari, Color Canyon and private transfers.",
       keywords: [
         "sharm el sheikh tours",
         "sharm el sheikh excursions",
@@ -162,7 +162,7 @@ export const destinations: Destination[] = [
     seo: {
       title: "Cairo Tours & Pyramids Day Trips from Sharm El Sheikh",
       description:
-        "Cairo tours with Bro Tour covering the Pyramids of Giza, the Grand Egyptian Museum and Old Cairo, available as a day trip from Sharm El Sheikh.",
+        "Cairo tours with Brother Sharm Tour covering the Pyramids of Giza, the Grand Egyptian Museum and Old Cairo, available as a day trip from Sharm El Sheikh.",
       keywords: [
         "cairo tours",
         "cairo day trips",

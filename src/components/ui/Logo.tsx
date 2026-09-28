@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 /**
- * BRO TOUR wordmark — an original lockup.
+ * BROTHER SHARM TOUR wordmark — an original lockup.
  *
  * The mark is a sun sitting on three horizon rules: the Red Sea, the desert
  * and the delta. It reads at 20px in the header and scales cleanly for
@@ -24,8 +24,8 @@ export function Logo({
     >
       <Glyph />
       <span className="flex flex-col leading-none">
-        <span className="text-[1.0625rem] font-bold uppercase leading-none tracking-[0.2em]">
-          Bro Tour
+        <span className="whitespace-nowrap text-[0.9375rem] font-bold uppercase leading-none tracking-[0.16em] sm:text-[1.0625rem] sm:tracking-[0.18em]">
+          Brother Sharm Tour
         </span>
         <span
           className={cn(
@@ -33,7 +33,7 @@ export function Logo({
             tone === "light" ? "text-white/65" : "text-stone",
           )}
         >
-          Egypt
+          Egypt · Since 2009
         </span>
       </span>
     </span>

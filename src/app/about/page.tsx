@@ -13,9 +13,9 @@ import { media } from "@/lib/media";
 import { site } from "@/data/site";
 
 export const metadata: Metadata = buildMetadata({
-  fallbackTitle: "About Bro Tour \u2014 Sharm El Sheikh Tour Operator",
+  fallbackTitle: "About Brother Sharm Tour \u2014 Sharm El Sheikh Tour Operator",
   fallbackDescription:
-    "Bro Tour is a tour operator based in Sharm El Sheikh, South Sinai, running Red Sea excursions, desert safari, Cairo day trips and private transfers across Egypt.",
+    "Brother Sharm Tour is a tour operator based in Sharm El Sheikh, South Sinai, running Red Sea excursions, desert safari, Cairo day trips and private transfers across Egypt.",
   path: "/about",
   image: media.about,
 });
@@ -57,7 +57,7 @@ export default function AboutPage() {
       <Hero
         image={media.about}
         size="tall"
-        eyebrow="About Bro Tour"
+        eyebrow="About Brother Sharm Tour"
         title="Our Story"
         subtitle="A small team on the Red Sea, running the trips we'd want to be on."
       >
@@ -83,7 +83,7 @@ export default function AboutPage() {
             <Reveal delay={100} className="lg:col-span-8">
               <div className="flex flex-col gap-5 text-[1.0625rem] leading-[1.75] text-stone">
                 <p>
-                  Bro Tour is based in Sharm El Sheikh. We organise excursions,
+                  Brother Sharm Tour is based in Sharm El Sheikh. We organise excursions,
                   activities and private transfers across South Sinai, and day
                   trips to Cairo for travellers who want to see the Pyramids and
                   the Grand Egyptian Museum without moving hotels.
@@ -122,12 +122,12 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ─────────── Why Bro Tour ─────────── */}
+      {/* ─────────── Why Brother Sharm Tour ─────────── */}
       <section className="band">
         <div className="shell">
           <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
             <Reveal className="lg:col-span-5">
-              <p className="eyebrow text-reef">Why Bro Tour</p>
+              <p className="eyebrow text-reef">Why Brother Sharm Tour</p>
               <h2 className="headline mt-4">
                 Small enough to care, local enough to know
               </h2>

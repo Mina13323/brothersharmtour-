@@ -335,7 +335,7 @@ function OtherDestination({ current }: { current: string }) {
           />
           <div className="relative z-10 flex w-full flex-wrap items-end justify-between gap-6 p-6 text-white md:p-10">
             <div>
-              <p className="eyebrow text-white/70">Also with Bro Tour</p>
+              <p className="eyebrow text-white/70">Also with Brother Sharm Tour</p>
               <h2 className="mt-3 font-display text-[clamp(2rem,1.4rem+2.4vw,3.25rem)] leading-none">
                 {other.name}
               </h2>

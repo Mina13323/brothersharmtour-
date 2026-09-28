@@ -12,7 +12,7 @@ import { media } from "@/lib/media";
 export const metadata: Metadata = buildMetadata({
   fallbackTitle: "Request a Booking",
   fallbackDescription:
-    "Send a booking request to Bro Tour. Tell us your experience, dates and group size and we will reply with availability, your pickup time and a final price.",
+    "Send a booking request to Brother Sharm Tour. Tell us your experience, dates and group size and we will reply with availability, your pickup time and a final price.",
   path: "/book",
   // Transactional form: thin for search, but still followed.
   noindex: true,

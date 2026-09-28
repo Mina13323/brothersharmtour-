@@ -7,9 +7,9 @@ import { Breadcrumbs, WhatsAppIcon } from "@/components/sections";
 import { site, whatsappLink } from "@/data/site";
 
 export const metadata: Metadata = buildMetadata({
-  fallbackTitle: "Contact Bro Tour in Sharm El Sheikh",
+  fallbackTitle: "Contact Brother Sharm Tour in Sharm El Sheikh",
   fallbackDescription:
-    "Contact Bro Tour to plan a Sharm El Sheikh excursion or Cairo day trip. Message us on WhatsApp, call, or send an enquiry and we will reply with availability.",
+    "Contact Brother Sharm Tour to plan a Sharm El Sheikh excursion or Cairo day trip. Message us on WhatsApp, call, or send an enquiry and we will reply with availability.",
   path: "/contact",
 });
 
@@ -149,7 +149,7 @@ export default function ContactPage() {
               */}
               <div
                 role="img"
-                aria-label="Map placeholder for Bro Tour's location in Sharm El Sheikh, South Sinai"
+                aria-label="Map placeholder for Brother Sharm Tour's location in Sharm El Sheikh, South Sinai"
                 className="relative flex aspect-[16/10] w-full items-center justify-center overflow-hidden border border-sand bg-[repeating-linear-gradient(45deg,var(--color-sand)_0_1px,transparent_1px_14px)]"
               >
                 <div className="bg-paper/90 px-6 py-5 text-center">

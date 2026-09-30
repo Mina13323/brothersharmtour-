@@ -22,11 +22,13 @@ export default function DestinationsPage() {
   return (
     <>
       <Hero
+        variant="card"
         image={media.sharmHero}
         size="short"
         eyebrow="Destinations"
         title="Two sides of Egypt"
         subtitle="The Red Sea and the Sinai desert on one side, four thousand years of history on the other."
+        showWave
       />
 
       <section className="band">

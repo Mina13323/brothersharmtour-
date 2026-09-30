@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type ElementType, type ReactNode } from "r
 import { cn } from "@/lib/utils";
 
 /** Motion vocabulary — see docs/design-research.md §8 and globals.css. */
-export type RevealVariant = "fade" | "clip" | "clip-up" | "rise";
+export type RevealVariant = "fade" | "clip" | "clip-up" | "rise" | "card" | "text";
 
 interface RevealProps {
   children: ReactNode;
@@ -16,6 +16,8 @@ interface RevealProps {
   threshold?: number;
   /**
    * `fade`    — default text/content lift
+   * `card`    — upward glide with scale settle for cards
+   * `text`    — silky smooth lift for headlines and ledes
    * `clip`    — horizontal wipe, for editorial imagery
    * `clip-up` — vertical uncover
    * `rise`    — larger settle, for feature blocks
@@ -34,7 +36,7 @@ export function Reveal({
   className,
   delay = 0,
   as: Tag = "div",
-  threshold = 0.12,
+  threshold = 0.08,
   variant = "fade",
 }: RevealProps) {
   const ref = useRef<HTMLElement>(null);
@@ -59,7 +61,7 @@ export function Reveal({
           observer.disconnect();
         }
       },
-      { threshold, rootMargin: "0px 0px -8% 0px" },
+      { threshold, rootMargin: "0px 0px -4% 0px" },
     );
 
     observer.observe(node);

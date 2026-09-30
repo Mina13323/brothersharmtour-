@@ -4,7 +4,7 @@ import { buildMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { Hero } from "@/components/Hero";
+import { CapsuleHero } from "@/components/TourHero";
 import { Reveal } from "@/components/Reveal";
 import { ToursExplorer } from "@/components/ToursExplorer";
 import { Breadcrumbs, CTASection, ArrowRight } from "@/components/sections";
@@ -97,33 +97,34 @@ export default async function ExperienceCategoryPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
 
-      <Hero
-        image={experience.image}
-        size="short"
-        eyebrow={experience.destinations.map(destinationName).join(" · ")}
+      <CapsuleHero
         title={experience.name}
-        subtitle={experience.tagline}
-      >
-        <BookButton className="btn btn-primary">Plan your trip</BookButton>
-      </Hero>
+        eyebrow={`${experience.destinations.map(destinationName).join(" • ").toUpperCase()} • ${list.length} TOURS`}
+        summary={experience.description || experience.tagline}
+        images={[experience.image, ...list.flatMap((t) => t.images)]}
+        breadcrumbs={[
+          { label: "Home", href: "/" },
+          { label: "Experiences", href: "/experiences" },
+          { label: experience.name },
+        ]}
+        primaryCta={{
+          label: "See The Tours",
+          href: "#tours",
+        }}
+        secondaryCta={{
+          label: "Plan Your Trip",
+        }}
+      />
 
       <section className="band">
         <div className="shell">
-          <Breadcrumbs
-            items={[
-              { label: "Home", href: "/" },
-              { label: "Experiences", href: "/experiences" },
-              { label: experience.name },
-            ]}
-          />
-
-          <Reveal className="mt-10 max-w-3xl">
+          <Reveal className="mt-2 max-w-3xl">
             <p className="text-[1.0625rem] leading-[1.75] text-stone">
               {experience.description}
             </p>
           </Reveal>
 
-          <div className="mt-10">
+          <div id="tours" className="mt-10 scroll-mt-24">
             <ToursExplorer tours={list} lockedCategory={experience.slug} />
           </div>
         </div>

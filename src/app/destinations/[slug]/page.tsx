@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { Hero } from "@/components/Hero";
+import { CapsuleHero } from "@/components/TourHero";
 import { Reveal } from "@/components/Reveal";
 import { HighlightTile, TourCard } from "@/components/cards";
 import { Gallery } from "@/components/Gallery";
@@ -16,6 +16,7 @@ import {
   ArrowRight,
 } from "@/components/sections";
 import { BookButton } from "@/components/BookingProvider";
+import { WaveDivider } from "@/components/WaveDivider";
 
 import { destinations, destinationBySlug } from "@/data/destinations";
 import { experiences } from "@/data/experiences";
@@ -112,30 +113,28 @@ export default async function DestinationPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
 
-      <Hero
-        image={destination.heroImage}
-        video={destination.heroVideo}
-        size="tall"
-        eyebrow={destination.tagline}
+      <CapsuleHero
         title={`Discover ${destination.name}`}
-        subtitle={destination.intro}
-      >
-        <Link href="#tours" className="btn btn-primary">
-          See the tours
-        </Link>
-        <BookButton className="btn btn-ghost-light">Plan your trip</BookButton>
-      </Hero>
+        eyebrow={`EGYPT • ${destination.tagline.toUpperCase()} • ${destinationTours.length} TOURS`}
+        summary={destination.intro}
+        images={[destination.heroImage, ...(destination.gallery || [])]}
+        breadcrumbs={[
+          { label: "Home", href: "/" },
+          { label: "Destinations", href: "/destinations" },
+          { label: destination.name },
+        ]}
+        primaryCta={{
+          label: "See The Tours",
+          href: "#tours",
+        }}
+        secondaryCta={{
+          label: "Plan Your Trip",
+        }}
+      />
 
       {/* ───────────────── Overview ───────────────── */}
       <section className="band">
         <div className="shell">
-          <Breadcrumbs
-            items={[
-              { label: "Home", href: "/" },
-              { label: "Destinations", href: "/destinations" },
-              { label: destination.name },
-            ]}
-          />
 
           <div className="mt-12 grid gap-10 lg:grid-cols-12 lg:gap-16">
             <Reveal className="lg:col-span-4">
@@ -197,7 +196,7 @@ export default async function DestinationPage({
           <div className="mt-12 flex flex-col gap-16 md:gap-20">
             {categories.map((group) => (
               <div key={group.experience.slug}>
-                <div className="flex flex-wrap items-baseline justify-between gap-4 border-t border-sand pt-6">
+                <div className="flex flex-wrap items-baseline justify-between gap-4 pt-6">
                   <h3 className="font-display text-[1.75rem] leading-none md:text-[2.125rem]">
                     {group.experience.name}
                   </h3>
@@ -274,8 +273,10 @@ export default async function DestinationPage({
       </section>
 
       {/* ───────────────── Travel information ───────────────── */}
-      <section className="on-ink bg-ink text-paper">
-        <div className="shell band-tight">
+      <section className="on-ink relative bg-ink text-paper">
+        <WaveDivider position="top" variant="wave-1" color="text-paper" />
+
+        <div className="shell band-tight py-16 md:py-24">
           <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
             <Reveal className="lg:col-span-4">
               <p className="eyebrow text-sun">Travel information</p>
@@ -286,9 +287,9 @@ export default async function DestinationPage({
             </Reveal>
 
             <Reveal delay={100} className="lg:col-span-8">
-              <dl className="grid gap-px overflow-hidden border border-ink-line bg-ink-line sm:grid-cols-2">
+              <dl className="grid gap-4 sm:grid-cols-2">
                 {destination.travelInfo.map((row) => (
-                  <div key={row.label} className="bg-ink p-6">
+                  <div key={row.label} className="rounded-2xl border border-white/10 bg-ink-soft p-6 shadow-sm">
                     <dt className="eyebrow text-paper/45">{row.label}</dt>
                     <dd className="mt-3 text-[0.9375rem] leading-relaxed text-paper/90">
                       {row.value}
@@ -299,6 +300,8 @@ export default async function DestinationPage({
             </Reveal>
           </div>
         </div>
+
+        <WaveDivider position="bottom" variant="wave-gentle" color="text-paper" />
       </section>
 
       {/* ───────────────── Cross-sell to the other destination ───────────────── */}
@@ -324,7 +327,7 @@ function OtherDestination({ current }: { current: string }) {
       <div className="shell">
         <Link
           href={`/destinations/${other.slug}`}
-          className="group media scrim-bottom relative flex aspect-[16/12] w-full items-end sm:aspect-[16/7]"
+          className="group media scrim-bottom relative flex aspect-[16/12] w-full items-end overflow-hidden rounded-[2rem] shadow-card-lg sm:aspect-[16/7]"
         >
           <Image
             src={other.cardImage.src}

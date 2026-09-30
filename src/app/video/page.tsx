@@ -11,6 +11,8 @@ import { destinationName } from "@/data/destinations";
 import { media } from "@/lib/media";
 import { money } from "@/lib/utils";
 
+import { Hero } from "@/components/Hero";
+
 export const metadata: Metadata = buildMetadata({
   fallbackTitle: "Video — Egypt through our lens",
   fallbackDescription:
@@ -25,30 +27,15 @@ export default function VideoPage() {
   return (
     <>
       {/* Hero film */}
-      <section className="on-ink relative isolate flex min-h-[52svh] items-end overflow-hidden bg-ink text-paper">
-        <Image
-          src={media.heroFilm.poster.src}
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="slow-zoom object-cover opacity-45"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/60 to-ink/30" />
-        <div className="shell relative z-10 pb-14 pt-32 md:pb-20">
-          <Reveal className="max-w-3xl">
-            <p className="eyebrow text-sun">Watch · Brother Sharm Tour</p>
-            <h1 className="display mt-5 text-[clamp(2.5rem,1.5rem+4vw,5rem)]">
-              <SplitHeadline lines={["Egypt, through", "our own lens"]} />
-            </h1>
-            <p className="lede mt-6 max-w-xl">
-              No stock footage and no drone reels bought online. Every frame
-              below was shot on our own trips across the Red Sea and the Sinai
-              desert.
-            </p>
-          </Reveal>
-        </div>
-      </section>
+      <Hero
+        variant="card"
+        image={media.heroFilm.poster}
+        size="tall"
+        eyebrow="Watch · Brother Sharm Tour"
+        title={<SplitHeadline lines={["Egypt, through", "our own lens"]} />}
+        subtitle="No stock footage and no drone reels bought online. Every frame below was shot on our own trips across the Red Sea and the Sinai desert."
+        showWave
+      />
 
       {/* Featured film */}
       <VideoSection
@@ -73,7 +60,7 @@ export default function VideoPage() {
                 <Reveal as="div" key={tour.slug} delay={i * 70}>
                   <Link
                     href={`/tours/${tour.slug}`}
-                    className="group block overflow-hidden rounded-card border border-sand bg-paper"
+                    className="group block overflow-hidden rounded-[2rem] bg-paper shadow-xs transition-all duration-500 hover:-translate-y-1 hover:shadow-xl"
                   >
                     <div className="media relative aspect-[4/3] overflow-hidden">
                       <Image

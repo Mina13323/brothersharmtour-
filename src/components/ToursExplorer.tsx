@@ -173,7 +173,7 @@ export function ToursExplorer({
   return (
     <div>
       {/* ───────── Search + sort bar ───────── */}
-      <div className="sticky top-[68px] z-40 -mx-5 border-y border-sand bg-paper/95 px-5 py-3 backdrop-blur-md md:top-[76px] md:mx-0 md:px-0 md:py-4">
+      <div className="sticky top-[68px] z-40 mb-6 rounded-2xl bg-paper/90 px-4 py-3 shadow-xs backdrop-blur-md md:top-[76px] md:px-5 md:py-3.5">
         <div className="flex items-center gap-3">
           <div className="relative grow">
             <svg
@@ -257,12 +257,12 @@ export function ToursExplorer({
           aria-modal={filtersOpen ? true : undefined}
           aria-label="Refine tours"
           className={cn(
-            "fixed inset-y-0 right-0 z-[120] flex w-[min(22rem,88vw)] flex-col bg-paper shadow-[var(--shadow-panel)] transition-transform duration-400 [transition-timing-function:var(--ease-premium)]",
-            "lg:static lg:z-auto lg:w-auto lg:translate-x-0 lg:shadow-none lg:transition-none",
+            "fixed inset-y-0 right-0 z-[120] flex w-[min(22rem,88vw)] flex-col rounded-l-3xl border-l border-sand/80 bg-paper shadow-[var(--shadow-panel)] transition-transform duration-400 [transition-timing-function:var(--ease-premium)]",
+            "lg:static lg:z-auto lg:w-auto lg:translate-x-0 lg:rounded-none lg:border-l-0 lg:shadow-none lg:transition-none",
             filtersOpen ? "translate-x-0" : "translate-x-full",
           )}
         >
-          <div className="flex items-center justify-between border-b border-sand px-5 py-4 lg:hidden">
+          <div className="flex items-center justify-between px-5 py-4 lg:hidden">
             <h2 className="eyebrow text-stone">Refine</h2>
             <button
               type="button"
@@ -377,7 +377,7 @@ export function ToursExplorer({
 
           {/* Drawer footer — mobile only. Filtering is live, so Apply simply
               dismisses the drawer and reveals the results behind it. */}
-          <div className="flex items-center gap-3 border-t border-sand px-5 py-4 lg:hidden">
+          <div className="flex items-center gap-3 px-5 py-4 lg:hidden">
             <button
               type="button"
               onClick={reset}
@@ -415,7 +415,7 @@ export function ToursExplorer({
               ))}
             </div>
           ) : (
-            <div className="border border-sand px-6 py-16 text-center">
+            <div className="rounded-3xl border border-sand/80 bg-paper-warm/50 px-6 py-16 text-center shadow-sm">
               <h3 className="headline text-[1.5rem]">Nothing matches that yet</h3>
               <p className="lede mx-auto mt-3 max-w-md text-[0.9375rem]">
                 Try widening the filters — or tell us what you had in mind and
@@ -440,7 +440,7 @@ function FilterGroup({
   children: React.ReactNode;
 }) {
   return (
-    <div className="border-t border-sand pt-5">
+    <div className="pt-5">
       <h3 className="label">{label}</h3>
       {children}
     </div>

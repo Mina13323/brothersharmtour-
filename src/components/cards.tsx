@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { experienceName } from "@/data/experiences";
-import { destinationName } from "@/data/destinations";
 import type { Destination, Experience, MediaImage, Tour } from "@/lib/types";
 import {
   cn,
@@ -39,9 +38,9 @@ export function TourCard({
   const image = tour.images[0];
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-[10px] border border-sand bg-paper shadow-[var(--shadow-lift)] transition-shadow duration-[var(--duration-ui)] hover:shadow-[var(--shadow-panel)]">
+    <article className="group flex h-full flex-col overflow-hidden rounded-[1.5rem] sm:rounded-[1.75rem] border border-sand/70 bg-paper shadow-[var(--shadow-lift)] transition-all duration-500 hover:shadow-[var(--shadow-panel)] hover:border-reef/30 hover:-translate-y-1">
       <Link href={`/tours/${tour.slug}`} className="flex h-full flex-col">
-        <div className="media aspect-[3/2] w-full !rounded-none">
+        <div className="media aspect-[3/2] w-full rounded-t-[1.5rem] sm:rounded-t-[1.75rem] rounded-b-none">
           <Image
             src={image.src}
             alt={image.alt}
@@ -52,23 +51,23 @@ export function TourCard({
             style={image.position ? { objectPosition: image.position } : undefined}
           />
           {/* Category tag — top left */}
-          <span className="absolute left-3 top-3 rounded-pill bg-ink/85 px-3 py-1 text-[0.625rem] font-semibold uppercase tracking-[0.16em] text-white backdrop-blur-sm">
+          <span className="absolute left-3.5 top-3.5 rounded-pill bg-ink/85 px-3 py-1 text-[0.625rem] font-semibold uppercase tracking-[0.16em] text-white backdrop-blur-sm shadow-xs">
             {experienceName(tour.category)}
           </span>
           {/* Rating pill — top right */}
-          <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-pill bg-paper/95 px-2.5 py-1 text-[0.6875rem] font-semibold text-ink">
+          <span className="absolute right-3.5 top-3.5 inline-flex items-center gap-1 rounded-pill bg-paper/95 px-2.5 py-1 text-[0.6875rem] font-semibold text-ink shadow-xs">
             <span className="text-sun" aria-hidden>★</span>
             {rating.toFixed(1)}
           </span>
           {discount ? (
-            <span className="absolute bottom-3 right-3 rounded-pill bg-sun px-2.5 py-1 text-[0.6875rem] font-bold text-white shadow-sm">
+            <span className="absolute bottom-3.5 right-3.5 rounded-pill bg-sun px-2.5 py-1 text-[0.6875rem] font-bold text-white shadow-sm">
               −{discount}%
             </span>
           ) : null}
         </div>
 
-        <div className="flex grow flex-col p-4 md:p-5">
-          <h3 className="font-display text-[1.375rem] leading-[1.12] transition-colors duration-[var(--duration-ui)] group-hover:text-reef">
+        <div className="flex grow flex-col p-4 sm:p-5">
+          <h3 className="font-display text-[1.35rem] sm:text-[1.4rem] leading-[1.15] transition-colors duration-[var(--duration-ui)] group-hover:text-reef">
             {tour.title}
           </h3>
 
@@ -84,7 +83,7 @@ export function TourCard({
           </p>
 
           {/* Price + CTA */}
-          <div className="mt-auto flex items-end justify-between gap-3 pt-5">
+          <div className="mt-auto flex flex-wrap items-end justify-between gap-3 pt-5">
             <div>
               {price ? (
                 <>
@@ -110,7 +109,7 @@ export function TourCard({
               )}
             </div>
 
-            <span className="btn btn-primary btn-sm shrink-0">View details</span>
+            <span className="btn btn-primary btn-sm shrink-0 shadow-xs">View details</span>
           </div>
 
           <span className="mt-3 flex items-center gap-1.5 text-[0.6875rem] text-stone">
@@ -142,7 +141,7 @@ export function DestinationCard({
     <Link
       href={`/destinations/${destination.slug}`}
       className={cn(
-        "group media scrim-bottom relative block w-full",
+        "group media scrim-bottom relative block w-full rounded-[1.75rem] md:rounded-[2.25rem] overflow-hidden shadow-lg transition-all duration-500 hover:shadow-2xl hover:-translate-y-1.5",
         primary ? "aspect-[4/5] md:aspect-[16/13]" : "aspect-[4/5] md:aspect-[16/13]",
       )}
     >
@@ -152,12 +151,12 @@ export function DestinationCard({
         fill
         priority={priority}
         sizes={primary ? "(max-width: 768px) 100vw, 58vw" : "(max-width: 768px) 100vw, 40vw"}
-        className="object-cover"
+        className="object-cover transition-transform duration-700 group-hover:scale-105"
       />
 
       <div className="absolute inset-x-0 bottom-0 z-10 p-6 text-white md:p-9">
         {primary ? (
-          <span className="mb-4 inline-block rounded-pill bg-sun px-3 py-1 text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-ink">
+          <span className="mb-4 inline-block rounded-pill bg-sun px-3 py-1 text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-ink shadow-xs">
             Our home base
           </span>
         ) : null}
@@ -202,14 +201,14 @@ export function ExperienceCard({
   return (
     <Link
       href={`/experiences/${experience.slug}`}
-      className="group media scrim-bottom relative block aspect-[4/5] w-full"
+      className="group media scrim-bottom relative block aspect-[4/5] w-full rounded-[1.75rem] overflow-hidden shadow-md transition-all duration-500 hover:shadow-xl hover:-translate-y-1.5"
     >
       <Image
         src={experience.image.src}
         alt={experience.image.alt}
         fill
         sizes={sizes}
-        className="object-cover"
+        className="object-cover transition-transform duration-700 group-hover:scale-105"
       />
 
       <div className="absolute inset-x-0 bottom-0 z-10 p-5 text-white md:p-6">
@@ -257,7 +256,7 @@ export function HighlightTile({
 }) {
   const body = (
     <>
-      <div className="media aspect-square w-full">
+      <div className="media aspect-square w-full rounded-[1.25rem] overflow-hidden shadow-sm transition-transform duration-500 group-hover:scale-[1.03]">
         <Image
           src={image.src}
           alt={image.alt}

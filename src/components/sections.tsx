@@ -6,6 +6,7 @@ import { media } from "@/lib/media";
 import { cn } from "@/lib/utils";
 import { Reveal } from "./Reveal";
 import { BookButton } from "./BookingProvider";
+import { WaveDivider } from "./WaveDivider";
 
 /* ═══════════════════════ Section heading ════════════════════════ */
 
@@ -28,6 +29,7 @@ export function SectionHeading({
 }) {
   return (
     <Reveal
+      variant="text"
       className={cn(
         "flex flex-col gap-6 md:flex-row md:items-end md:justify-between",
         align === "center" && "md:flex-col md:items-center md:text-center",
@@ -122,15 +124,24 @@ export function CTASection({
   text = "Tell us where you want to go. We'll take care of the rest.",
   image = media.sharmHero,
   tourSlug,
+  topWave = true,
+  bottomWave = true,
+  waveColor = "text-paper",
 }: {
   eyebrow?: string;
   title?: string;
   text?: string;
   image?: typeof media.sharmHero;
   tourSlug?: string;
+  topWave?: boolean;
+  bottomWave?: boolean;
+  waveColor?: string;
 }) {
   return (
     <section className="on-ink relative isolate overflow-hidden bg-ink text-paper">
+      {topWave && (
+        <WaveDivider position="top" fillColor={waveColor} variant="wave-2" />
+      )}
       <Image
         src={image.src}
         alt=""
@@ -140,7 +151,7 @@ export function CTASection({
       />
       <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/70 to-ink/40" />
 
-      <div className="shell relative z-10 band">
+      <div className="shell relative z-10 band py-20 md:py-28">
         <Reveal className="mx-auto flex max-w-3xl flex-col items-center text-center">
           <p className="eyebrow text-sun">{eyebrow}</p>
           <h2 className="display mt-6 text-[clamp(2.5rem,1.4rem+4.4vw,5rem)]">
@@ -149,7 +160,7 @@ export function CTASection({
           <p className="lede mt-6 max-w-xl">{text}</p>
 
           <div className="mt-10 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
-            <BookButton tourSlug={tourSlug} className="btn btn-primary">
+            <BookButton tourSlug={tourSlug} className="btn btn-primary shadow-sm hover:shadow-md">
               Plan my trip
               <span className="arrow" aria-hidden>
                 →
@@ -159,7 +170,7 @@ export function CTASection({
               href={whatsappLink()}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn btn-whatsapp"
+              className="btn btn-whatsapp shadow-sm hover:shadow-md"
             >
               <WhatsAppIcon />
               WhatsApp
@@ -167,6 +178,10 @@ export function CTASection({
           </div>
         </Reveal>
       </div>
+
+      {bottomWave && (
+        <WaveDivider position="bottom" fillColor={waveColor} variant="wave-1" />
+      )}
     </section>
   );
 }

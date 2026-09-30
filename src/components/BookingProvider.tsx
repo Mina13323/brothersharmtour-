@@ -81,7 +81,7 @@ export function BookingProvider({ children }: { children: ReactNode }) {
           role="dialog"
           aria-modal={isOpen}
           aria-label="Request a booking"
-          className={`absolute inset-y-0 right-0 flex w-full max-w-[34rem] flex-col bg-paper shadow-2xl transition-transform duration-[600ms] [transition-timing-function:var(--ease-out-expo)] ${
+          className={`absolute inset-y-0 right-0 flex w-full max-w-[34rem] flex-col overflow-hidden rounded-t-[2rem] border-l border-sand/80 bg-paper shadow-2xl transition-transform duration-[600ms] [transition-timing-function:var(--ease-out-expo)] md:rounded-t-none md:rounded-l-[2.5rem] ${
             isOpen ? "translate-x-0" : "translate-x-full"
           }`}
         >

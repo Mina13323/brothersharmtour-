@@ -61,7 +61,7 @@ export function EditorialFeature({
             )}
           >
             <Reveal variant="clip">
-              <div className="media aspect-[4/5] w-full sm:aspect-[3/2]">
+              <div className="media aspect-[4/5] w-full overflow-hidden rounded-[2rem] shadow-card-lg sm:aspect-[3/2]">
                 <Image
                   src={image.src}
                   alt={image.alt}
@@ -84,7 +84,7 @@ export function EditorialFeature({
                   reverse ? "right-6" : "left-6",
                 )}
               >
-                <div className="media size-full">
+                <div className="media size-full overflow-hidden rounded-2xl ring-4 ring-paper shadow-curved">
                   <Image
                     src={secondaryImage.src}
                     alt={secondaryImage.alt}
@@ -110,8 +110,8 @@ export function EditorialFeature({
             <Reveal
               delay={120}
               className={cn(
-                "p-6 sm:p-10",
-                dark ? "bg-ink-soft" : "bg-paper",
+                "rounded-3xl border border-sand/70 p-6 shadow-curved sm:p-10",
+                dark ? "border-white/10 bg-ink-soft" : "bg-paper",
               )}
             >
               {index ? (

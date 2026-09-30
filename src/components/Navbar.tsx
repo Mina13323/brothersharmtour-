@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { site, whatsappLink } from "@/data/site";
 import { cn } from "@/lib/utils";
 import { WhatsAppIcon } from "./sections";
@@ -10,202 +10,219 @@ import { LanguageSwitcher } from "./LanguageSwitcher";
 import { Logo } from "./ui/Logo";
 
 /**
- * Slim header modelled on sharmtours.org: logo + wordmark on the left, a short
- * flat link set, the language switch and a WhatsApp primary action on the right.
- * Transparent over a hero, solid on scroll, and it hides on downward scroll to
- * keep the CTA reachable on long pages.
+ * Modern floating pill navigation matching the reference design:
+ * - Desktop: Floating pill header with Logo, icons+labels navigation items, language switcher, and Book button
+ * - Mobile: Fixed bottom floating pill dock with Home, Search, Contact, Videos, and About
  */
-const links = [
-  { label: "Tours", href: "/tours" },
-  { label: "Video", href: "/video" },
-  { label: "Reviews", href: "/#reviews" },
-  { label: "FAQ", href: "/#faq" },
-  { label: "About", href: "/about" },
-  { label: "Contact", href: "/contact" },
+const navItems = [
+  {
+    label: "Home",
+    href: "/",
+    icon: (
+      <svg
+        className="size-4 shrink-0"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M3 10.5 12 3l9 7.5v10a1.5 1.5 0 0 1-1.5 1.5H4.5A1.5 1.5 0 0 1 3 20.5v-10Z" />
+        <path d="M9 22V12h6v10" />
+      </svg>
+    ),
+  },
+  {
+    label: "Search",
+    href: "/tours",
+    icon: (
+      <svg
+        className="size-4 shrink-0"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <circle cx="11" cy="11" r="7.5" />
+        <path d="m16.5 16.5 4.5 4.5" />
+      </svg>
+    ),
+  },
+  {
+    label: "Contact",
+    href: "/contact",
+    icon: (
+      <svg
+        className="size-4 shrink-0"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+        <path d="M10 10.5c.5.5 1.5 1.5 2 2" strokeWidth="2.2" />
+      </svg>
+    ),
+  },
+  {
+    label: "Videos",
+    href: "/video",
+    icon: (
+      <svg
+        className="size-4 shrink-0"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <rect width="13" height="12" x="2.5" y="6" rx="2.5" />
+        <path d="m15.5 10 5.5-3.5v11L15.5 14v-4Z" />
+      </svg>
+    ),
+  },
+  {
+    label: "About",
+    href: "/about",
+    icon: (
+      <svg
+        className="size-4 shrink-0"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <circle cx="12" cy="12" r="9.5" />
+        <line x1="12" x2="12" y1="7.5" y2="12.5" />
+        <circle cx="12" cy="16" r="0.75" fill="currentColor" stroke="none" />
+      </svg>
+    ),
+  },
 ];
 
 export function Navbar() {
   const pathname = usePathname();
-
   const [scrolled, setScrolled] = useState(false);
-  const [hidden, setHidden] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const lastY = useRef(0);
-
-  const overHero =
-    pathname === "/" ||
-    pathname.startsWith("/destinations/") ||
-    pathname.startsWith("/tours/") ||
-    pathname.startsWith("/experiences/") ||
-    pathname === "/about" ||
-    pathname === "/video";
 
   useEffect(() => {
-    const onScroll = () => {
-      const y = window.scrollY;
-      setScrolled(y > 24);
-      setHidden(y > 600 && y > lastY.current && !mobileOpen);
-      lastY.current = y;
-    };
+    const onScroll = () => setScrolled(window.scrollY > 20);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, [mobileOpen]);
+  }, []);
 
-  useEffect(() => setMobileOpen(false), [pathname]);
-
-  useEffect(() => {
-    document.body.style.overflow = mobileOpen ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [mobileOpen]);
-
-  const solid = scrolled || !overHero || mobileOpen;
+  function isActive(href: string) {
+    if (href === "/") return pathname === "/";
+    return pathname.startsWith(href);
+  }
 
   return (
-    <header
-      className={cn(
-        "fixed inset-x-0 top-0 z-[100] transition-[transform,background-color,border-color] duration-500",
-        "[transition-timing-function:var(--ease-editorial)]",
-        hidden ? "-translate-y-full" : "translate-y-0",
-        solid
-          ? "border-b border-sand bg-paper/95 backdrop-blur-md"
-          : "border-b border-transparent bg-transparent",
-      )}
-    >
-      <div className="shell">
+    <>
+      {/* ─── Desktop Top Floating Header ─── */}
+      <header className="fixed inset-x-0 top-0 z-[100] px-3 sm:px-6 pt-2 sm:pt-3 pointer-events-none transition-all duration-300">
         <div
           className={cn(
-            "flex items-center justify-between gap-6 transition-[height] duration-500",
-            solid ? "h-[64px] md:h-[70px]" : "h-[72px] md:h-[84px]",
+            "max-w-6xl mx-auto flex items-center justify-between pointer-events-auto rounded-full bg-white/95 backdrop-blur-md border border-sand/50 shadow-md px-4 sm:px-5 lg:px-6 py-1.5 transition-all duration-300 gap-3",
+            scrolled ? "shadow-lg border-sand/70 py-1" : "shadow-md py-1.5",
           )}
         >
+          {/* Logo */}
           <Link
             href="/"
             aria-label={`${site.name} — home`}
-            className="relative z-10 shrink-0"
+            className="shrink-0 transition-opacity hover:opacity-85"
           >
-            <Logo tone={solid ? "ink" : "light"} />
+            <Logo tone="ink" />
           </Link>
 
-          {/* Desktop links */}
-          <nav aria-label="Main" className="hidden lg:block">
-            <ul className="flex items-center gap-1">
-              {links.map((item) => {
-                const active =
-                  item.href.startsWith("/#")
-                    ? false
-                    : pathname === item.href ||
-                      (item.href !== "/" && pathname.startsWith(item.href));
-                return (
-                  <li key={item.label}>
-                    <Link
-                      href={item.href}
-                      className={cn(
-                        "relative inline-flex h-10 items-center px-3.5 text-[0.8125rem] font-medium tracking-[0.03em] transition-colors",
-                        solid ? "text-ink" : "text-white",
-                        active && "font-semibold",
-                      )}
-                    >
-                      {item.label}
-                      <span
-                        className={cn(
-                          "absolute inset-x-3.5 bottom-1.5 h-px origin-left scale-x-0 bg-current transition-transform duration-500",
-                          "[transition-timing-function:var(--ease-out-expo)]",
-                          active && "scale-x-100",
-                        )}
-                      />
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
-
-          <div className="flex items-center gap-2.5">
-            <LanguageSwitcher tone={solid ? "ink" : "light"} className="hidden sm:block" />
-            <a
-              href={whatsappLink()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-whatsapp btn-sm hidden sm:inline-flex"
-            >
-              <WhatsAppIcon className="size-4" />
-              Book on WhatsApp
-            </a>
-
-            {/* Mobile trigger */}
-            <button
-              onClick={() => setMobileOpen((v) => !v)}
-              aria-label={mobileOpen ? "Close menu" : "Open menu"}
-              aria-expanded={mobileOpen}
-              className={cn(
-                "relative z-10 grid size-11 place-items-center lg:hidden",
-                solid || mobileOpen ? "text-ink" : "text-white",
-              )}
-            >
-              <span className="flex w-6 flex-col gap-[5px]">
-                <span className={cn("h-px w-full bg-current transition-transform duration-400", mobileOpen && "translate-y-[6px] rotate-45")} />
-                <span className={cn("h-px w-full bg-current transition-opacity duration-300", mobileOpen && "opacity-0")} />
-                <span className={cn("h-px w-full bg-current transition-transform duration-400", mobileOpen && "-translate-y-[6px] -rotate-45")} />
-              </span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile sheet */}
-      <div
-        className={cn(
-          "fixed inset-0 top-0 z-[-1] flex h-[100dvh] flex-col bg-paper pt-[64px] transition-[opacity,visibility] duration-400 lg:hidden",
-          mobileOpen ? "visible opacity-100" : "invisible opacity-0",
-        )}
-      >
-        <nav aria-label="Mobile" className="grow overflow-y-auto overscroll-contain px-5 pb-8 pt-4">
-          <ul className="flex flex-col">
-            {links.map((item, i) => (
-              <li key={item.label} className="border-b border-sand">
+          {/* Center Pill Nav (Streamlined, compact horizontal links) */}
+          <nav aria-label="Main" className="hidden lg:flex items-center gap-0.5 xl:gap-1.5">
+            {navItems.map((item) => {
+              const active = isActive(item.href);
+              return (
                 <Link
+                  key={item.label}
                   href={item.href}
-                  style={{ transitionDelay: mobileOpen ? `${80 + i * 45}ms` : "0ms" }}
                   className={cn(
-                    "block py-4 font-display text-[1.75rem] transition-[opacity,transform] duration-600 [transition-timing-function:var(--ease-out-expo)]",
-                    mobileOpen ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0",
+                    "flex items-center gap-1.5 px-2.5 xl:px-3 py-1.5 rounded-full transition-all duration-200 group cursor-pointer text-xs font-semibold tracking-wide",
+                    active
+                      ? "text-sun font-bold bg-sun/10"
+                      : "text-stone-700 hover:text-ink hover:bg-paper-warm/50",
                   )}
                 >
-                  {item.label}
+                  <div
+                    className={cn(
+                      "transition-transform duration-200 group-hover:scale-110",
+                      active ? "text-sun" : "text-stone-600 group-hover:text-ink",
+                    )}
+                  >
+                    {item.icon}
+                  </div>
+                  <span className="leading-none">
+                    {item.label}
+                  </span>
                 </Link>
-              </li>
-            ))}
-          </ul>
+              );
+            })}
+          </nav>
 
-          <div className="mt-8 flex flex-col gap-3">
+          {/* Right actions: Language Switcher + Book on WhatsApp */}
+          <div className="flex items-center gap-2 shrink-0">
+            <LanguageSwitcher tone="ink" className="hidden sm:block" />
             <a
               href={whatsappLink()}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn btn-whatsapp w-full"
+              className="h-9 px-3.5 sm:px-4 rounded-full bg-sun hover:bg-sun-bright text-white text-xs font-bold uppercase tracking-wider shadow-sm hover:shadow-md shrink-0 whitespace-nowrap flex items-center gap-1.5 transition-all cursor-pointer"
             >
-              <WhatsAppIcon className="size-5" />
-              Book on WhatsApp
+              <WhatsAppIcon className="size-3.5 shrink-0" />
+              <span>
+                Book <span className="hidden xl:inline">on WhatsApp</span>
+              </span>
             </a>
-            <div className="pt-1">
-              <LanguageSwitcher tone="ink" />
-            </div>
           </div>
+        </div>
+      </header>
 
-          <div className="mt-10 space-y-1 text-sm text-stone">
-            <p>{site.contact.base}</p>
-            <p>
-              <a href={`tel:${site.contact.phone}`}>{site.contact.phone}</a>
-            </p>
-            <p>
-              <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>
-            </p>
-          </div>
-        </nav>
-      </div>
-    </header>
+      {/* ─── Mobile Floating Pill Dock (Exact match to Reference Screenshot) ─── */}
+      <nav
+        aria-label="Mobile Bottom Navigation"
+        className="fixed bottom-5 inset-x-4 max-w-sm sm:max-w-md mx-auto z-[100] rounded-full bg-white/95 backdrop-blur-xl border border-sand/60 shadow-[0_16px_48px_rgba(15,65,74,0.18)] px-5 py-2.5 flex items-center justify-between lg:hidden"
+      >
+        {navItems.map((item) => {
+          const active = isActive(item.href);
+          return (
+            <Link
+              key={item.label}
+              href={item.href}
+              className={cn(
+                "flex flex-col items-center justify-center gap-1 transition-all duration-200 group cursor-pointer min-w-[52px]",
+                active ? "text-[#e05328] font-bold scale-105" : "text-stone-700 hover:text-ink",
+              )}
+            >
+              <div
+                className={cn(
+                  "transition-colors",
+                  active ? "text-[#e05328]" : "text-stone-700 group-hover:text-ink",
+                )}
+              >
+                {item.icon}
+              </div>
+              <span className="text-[11px] tracking-tight leading-none">
+                {item.label}
+              </span>
+            </Link>
+          );
+        })}
+      </nav>
+    </>
   );
 }

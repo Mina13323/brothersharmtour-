@@ -61,117 +61,217 @@ export function HeroSearch() {
   return (
     <div className="w-full">
       {/* ---------- Tabs ---------- */}
-      <div role="tablist" aria-label="Search type" className="flex gap-1">
-        {tabs.map((t) => {
-          const active = t.id === tab;
-          return (
-            <button
-              key={t.id}
-              role="tab"
-              type="button"
-              aria-selected={active}
-              onClick={() => setTab(t.id)}
-              className={cn(
-                "rounded-t-[0.75rem] px-5 py-3 text-[0.6875rem] font-semibold uppercase tracking-[0.14em] transition-colors duration-[var(--duration-ui)]",
-                active
-                  ? "bg-paper text-ink"
-                  : "bg-ink/35 text-paper/80 backdrop-blur-sm hover:bg-ink/50 hover:text-paper",
-              )}
-            >
-              {t.label}
-            </button>
-          );
-        })}
+      <div className="flex justify-center mb-3">
+        <div
+          role="tablist"
+          aria-label="Search type"
+          className="inline-flex rounded-full bg-paper/95 backdrop-blur-md p-1 border border-sand/60 shadow-sm"
+        >
+          {tabs.map((t) => {
+            const active = t.id === tab;
+            return (
+              <button
+                key={t.id}
+                role="tab"
+                type="button"
+                aria-selected={active}
+                onClick={() => setTab(t.id)}
+                className={cn(
+                  "rounded-full px-5 py-1.5 text-xs font-semibold tracking-wider uppercase transition-all duration-200 cursor-pointer",
+                  active
+                    ? "bg-ink text-white shadow-sm"
+                    : "text-stone hover:text-ink hover:bg-black/5",
+                )}
+              >
+                {t.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      {/* ---------- Panel ---------- */}
+      {/* ---------- Floating Pill Search Dock ---------- */}
       <form
         onSubmit={submit}
-        className="rounded-[0.75rem] rounded-tl-none bg-paper p-3 shadow-[var(--shadow-panel)] sm:p-4"
+        className="bg-white rounded-3xl lg:rounded-full p-2.5 sm:p-3 shadow-[0_20px_50px_rgba(15,65,74,0.15)] border border-sand/60 flex flex-col lg:flex-row items-stretch lg:items-center gap-2 lg:gap-0"
       >
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:gap-0">
-          <Field label="Destination" className="lg:flex-1">
+        {/* Field 1: Where */}
+        <div className="flex-1 flex items-center gap-3 px-4 py-2 hover:bg-paper-warm/30 rounded-2xl lg:rounded-full transition-colors cursor-pointer group">
+          <div className="size-9 rounded-full bg-paper flex items-center justify-center text-reef shrink-0 group-hover:bg-sand/30 transition-colors">
+            <svg
+              className="size-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+          </div>
+          <div className="flex-1 min-w-0">
+            <span className="block text-[10px] font-bold uppercase tracking-[0.16em] text-stone">
+              Where
+            </span>
             <select
               value={destination}
               onChange={(e) => setDestination(e.target.value)}
               aria-label="Destination"
-              className="search-select"
+              className="w-full bg-transparent text-sm font-semibold text-ink border-0 p-0 focus:ring-0 focus:outline-none cursor-pointer truncate"
             >
-              <option value="all">Anywhere in Egypt</option>
+              <option value="all">Choose a destination</option>
               {destinations.map((d) => (
                 <option key={d.slug} value={d.slug}>
                   {d.name}
                 </option>
               ))}
             </select>
-          </Field>
-
-          {tab !== "transfers" ? (
-            <>
-              <Divider />
-              <Field label="Experience" className="lg:flex-1">
-                <select
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  aria-label="Experience type"
-                  className="search-select"
-                >
-                  <option value="all">Any experience</option>
-                  {experiences.map((x) => (
-                    <option key={x.slug} value={x.slug}>
-                      {x.name}
-                    </option>
-                  ))}
-                </select>
-              </Field>
-
-              <Divider />
-              <Field label="Duration" className="lg:flex-1">
-                <select
-                  value={duration}
-                  onChange={(e) => setDuration(e.target.value)}
-                  aria-label="Duration"
-                  className="search-select"
-                >
-                  <option value="all">Any length</option>
-                  {durationBuckets.map((b) => (
-                    <option key={b.id} value={b.id}>
-                      {b.label}
-                    </option>
-                  ))}
-                </select>
-              </Field>
-            </>
-          ) : (
-            <>
-              <Divider />
-              <Field label="Service" className="lg:flex-[2]">
-                <p className="px-3 py-2 text-[0.9375rem] text-stone">
-                  Airport and private transfers
-                </p>
-              </Field>
-            </>
-          )}
-
-          <button type="submit" className="btn btn-primary w-full lg:ml-3 lg:w-auto">
-            Search
-            <span className="arrow" aria-hidden>
-              →
-            </span>
-          </button>
+          </div>
         </div>
+
+        <div className="hidden lg:block w-px h-10 bg-sand/60 mx-1 shrink-0" />
+
+        {/* Field 2: Experience / Service */}
+        {tab !== "transfers" ? (
+          <div className="flex-1 flex items-center gap-3 px-4 py-2 hover:bg-paper-warm/30 rounded-2xl lg:rounded-full transition-colors cursor-pointer group">
+            <div className="size-9 rounded-full bg-paper flex items-center justify-center text-reef shrink-0 group-hover:bg-sand/30 transition-colors">
+              <svg
+                className="size-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+              </svg>
+            </div>
+            <div className="flex-1 min-w-0">
+              <span className="block text-[10px] font-bold uppercase tracking-[0.16em] text-stone">
+                Experience
+              </span>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                aria-label="Experience type"
+                className="w-full bg-transparent text-sm font-semibold text-ink border-0 p-0 focus:ring-0 focus:outline-none cursor-pointer truncate"
+              >
+                <option value="all">Select experience</option>
+                {experiences.map((x) => (
+                  <option key={x.slug} value={x.slug}>
+                    {x.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        ) : (
+          <div className="flex-1 flex items-center gap-3 px-4 py-2 hover:bg-paper-warm/30 rounded-2xl lg:rounded-full transition-colors cursor-pointer group">
+            <div className="size-9 rounded-full bg-paper flex items-center justify-center text-reef shrink-0 group-hover:bg-sand/30 transition-colors">
+              <svg
+                className="size-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" />
+                <circle cx="7" cy="17" r="2" />
+                <path d="M9 17h6" />
+                <circle cx="17" cy="17" r="2" />
+              </svg>
+            </div>
+            <div className="flex-1 min-w-0">
+              <span className="block text-[10px] font-bold uppercase tracking-[0.16em] text-stone">
+                Service
+              </span>
+              <p className="text-sm font-semibold text-ink truncate">
+                Airport &amp; Private Transfers
+              </p>
+            </div>
+          </div>
+        )}
+
+        <div className="hidden lg:block w-px h-10 bg-sand/60 mx-1 shrink-0" />
+
+        {/* Field 3: Duration */}
+        <div className="flex-1 flex items-center gap-3 px-4 py-2 hover:bg-paper-warm/30 rounded-2xl lg:rounded-full transition-colors cursor-pointer group">
+          <div className="size-9 rounded-full bg-paper flex items-center justify-center text-reef shrink-0 group-hover:bg-sand/30 transition-colors">
+            <svg
+              className="size-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+          </div>
+          <div className="flex-1 min-w-0">
+            <span className="block text-[10px] font-bold uppercase tracking-[0.16em] text-stone">
+              Duration
+            </span>
+            <select
+              value={duration}
+              onChange={(e) => setDuration(e.target.value)}
+              aria-label="Duration"
+              className="w-full bg-transparent text-sm font-semibold text-ink border-0 p-0 focus:ring-0 focus:outline-none cursor-pointer truncate"
+            >
+              <option value="all">Any length</option>
+              {durationBuckets.map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Submit button */}
+        <button
+          type="submit"
+          className="bg-ink hover:bg-reef text-white px-8 py-3.5 rounded-full font-semibold flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer shrink-0 lg:ml-2"
+        >
+          <svg
+            className="size-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.3-4.3" />
+          </svg>
+          <span className="text-sm tracking-wide">Search</span>
+        </button>
       </form>
 
       {/* ---------- Popular ---------- */}
-      <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2">
-        <span className="text-[0.6875rem] uppercase tracking-[0.16em] text-paper/60">
-          Popular
+      <div className="mt-4 flex flex-wrap items-center justify-center gap-2 sm:gap-2.5">
+        <span className="text-[0.6875rem] uppercase tracking-[0.16em] text-stone font-semibold mr-1">
+          Popular:
         </span>
         {popular.map((p) => (
           <a
             key={p.href}
             href={p.href}
-            className="rounded-pill border border-paper/30 px-3.5 py-1.5 text-[0.8125rem] text-paper/90 transition-colors duration-[var(--duration-ui)] hover:border-paper hover:bg-paper hover:text-ink"
+            className="rounded-full bg-white/80 hover:bg-white text-ink hover:text-reef px-3.5 py-1.5 text-xs font-medium border border-sand/50 shadow-xs hover:shadow-sm hover:scale-105 transition-all duration-200"
           >
             {p.label}
           </a>
@@ -179,28 +279,4 @@ export function HeroSearch() {
       </div>
     </div>
   );
-}
-
-function Field({
-  label,
-  className,
-  children,
-}: {
-  label: string;
-  className?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <label className={cn("block min-w-0", className)}>
-      <span className="block px-3 text-[0.625rem] font-semibold uppercase tracking-[0.16em] text-stone">
-        {label}
-      </span>
-      {children}
-    </label>
-  );
-}
-
-/** Hairline between fields — desktop only, where the row is horizontal. */
-function Divider() {
-  return <span aria-hidden className="hidden w-px self-stretch bg-sand lg:block" />;
 }

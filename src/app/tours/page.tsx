@@ -41,11 +41,13 @@ export default function ToursPage() {
       />
 
       <Hero
+        variant="card"
         image={media.whiteIsland.hero}
         size="short"
         eyebrow={`${tours.length} experiences · Sharm El Sheikh & Cairo`}
         title="Find your Egypt experience"
         subtitle="Filter by destination, the kind of day you want, how long you have and what you'd like to spend."
+        showWave
       >
         <BookButton className="btn btn-primary">Ask us to plan it</BookButton>
       </Hero>

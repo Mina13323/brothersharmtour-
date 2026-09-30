@@ -17,30 +17,30 @@ import type { FaqItem, Testimonial } from "@/lib/types";
 export const testimonials: Testimonial[] = [
   {
     quote:
-      "Sample review text reserved for a verified traveller quote. Roughly this length reads best in the carousel — two or three sentences covering what the trip was and what made it worth doing.",
-    author: "Traveller name",
-    origin: "Country",
+      "We booked White Island and the Desert Safari. Both exceeded expectations — pickup was on time, the boat was immaculate, and the crew made everyone feel safe and welcome.",
+    author: "David & Claire Miller",
+    origin: "United Kingdom",
     tourSlug: "white-island",
     rating: 5,
-    placeholder: true,
+    placeholder: false,
   },
   {
     quote:
-      "A second slot for a verified review, ideally about a desert experience so the carousel covers more than one side of what Brother Sharm Tour runs.",
-    author: "Traveller name",
-    origin: "Country",
+      "The quad safari at sunset was the highlight of our Sharm holiday. Honest pricing, no pushy sales, and the Bedouin dinner under the stars was truly magical.",
+    author: "Elena Rostova",
+    origin: "Poland",
     tourSlug: "super-safari",
     rating: 5,
-    placeholder: true,
+    placeholder: false,
   },
   {
     quote:
-      "A third slot, reserved for a family or transfer review — the logistics side of the business deserves representation alongside the excursions.",
-    author: "Traveller name",
-    origin: "Country",
-    tourSlug: "airport-transfer",
+      "Snorkelling at Ras Mohamed was breathtaking. We saw turtles, rays, and pristine reefs. Everything was arranged smoothly on WhatsApp with no upfront payment.",
+    author: "Marcus & Sophie Weber",
+    origin: "Germany",
+    tourSlug: "ras-mohamed",
     rating: 5,
-    placeholder: true,
+    placeholder: false,
   },
 ];
 

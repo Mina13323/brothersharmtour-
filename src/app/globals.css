@@ -33,8 +33,10 @@
   /* ---- Type ---------------------------------------------------------- */
   --font-sans: "Inter Variable", "Inter", ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", sans-serif;
-  --font-display: "Cormorant Garamond Variable", "Cormorant Garamond",
+  --font-cormorant: "Cormorant Garamond Variable", "Cormorant Garamond",
     ui-serif, Georgia, "Times New Roman", serif;
+  --font-augsburg: var(--font-augsburg-local), system-ui, sans-serif;
+  --font-display: var(--font-augsburg-local), system-ui, sans-serif;
 
   /* Fluid editorial scale — 390px → 1440px */
   --text-eyebrow: 0.6875rem;
@@ -66,13 +68,17 @@
   --container-content: 76rem;
   --container-prose: 44rem;
 
-  /* ---- Radius — restrained, architectural ---------------------------- */
-  --radius-card: 2px;
+  /* ---- Radius — organic curved style ---------------------------- */
+  --radius-card-sm: 0.875rem;
+  --radius-card: 1.5rem;
+  --radius-card-lg: 2rem;
+  --radius-card-xl: 2.75rem;
   --radius-pill: 999px;
 
-  /* ---- Elevation — restrained; depth comes from layering, not shadows -- */
-  --shadow-lift: 0 18px 40px -24px rgb(11 15 20 / 0.45);
-  --shadow-panel: 0 40px 90px -50px rgb(11 15 20 / 0.6);
+  /* ---- Elevation — soft, natural organic depth ------------------ */
+  --shadow-lift: 0 14px 34px -12px rgb(15 65 74 / 0.14), 0 4px 12px -4px rgb(15 65 74 / 0.06);
+  --shadow-panel: 0 28px 64px -22px rgb(15 65 74 / 0.25), 0 8px 24px -8px rgb(15 65 74 / 0.1);
+  --shadow-curved: 0 20px 48px -16px rgb(15 65 74 / 0.18);
 
   /* ---- Motion ---------------------------------------------------------
      One vocabulary, three speeds. See docs/design-research.md §8.
@@ -132,11 +138,15 @@
   h1,
   h2,
   h3,
-  h4 {
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-augsburg);
     text-wrap: balance;
   }
 
   p {
+    font-family: var(--font-sans);
     text-wrap: pretty;
   }
 
@@ -222,7 +232,7 @@
 
   .display {
     font-family: var(--font-display);
-    font-weight: 300;
+    font-weight: 600;
     font-size: var(--text-display);
     line-height: 0.94;
     letter-spacing: -0.02em;
@@ -230,7 +240,7 @@
 
   .headline {
     font-family: var(--font-display);
-    font-weight: 300;
+    font-weight: 500;
     font-size: var(--text-h2);
     line-height: 1.04;
     letter-spacing: -0.015em;
@@ -308,11 +318,11 @@
   }
 
   .btn-whatsapp {
-    background: #1faa54;
+    background: var(--color-sun);
     color: #fff;
   }
   .btn-whatsapp:hover {
-    background: #189347;
+    background: var(--color-sun-bright);
   }
 
   .btn-sm {
@@ -389,6 +399,7 @@
     position: relative;
     overflow: hidden;
     background: var(--color-sand);
+    border-radius: var(--radius-card);
   }
   .media img {
     transition: transform 1.1s var(--ease-out-expo);
@@ -469,13 +480,13 @@
   .field {
     width: 100%;
     height: 3.25rem;
-    padding-inline: 1rem;
+    padding-inline: 1.25rem;
     background: transparent;
     border: 1px solid color-mix(in srgb, var(--color-ink) 16%, transparent);
-    border-radius: var(--radius-card);
+    border-radius: 1rem;
     font-size: 0.9375rem;
     color: var(--color-ink);
-    transition: border-color 0.3s ease, background-color 0.3s ease;
+    transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
   }
   .field::placeholder {
     color: var(--color-stone-soft);
@@ -486,7 +497,7 @@
      than a row of separate boxes. */
   .search-select {
     width: 100%;
-    padding: 0.35rem 0.75rem 0.5rem;
+    padding: 0.5rem 0.85rem 0.55rem;
     background: transparent;
     border: 0;
     font-size: 0.9375rem;
@@ -497,7 +508,7 @@
   .search-select:focus-visible {
     outline: 2px solid var(--color-reef);
     outline-offset: 2px;
-    border-radius: 0.375rem;
+    border-radius: 0.75rem;
   }
   .field:hover {
     border-color: color-mix(in srgb, var(--color-ink) 30%, transparent);
@@ -506,12 +517,14 @@
     outline: none;
     border-color: var(--color-reef);
     background: #fff;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-reef) 18%, transparent);
   }
   textarea.field {
     height: auto;
-    padding-block: 0.9rem;
+    padding-block: 1rem;
     line-height: 1.6;
     resize: vertical;
+    border-radius: 1.25rem;
   }
   select.field {
     appearance: none;
@@ -606,6 +619,30 @@
       transform var(--duration-editorial) var(--ease-premium);
   }
   .reveal[data-variant="rise"][data-shown="true"] {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Card reveal — smooth glide up with organic scale settle for cards */
+  .reveal[data-variant="card"] {
+    opacity: 0;
+    transform: translateY(28px) scale(0.97);
+    transition: opacity 0.75s var(--ease-premium),
+      transform 0.75s var(--ease-premium);
+  }
+  .reveal[data-variant="card"][data-shown="true"] {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Text reveal — soft elegant lift for headings, eyebrows, and paragraphs */
+  .reveal[data-variant="text"] {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.8s var(--ease-editorial),
+      transform 0.8s var(--ease-editorial);
+  }
+  .reveal[data-variant="text"][data-shown="true"] {
     opacity: 1;
     transform: none;
   }

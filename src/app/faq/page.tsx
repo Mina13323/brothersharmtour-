@@ -9,6 +9,8 @@ import { generalFaq } from "@/data/testimonials";
 import { site, whatsappLink } from "@/data/site";
 import { media } from "@/lib/media";
 
+import { Hero } from "@/components/Hero";
+
 export const metadata: Metadata = buildMetadata({
   fallbackTitle: "Booking FAQ \u2014 Sharm El Sheikh Tours",
   fallbackDescription:
@@ -36,21 +38,15 @@ export default function FaqPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
 
-      <section className="border-b border-sand bg-paper-warm pb-14 pt-32 md:pb-20 md:pt-40">
-        <div className="shell">
-          <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "FAQ" }]} />
-          <div className="mt-8 max-w-3xl">
-            <p className="eyebrow text-reef">Questions</p>
-            <h1 className="display mt-5 text-[clamp(2.5rem,1.4rem+4vw,4.5rem)]">
-              Good to know
-            </h1>
-            <p className="lede mt-6 max-w-xl">
-              The things travellers ask us most. Anything we haven&apos;t
-              covered, just message — we answer quickly.
-            </p>
-          </div>
-        </div>
-      </section>
+      <Hero
+        variant="card"
+        image={media.sharmHero}
+        size="short"
+        eyebrow="Questions & Answers"
+        title="Good to know"
+        subtitle="The things travellers ask us most. Anything we haven't covered, just message — we answer quickly."
+        showWave
+      />
 
       <section className="band">
         <div className="shell">

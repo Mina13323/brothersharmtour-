@@ -2,10 +2,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { Reveal } from "./Reveal";
 import { SectionHeading, WhatsAppIcon } from "./sections";
+import { WaveDivider } from "./WaveDivider";
 import { site, whatsappLink } from "@/data/site";
 import { featuredTours, tours } from "@/data/tours";
 import { destinationName } from "@/data/destinations";
 import { money } from "@/lib/utils";
+import { media } from "@/lib/media";
 
 const TOUR_COUNT = tours.length;
 
@@ -13,28 +15,119 @@ const TOUR_COUNT = tours.length;
 /* Avatar cluster + rating + head stat chips — sits under the hero search. */
 
 export function HeroTrust() {
+  const partners = [
+    {
+      name: "TRIPADVISOR",
+      badge: "TRAVELLERS' CHOICE",
+      icon: (
+        <svg className="size-6 text-stone" viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="8.5" cy="13.5" r="2.5" />
+          <circle cx="15.5" cy="13.5" r="2.5" />
+          <path d="M12 4c-4.4 0-8 2.6-8 6.5 0 2.2 1.2 4.2 3.1 5.3L6 19l3.5-1.5c.8.3 1.6.5 2.5.5s1.7-.2 2.5-.5L18 19l-1.1-3.2c1.9-1.1 3.1-3.1 3.1-5.3C20 6.6 16.4 4 12 4zm0 2c3.3 0 6 2 6 4.5S15.3 15 12 15s-6-2-6-4.5S8.7 6 12 6z" />
+        </svg>
+      ),
+    },
+    {
+      name: "GOOGLE REVIEWS",
+      badge: "4.9 ★★★★★",
+      icon: (
+        <svg className="size-6 text-stone" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M21.35 11.1H12v3.8h5.38c-.78 2.1-2.6 3.6-5.38 3.6-3.3 0-6-2.7-6-6s2.7-6 6-6c1.47 0 2.8.54 3.84 1.44l2.84-2.84C17.02 3.5 14.65 2.5 12 2.5 6.75 2.5 2.5 6.75 2.5 12s4.25 9.5 9.5 9.5c5.5 0 9.15-3.86 9.15-9.3 0-.74-.08-1.36-.2-1.9z" />
+        </svg>
+      ),
+    },
+    {
+      name: "VIATOR",
+      badge: "VERIFIED PARTNER",
+      icon: (
+        <svg className="size-6 text-stone" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+        </svg>
+      ),
+    },
+    {
+      name: "GETYOURGUIDE",
+      badge: "OFFICIAL PARTNER",
+      icon: (
+        <svg className="size-6 text-stone" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <path d="m9 12 2 2 4-4" />
+        </svg>
+      ),
+    },
+    {
+      name: "PADI DIVING",
+      badge: "CERTIFIED RESORT",
+      icon: (
+        <svg className="size-6 text-stone" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="2" y1="12" x2="22" y2="12" />
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+        </svg>
+      ),
+    },
+    {
+      name: "EGYPT TOURISM",
+      badge: "LICENSED OPERATOR",
+      icon: (
+        <svg className="size-6 text-stone" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        </svg>
+      ),
+    },
+  ];
+
   return (
-    <div className="mt-8 flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-8">
-      <div className="flex items-center gap-3">
-        <Avatars />
-        <div className="text-white">
-          <p className="flex items-center gap-1.5 text-[0.95rem] font-semibold">
-            <span className="text-reef-bright">★</span> 4.9 / 5
-          </p>
-          <p className="text-[0.8rem] text-white/75">150,000+ happy travellers</p>
+    <div className="w-full pt-8 pb-4">
+      <div className="shell">
+        {/* Partner Logos Strip (Clean floating style matching Save Nature reference - no straight lines) */}
+        <div className="flex flex-wrap items-center justify-center md:justify-between gap-6 sm:gap-8 py-4">
+          {partners.map((p) => (
+            <div
+              key={p.name}
+              className="flex items-center gap-3 text-stone/80 hover:text-ink transition-colors group cursor-default"
+            >
+              <div className="opacity-70 group-hover:opacity-100 transition-opacity">
+                {p.icon}
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xs font-bold tracking-[0.14em] text-ink/80 group-hover:text-ink">
+                  {p.name}
+                </span>
+                <span className="text-[9px] font-medium tracking-[0.1em] text-stone">
+                  {p.badge}
+                </span>
+              </div>
+            </div>
+          ))}
         </div>
-      </div>
 
-      <span className="hidden h-10 w-px bg-white/25 sm:block" />
+        {/* Highlight Stats Bar (Soft rounded pill cards - no straight divider lines) */}
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-center sm:text-left">
+          <div className="flex items-center gap-3 rounded-full bg-paper-warm/60 px-5 py-2.5 shadow-2xs">
+            <Avatars dark />
+            <div>
+              <p className="flex items-center gap-1.5 text-sm font-bold text-ink">
+                <span className="text-yellow-500">★</span> 4.9 / 5 Rating
+              </p>
+              <p className="text-xs text-stone">150,000+ happy travellers</p>
+            </div>
+          </div>
 
-      <div className="flex gap-6">
-        <div className="text-white">
-          <p className="font-display text-[1.35rem] leading-none">from £15</p>
-          <p className="mt-1 text-[0.78rem] text-white/75">per person</p>
-        </div>
-        <div className="text-white">
-          <p className="font-display text-[1.35rem] leading-none">17+ years</p>
-          <p className="mt-1 text-[0.78rem] text-white/75">of experience</p>
+          <div className="rounded-full bg-paper-warm/60 px-5 py-2.5 shadow-2xs">
+            <p className="font-display text-lg font-bold leading-none text-ink">From £15</p>
+            <p className="mt-0.5 text-xs text-stone">per person</p>
+          </div>
+
+          <div className="rounded-full bg-paper-warm/60 px-5 py-2.5 shadow-2xs">
+            <p className="font-display text-lg font-bold leading-none text-ink">17+ Years</p>
+            <p className="mt-0.5 text-xs text-stone">of local experience</p>
+          </div>
+
+          <div className="rounded-full bg-paper-warm/60 px-5 py-2.5 shadow-2xs">
+            <p className="font-display text-lg font-bold leading-none text-ink">Pay on the Day</p>
+            <p className="mt-0.5 text-xs text-stone">no deposit needed</p>
+          </div>
         </div>
       </div>
     </div>
@@ -79,23 +172,110 @@ const valueProps = [
 ];
 
 export function ValueProps() {
+  const previewCards = [
+    {
+      title: "Red Sea & White Island",
+      tag: "Boat Trips & Snorkelling",
+      image: media.whiteIsland.card,
+      href: "/tours/white-island",
+    },
+    {
+      title: "Sinai Desert Safari",
+      tag: "Quads, Camels & Dinner",
+      image: media.superSafari.card,
+      href: "/experiences/desert",
+    },
+    {
+      title: "Cairo & Pyramids",
+      tag: "Guided Day Trips",
+      image: media.pyramids.card,
+      href: "/destinations/cairo",
+    },
+  ];
+
   return (
-    <section className="band-tight">
+    <section className="band bg-paper">
       <div className="shell">
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {/* Top Centered Headline (matching "Comfort Meets Escape") */}
+        <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
+          <p className="eyebrow text-reef font-semibold tracking-[0.2em] uppercase mb-3">
+            Why Brother Sharm Tour
+          </p>
+          <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight text-ink leading-tight">
+            Comfort Meets Adventure
+          </h2>
+        </div>
+
+        {/* 2-Column Row: Left pitch & button, Right 3 image cards */}
+        <div className="grid gap-10 lg:grid-cols-12 lg:gap-12 items-center">
+          {/* Left Column */}
+          <div className="lg:col-span-4 flex flex-col items-start">
+            <h3 className="font-display text-2xl sm:text-3xl text-ink leading-snug">
+              Thoughtful excursions made for slower, memorable days
+            </h3>
+            <p className="mt-4 text-stone text-sm sm:text-base leading-relaxed">
+              Every tour is operated directly by our local crew in Sharm El Sheikh. We provide free hotel transfers, clear pricing in your currency, and instant confirmation on WhatsApp.
+            </p>
+            <Link
+              href="/about"
+              className="mt-7 inline-flex items-center gap-2 rounded-full bg-sun hover:bg-sun-bright text-white px-7 py-3 text-sm font-semibold tracking-wide shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
+            >
+              <span>Learn More</span>
+              <span aria-hidden="true">→</span>
+            </Link>
+          </div>
+
+          {/* Right Column: 3 rounded cards side by side */}
+          <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+            {previewCards.map((card, i) => (
+              <Reveal
+                as="div"
+                key={card.title}
+                variant="card"
+                delay={i * 80}
+              >
+                <Link
+                  href={card.href}
+                  className="group relative block aspect-[3/4] sm:aspect-[4/5] rounded-[1.75rem] overflow-hidden shadow-md hover:shadow-xl transition-all duration-500 hover:-translate-y-1.5"
+                >
+                  <Image
+                    src={card.image.src}
+                    alt={card.image.alt}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 30vw, 25vw"
+                    className="object-cover transition-transform duration-700 [transition-timing-function:var(--ease-out-expo)] group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/20 to-transparent" />
+                  <div className="absolute inset-x-0 bottom-0 p-5 text-white">
+                    <span className="inline-block text-[10px] font-bold uppercase tracking-[0.14em] text-reef-bright mb-1">
+                      {card.tag}
+                    </span>
+                    <h4 className="font-display text-lg font-semibold leading-tight group-hover:text-sand transition-colors">
+                      {card.title}
+                    </h4>
+                  </div>
+                </Link>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+
+        {/* 6 Value Props Mini-Grid (Clean rounded cards - no straight dividing line) */}
+        <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {valueProps.map((v, i) => (
             <Reveal
               as="div"
               key={v.title}
-              delay={i * 60}
-              className="flex gap-4 rounded-card border border-sand bg-paper p-6 transition-colors hover:border-reef-deep/40"
+              variant="card"
+              delay={i * 40}
+              className="flex items-start gap-4 rounded-2xl bg-paper-warm/50 p-4 sm:p-5 transition-all hover:bg-paper-warm/80 hover:shadow-xs shadow-2xs"
             >
-              <span className="grid size-12 shrink-0 place-items-center rounded-full bg-paper-warm text-2xl">
+              <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-white text-xl shadow-xs">
                 {v.icon}
               </span>
               <div>
-                <h3 className="font-display text-[1.2rem] leading-tight">{v.title}</h3>
-                <p className="mt-1.5 text-[0.9rem] leading-relaxed text-stone">{v.body}</p>
+                <h4 className="text-sm font-bold text-ink leading-tight">{v.title}</h4>
+                <p className="mt-1 text-xs text-stone leading-relaxed">{v.body}</p>
               </div>
             </Reveal>
           ))}
@@ -117,14 +297,16 @@ export function TrustMarquee() {
     </span>
   );
   return (
-    <section className="on-ink border-y border-ink-line bg-ink py-6 text-white">
-      <div className="marquee-mask relative flex overflow-hidden">
+    <section className="on-ink relative bg-ink text-white overflow-hidden">
+      <WaveDivider position="top" fillColor="text-paper" variant="wave-gentle" />
+      <div className="marquee-mask relative flex overflow-hidden py-3">
         <div className="marquee-track flex shrink-0 items-center">
           {Array.from({ length: 6 }).map((_, i) => (
             <span key={i} className="flex">{item}</span>
           ))}
         </div>
       </div>
+      <WaveDivider position="bottom" fillColor="text-paper" variant="wave-1" />
     </section>
   );
 }
@@ -132,58 +314,160 @@ export function TrustMarquee() {
 /* ───────────────────────── Bestsellers ───────────────────────── */
 
 export function Bestsellers() {
-  const picks = featuredTours().slice(0, 5);
+  const topPicks = [
+    {
+      title: "White Island & Ras Mohamed",
+      slug: "white-island",
+      tag: "Red Sea Marine",
+      image: media.whiteIsland.card,
+      price: 22,
+      duration: "Full day · 8 hrs",
+      desc: "Snorkel pristine coral reefs and step onto the white sandbar rising in the Red Sea.",
+    },
+    {
+      title: "Sinai Desert Super Safari",
+      slug: "super-safari",
+      tag: "Desert Adventure",
+      image: media.superSafari.card,
+      price: 15,
+      duration: "Evening · 5 hrs",
+      desc: "Quad biking, camel ride, authentic Bedouin barbecue dinner and desert stargazing.",
+    },
+    {
+      title: "Cairo & Giza Pyramids",
+      slug: "cairo-bus",
+      tag: "Ancient Heritage",
+      image: media.pyramids.card,
+      price: 45,
+      duration: "Full day · Guided",
+      desc: "The Great Pyramids, Sphinx, and the Grand Egyptian Museum with English Egyptologist.",
+    },
+  ];
+
   return (
-    <section className="band-tight bg-paper-warm">
+    <section className="band bg-paper">
       <div className="shell">
-        <SectionHeading
-          eyebrow="Bestsellers"
-          title="Bestselling Sharm El Sheikh excursions"
-          action={{ label: "All tours", href: "#tours" }}
-        />
-        <div className="mt-10 flex snap-x snap-mandatory gap-5 overflow-x-auto pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {picks.map((tour, i) => {
-            const image = tour.images[0];
-            return (
-              <Reveal
-                as="div"
-                key={tour.slug}
-                delay={i * 70}
-                className="w-[78vw] shrink-0 snap-start sm:w-[46vw] lg:w-[30%]"
-              >
-                <Link
-                  href={`/tours/${tour.slug}`}
-                  className="group relative block aspect-[4/5] overflow-hidden rounded-card"
-                >
-                  <Image
-                    src={image.src}
-                    alt={image.alt}
-                    fill
-                    sizes="(max-width: 640px) 78vw, (max-width: 1024px) 46vw, 30vw"
-                    className="object-cover transition-transform duration-700 [transition-timing-function:var(--ease-out-expo)] group-hover:scale-105"
-                    style={image.position ? { objectPosition: image.position } : undefined}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/15 to-transparent" />
-                  <span className="absolute left-4 top-4 rounded-pill bg-paper/90 px-3 py-1 text-[0.72rem] font-semibold uppercase tracking-[0.06em] text-reef-deep">
-                    {destinationName(tour.destination)}
-                  </span>
-                  <div className="absolute inset-x-0 bottom-0 p-5">
-                    <h3 className="font-display text-[1.3rem] leading-tight text-white">
+        {/* Header matching Save Nature structure */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+          <div className="max-w-2xl">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-reef/10 px-3.5 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-reef mb-3">
+              ✦ Bestselling Excursions
+            </span>
+            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight text-ink leading-tight">
+              Real Adventures. Real Memories. The Best of Egypt.
+            </h2>
+            <p className="mt-3 text-stone text-sm sm:text-base leading-relaxed">
+              Handpicked excursions operated directly by our team with guaranteed departures, free hotel transfers and zero prepayment.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3 shrink-0">
+            <Link
+              href="/tours"
+              className="inline-flex items-center gap-2 rounded-full bg-sun hover:bg-sun-bright text-white px-6 py-2.5 text-xs font-semibold uppercase tracking-wider shadow-sm hover:shadow-md transition-all"
+            >
+              <span>All 20+ Tours</span>
+              <span aria-hidden="true">→</span>
+            </Link>
+          </div>
+        </div>
+
+        {/* Excursion Cards + Callout Grid */}
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 items-stretch">
+          {topPicks.map((tour, i) => (
+            <Reveal
+              as="div"
+              key={tour.slug}
+              variant="card"
+              delay={i * 70}
+              className="flex flex-col rounded-[2rem] bg-paper overflow-hidden shadow-xs hover:shadow-xl transition-all duration-500 hover:-translate-y-1.5"
+            >
+              <Link href={`/tours/${tour.slug}`} className="relative aspect-[4/3] block overflow-hidden group">
+                <Image
+                  src={tour.image.src}
+                  alt={tour.image.alt}
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  className="object-cover transition-transform duration-700 [transition-timing-function:var(--ease-out-expo)] group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                <span className="absolute left-3.5 top-3.5 rounded-full bg-white/90 backdrop-blur-md px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-ink shadow-xs">
+                  {tour.tag}
+                </span>
+                <span className="absolute right-3.5 bottom-3 text-xs font-semibold text-white drop-shadow-sm">
+                  {tour.duration}
+                </span>
+              </Link>
+
+              <div className="p-5 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="font-display text-xl font-bold text-ink leading-snug">
+                    <Link href={`/tours/${tour.slug}`} className="hover:text-reef transition-colors">
                       {tour.title}
-                    </h3>
-                    {tour.priceFrom !== null ? (
-                      <p className="mt-2 text-[0.85rem] text-white/85">
-                        from{" "}
-                        <span className="font-semibold text-white">
-                          {money(tour.priceFrom)}
-                        </span>
-                      </p>
-                    ) : null}
+                    </Link>
+                  </h3>
+                  <p className="mt-2 text-xs text-stone leading-relaxed line-clamp-2">
+                    {tour.desc}
+                  </p>
+                </div>
+
+                <div className="mt-5 flex items-center justify-between pt-2">
+                  <div>
+                    <span className="text-[10px] uppercase tracking-wider text-stone block">From</span>
+                    <span className="font-display text-xl font-bold text-ink leading-none">
+                      £{tour.price}
+                    </span>
                   </div>
-                </Link>
-              </Reveal>
-            );
-          })}
+                  <Link
+                    href={`/tours/${tour.slug}`}
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-reef hover:text-sun transition-colors"
+                  >
+                    <span>Details</span>
+                    <span>→</span>
+                  </Link>
+                </div>
+              </div>
+            </Reveal>
+          ))}
+
+          {/* Standout Callout Box matching Save Nature reference */}
+          <Reveal
+            as="div"
+            variant="card"
+            delay={240}
+            className="flex flex-col justify-between rounded-[2rem] bg-paper-warm p-6 sm:p-7 shadow-xs"
+          >
+            <div>
+              <span className="inline-block text-[10px] font-bold uppercase tracking-[0.16em] text-reef-deep mb-2">
+                Custom Itineraries
+              </span>
+              <h3 className="font-display text-2xl font-bold text-ink leading-tight">
+                Plan a Custom Trip. Zero Hassle.
+              </h3>
+              <p className="mt-3 text-xs text-stone leading-relaxed">
+                Want a private yacht charter, VIP desert safari, or custom Cairo trip? Tell us your dates and group size.
+              </p>
+            </div>
+
+            <div className="mt-6">
+              <a
+                href={whatsappLink("Hi Brother Sharm Tour, I'd like a custom itinerary planned for my trip.")}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-whatsapp w-full rounded-full shadow-sm hover:shadow-md text-xs py-2.5"
+              >
+                <WhatsAppIcon className="size-4" />
+                <span>Chat on WhatsApp</span>
+              </a>
+
+              <div className="mt-5 flex items-center gap-3">
+                <Avatars dark />
+                <span className="text-[11px] font-semibold text-ink">
+                  150,000+ Happy Guests
+                </span>
+              </div>
+            </div>
+          </Reveal>
         </div>
       </div>
     </section>
@@ -191,12 +475,19 @@ export function Bestsellers() {
 }
 
 /* ───────────────────────── Rating panel ───────────────────────── */
+/* Wave designs preserved as user requested */
 
 export function RatingPanel() {
-  const platforms = ["Google", "Tripadvisor", "GetYourGuide"];
+  const platforms = [
+    { name: "Google Reviews", rating: "4.9 ★★★★★", reviews: "1,200+ Reviews" },
+    { name: "Tripadvisor", rating: "Travellers' Choice", reviews: "Top 10% Worldwide" },
+    { name: "GetYourGuide", rating: "Certified Partner", reviews: "Verified Operator" },
+  ];
+
   return (
-    <section className="on-ink bg-ink py-16 text-white md:py-20">
-      <div className="shell">
+    <section className="on-ink relative bg-ink text-white">
+      <WaveDivider position="top" fillColor="text-paper" variant="wave-gentle" />
+      <div className="shell py-16 md:py-24">
         <div className="grid items-center gap-10 lg:grid-cols-[1fr_1.2fr] lg:gap-16">
           <Reveal>
             <p className="eyebrow text-reef-bright">{site.name} · Since 2009</p>
@@ -213,21 +504,27 @@ export function RatingPanel() {
             </p>
           </Reveal>
 
-          <div className="grid gap-3">
+          {/* Clean frameless glass cards - no straight lines */}
+          <div className="grid gap-3.5">
             {platforms.map((p, i) => (
               <Reveal
                 as="div"
-                key={p}
+                key={p.name}
+                variant="card"
                 delay={i * 80}
-                className="flex items-center justify-between rounded-card border border-ink-line bg-white/[0.03] px-6 py-5"
+                className="flex items-center justify-between rounded-2xl bg-white/[0.06] hover:bg-white/[0.1] px-6 py-5 shadow-xs transition-all duration-300 hover:scale-[1.02]"
               >
-                <span className="font-display text-[1.35rem]">{p}</span>
-                <span className="text-reef-bright">★★★★★</span>
+                <div>
+                  <span className="font-display text-[1.35rem] block">{p.name}</span>
+                  <span className="text-xs text-white/60">{p.reviews}</span>
+                </div>
+                <span className="text-reef-bright font-semibold text-sm">{p.rating}</span>
               </Reveal>
             ))}
           </div>
         </div>
       </div>
+      <WaveDivider position="bottom" fillColor="text-paper" variant="wave-1" />
     </section>
   );
 }
@@ -246,16 +543,22 @@ const guarantees = [
 
 export function NoCompromises() {
   return (
-    <section className="band bg-paper-warm">
+    <section className="band bg-paper-warm/40">
       <div className="shell">
         <SectionHeading eyebrow="Our promise" title="No compromises" intro="Since 2009." />
-        <div className="mt-10 grid gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {guarantees.map((g, i) => (
-            <Reveal as="div" key={g.title} delay={i * 50} className="border-t border-sand pt-5">
-              <span className="font-display text-[2rem] leading-none text-sand">
+            <Reveal
+              as="div"
+              key={g.title}
+              variant="card"
+              delay={i * 50}
+              className="rounded-3xl bg-paper p-6 shadow-xs transition-all duration-300 hover:shadow-md hover:-translate-y-1"
+            >
+              <span className="font-display text-[2rem] leading-none text-reef-deep">
                 {String(i + 1).padStart(2, "0")}
               </span>
-              <h3 className="mt-4 font-display text-[1.25rem] leading-tight">{g.title}</h3>
+              <h3 className="mt-4 font-display text-[1.25rem] leading-tight text-ink">{g.title}</h3>
               <p className="mt-2 text-[0.9rem] leading-relaxed text-stone">{g.body}</p>
             </Reveal>
           ))}
@@ -278,15 +581,15 @@ export function ThreeSteps() {
     <section className="band-tight">
       <div className="shell">
         <SectionHeading eyebrow="How to book" title="Three steps" intro="Fast and easy." />
-        <ol className="mt-12 grid gap-x-8 gap-y-10 md:grid-cols-3">
+        <ol className="mt-12 grid gap-6 md:grid-cols-3">
           {steps.map((step, i) => (
-            <Reveal as="li" key={step.title} delay={i * 80}>
-              <div className="flex gap-4">
-                <span className="grid size-10 shrink-0 place-items-center rounded-full bg-reef-deep font-display text-lg text-paper">
+            <Reveal as="li" key={step.title} variant="card" delay={i * 80}>
+              <div className="flex flex-col gap-4 rounded-3xl bg-paper p-7 shadow-xs transition-all duration-300 hover:shadow-md hover:-translate-y-1 h-full">
+                <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-reef-deep font-display text-xl text-paper shadow-xs">
                   {i + 1}
                 </span>
                 <div>
-                  <h3 className="font-display text-[1.35rem] leading-tight">{step.title}</h3>
+                  <h3 className="font-display text-[1.35rem] leading-tight text-ink">{step.title}</h3>
                   <p className="mt-2 text-[0.9375rem] leading-relaxed text-stone">{step.body}</p>
                 </div>
               </div>
@@ -294,7 +597,8 @@ export function ThreeSteps() {
           ))}
         </ol>
 
-        <div className="mt-12 grid grid-cols-3 gap-4 border-t border-sand pt-8 text-center">
+        {/* Stats bar - no straight border lines */}
+        <div className="mt-12 grid grid-cols-3 gap-4 rounded-3xl bg-paper-warm/80 p-6 sm:p-8 text-center shadow-xs">
           {[
             { n: "17+", l: "years" },
             { n: "150k+", l: "travellers" },
@@ -302,7 +606,7 @@ export function ThreeSteps() {
           ].map((s) => (
             <div key={s.l}>
               <p className="font-display text-[2.25rem] leading-none text-reef-deep">{s.n}</p>
-              <p className="mt-1 text-[0.8rem] uppercase tracking-[0.1em] text-stone">{s.l}</p>
+              <p className="mt-1 text-[0.8rem] uppercase tracking-[0.1em] text-stone font-medium">{s.l}</p>
             </div>
           ))}
         </div>
@@ -322,7 +626,7 @@ export function GeographyBook() {
     "Insurance included",
   ];
   return (
-    <section className="band bg-paper-warm">
+    <section className="band bg-paper-warm/40">
       <div className="shell">
         <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
           <Reveal>
@@ -340,9 +644,10 @@ export function GeographyBook() {
           </Reveal>
 
           <Reveal delay={120}>
-            <div className="rounded-card border border-sand bg-paper p-7 shadow-sm md:p-9">
+            {/* Frameless shadow card - no straight border */}
+            <div className="rounded-[2rem] bg-paper p-7 shadow-[var(--shadow-lift)] md:p-9 hover:shadow-[var(--shadow-panel)] transition-shadow">
               <p className="eyebrow text-reef">Book a tour</p>
-              <p className="mt-2 font-display text-[1.75rem] leading-tight">
+              <p className="mt-2 font-display text-[1.75rem] leading-tight text-ink">
                 We reply in 3 minutes
               </p>
               <p className="mt-1 text-[0.9rem] text-stone">
@@ -359,7 +664,7 @@ export function GeographyBook() {
                 href={whatsappLink()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-whatsapp mt-7 w-full"
+                className="btn btn-whatsapp mt-7 w-full shadow-sm hover:shadow-md"
               >
                 <WhatsAppIcon className="size-5" />
                 Message us on WhatsApp
@@ -399,18 +704,18 @@ export function ContactChannels() {
         <SectionHeading eyebrow="Get in touch" title="Reach us on your favourite messenger" />
         <div className="mt-10 grid gap-4 sm:grid-cols-3">
           {channels.map((c, i) => (
-            <Reveal as="div" key={c.name} delay={i * 70}>
+            <Reveal as="div" key={c.name} variant="card" delay={i * 70}>
               <a
                 href={c.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex items-center gap-4 rounded-card border border-sand bg-paper p-6 transition-colors hover:border-reef-deep/40"
+                className="group flex items-center gap-4 rounded-3xl bg-paper p-6 transition-all duration-300 shadow-xs hover:shadow-md hover:-translate-y-1"
               >
-                <span className="grid size-12 shrink-0 place-items-center rounded-full bg-reef-deep/10 text-reef-deep transition-colors group-hover:bg-reef-deep group-hover:text-paper">
+                <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-reef-deep/10 text-reef-deep transition-all duration-300 group-hover:bg-reef-deep group-hover:text-paper group-hover:scale-105 shadow-xs">
                   {c.icon}
                 </span>
                 <div>
-                  <p className="font-display text-[1.2rem] leading-tight">{c.name}</p>
+                  <p className="font-display text-[1.25rem] leading-tight text-ink">{c.name}</p>
                   <p className="text-[0.85rem] text-stone">{c.caption}</p>
                 </div>
               </a>

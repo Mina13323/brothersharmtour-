@@ -43,12 +43,12 @@ export function HomeCatalogue() {
         />
 
         {/* Filter bar */}
-        <div className="mt-8 flex flex-wrap gap-2.5">
+        <div className="mt-8 flex gap-2.5 overflow-x-auto pb-2 sm:flex-wrap sm:overflow-visible [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {tabs.map((tab) => (
             <button
               key={tab}
               onClick={() => setActive(tab)}
-              className="chip"
+              className="chip shrink-0"
               data-active={active === tab}
             >
               {tab}
@@ -63,19 +63,19 @@ export function HomeCatalogue() {
             if (!list.length) return null;
             return (
               <div key={group.name}>
-                <div className="flex items-end justify-between gap-4 border-b border-sand pb-4">
+                <div className="flex items-end justify-between gap-4 pb-2">
                   <div>
                     <h3 className="font-display text-[1.75rem] leading-tight">{group.name}</h3>
                     <p className="mt-1 text-[0.9rem] text-stone">{group.caption}</p>
                   </div>
-                  <span className="shrink-0 text-[0.85rem] font-medium text-reef-deep">
+                  <span className="shrink-0 rounded-pill bg-reef-deep/10 px-3 py-1 text-[0.8rem] font-semibold text-reef-deep">
                     {list.length} tours
                   </span>
                 </div>
 
-                <div className="mt-8 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {list.map((tour, i) => (
-                    <Reveal key={tour.slug} delay={(i % 4) * 70}>
+                    <Reveal key={tour.slug} variant="card" delay={(i % 4) * 70}>
                       <TourCard tour={tour} />
                     </Reveal>
                   ))}

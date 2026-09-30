@@ -46,7 +46,7 @@ export function GalleryCarousel({ images }: { images: MediaImage[] }) {
   return (
     <div>
       {/* Stage */}
-      <div className="media relative aspect-[16/10] w-full overflow-hidden md:aspect-[16/9]">
+      <div className="media relative aspect-[16/10] w-full overflow-hidden rounded-2xl shadow-card sm:rounded-3xl md:aspect-[16/9]">
         <Image
           key={current.src}
           src={current.src}
@@ -83,7 +83,7 @@ export function GalleryCarousel({ images }: { images: MediaImage[] }) {
                 aria-label={`Photo ${i + 1}`}
                 aria-current={i === index}
                 className={cn(
-                  "media relative block size-16 overflow-hidden transition-opacity md:size-20",
+                  "media relative block size-16 overflow-hidden rounded-xl transition-opacity md:size-20",
                   i === index
                     ? "ring-2 ring-reef-deep ring-offset-2 ring-offset-paper"
                     : "opacity-60 hover:opacity-100",

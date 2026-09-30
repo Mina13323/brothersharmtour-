@@ -2,15 +2,17 @@ import Link from "next/link";
 import { footerNav, site, whatsappLink } from "@/data/site";
 import { Logo } from "./ui/Logo";
 import { WhatsAppIcon } from "./sections";
+import { WaveDivider } from "./WaveDivider";
 
 export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="on-ink bg-ink text-paper">
+    <footer className="on-ink relative bg-ink text-paper">
+      <WaveDivider position="top" fillColor="text-paper" variant="wave-gentle" />
       <div className="shell">
         {/* ---- Brand row ---- */}
-        <div className="grid gap-12 border-b border-ink-line py-16 lg:grid-cols-12 lg:gap-8">
+        <div className="grid gap-12 py-16 lg:grid-cols-12 lg:gap-8">
           <div className="lg:col-span-4">
             <Logo tone="light" />
             <p className="mt-6 max-w-xs font-display text-[1.75rem] leading-tight text-paper">

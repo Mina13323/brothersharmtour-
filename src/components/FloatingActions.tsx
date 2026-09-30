@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { whatsappLink } from "@/data/site";
 import { cn } from "@/lib/utils";
 import { useBooking } from "./BookingProvider";
@@ -10,14 +11,18 @@ import { WhatsAppIcon } from "./sections";
  * Floating conversion layer.
  *
  * Desktop: a single WhatsApp button, bottom-right, after the fold.
- * Mobile: a fixed bottom bar pairing WhatsApp with the primary booking CTA,
+ * Mobile: a floating curved dock pairing WhatsApp with the primary booking CTA,
  * because on a phone the header CTA scrolls away and thumb reach matters more
  * than chrome purity. Hidden until the user has scrolled past the hero so it
- * never competes with the hero's own CTAs.
+ * never competes with the hero's own CTAs. Suppressed on tour detail pages to
+ * yield cleanly to StickyBookBar.
  */
 export function FloatingActions() {
+  const pathname = usePathname();
   const { open, isOpen } = useBooking();
   const [visible, setVisible] = useState(false);
+
+  const isTourDetail = pathname.startsWith("/tours/") && pathname !== "/tours";
 
   useEffect(() => {
     const onScroll = () => setVisible(window.scrollY > window.innerHeight * 0.7);
@@ -44,26 +49,7 @@ export function FloatingActions() {
         <WhatsAppIcon className="size-6" />
       </a>
 
-      {/* Mobile bar */}
-      <div
-        className={cn(
-          "fixed inset-x-0 bottom-0 z-[90] flex gap-2 border-t border-sand bg-paper/96 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-md transition-transform duration-500 [transition-timing-function:var(--ease-editorial)] md:hidden",
-          visible && !isOpen ? "translate-y-0" : "translate-y-full",
-        )}
-      >
-        <a
-          href={whatsappLink()}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn btn-whatsapp shrink-0 px-5"
-          aria-label="Chat on WhatsApp"
-        >
-          <WhatsAppIcon className="size-[1.1rem]" />
-        </a>
-        <button onClick={() => open()} className="btn btn-primary grow">
-          Book Now
-        </button>
-      </div>
+      {/* Mobile dock is replaced by the floating pill navbar */}
     </>
   );
 }

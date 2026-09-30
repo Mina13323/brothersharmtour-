@@ -24,30 +24,35 @@ export default function ExperiencesPage() {
   return (
     <>
       <Hero
+        variant="card"
         image={media.tiranIsland.hero}
         size="short"
         eyebrow="Experiences"
         title="What kind of day is it?"
         subtitle="Start with the mood rather than the map. Every category leads to the trips we actually run."
+        showWave
       />
 
-      <section className="band">
+      <section className="band bg-paper-warm/30">
         <div className="shell">
           <Breadcrumbs
             items={[{ label: "Home", href: "/" }, { label: "Experiences" }]}
           />
 
-          {/* Editorial index — alternating large rows rather than a uniform grid */}
-          <ul className="mt-12 flex flex-col">
+          {/* Editorial index — elevated rounded cards rather than bordered rows */}
+          <ul className="mt-12 flex flex-col gap-6">
             {experiences.map((experience, index) => {
               const list = toursByCategory(experience.slug);
               const reverse = index % 2 === 1;
 
               return (
-                <li key={experience.slug} className="border-t border-sand">
+                <li
+                  key={experience.slug}
+                  className="rounded-[2rem] bg-paper p-5 sm:p-7 shadow-xs hover:shadow-lg transition-all duration-500 hover:-translate-y-1"
+                >
                   <Link
                     href={`/experiences/${experience.slug}`}
-                    className="group grid items-center gap-6 py-8 md:grid-cols-12 md:gap-10 md:py-10"
+                    className="group grid items-center gap-6 md:grid-cols-12 md:gap-10"
                   >
                     <Reveal
                       variant="clip"

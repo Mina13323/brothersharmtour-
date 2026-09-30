@@ -28,7 +28,7 @@ export function ExperienceDiscovery({
       <Reveal variant="clip" className="lg:col-span-7">
         <Link
           href={`/experiences/${feature.slug}`}
-          className="group media scrim-bottom relative block aspect-[4/5] w-full sm:aspect-[3/2] lg:aspect-[4/5]"
+          className="group media scrim-bottom relative block aspect-[4/5] w-full overflow-hidden rounded-[2rem] shadow-card-lg sm:aspect-[3/2] lg:aspect-[4/5]"
         >
           <Image
             src={feature.image.src}
@@ -60,19 +60,19 @@ export function ExperienceDiscovery({
       </Reveal>
 
       {/* ---------- Stacked secondary ---------- */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:col-span-5 lg:grid-cols-1 lg:gap-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:col-span-5 lg:grid-cols-1">
         {rest.slice(0, 3).map((experience, i) => (
           <Reveal key={experience.slug} delay={i * 80}>
             <Link
               href={`/experiences/${experience.slug}`}
-              className="group flex items-center gap-5 border-b border-sand pb-4 lg:pb-3"
+              className="group flex items-center gap-4 rounded-2xl border border-sand/70 bg-paper-warm/40 p-3 transition-all duration-300 hover:border-sand hover:bg-paper-warm/90 hover:shadow-sm"
             >
-              <div className="media aspect-square w-24 shrink-0 lg:w-28">
+              <div className="media aspect-square w-20 shrink-0 overflow-hidden rounded-xl lg:w-24">
                 <Image
                   src={experience.image.src}
                   alt=""
                   fill
-                  sizes="7rem"
+                  sizes="6rem"
                   className="object-cover"
                 />
               </div>
@@ -81,15 +81,15 @@ export function ExperienceDiscovery({
                 <p className="text-[0.625rem] uppercase tracking-[0.18em] text-stone">
                   {counts[experience.slug] ?? 0} experiences
                 </p>
-                <h3 className="mt-1.5 font-display text-[1.375rem] leading-tight transition-colors duration-[var(--duration-ui)] group-hover:text-reef">
+                <h3 className="mt-1 font-display text-[1.25rem] leading-tight transition-colors duration-[var(--duration-ui)] group-hover:text-reef">
                   {experience.name}
                 </h3>
-                <p className="mt-1 truncate text-[0.8125rem] text-stone">
+                <p className="mt-0.5 truncate text-[0.8125rem] text-stone">
                   {experience.tagline}
                 </p>
               </div>
 
-              <span className="arrow shrink-0 text-stone" aria-hidden>
+              <span className="arrow shrink-0 text-stone group-hover:translate-x-1" aria-hidden>
                 →
               </span>
             </Link>
@@ -100,12 +100,12 @@ export function ExperienceDiscovery({
           <Reveal delay={260} className="sm:col-span-2 lg:col-span-1">
             <Link
               href="/experiences"
-              className="group flex items-center justify-between border-b border-ink py-4"
+              className="group flex items-center justify-between rounded-2xl border border-ink/20 bg-paper-warm/30 p-4 transition-colors hover:border-ink hover:bg-paper-warm/70"
             >
-              <span className="font-display text-[1.375rem] leading-none">
+              <span className="font-display text-[1.25rem] leading-none">
                 All {experiences.length} categories
               </span>
-              <span className="arrow" aria-hidden>
+              <span className="arrow group-hover:translate-x-1" aria-hidden>
                 →
               </span>
             </Link>

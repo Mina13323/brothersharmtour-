@@ -11,6 +11,8 @@ import { StickyBookBar } from "@/components/StickyBookBar";
 import { Accordion } from "@/components/Accordion";
 import { Breadcrumbs, CTASection, SectionHeading, WhatsAppIcon } from "@/components/sections";
 import { BookButton } from "@/components/BookingProvider";
+import { WaveDivider } from "@/components/WaveDivider";
+import { TourHero } from "@/components/TourHero";
 
 import { tours, tourBySlug, relatedTours } from "@/data/tours";
 import { experienceName } from "@/data/experiences";
@@ -23,7 +25,6 @@ import {
   tourOriginalPrice,
   tourDiscountPct,
   tourPriceUnit,
-  tourSchedule,
 } from "@/lib/utils";
 
 export function generateStaticParams() {
@@ -70,7 +71,6 @@ export default async function TourDetailPage({
   const unit = tourPriceUnit(tour);
   const unitShort = unit === "per person" ? "/pp" : unit.replace("per ", "/ ");
   const related = relatedTours(tour, 3);
-  const [lead, ...rest] = tour.images;
   const galleryImages = tour.images.length > 1 ? tour.images : [];
 
   const schema = {
@@ -142,83 +142,11 @@ export default async function TourDetailPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
 
-      {/* ═══════════════════ HERO GALLERY ═══════════════════ */}
-      <section className="on-ink relative bg-ink">
-        <div className="grid h-[62svh] grid-cols-4 grid-rows-2 gap-1 md:h-[78svh]">
-          <div
-            className={`media relative ${
-              rest.length ? "col-span-4 row-span-2 md:col-span-3" : "col-span-4 row-span-2"
-            }`}
-          >
-            <Image
-              src={lead.src}
-              alt={lead.alt}
-              fill
-              priority
-              sizes="(max-width: 768px) 100vw, 75vw"
-              className="object-cover"
-              style={lead.position ? { objectPosition: lead.position } : undefined}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-ink/10 to-ink/30 md:from-ink/45" />
-            {tour.images.length > 1 ? (
-              <a
-                href="#gallery"
-                className="absolute bottom-3 right-3 z-10 inline-flex items-center gap-1.5 rounded-pill bg-ink/70 px-3.5 py-1.5 text-[0.75rem] font-medium text-white backdrop-blur-sm transition-colors hover:bg-ink/90"
-              >
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
-                  <rect x="1" y="1" width="14" height="11" rx="1.5" stroke="currentColor" strokeWidth="1.3" />
-                  <circle cx="5.5" cy="5" r="1.2" fill="currentColor" />
-                  <path d="M2 11l3.5-3 2.5 2 3-2.5 4 3.5" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" />
-                </svg>
-                View all {tour.images.length} photos
-              </a>
-            ) : null}
-          </div>
-
-          {rest.slice(0, 2).map((image) => (
-            <div key={image.src} className="media relative hidden md:block">
-              <Image
-                src={image.src}
-                alt={image.alt}
-                fill
-                sizes="25vw"
-                className="object-cover"
-              />
-            </div>
-          ))}
-
-          {rest.length === 1 ? (
-            <div className="media relative hidden bg-ink-soft md:block" />
-          ) : null}
-        </div>
-
-        {/* Title block overlays the lead image */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0">
-          <div className="shell pb-8 md:pb-12">
-            <div className="pointer-events-auto max-w-3xl text-white">
-              <Breadcrumbs
-                tone="light"
-                items={[
-                  { label: "Home", href: "/" },
-                  { label: "Tours", href: "/tours" },
-                  { label: tour.title },
-                ]}
-              />
-              <p className="eyebrow mt-5 text-sun">
-                {experienceName(tour.category)}
-                <span className="mx-2 opacity-40">·</span>
-                {destinationName(tour.destination)}
-              </p>
-              <h1 className="display mt-4 text-[clamp(2.25rem,1.3rem+3.6vw,4.5rem)]">
-                {tour.title}
-              </h1>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* ═══════════════════ HERO (Design matching reference screenshot) ═══════════════════ */}
+      <TourHero tour={tour} />
 
       {/* ═══════════════════ BOOKING BAR ═══════════════════ */}
-      <section className="border-b border-sand bg-paper">
+      <section className="bg-paper">
         <div className="shell">
           <div className="flex flex-col gap-6 py-6 lg:flex-row lg:items-center lg:justify-between lg:py-7">
             <dl className="grid grid-cols-2 gap-x-8 gap-y-4 sm:grid-cols-4 lg:gap-x-12">
@@ -278,7 +206,7 @@ export default async function TourDetailPage({
       </section>
 
       {/* ═══════════════════ TRUST / URGENCY STRIP ═══════════════════ */}
-      <section className="border-b border-sand bg-paper-warm">
+      <section className="bg-paper-warm/50">
         <div className="shell">
           <div className="flex flex-col gap-3 py-4 md:flex-row md:items-center md:justify-between">
             <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
@@ -334,22 +262,22 @@ export default async function TourDetailPage({
               {/* Highlights */}
               <Reveal className="mt-14">
                 <h2 className="eyebrow text-reef">Highlights</h2>
-                <ul className="mt-5 grid gap-x-8 sm:grid-cols-2">
+                <ul className="mt-5 grid gap-3 sm:grid-cols-2">
                   {tour.highlights.map((h) => (
                     <li
                       key={h}
-                      className="flex gap-3 border-b border-sand py-4 text-[0.9375rem] leading-relaxed"
+                      className="flex items-start gap-3 rounded-2xl bg-paper-warm/50 p-4 text-[0.9375rem] leading-relaxed transition-all hover:bg-paper-warm/80 hover:shadow-2xs"
                     >
-                      <span className="mt-[0.45rem] size-1.5 shrink-0 rounded-pill bg-sun" />
-                      {h}
+                      <span className="mt-[0.45rem] size-2 shrink-0 rounded-full bg-sun" />
+                      <span>{h}</span>
                     </li>
                   ))}
                 </ul>
               </Reveal>
 
               {/* Included / excluded */}
-              <Reveal className="mt-14 grid gap-10 sm:grid-cols-2">
-                <div>
+              <Reveal className="mt-14 grid gap-6 sm:grid-cols-2">
+                <div className="rounded-3xl bg-paper-warm/50 p-6 shadow-xs md:p-8">
                   <h2 className="eyebrow text-reef">What&apos;s included</h2>
                   <ul className="mt-5 flex flex-col gap-3">
                     {tour.included.map((item) => (
@@ -360,7 +288,7 @@ export default async function TourDetailPage({
                     ))}
                   </ul>
                 </div>
-                <div>
+                <div className="rounded-3xl bg-paper-warm/50 p-6 shadow-xs md:p-8">
                   <h2 className="eyebrow text-stone">Not included</h2>
                   <ul className="mt-5 flex flex-col gap-3">
                     {tour.excluded.map((item) => (
@@ -402,7 +330,7 @@ export default async function TourDetailPage({
               </Reveal>
 
               {/* Meeting point */}
-              <Reveal className="mt-14 border border-sand bg-paper-warm p-6 md:p-8">
+              <Reveal className="mt-14 rounded-3xl border border-sand/80 bg-paper-warm p-6 shadow-sm md:p-8">
                 <h2 className="eyebrow text-reef">Meeting & pickup</h2>
                 <p className="mt-4 text-[0.9375rem] leading-relaxed">
                   {tour.meetingPoint}
@@ -433,8 +361,8 @@ export default async function TourDetailPage({
             {/* ---------- Sticky booking rail ---------- */}
             <aside className="lg:col-span-5 xl:col-span-4">
               <div className="lg:sticky lg:top-28">
-                <div className="border border-sand bg-paper-warm p-6 md:p-8">
-                  <div className="flex items-end justify-between gap-4 border-b border-sand pb-5">
+                <div className="rounded-3xl bg-paper-warm p-6 shadow-md md:p-8">
+                  <div className="flex items-end justify-between gap-4 pb-5">
                     <div>
                       <p className="eyebrow text-stone">From</p>
                       <p className="mt-2 font-display text-[2.5rem] leading-none">
@@ -494,7 +422,7 @@ export default async function TourDetailPage({
                 </div>
 
                 {!tour.verified ? (
-                  <p className="mt-4 border-l-2 border-sun/70 bg-sun/[0.06] py-3 pl-4 text-[0.75rem] leading-relaxed text-stone">
+                  <p className="mt-4 rounded-2xl border border-sun/30 bg-sun/[0.08] p-4 text-[0.75rem] leading-relaxed text-stone">
                     Pricing and timings shown are indicative placeholders pending
                     confirmation from Brother Sharm Tour operations. We always confirm the
                     final price in writing before you book.

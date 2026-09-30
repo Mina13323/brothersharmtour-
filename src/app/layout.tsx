@@ -1,12 +1,71 @@
 import type { Metadata, Viewport } from "next";
+import localFont from "next/font/local";
 import "@fontsource-variable/inter";
 import "@fontsource-variable/cormorant-garamond";
 import "./globals.css";
+
+const augsburg = localFont({
+  src: [
+    {
+      path: "../fonts/Plush-Trial-Light-BF654c401444f88.otf",
+      weight: "300",
+      style: "normal",
+    },
+    {
+      path: "../fonts/Plush-Trial-LightItalic-BF654c40142d3df.otf",
+      weight: "300",
+      style: "italic",
+    },
+    {
+      path: "../fonts/Plush-Trial-Regular-BF654c40145b0dd.otf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../fonts/Plush-Trial-Italic-BF654c40145fe4f.otf",
+      weight: "400",
+      style: "italic",
+    },
+    {
+      path: "../fonts/Plush-Trial-Medium-BF654c401412ccd.otf",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../fonts/Plush-Trial-MediumItalic-BF654c40146661a.otf",
+      weight: "500",
+      style: "italic",
+    },
+    {
+      path: "../fonts/Plush-Trial-Bold-BF654c40144cc74.otf",
+      weight: "700",
+      style: "normal",
+    },
+    {
+      path: "../fonts/Plush-Trial-BoldItalic-BF654c40144a11a.otf",
+      weight: "700",
+      style: "italic",
+    },
+    {
+      path: "../fonts/Plush-Trial-ExtraBold-BF654c4014409f5.otf",
+      weight: "800",
+      style: "normal",
+    },
+    {
+      path: "../fonts/Plush-Trial-Black-BF654c4013ec70c.otf",
+      weight: "900",
+      style: "normal",
+    },
+  ],
+  variable: "--font-augsburg-local",
+  display: "swap",
+});
 
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { BookingProvider } from "@/components/BookingProvider";
 import { FloatingActions } from "@/components/FloatingActions";
+import { SmoothScroll } from "@/components/SmoothScroll";
 import { site } from "@/data/site";
 import { OG_IMAGE } from "@/lib/media";
 
@@ -107,7 +166,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={augsburg.variable}>
       <head>
         {/*
           No-JS fallback for the scroll-reveal system.
@@ -143,6 +202,7 @@ export default function RootLayout({
         </a>
 
         <BookingProvider>
+          <SmoothScroll />
           <Navbar />
           <main id="main">{children}</main>
           <Footer />

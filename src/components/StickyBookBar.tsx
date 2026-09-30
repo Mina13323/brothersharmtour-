@@ -26,11 +26,11 @@ export function StickyBookBar({ tour }: { tour: Tour }) {
 
   return (
     <div
-      className={`fixed inset-x-0 bottom-0 z-[90] border-t border-sand bg-paper/95 backdrop-blur-md transition-transform duration-500 [transition-timing-function:var(--ease-out-expo)] ${
-        show ? "translate-y-0" : "translate-y-full"
-      }`}
+      className={`fixed z-[90] transition-transform duration-500 [transition-timing-function:var(--ease-out-expo)] ${
+        show ? "translate-y-0" : "translate-y-28 sm:translate-y-full"
+      } inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] rounded-2xl border border-sand/80 bg-paper/98 p-3 shadow-curved backdrop-blur-md sm:inset-x-0 sm:bottom-0 sm:rounded-none sm:border-x-0 sm:border-b-0 sm:border-t sm:p-0`}
     >
-      <div className="shell flex items-center justify-between gap-4 py-3">
+      <div className="shell flex items-center justify-between gap-4 sm:py-3">
         <div className="min-w-0">
           <p className="truncate text-[0.8rem] font-medium text-ink">
             {tour.title}

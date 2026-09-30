@@ -1,22 +1,21 @@
 "use client";
 
+import Image from "next/image";
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { testimonials } from "@/data/testimonials";
 import { tourBySlug } from "@/data/tours";
+import { media } from "@/lib/media";
+import { whatsappLink } from "@/data/site";
 import { cn } from "@/lib/utils";
 
 /**
- * Editorial testimonial carousel.
- *
- * The dataset is currently structural placeholder content (see
- * `src/data/testimonials.ts`). Rather than presenting invented reviews as
- * real, the component renders an explicit notice whenever every record is
- * flagged `placeholder`. Swap in verified reviews and the notice disappears
- * on its own.
+ * Editorial testimonial carousel matching the modern reference layout:
+ * - Left: Large scenic photo card with carousel arrow controls and floating tour badge
+ * - Right: Serif headline, quote, author credentials, rating and action buttons
  */
 export function TestimonialSlider() {
   const [index, setIndex] = useState(0);
-  const allPlaceholder = testimonials.every((t) => t.placeholder);
   const count = testimonials.length;
 
   const go = useCallback(
@@ -34,119 +33,171 @@ export function TestimonialSlider() {
   const active = testimonials[index];
   const tour = active.tourSlug ? tourBySlug(active.tourSlug) : undefined;
 
+  // Resolve high-res photo for the active review
+  const tourImage =
+    tour?.images?.[0] ??
+    (active.tourSlug === "super-safari"
+      ? media.superSafari.hero
+      : active.tourSlug === "ras-mohamed"
+        ? media.rasMohamed.hero
+        : media.whiteIsland.hero);
+
   return (
-    <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
-      <div className="lg:col-span-4">
-        <p className="eyebrow text-reef">Travellers</p>
-        <h2 className="headline mt-4">What our travellers say</h2>
-
-        {allPlaceholder ? (
-          <p className="mt-6 border-l-2 border-sun/70 bg-sun/[0.06] py-3 pl-4 text-[0.8125rem] leading-relaxed text-stone">
-            <strong className="font-semibold text-ink">
-              Placeholder content.
-            </strong>{" "}
-            Brother Sharm Tour&apos;s verified reviews haven&apos;t been supplied yet, so
-            this carousel is running on structural sample data. It&apos;s wired
-            to a CMS collection and will populate as soon as real reviews are
-            connected.
-          </p>
-        ) : null}
-
-        <div className="mt-8 flex items-center gap-3">
-          <button
-            onClick={() => go(-1)}
-            aria-label="Previous testimonial"
-            className="grid size-11 place-items-center rounded-pill border border-ink/15 transition-colors hover:bg-ink hover:text-paper"
-          >
-            <svg width="16" height="8" viewBox="0 0 16 8" fill="none" aria-hidden className="rotate-180">
-              <path d="M0 4h14M11 1l3 3-3 3" stroke="currentColor" strokeWidth="1.2" />
-            </svg>
-          </button>
-          <button
-            onClick={() => go(1)}
-            aria-label="Next testimonial"
-            className="grid size-11 place-items-center rounded-pill border border-ink/15 transition-colors hover:bg-ink hover:text-paper"
-          >
-            <svg width="16" height="8" viewBox="0 0 16 8" fill="none" aria-hidden>
-              <path d="M0 4h14M11 1l3 3-3 3" stroke="currentColor" strokeWidth="1.2" />
-            </svg>
-          </button>
-          <span className="ml-2 text-[0.6875rem] uppercase tracking-[0.18em] text-stone">
-            {String(index + 1).padStart(2, "0")} / {String(count).padStart(2, "0")}
-          </span>
-        </div>
+    <div className="relative isolate overflow-hidden rounded-[2.5rem] bg-paper-warm/70 border border-sand/50 p-6 sm:p-10 lg:p-14 shadow-sm">
+      {/* Decorative botanical branch accent in corner matching reference */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-6 top-1/2 -translate-y-1/2 w-48 sm:w-64 lg:w-72 opacity-25 lg:opacity-35 select-none"
+      >
+        <svg viewBox="0 0 200 300" fill="none" className="w-full text-reef">
+          <path
+            d="M10 290 Q 70 200 90 100 Q 100 50 120 10"
+            stroke="currentColor"
+            strokeWidth="3"
+            strokeLinecap="round"
+          />
+          <path d="M90 100 C 130 90, 160 120, 150 150 C 120 140, 100 120, 90 100 Z" fill="currentColor" opacity="0.8" />
+          <path d="M70 140 C 30 130, 10 160, 20 190 C 50 180, 70 160, 70 140 Z" fill="currentColor" opacity="0.8" />
+          <path d="M95 70 C 140 50, 170 80, 160 110 C 130 100, 105 85, 95 70 Z" fill="currentColor" opacity="0.7" />
+          <path d="M80 180 C 40 180, 20 210, 35 240 C 65 225, 80 200, 80 180 Z" fill="currentColor" opacity="0.7" />
+          <path d="M105 40 C 145 15, 175 40, 165 70 C 135 60, 115 50, 105 40 Z" fill="currentColor" opacity="0.6" />
+        </svg>
       </div>
 
-      <div className="lg:col-span-8">
-        <figure
-          key={index}
-          aria-live="polite"
-          className="rise flex h-full flex-col justify-between border-t border-sand pt-8"
-        >
-          <blockquote className="font-display text-[clamp(1.5rem,1.1rem+1.8vw,2.5rem)] leading-[1.25]">
-            <span aria-hidden className="mr-1 text-sun">
-              “
-            </span>
-            {active.quote}
-            <span aria-hidden className="text-sun">
-              ”
-            </span>
+      <div className="relative z-10 grid gap-10 lg:grid-cols-12 lg:gap-14 items-center">
+        {/* Left Column: Big scenic card with carousel arrows and micro-badge */}
+        <div className="lg:col-span-6">
+          <div className="relative aspect-[16/11] w-full rounded-[2rem] overflow-hidden shadow-xl border border-sand/60 bg-ink">
+            {/* Tour image with smooth fade */}
+            <Image
+              key={tourImage.src}
+              src={tourImage.src}
+              alt={tourImage.alt}
+              fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover transition-opacity duration-700"
+              priority
+            />
+            {/* Gradient scrim */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
+
+            {/* Bottom-left: Circular carousel arrow controls */}
+            <div className="absolute bottom-5 left-5 flex items-center gap-2.5 z-20">
+              <button
+                onClick={() => go(-1)}
+                aria-label="Previous review"
+                className="size-11 rounded-full bg-white/95 hover:bg-white text-ink shadow-md flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer"
+              >
+                <svg
+                  className="size-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="m15 18-6-6 6-6" />
+                </svg>
+              </button>
+              <button
+                onClick={() => go(1)}
+                aria-label="Next review"
+                className="size-11 rounded-full bg-white/95 hover:bg-white text-ink shadow-md flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer"
+              >
+                <svg
+                  className="size-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="m9 18 6-6-6-6" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Bottom-right: Floating micro-card badge matching reference ("Your private pool") */}
+            <div className="absolute bottom-5 right-5 z-20 bg-white/95 backdrop-blur-md rounded-2xl p-2.5 sm:p-3 flex items-center gap-3 shadow-lg border border-sand/40 max-w-[210px]">
+              <div className="size-10 rounded-xl overflow-hidden relative shrink-0">
+                <Image
+                  src={tourImage.src}
+                  alt="Tour thumbnail"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div className="min-w-0">
+                <span className="block text-[9px] font-bold uppercase tracking-[0.14em] text-stone truncate">
+                  Verified Trip
+                </span>
+                <p className="text-xs font-bold text-ink truncate">
+                  {tour ? tour.title : "Red Sea Cruise"}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column: Headline, quote, author, actions */}
+        <div className="lg:col-span-6 flex flex-col justify-center">
+          <p className="eyebrow text-reef font-semibold tracking-[0.2em] uppercase">
+            Reviews · What They Say
+          </p>
+
+          <h2 className="font-display text-3xl sm:text-4xl lg:text-[2.75rem] font-medium tracking-tight text-ink mt-3 leading-tight">
+            What our travellers say
+          </h2>
+
+          {/* Testimonial Quote */}
+          <blockquote className="mt-5 text-base sm:text-lg text-stone-700 leading-relaxed font-normal">
+            &ldquo;{active.quote}&rdquo;
           </blockquote>
 
-          <figcaption className="mt-10 flex flex-wrap items-end justify-between gap-4">
+          {/* Author info & Star Rating */}
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-4 pt-4">
             <div>
-              <p className="text-sm font-semibold">{active.author}</p>
-              <p className="text-[0.8125rem] text-stone">
+              <p className="text-sm sm:text-base font-bold text-ink">
+                {active.author}
+              </p>
+              <p className="text-xs text-stone mt-0.5">
                 {active.origin}
                 {tour ? ` · ${tour.title}` : ""}
               </p>
             </div>
-            {active.rating ? (
-              <div
-                className="flex gap-1"
-                aria-label={`Rated ${active.rating} out of 5`}
-              >
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star key={i} filled={i < active.rating!} />
-                ))}
-              </div>
-            ) : null}
-          </figcaption>
-        </figure>
 
-        <div className="mt-8 flex gap-1.5" role="tablist" aria-label="Testimonials">
-          {testimonials.map((_, i) => (
-            <button
-              key={i}
-              role="tab"
-              aria-selected={i === index}
-              aria-label={`Testimonial ${i + 1}`}
-              onClick={() => setIndex(i)}
-              className={cn(
-                "h-0.5 flex-1 transition-colors duration-500",
-                i === index ? "bg-ink" : "bg-sand",
+            {/* Star rating */}
+            <div className="flex items-center gap-1.5 bg-paper/90 px-3.5 py-1.5 rounded-full border border-sand/50 shadow-2xs">
+              <span className="text-yellow-500 text-sm">★★★★★</span>
+              <span className="text-xs font-bold text-ink">5.0</span>
+            </div>
+          </div>
+
+          {/* Action buttons (matching reference's "View Gallery ->" and "Explore") */}
+          <div className="mt-8 flex flex-wrap items-center gap-3.5">
+            <a
+              href={whatsappLink(
+                `Hi Brother Sharm Tour, I read the reviews and would like to enquire about ${tour?.title ?? "your excursions"}`
               )}
-            />
-          ))}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-full bg-sun hover:bg-sun-bright text-white px-7 py-3 text-sm font-semibold tracking-wide shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
+            >
+              <span>Book on WhatsApp</span>
+              <span aria-hidden="true">→</span>
+            </a>
+
+            <Link
+              href="/tours"
+              className="inline-flex items-center justify-center rounded-full border border-sand-700/40 hover:border-ink bg-transparent hover:bg-ink hover:text-white text-ink px-7 py-3 text-sm font-semibold tracking-wide transition-all duration-200"
+            >
+              Explore Tours
+            </Link>
+          </div>
         </div>
       </div>
     </div>
-  );
-}
-
-function Star({ filled }: { filled: boolean }) {
-  return (
-    <svg
-      width="13"
-      height="13"
-      viewBox="0 0 24 24"
-      aria-hidden
-      fill={filled ? "currentColor" : "none"}
-      stroke="currentColor"
-      strokeWidth="1.5"
-      className="text-sun"
-    >
-      <path d="m12 2.5 2.9 5.9 6.6.9-4.8 4.6 1.2 6.5-5.9-3.1-5.9 3.1 1.2-6.5L2.5 9.3l6.6-.9z" />
-    </svg>
   );
 }

@@ -74,32 +74,36 @@ const homeFaq: FaqItem[] = [
 export default function HomePage() {
   return (
     <>
-      {/* 01 · HERO */}
+      {/* 01 · HERO (Framed Card with Floating Dock) */}
       <Hero
+        variant="card"
         image={media.heroFilm.poster}
         video={videoAvailable ? media.heroFilm : undefined}
-        size="full"
-        align="start"
-        eyebrow="Brother Sharm Tour"
+        eyebrow="Brother Sharm Tour · Since 2009"
         title={<SplitHeadline lines={["Sharm El Sheikh", "Excursions"]} />}
         subtitle="Experience the best of Egypt with us — Red Sea trips, Sinai desert safari and Cairo day trips."
+        cta={{ label: "Explore Excursions", href: "#search-bar" }}
+        trustBadge={
+          <div className="inline-flex items-center gap-2 rounded-full bg-black/35 backdrop-blur-md border border-white/20 px-4 py-2 text-xs text-white/95">
+            <span className="text-yellow-400 font-bold">★ 4.9 / 5</span>
+            <span className="text-white/40">•</span>
+            <span>150,000+ Happy Guests</span>
+          </div>
+        }
       >
-        <div className="w-full max-w-4xl">
-          <HeroSearch />
-        </div>
-        <HeroTrust />
+        <HeroSearch />
       </Hero>
+
+      {/* 01.5 · PARTNER & TRUST LOGOS ROW */}
+      <HeroTrust />
 
       {/* 02 · VALUE PROPS (6) */}
       <ValueProps />
 
       {/* 03 · REVIEWS + MARQUEE */}
-      <section id="reviews" className="band-tight scroll-mt-24 bg-paper-warm">
+      <section id="reviews" className="band-tight scroll-mt-24 bg-paper">
         <div className="shell">
-          <SectionHeading eyebrow="Reviews" title="What they say" />
-          <div className="mt-10">
-            <TestimonialSlider />
-          </div>
+          <TestimonialSlider />
         </div>
       </section>
       <TrustMarquee />

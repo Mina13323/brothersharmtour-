@@ -9,6 +9,7 @@ import { Reveal } from "@/components/Reveal";
 import { Gallery } from "@/components/Gallery";
 import { Breadcrumbs, CTASection, SectionHeading } from "@/components/sections";
 import { BookButton } from "@/components/BookingProvider";
+import { WaveDivider } from "@/components/WaveDivider";
 import { media } from "@/lib/media";
 import { site } from "@/data/site";
 
@@ -55,11 +56,13 @@ export default function AboutPage() {
   return (
     <>
       <Hero
+        variant="card"
         image={media.about}
         size="tall"
         eyebrow="About Brother Sharm Tour"
         title="Our Story"
         subtitle="A small team on the Red Sea, running the trips we'd want to be on."
+        showWave
       >
         <BookButton className="btn btn-primary">Plan your trip</BookButton>
         <Link href="/tours" className="btn btn-ghost-light">
@@ -110,7 +113,7 @@ export default function AboutPage() {
       {/* ─────────── Editorial image break ─────────── */}
       <section>
         <div className="shell">
-          <Reveal variant="clip" className="media aspect-[4/3] w-full md:aspect-[21/9]">
+          <Reveal variant="clip" className="media aspect-[4/3] w-full overflow-hidden rounded-[2rem] shadow-card-lg md:aspect-[21/9]">
             <Image
               src={media.sharmHero.src}
               alt={media.sharmHero.alt}
@@ -136,15 +139,15 @@ export default function AboutPage() {
                 message us, you reach the people who run the trips.
               </p>
 
-              <dl className="mt-10 grid grid-cols-2 gap-x-6 gap-y-8 border-t border-sand pt-8">
+              <dl className="mt-10 grid grid-cols-2 gap-4">
                 {localExpertise.map((item) => (
-                  <div key={item.label}>
+                  <div key={item.label} className="rounded-2xl bg-paper-warm/60 p-5 shadow-2xs">
                     <dt className="sr-only">{item.label}</dt>
                     <dd>
-                      <span className="block font-display text-[2rem] leading-none">
+                      <span className="block font-display text-[2.25rem] leading-none text-reef-deep">
                         {item.value}
                       </span>
-                      <span className="mt-2 block text-[0.75rem] leading-snug text-stone">
+                      <span className="mt-2 block text-[0.8rem] leading-snug text-stone">
                         {item.label}
                       </span>
                     </dd>
@@ -154,7 +157,7 @@ export default function AboutPage() {
             </Reveal>
 
             <Reveal delay={120} className="lg:col-span-7">
-              <div className="media aspect-[4/5] w-full md:aspect-[4/3]">
+              <div className="media aspect-[4/5] w-full overflow-hidden rounded-[2rem] shadow-card-lg md:aspect-[4/3]">
                 <Image
                   src={media.aboutPortrait.src}
                   alt={media.aboutPortrait.alt}
@@ -169,8 +172,10 @@ export default function AboutPage() {
       </section>
 
       {/* ─────────── Our approach ─────────── */}
-      <section className="on-ink bg-ink text-paper">
-        <div className="shell band">
+      <section className="on-ink relative bg-ink text-paper">
+        <WaveDivider position="top" variant="wave-gentle" color="text-paper" />
+
+        <div className="shell band py-16 md:py-24">
           <SectionHeading
             eyebrow="Our approach"
             tone="light"
@@ -178,9 +183,12 @@ export default function AboutPage() {
             intro="Three rules that decide almost everything we do."
           />
 
-          <div className="mt-12 grid gap-px overflow-hidden border border-ink-line bg-ink-line md:mt-16 md:grid-cols-3">
+          <div className="mt-12 grid gap-6 md:mt-16 md:grid-cols-3">
             {approach.map((item, i) => (
-              <div key={item.title} className="bg-ink p-8 md:p-10">
+              <div
+                key={item.title}
+                className="rounded-3xl border border-white/10 bg-ink-soft p-8 shadow-curved transition-transform duration-500 hover:-translate-y-1.5 md:p-10"
+              >
                 <Reveal delay={i * 90}>
                   <span className="font-display text-[2.5rem] leading-none text-sun/70">
                     {String(i + 1).padStart(2, "0")}
@@ -196,6 +204,8 @@ export default function AboutPage() {
             ))}
           </div>
         </div>
+
+        <WaveDivider position="bottom" variant="wave-1" color="text-paper" />
       </section>
 
       {/* ─────────── Customer experience ─────────── */}
@@ -208,7 +218,7 @@ export default function AboutPage() {
             </Reveal>
 
             <Reveal delay={100} className="lg:col-span-8">
-              <ol className="grid gap-x-10 sm:grid-cols-2">
+              <ol className="grid gap-4 sm:grid-cols-2">
                 {[
                   {
                     t: "You message us",
@@ -227,7 +237,10 @@ export default function AboutPage() {
                     d: "And on the end of a phone for the rest of your trip, whether you've booked one day or five.",
                   },
                 ].map((item, i) => (
-                  <li key={item.t} className="border-t border-sand py-6">
+                  <li
+                    key={item.t}
+                    className="rounded-2xl bg-paper-warm/50 p-6 shadow-xs transition-all hover:bg-paper-warm hover:shadow-sm"
+                  >
                     <span className="eyebrow text-sun">
                       {String(i + 1).padStart(2, "0")}
                     </span>

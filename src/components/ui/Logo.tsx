@@ -17,19 +17,19 @@ export function Logo({
   return (
     <span
       className={cn(
-        "flex items-center gap-2.5 transition-colors duration-500",
+        "flex items-center gap-2 transition-colors duration-500",
         tone === "light" ? "text-white" : "text-ink",
         className,
       )}
     >
-      <Glyph />
+      <Glyph className="size-5 sm:size-6 shrink-0" />
       <span className="flex flex-col leading-none">
-        <span className="whitespace-nowrap text-[0.9375rem] font-bold uppercase leading-none tracking-[0.16em] sm:text-[1.0625rem] sm:tracking-[0.18em]">
+        <span className="whitespace-nowrap text-[0.8rem] sm:text-[0.9375rem] font-bold uppercase leading-none tracking-[0.14em] sm:tracking-[0.16em]">
           Brother Sharm Tour
         </span>
         <span
           className={cn(
-            "mt-[3px] text-[0.5rem] uppercase leading-none tracking-[0.34em]",
+            "mt-[2px] text-[0.42rem] sm:text-[0.48rem] uppercase leading-none tracking-[0.24em] sm:tracking-[0.3em]",
             tone === "light" ? "text-white/65" : "text-stone",
           )}
         >

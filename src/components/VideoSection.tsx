@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import type { MediaVideo } from "@/lib/types";
 import { videoAvailable } from "@/lib/media";
 import { Reveal } from "./Reveal";
+import { WaveDivider } from "./WaveDivider";
 
 /**
  * Cinematic film section.
@@ -97,8 +98,10 @@ export function VideoSection({
   }
 
   return (
-    <section className="on-ink bg-ink text-paper">
-      <div className="shell band">
+    <section className="on-ink relative bg-ink text-paper">
+      <WaveDivider position="top" variant="wave-1" color="text-paper" />
+
+      <div className="shell band py-16 md:py-24">
         <Reveal className="mx-auto mb-10 max-w-2xl text-center md:mb-14">
           <p className="eyebrow text-sun">{eyebrow}</p>
           <h2 className="headline mt-4">{title}</h2>
@@ -108,7 +111,7 @@ export function VideoSection({
         <Reveal delay={90}>
           <div
             ref={containerRef}
-            className="media relative aspect-[4/5] w-full sm:aspect-[16/9]"
+            className="media relative aspect-[4/5] w-full overflow-hidden rounded-2xl ring-1 ring-white/10 sm:aspect-[16/9] sm:rounded-3xl shadow-2xl"
           >
             <Image
               src={video.poster.src}
@@ -192,6 +195,8 @@ export function VideoSection({
           </div>
         </Reveal>
       </div>
+
+      <WaveDivider position="bottom" variant="wave-2" color="text-paper-warm" />
     </section>
   );
 }

@@ -9,6 +9,8 @@ import { Breadcrumbs, WhatsAppIcon } from "@/components/sections";
 import { site, whatsappLink } from "@/data/site";
 import { media } from "@/lib/media";
 
+import { Hero } from "@/components/Hero";
+
 export const metadata: Metadata = buildMetadata({
   fallbackTitle: "Request a Booking",
   fallbackDescription:
@@ -36,21 +38,15 @@ const reassurance = [
 export default function BookPage() {
   return (
     <>
-      <section className="border-b border-sand bg-paper-warm pb-12 pt-32 md:pb-16 md:pt-40">
-        <div className="shell">
-          <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Book" }]} />
-          <div className="mt-8 max-w-3xl">
-            <p className="eyebrow text-reef">Booking request</p>
-            <h1 className="display mt-5 text-[clamp(2.5rem,1.4rem+4vw,4.5rem)]">
-              Tell us your plan
-            </h1>
-            <p className="lede mt-6 max-w-xl">
-              One short form. We&apos;ll come back with availability, your hotel
-              pickup time and a final price — then you decide.
-            </p>
-          </div>
-        </div>
-      </section>
+      <Hero
+        variant="card"
+        image={media.whiteIsland.hero}
+        size="short"
+        eyebrow="Booking request"
+        title="Tell us your plan"
+        subtitle="One short form. We'll come back with availability, your hotel pickup time and a final price — then you decide."
+        showWave
+      />
 
       <section className="band">
         <div className="shell">
@@ -69,7 +65,7 @@ export default function BookPage() {
 
             <aside className="lg:col-span-5">
               <Reveal delay={100} className="lg:sticky lg:top-28">
-                <div className="media aspect-[4/3] w-full">
+                <div className="media aspect-[4/3] w-full overflow-hidden rounded-[2rem] shadow-sm">
                   <Image
                     src={media.whiteIsland.hero.src}
                     alt={media.whiteIsland.hero.alt}
@@ -79,9 +75,9 @@ export default function BookPage() {
                   />
                 </div>
 
-                <ul className="mt-8 flex flex-col">
+                <ul className="mt-8 flex flex-col gap-3">
                   {reassurance.map((item) => (
-                    <li key={item.title} className="border-t border-sand py-5">
+                    <li key={item.title} className="rounded-2xl bg-paper-warm/50 p-4 shadow-2xs">
                       <h2 className="font-display text-[1.25rem] leading-tight">
                         {item.title}
                       </h2>
@@ -92,7 +88,7 @@ export default function BookPage() {
                   ))}
                 </ul>
 
-                <div className="border-t border-sand pt-6">
+                <div className="mt-6 pt-2">
                   <p className="text-[0.875rem] text-stone">
                     Prefer to talk it through?
                   </p>

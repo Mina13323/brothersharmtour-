@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { MediaImage, MediaVideo } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { WaveDivider } from "./WaveDivider";
 
 /**
  * Cinematic hero.
@@ -22,6 +23,11 @@ export function Hero({
   children,
   size = "full",
   align = "start",
+  showWave = true,
+  waveColor = "text-paper",
+  variant = "bleed",
+  cta,
+  trustBadge,
 }: {
   image: MediaImage;
   video?: MediaVideo;
@@ -31,6 +37,11 @@ export function Hero({
   children?: ReactNode;
   size?: "full" | "tall" | "short";
   align?: "start" | "center";
+  showWave?: boolean;
+  waveColor?: string;
+  variant?: "bleed" | "card";
+  cta?: { label: string; href: string };
+  trustBadge?: ReactNode;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoReady, setVideoReady] = useState(false);
@@ -56,6 +67,111 @@ export function Hero({
       }
     };
   }, [video]);
+
+  // Framed card variant matching the modern reference
+  if (variant === "card") {
+    return (
+      <section className="relative w-full bg-paper pt-3 sm:pt-4 md:pt-6 px-3 sm:px-5 lg:px-8">
+        <div className="relative isolate w-full max-w-[1520px] mx-auto rounded-[2rem] sm:rounded-[2.5rem] lg:rounded-[3rem] overflow-hidden bg-ink text-white shadow-2xl min-h-[560px] sm:min-h-[620px] lg:min-h-[680px] flex flex-col justify-between border border-white/10">
+          {/* Media background */}
+          <div className="absolute inset-0 -z-10">
+            <Image
+              src={image.src}
+              alt={image.alt}
+              fill
+              priority
+              sizes="100vw"
+              className={cn(
+                "slow-zoom object-cover transition-opacity duration-[1400ms]",
+                videoReady ? "opacity-0" : "opacity-100",
+              )}
+              style={image.position ? { objectPosition: image.position } : undefined}
+            />
+
+            {video && attachVideo ? (
+              <video
+                ref={videoRef}
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="none"
+                poster={image.src}
+                onPlaying={() => setVideoReady(true)}
+                aria-hidden
+                className={cn(
+                  "size-full object-cover transition-opacity duration-[1400ms]",
+                  videoReady ? "opacity-100" : "opacity-0",
+                )}
+              >
+                <source src={video.src} type="video/mp4" />
+              </video>
+            ) : null}
+          </div>
+
+          {/* Scrim overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/50 -z-10" />
+
+          {/* Hero Content */}
+          <div className="shell relative w-full pt-28 sm:pt-36 lg:pt-44 pb-20 sm:pb-28 lg:pb-32">
+            <div className="flex max-w-3xl flex-col items-start text-left">
+              {eyebrow ? (
+                <div
+                  className="rise inline-flex items-center gap-2 rounded-full bg-white/15 backdrop-blur-md px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-white border border-white/20 mb-5"
+                  style={{ animationDelay: "120ms" }}
+                >
+                  <span className="size-1.5 rounded-full bg-reef-bright animate-pulse" />
+                  {eyebrow}
+                </div>
+              ) : null}
+
+              <h1
+                className="font-display rise text-4xl sm:text-5xl md:text-6xl lg:text-[4.25rem] font-bold tracking-tight text-white leading-[1.06] drop-shadow-md"
+                style={{ animationDelay: "220ms" }}
+              >
+                {title}
+              </h1>
+
+              {subtitle ? (
+                <p
+                  className="rise mt-5 max-w-xl text-base sm:text-lg lg:text-xl text-white/90 leading-relaxed font-normal drop-shadow-sm"
+                  style={{ animationDelay: "340ms" }}
+                >
+                  {subtitle}
+                </p>
+              ) : null}
+
+              {cta || trustBadge ? (
+                <div
+                  className="rise mt-8 flex flex-wrap items-center gap-4"
+                  style={{ animationDelay: "460ms" }}
+                >
+                  {cta ? (
+                    <a
+                      href={cta.href}
+                      className="group inline-flex items-center gap-2.5 rounded-full bg-sun hover:bg-sun-bright text-white px-7 py-3.5 text-sm font-semibold tracking-wide shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
+                    >
+                      <span>{cta.label}</span>
+                      <span aria-hidden="true" className="text-base transition-transform group-hover:translate-x-1">→</span>
+                    </a>
+                  ) : null}
+
+                  {trustBadge}
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </div>
+
+        {/* Floating docked search bar */}
+        {children ? (
+          <div id="search-bar" className="relative z-30 -mt-10 sm:-mt-12 lg:-mt-14 max-w-5xl mx-auto px-4">
+            {children}
+          </div>
+        ) : null}
+      </section>
+    );
+  }
 
   return (
     <section
@@ -151,6 +267,15 @@ export function Hero({
       </div>
 
       {size === "full" ? <ScrollCue /> : null}
+
+      {showWave && (
+        <WaveDivider
+          position="bottom"
+          fillColor={waveColor}
+          variant="wave-1"
+          className="z-20"
+        />
+      )}
     </section>
   );
 }
@@ -159,13 +284,13 @@ function ScrollCue() {
   return (
     <div
       aria-hidden
-      className="pointer-events-none absolute bottom-6 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-3 md:flex"
+      className="pointer-events-none absolute bottom-12 md:bottom-16 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-3 z-30 md:flex"
     >
-      <span className="text-[0.5625rem] uppercase tracking-[0.3em] text-white/55">
+      <span className="text-[0.5625rem] uppercase tracking-[0.3em] text-white/70 font-medium">
         Scroll
       </span>
-      <span className="relative block h-12 w-px overflow-hidden bg-white/25">
-        <span className="absolute inset-x-0 top-0 h-4 animate-[cue_2.4s_var(--ease-editorial)_infinite] bg-white/80" />
+      <span className="relative block h-10 w-px overflow-hidden bg-white/30 rounded-full">
+        <span className="absolute inset-x-0 top-0 h-3.5 animate-[cue_2.4s_var(--ease-editorial)_infinite] bg-white rounded-full" />
       </span>
       <style>{`@keyframes cue{0%{transform:translateY(-100%)}60%,100%{transform:translateY(300%)}}`}</style>
     </div>

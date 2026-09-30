@@ -101,7 +101,7 @@ export function BookingWidget({
   return (
     <div className="flex flex-col gap-7">
       {/* Live availability reassurance */}
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-card border border-sand bg-paper-warm/60 px-4 py-3 text-[0.8rem]">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl border border-sand/80 bg-paper-warm/80 px-4 py-3 text-[0.8rem]">
         <span className="inline-flex items-center gap-2 font-medium text-reef-deep">
           <span className="relative flex size-2">
             <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500/70" />
@@ -168,7 +168,7 @@ export function BookingWidget({
 
       {/* 4 · Guests */}
       <Field step={4} label="Guests">
-        <div className="flex flex-col divide-y divide-sand rounded-card border border-sand">
+        <div className="flex flex-col divide-y divide-sand/70 overflow-hidden rounded-2xl border border-sand/80 bg-paper-warm/30">
           <Counter
             label="Adults"
             sub={adultPrice !== null && !perBoat ? money(adultPrice) : "12+"}
@@ -205,7 +205,7 @@ export function BookingWidget({
       {/* 5 · Add-ons */}
       {addons.length ? (
         <Field step={5} label="Add-ons">
-          <div className="flex flex-col divide-y divide-sand rounded-card border border-sand">
+          <div className="flex flex-col divide-y divide-sand/70 overflow-hidden rounded-2xl border border-sand/80 bg-paper-warm/30">
             {addons.map((a) => (
               <Counter
                 key={a.label}
@@ -456,7 +456,7 @@ function Calendar({
     `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
 
   return (
-    <div className="rounded-card border border-sand bg-paper p-3">
+    <div className="rounded-2xl border border-sand/80 bg-paper-warm/30 p-3 sm:p-4">
       <div className="mb-2 flex items-center justify-between px-1">
         <button
           type="button"
@@ -511,10 +511,10 @@ function Calendar({
               disabled={past}
               onClick={() => onChange(cellIso)}
               className={cn(
-                "aspect-square rounded-md text-[0.85rem] tabular-nums transition-colors",
+                "aspect-square rounded-xl text-[0.85rem] font-medium tabular-nums transition-all",
                 past && "cursor-not-allowed text-stone-soft/50",
-                !past && !selected && "text-ink hover:bg-paper-warm",
-                selected && "bg-reef-deep font-semibold text-paper",
+                !past && !selected && "text-ink hover:bg-sand/30 hover:scale-105",
+                selected && "bg-reef-deep font-semibold text-paper shadow-sm",
               )}
             >
               {d}

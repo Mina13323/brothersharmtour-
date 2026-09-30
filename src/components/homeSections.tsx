@@ -8,6 +8,7 @@ import { featuredTours, tours } from "@/data/tours";
 import { destinationName } from "@/data/destinations";
 import { money } from "@/lib/utils";
 import { media } from "@/lib/media";
+import { GuideLanguageBadge } from "./DynamicGuideLanguage";
 
 const TOUR_COUNT = tours.length;
 
@@ -15,95 +16,11 @@ const TOUR_COUNT = tours.length;
 /* Avatar cluster + rating + head stat chips — sits under the hero search. */
 
 export function HeroTrust() {
-  const partners = [
-    {
-      name: "TRIPADVISOR",
-      badge: "TRAVELLERS' CHOICE",
-      icon: (
-        <svg className="size-6 text-stone" viewBox="0 0 24 24" fill="currentColor">
-          <circle cx="8.5" cy="13.5" r="2.5" />
-          <circle cx="15.5" cy="13.5" r="2.5" />
-          <path d="M12 4c-4.4 0-8 2.6-8 6.5 0 2.2 1.2 4.2 3.1 5.3L6 19l3.5-1.5c.8.3 1.6.5 2.5.5s1.7-.2 2.5-.5L18 19l-1.1-3.2c1.9-1.1 3.1-3.1 3.1-5.3C20 6.6 16.4 4 12 4zm0 2c3.3 0 6 2 6 4.5S15.3 15 12 15s-6-2-6-4.5S8.7 6 12 6z" />
-        </svg>
-      ),
-    },
-    {
-      name: "GOOGLE REVIEWS",
-      badge: "4.9 ★★★★★",
-      icon: (
-        <svg className="size-6 text-stone" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M21.35 11.1H12v3.8h5.38c-.78 2.1-2.6 3.6-5.38 3.6-3.3 0-6-2.7-6-6s2.7-6 6-6c1.47 0 2.8.54 3.84 1.44l2.84-2.84C17.02 3.5 14.65 2.5 12 2.5 6.75 2.5 2.5 6.75 2.5 12s4.25 9.5 9.5 9.5c5.5 0 9.15-3.86 9.15-9.3 0-.74-.08-1.36-.2-1.9z" />
-        </svg>
-      ),
-    },
-    {
-      name: "VIATOR",
-      badge: "VERIFIED PARTNER",
-      icon: (
-        <svg className="size-6 text-stone" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-        </svg>
-      ),
-    },
-    {
-      name: "GETYOURGUIDE",
-      badge: "OFFICIAL PARTNER",
-      icon: (
-        <svg className="size-6 text-stone" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="10" />
-          <path d="m9 12 2 2 4-4" />
-        </svg>
-      ),
-    },
-    {
-      name: "PADI DIVING",
-      badge: "CERTIFIED RESORT",
-      icon: (
-        <svg className="size-6 text-stone" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="10" />
-          <line x1="2" y1="12" x2="22" y2="12" />
-          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-        </svg>
-      ),
-    },
-    {
-      name: "EGYPT TOURISM",
-      badge: "LICENSED OPERATOR",
-      icon: (
-        <svg className="size-6 text-stone" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-        </svg>
-      ),
-    },
-  ];
-
   return (
-    <div className="w-full pt-8 pb-4">
+    <div className="w-full pt-6 pb-4">
       <div className="shell">
-        {/* Partner Logos Strip (Clean floating style matching Save Nature reference - no straight lines) */}
-        <div className="flex flex-wrap items-center justify-center md:justify-between gap-6 sm:gap-8 py-4">
-          {partners.map((p) => (
-            <div
-              key={p.name}
-              className="flex items-center gap-3 text-stone/80 hover:text-ink transition-colors group cursor-default"
-            >
-              <div className="opacity-70 group-hover:opacity-100 transition-opacity">
-                {p.icon}
-              </div>
-              <div className="flex flex-col">
-                <span className="text-xs font-bold tracking-[0.14em] text-ink/80 group-hover:text-ink">
-                  {p.name}
-                </span>
-                <span className="text-[9px] font-medium tracking-[0.1em] text-stone">
-                  {p.badge}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-
         {/* Highlight Stats Bar (Soft rounded pill cards - no straight divider lines) */}
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-center sm:text-left">
+        <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-center sm:text-left">
           <div className="flex items-center gap-3 rounded-full bg-paper-warm/60 px-5 py-2.5 shadow-2xs">
             <Avatars dark />
             <div>
@@ -162,12 +79,12 @@ export function Avatars({ dark = false }: { dark?: boolean }) {
 
 /* ───────────────────────── Value props (6) ───────────────────────── */
 
-const valueProps = [
+const valueProps: { icon: string; title: string; body: React.ReactNode }[] = [
   { icon: "💰", title: "Affordable Prices", body: "Amazing experiences from £15 per person with no hidden fees." },
   { icon: "🤝", title: "No Prepayment", body: "Reserve today and pay on the day in GBP, USD, EUR or EGP." },
   { icon: "⚡", title: "Instant Booking", body: "Fast WhatsApp confirmation in just a few minutes." },
   { icon: "🚌", title: "Free Hotel Transfer", body: "Comfortable transfers included with every tour." },
-  { icon: "🗣️", title: "Expert Guides", body: "Every tour is led by an experienced English-speaking guide." },
+  { icon: "🗣️", title: "Expert Guides", body: <>Every tour is led by an experienced <GuideLanguageBadge format="speaking-guide" />.</> },
   { icon: "🛡️", title: "Insurance Included", body: "Every traveller is insured for the entire duration of the tour." },
 ];
 
@@ -531,12 +448,12 @@ export function RatingPanel() {
 
 /* ───────────────────────── No compromises (7) ───────────────────────── */
 
-const guarantees = [
+const guarantees: { title: React.ReactNode; body: React.ReactNode }[] = [
   { title: "No prepayment", body: "Pay on the day of your tour — in cash, in any currency." },
   { title: "No hidden fees", body: "The final price includes everything — no surprises." },
   { title: "Hotel transfer", body: "Free pickup and drop-off from any hotel." },
-  { title: "24/7 support", body: "A real person on WhatsApp, in English." },
-  { title: "English-speaking guides", body: "Professionals who love every route they lead." },
+  { title: "24/7 support", body: <>A real person on WhatsApp, <GuideLanguageBadge format="in-language" />.</> },
+  { title: <><GuideLanguageBadge format="adjective" />-speaking guides</>, body: "Professionals who love every route they lead." },
   { title: "17 years of experience", body: "Since 2009. Over 150,000 happy travellers." },
   { title: "Real offices", body: "In Sharm El Sheikh and Cairo — real people." },
 ];
@@ -550,7 +467,7 @@ export function NoCompromises() {
           {guarantees.map((g, i) => (
             <Reveal
               as="div"
-              key={g.title}
+              key={i}
               variant="card"
               delay={i * 50}
               className="rounded-3xl bg-paper p-6 shadow-xs transition-all duration-300 hover:shadow-md hover:-translate-y-1"
@@ -618,11 +535,11 @@ export function ThreeSteps() {
 /* ───────────────────── Geography + book-a-tour card ───────────────────── */
 
 export function GeographyBook() {
-  const benefits = [
+  const benefits: React.ReactNode[] = [
     "No prepayment",
     "Hotel transfer included",
     "Book in 3 minutes",
-    "English-speaking guides",
+    <GuideLanguageBadge key="guides" format="speaking-guides" />,
     "Insurance included",
   ];
   return (
@@ -654,8 +571,8 @@ export function GeographyBook() {
                 from <span className="font-semibold text-ink">£15</span> / person
               </p>
               <ul className="mt-6 space-y-2.5">
-                {benefits.map((b) => (
-                  <li key={b} className="flex items-center gap-2.5 text-[0.9rem] text-ink">
+                {benefits.map((b, i) => (
+                  <li key={i} className="flex items-center gap-2.5 text-[0.9rem] text-ink">
                     <Check /> {b}
                   </li>
                 ))}

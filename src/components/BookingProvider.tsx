@@ -101,7 +101,7 @@ export function BookingProvider({ children }: { children: ReactNode }) {
             </button>
           </header>
 
-          <div className="grow overflow-y-auto px-6 py-8 md:px-9">
+          <div className="grow overflow-y-auto px-6 pt-6 pb-0 md:px-9 md:pt-8 md:pb-0">
             {isOpen ? (
               <BookingWidget initialTour={tourSlug} onClose={close} />
             ) : null}

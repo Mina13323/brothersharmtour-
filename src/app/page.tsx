@@ -10,9 +10,6 @@ import { Accordion } from "@/components/Accordion";
 import { TestimonialSlider } from "@/components/TestimonialSlider";
 import { HomeCatalogue } from "@/components/HomeCatalogue";
 import {
-  HeroTrust,
-  ValueProps,
-  TrustMarquee,
   Bestsellers,
   RatingPanel,
   NoCompromises,
@@ -79,36 +76,22 @@ export default function HomePage() {
         variant="card"
         image={media.heroFilm.poster}
         video={videoAvailable ? media.heroFilm : undefined}
-        eyebrow="Brother Sharm Tour · Since 2009"
+        eyebrow="Brother Sharm Tour"
         title={<SplitHeadline lines={["Sharm El Sheikh", "Excursions"]} />}
         subtitle="Experience the best of Egypt with us — Red Sea trips, Sinai desert safari and Cairo day trips."
         cta={{ label: "Explore Excursions", href: "#search-bar" }}
-        trustBadge={
-          <div className="inline-flex items-center gap-2 rounded-full bg-black/35 backdrop-blur-md border border-white/20 px-4 py-2 text-xs text-white/95">
-            <span className="text-yellow-400 font-bold">★ 4.9 / 5</span>
-            <span className="text-white/40">•</span>
-            <span>150,000+ Happy Guests</span>
-          </div>
-        }
       >
         <HeroSearch />
       </Hero>
 
-      {/* 01.5 · PARTNER & TRUST LOGOS ROW */}
-      <HeroTrust />
-
-      {/* 02 · VALUE PROPS (6) */}
-      <ValueProps />
-
-      {/* 03 · REVIEWS + MARQUEE */}
+      {/* 02 · REVIEWS */}
       <section id="reviews" className="band-tight scroll-mt-24 bg-paper">
         <div className="shell">
           <TestimonialSlider />
         </div>
       </section>
-      <TrustMarquee />
 
-      {/* 04 · BESTSELLERS */}
+      {/* 03 · BESTSELLERS */}
       <Bestsellers />
 
       {/* 05 · FULL CATALOGUE (category filter) */}

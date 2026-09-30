@@ -1,10 +1,17 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { footerNav, site, whatsappLink } from "@/data/site";
 import { Logo } from "./ui/Logo";
 import { WhatsAppIcon } from "./sections";
 import { WaveDivider } from "./WaveDivider";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 
 export function Footer() {
+  const pathname = usePathname();
+  if (pathname?.startsWith("/admin")) return null;
+
   const year = new Date().getFullYear();
 
   return (
@@ -103,23 +110,26 @@ export function Footer() {
           <p>
             © {year} {site.legalName}. All rights reserved.
           </p>
-          <ul className="flex flex-wrap gap-x-6 gap-y-2">
-            <li>
-              <Link href="/faq" className="transition-colors hover:text-paper">
-                FAQ
-              </Link>
-            </li>
-            <li>
-              <Link href="/contact" className="transition-colors hover:text-paper">
-                Contact
-              </Link>
-            </li>
-            <li>
-              <Link href="/tours" className="transition-colors hover:text-paper">
-                All tours
-              </Link>
-            </li>
-          </ul>
+          <div className="flex flex-wrap items-center gap-4">
+            <LanguageSwitcher tone="light" />
+            <ul className="flex flex-wrap gap-x-6 gap-y-2">
+              <li>
+                <Link href="/faq" className="transition-colors hover:text-paper">
+                  FAQ
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className="transition-colors hover:text-paper">
+                  Contact
+                </Link>
+              </li>
+              <li>
+                <Link href="/tours" className="transition-colors hover:text-paper">
+                  All tours
+                </Link>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </footer>

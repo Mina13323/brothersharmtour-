@@ -13,6 +13,7 @@ import { Breadcrumbs, CTASection, SectionHeading, WhatsAppIcon } from "@/compone
 import { BookButton } from "@/components/BookingProvider";
 import { WaveDivider } from "@/components/WaveDivider";
 import { TourHero } from "@/components/TourHero";
+import { GuideLanguageBadge } from "@/components/DynamicGuideLanguage";
 
 import { tours, tourBySlug, relatedTours } from "@/data/tours";
 import { experienceName } from "@/data/experiences";
@@ -228,12 +229,12 @@ export default async function TourDetailPage({
             <ul className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[0.75rem] text-stone">
               {[
                 "Pay on the day",
-                "English-speaking guide",
+                <GuideLanguageBadge key="guide" format="speaking-guide" />,
                 "Insurance included",
                 "Free hotel transfer",
                 "Book in 3 minutes",
-              ].map((b) => (
-                <li key={b} className="inline-flex items-center gap-1.5">
+              ].map((b, i) => (
+                <li key={i} className="inline-flex items-center gap-1.5">
                   <span className="text-[#1faa54]" aria-hidden>✓</span>
                   {b}
                 </li>

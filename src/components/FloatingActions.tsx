@@ -22,6 +22,8 @@ export function FloatingActions() {
   const { open, isOpen } = useBooking();
   const [visible, setVisible] = useState(false);
 
+  if (pathname?.startsWith("/admin")) return null;
+
   const isTourDetail = pathname.startsWith("/tours/") && pathname !== "/tours";
 
   useEffect(() => {

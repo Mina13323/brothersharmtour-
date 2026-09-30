@@ -82,6 +82,26 @@ export async function POST(request: Request) {
   // Structured log — visible in the platform's logs until a real sink is wired.
   console.info("[bro-tour:inquiry]", JSON.stringify(inquiry));
 
+  // Persist directly to Supabase inquiries table
+  try {
+    const { createClient } = await import("@/lib/supabase/server");
+    const supabase = await createClient();
+    await supabase.from("inquiries").insert({
+      tour_id: body.tourSlug || null,
+      tour_title: inquiry.tourTitle,
+      guest_name: name,
+      guest_email: email || null,
+      guest_phone: phone,
+      preferred_date: body.date || null,
+      adults: Number(body.adults ?? 1) || 1,
+      children: Number(body.children ?? 0) || 0,
+      notes: body.notes?.trim() || null,
+      status: "new",
+    });
+  } catch (dbErr) {
+    console.warn("[bro-tour:inquiry] Supabase save note:", dbErr);
+  }
+
   const webhook = process.env.INQUIRY_WEBHOOK_URL;
   if (webhook) {
     try {

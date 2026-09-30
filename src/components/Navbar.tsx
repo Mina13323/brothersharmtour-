@@ -112,6 +112,8 @@ export function Navbar() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
 
+  if (pathname?.startsWith("/admin")) return null;
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     onScroll();
@@ -175,8 +177,8 @@ export function Navbar() {
           </nav>
 
           {/* Right actions: Language Switcher + Book on WhatsApp */}
-          <div className="flex items-center gap-2 shrink-0">
-            <LanguageSwitcher tone="ink" className="hidden sm:block" />
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <LanguageSwitcher tone="ink" />
             <a
               href={whatsappLink()}
               target="_blank"

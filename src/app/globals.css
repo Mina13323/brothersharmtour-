@@ -765,3 +765,27 @@
 .on-ink .text-sun\/60 {
   color: color-mix(in srgb, var(--color-reef-bright) 75%, transparent);
 }
+
+/* ==========================================================================
+   Seamless Translation Engine Styles
+   ========================================================================== */
+.goog-te-banner-frame.skiptranslate,
+.goog-te-banner-frame {
+  display: none !important;
+}
+body {
+  top: 0px !important;
+}
+#goog-gt-tt,
+.goog-te-balloon-frame,
+.goog-tooltip,
+.goog-tooltip:hover {
+  display: none !important;
+}
+.goog-text-highlight {
+  background: none !important;
+  box-shadow: none !important;
+}
+.skiptranslate iframe {
+  display: none !important;
+}

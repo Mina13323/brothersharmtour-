@@ -7,8 +7,7 @@ import { notFound } from "next/navigation";
 import { CapsuleHero } from "@/components/TourHero";
 import { Reveal } from "@/components/Reveal";
 import { ToursExplorer } from "@/components/ToursExplorer";
-import { Breadcrumbs, CTASection, ArrowRight } from "@/components/sections";
-import { BookButton } from "@/components/BookingProvider";
+import { CTASection, ArrowRight } from "@/components/sections";
 
 import {
   activeExperiences,

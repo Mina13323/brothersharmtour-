@@ -20,12 +20,8 @@ import { WhatsAppIcon } from "./sections";
 export function FloatingActions() {
   const { whatsappLink } = useSite();
   const pathname = usePathname();
-  const { open, isOpen } = useBooking();
+  const { isOpen } = useBooking();
   const [visible, setVisible] = useState(false);
-
-  if (pathname?.startsWith("/admin")) return null;
-
-  const isTourDetail = pathname.startsWith("/tours/") && pathname !== "/tours";
 
   useEffect(() => {
     const onScroll = () => setVisible(window.scrollY > window.innerHeight * 0.7);
@@ -33,6 +29,10 @@ export function FloatingActions() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  if (pathname?.startsWith("/admin")) return null;
+
+  const isTourDetail = pathname.startsWith("/tours/") && pathname !== "/tours";
 
   return (
     <>

@@ -19,7 +19,6 @@ import type {
   MediaImage,
   MediaVideo,
   SeoMeta,
-  Tour,
   TourType,
 } from "@/lib/types";
 

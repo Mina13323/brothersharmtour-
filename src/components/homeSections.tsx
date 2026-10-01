@@ -623,7 +623,7 @@ export function ThreeSteps() {
 /* ───────────────────── Geography + book-a-tour card ───────────────────── */
 
 export function GeographyBook() {
-  const { settings, whatsappLink } = useSite();
+  const { whatsappLink } = useSite();
   const benefits: React.ReactNode[] = [
     "No prepayment",
     "Hotel transfer included",

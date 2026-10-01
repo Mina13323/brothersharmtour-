@@ -25,16 +25,17 @@ export type TourType = "group" | "private" | "transfer";
 export interface MediaImage {
   src: string;
   alt: string;
-  width: number;
-  height: number;
+  /** Intrinsic size when known — optional because CMS-uploaded media may omit it. */
+  width?: number;
+  height?: number;
   /** Optional focal point for art-directed cropping, e.g. "50% 30%". */
   position?: string;
 }
 
 export interface MediaVideo {
   src: string;
-  /** Poster is mandatory: it is the mobile fallback and the LCP candidate. */
-  poster: MediaImage;
+  /** Poster is the mobile fallback and the LCP candidate — strongly recommended. */
+  poster?: MediaImage;
   label?: string;
 }
 
@@ -51,9 +52,9 @@ export interface MediaVideo {
  */
 export interface SeoMeta {
   /** Page title, without the brand suffix — the layout template appends it. */
-  title: string;
+  title?: string;
   /** 140–160 chars. Written to be read by a human in a search result. */
-  description: string;
+  description?: string;
   /** Primary intent first. Editorial reference only, never rendered. */
   keywords?: string[];
   /** Overrides the record's hero/card image for social sharing. */

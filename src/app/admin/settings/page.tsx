@@ -1,330 +1,467 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import {
-  getSiteSettings,
-  saveSiteSettings,
-  seedSupabaseDatabase,
-  type SiteSettings,
-} from "@/lib/cms";
-import {
-  Settings,
-  Save,
-  Database,
-  Phone,
-  Mail,
-  MapPin,
-  CheckCircle2,
-  AlertCircle,
-  Sparkles,
-  Copy,
-  Check,
-} from "lucide-react";
+/**
+ * Site settings — contact details, social links (the single source of truth
+ * the whole site reads), announcement bar, admin-confirmed trust claims,
+ * currency rules and email notifications. SMTP credentials are env-only and
+ * never appear here.
+ */
+
+import { useCallback, useEffect, useState } from "react";
+import { Save, Send, KeyRound, Plus, Trash2, CheckCircle2, XCircle } from "lucide-react";
+
+interface SettingsShape {
+  site: { name: string; legalName: string; tagline: string; description: string; url: string };
+  contact: {
+    whatsapp: string;
+    phone: string;
+    email: string;
+    address: string;
+    addressCairo?: string;
+    hours: string;
+  };
+  social: Record<string, string | undefined>;
+  announcement: { enabled: boolean; text: string };
+  trust: { yearsOperating?: string; guestsServed?: string };
+  currency: { base: string; display: string; rates: Record<string, number> };
+  languages: { code: string; label: string; dir: string; enabled: boolean }[];
+  email: {
+    notifyTo: string[];
+    notifyOnInquiry: boolean;
+    notifyOnReview: boolean;
+    customerConfirmation: boolean;
+    fromName: string;
+  };
+}
 
 export default function AdminSettingsPage() {
-  const [settings, setSettings] = useState<SiteSettings | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [seeding, setSeeding] = useState(false);
-  const [statusMsg, setStatusMsg] = useState<{
-    type: "success" | "error";
-    text: string;
-  } | null>(null);
-  const [copiedSql, setCopiedSql] = useState(false);
+  const [settings, setSettings] = useState<SettingsShape | null>(null);
+  const [smtpConfigured, setSmtpConfigured] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
+  const [testTo, setTestTo] = useState("");
+  const [newPassword, setNewPassword] = useState("");
 
   useEffect(() => {
-    async function load() {
-      try {
-        const s = await getSiteSettings();
-        setSettings(s);
-      } finally {
-        setLoading(false);
-      }
-    }
-    load();
+    fetch("/api/admin/settings")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.ok) {
+          setSettings(d.settings);
+          setSmtpConfigured(d.smtpConfigured);
+          setTestTo(d.adminEmail ?? "");
+        }
+      })
+      .catch(() => setMessage({ kind: "err", text: "Could not load settings." }));
   }, []);
 
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const set = useCallback(
+    <S extends keyof SettingsShape>(section: S, patch: Partial<SettingsShape[S]>) =>
+      setSettings((s) => (s ? { ...s, [section]: { ...s[section], ...patch } } : s)),
+    [],
+  );
+
+  async function save() {
     if (!settings) return;
-    setSaving(true);
-    setStatusMsg(null);
-
+    setBusy(true);
+    setMessage(null);
     try {
-      await saveSiteSettings(settings);
-      setStatusMsg({
-        type: "success",
-        text: "Site settings updated successfully!",
+      const res = await fetch("/api/admin/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(settings),
       });
-    } catch (err: unknown) {
-      setStatusMsg({
-        type: "error",
-        text: err instanceof Error ? err.message : "Failed to save settings",
-      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setMessage({ kind: "err", text: data.message ?? "Save failed." });
+        return;
+      }
+      setSettings(data.settings);
+      setMessage({ kind: "ok", text: "Settings saved — the site reflects them immediately." });
+    } catch {
+      setMessage({ kind: "err", text: "Network error." });
     } finally {
-      setSaving(false);
+      setBusy(false);
     }
-  };
+  }
 
-  const handleSeedDatabase = async () => {
-    if (
-      !confirm(
-        "This will upload and sync all existing 20+ tours and reviews into your Supabase database. Proceed?"
-      )
-    ) {
-      return;
-    }
-
-    setSeeding(true);
-    setStatusMsg(null);
-
+  async function sendTest() {
+    setBusy(true);
+    setMessage(null);
     try {
-      const result = await seedSupabaseDatabase();
-      setStatusMsg({
-        type: "success",
-        text: `Success! Synced ${result.toursCount} tours and reviews into Supabase.`,
+      const res = await fetch("/api/admin/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ to: testTo }),
       });
-    } catch (err: unknown) {
-      setStatusMsg({
-        type: "error",
-        text:
-          "Seeding note: If your Supabase tables do not exist yet, make sure to execute the SQL Schema in your Supabase SQL Editor first. Details: " +
-          (err instanceof Error ? err.message : String(err)),
-      });
+      const data = await res.json().catch(() => ({}));
+      setMessage(
+        data.ok
+          ? { kind: "ok", text: `Test email sent to ${testTo}.` }
+          : { kind: "err", text: `Test email ${data.result ?? "failed"}${data.error ? `: ${data.error}` : ""}.` },
+      );
     } finally {
-      setSeeding(false);
+      setBusy(false);
     }
-  };
+  }
 
-  const sqlSchemaPreview = `-- In your Supabase Dashboard:
--- 1. Click "SQL Editor" on the left menu
--- 2. Click "New Query"
--- 3. Paste the contents of supabase/schema.sql and click "Run"`;
+  async function changePassword() {
+    setBusy(true);
+    setMessage(null);
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ newPassword }),
+      });
+      const data = await res.json().catch(() => ({}));
+      setMessage(
+        res.ok
+          ? { kind: "ok", text: "Password updated — other sessions are now signed out." }
+          : { kind: "err", text: data.message ?? "Failed." },
+      );
+      if (res.ok) setNewPassword("");
+    } finally {
+      setBusy(false);
+    }
+  }
 
-  const copySqlGuide = () => {
-    navigator.clipboard.writeText(sqlSchemaPreview);
-    setCopiedSql(true);
-    setTimeout(() => setCopiedSql(false), 2000);
-  };
-
-  if (loading || !settings) {
-    return (
-      <div className="p-12 text-center text-stone-400">Loading settings...</div>
-    );
+  if (!settings) {
+    return <p className="text-sm text-stone-400">Loading settings…</p>;
   }
 
   return (
-    <div className="space-y-8">
-      {/* ─── Header ─── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-white/10">
+    <div className="space-y-6">
+      <header className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2.5">
-            <Settings className="size-6 text-teal-400" />
-            Site Settings & Database
-          </h1>
+          <h1 className="text-2xl font-bold text-white">Site Settings</h1>
           <p className="text-sm text-stone-400 mt-1">
-            Manage contact channels, WhatsApp numbers, and Supabase synchronization
+            These values feed the live site directly — nav, footer, contact
+            buttons, schema.org data and emails.
           </p>
         </div>
-      </div>
+        <button
+          onClick={save}
+          disabled={busy}
+          className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-500 disabled:opacity-50 text-white text-sm font-semibold rounded-xl px-4 py-2.5"
+        >
+          <Save className="size-4" /> {busy ? "Working…" : "Save settings"}
+        </button>
+      </header>
 
-      {statusMsg && (
-        <div
-          className={`p-4 rounded-xl text-sm flex items-start gap-2.5 ${
-            statusMsg.type === "success"
-              ? "bg-emerald-500/10 border border-emerald-500/20 text-emerald-300"
-              : "bg-red-500/10 border border-red-500/20 text-red-300"
+      {message ? (
+        <p
+          className={`text-xs rounded-xl px-4 py-2.5 border ${
+            message.kind === "ok"
+              ? "text-teal-300 bg-teal-500/10 border-teal-500/20"
+              : "text-red-300 bg-red-500/10 border-red-500/20"
           }`}
         >
-          {statusMsg.type === "success" ? (
-            <CheckCircle2 className="size-5 shrink-0 text-emerald-400 mt-0.5" />
-          ) : (
-            <AlertCircle className="size-5 shrink-0 text-red-400 mt-0.5" />
-          )}
-          <span>{statusMsg.text}</span>
-        </div>
-      )}
+          {message.text}
+        </p>
+      ) : null}
 
-      {/* ─── Database Seeder Card ─── */}
-      <div className="p-6 rounded-2xl bg-gradient-to-br from-teal-950/40 via-[#0f1b1e] to-black border border-teal-500/30 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <div className="inline-flex items-center gap-2 text-xs font-bold text-teal-400 uppercase tracking-wider">
-              <Database className="size-4" /> Supabase 1-Click Sync
-            </div>
-            <h2 className="text-lg font-bold text-white">
-              Populate Supabase with Current Tours & Reviews
-            </h2>
-            <p className="text-xs text-stone-400 max-w-xl">
-              Sync all excursions, itineraries, pricing, and guest testimonials from the local catalog directly into your connected Supabase PostgreSQL database.
-            </p>
-          </div>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Section title="Site identity">
+          <Field label="Name">
+            <input className={input} value={settings.site.name} onChange={(e) => set("site", { name: e.target.value })} />
+          </Field>
+          <Field label="Legal name (schema.org)">
+            <input className={input} value={settings.site.legalName} onChange={(e) => set("site", { legalName: e.target.value })} />
+          </Field>
+          <Field label="Tagline">
+            <input className={input} value={settings.site.tagline} onChange={(e) => set("site", { tagline: e.target.value })} />
+          </Field>
+          <Field label="Description (meta / schema.org)">
+            <textarea rows={3} className={input} value={settings.site.description} onChange={(e) => set("site", { description: e.target.value })} />
+          </Field>
+          <Field label="Site URL (used in sitemap & structured data)">
+            <input className={input} value={settings.site.url} onChange={(e) => set("site", { url: e.target.value })} />
+          </Field>
+        </Section>
 
-          <button
-            type="button"
-            disabled={seeding}
-            onClick={handleSeedDatabase}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-black font-bold text-xs shadow-md shadow-teal-500/20 transition-all self-start sm:self-center disabled:opacity-50"
-          >
-            <Sparkles className="size-4" />
-            {seeding ? "Syncing Catalog..." : "Sync Database Now"}
-          </button>
-        </div>
+        <Section title="Contact — single source of truth">
+          <Field label="WhatsApp number (digits only, with country code)">
+            <input className={input} value={settings.contact.whatsapp} onChange={(e) => set("contact", { whatsapp: e.target.value })} />
+          </Field>
+          <Field label="Phone">
+            <input className={input} value={settings.contact.phone} onChange={(e) => set("contact", { phone: e.target.value })} />
+          </Field>
+          <Field label="Email">
+            <input className={input} value={settings.contact.email} onChange={(e) => set("contact", { email: e.target.value })} />
+          </Field>
+          <Field label="Address (Sharm El Sheikh)">
+            <input className={input} value={settings.contact.address} onChange={(e) => set("contact", { address: e.target.value })} />
+          </Field>
+          <Field label="Office hours">
+            <input className={input} value={settings.contact.hours} onChange={(e) => set("contact", { hours: e.target.value })} />
+          </Field>
+        </Section>
 
-        <div className="pt-3 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-stone-400">
-          <span>Schema file generated at: <code className="text-teal-300">supabase/schema.sql</code></span>
-          <button
-            type="button"
-            onClick={copySqlGuide}
-            className="text-stone-300 hover:text-white flex items-center gap-1.5 self-start"
-          >
-            {copiedSql ? (
-              <>
-                <Check className="size-3.5 text-teal-400" /> Copied instructions!
-              </>
-            ) : (
-              <>
-                <Copy className="size-3.5" /> Copy instructions
-              </>
-            )}
-          </button>
-        </div>
-      </div>
-
-      {/* ─── Contact Info & Site Form ─── */}
-      <form onSubmit={handleSave} className="space-y-6">
-        <div className="p-6 rounded-2xl bg-[#0f1b1e] border border-white/10 space-y-4">
-          <h2 className="text-sm font-bold text-teal-400 uppercase tracking-wider">
-            Contact & Operations Info
-          </h2>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-stone-300 mb-1.5 flex items-center gap-1.5">
-                <Phone className="size-3.5 text-teal-400" /> Primary WhatsApp Number *
-              </label>
+        <Section title="Social links (empty = hidden)">
+          {["instagram", "facebook", "tiktok", "youtube", "telegram", "tripadvisor"].map((key) => (
+            <Field key={key} label={key}>
               <input
-                type="text"
-                required
-                value={settings.whatsappNumber}
-                onChange={(e) =>
-                  setSettings({ ...settings, whatsappNumber: e.target.value })
-                }
-                placeholder="+20 100 000 0000"
-                className="w-full px-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-sm focus:outline-none focus:border-teal-500"
+                className={input}
+                value={settings.social[key] ?? ""}
+                placeholder="https://…"
+                onChange={(e) => set("social", { [key]: e.target.value } as never)}
               />
-              <span className="text-[11px] text-stone-500 mt-1 block">
-                Direct destination number for guest booking inquiries
-              </span>
-            </div>
+            </Field>
+          ))}
+        </Section>
 
-            <div>
-              <label className="block text-xs font-semibold text-stone-300 mb-1.5 flex items-center gap-1.5">
-                <Phone className="size-3.5 text-teal-400" /> Direct Phone Hotline
-              </label>
-              <input
-                type="text"
-                value={settings.phone}
-                onChange={(e) =>
-                  setSettings({ ...settings, phone: e.target.value })
-                }
-                placeholder="+20 100 000 0000"
-                className="w-full px-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-sm focus:outline-none focus:border-teal-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-stone-300 mb-1.5 flex items-center gap-1.5">
-                <Mail className="size-3.5 text-teal-400" /> Support Email
-              </label>
-              <input
-                type="email"
-                value={settings.email}
-                onChange={(e) =>
-                  setSettings({ ...settings, email: e.target.value })
-                }
-                placeholder="info@brothersharmtour.com"
-                className="w-full px-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-sm focus:outline-none focus:border-teal-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-stone-300 mb-1.5 flex items-center gap-1.5">
-                <MapPin className="size-3.5 text-teal-400" /> Sharm El Sheikh Office
-              </label>
-              <input
-                type="text"
-                value={settings.officeSharm}
-                onChange={(e) =>
-                  setSettings({ ...settings, officeSharm: e.target.value })
-                }
-                placeholder="Naama Bay, Sharm El Sheikh"
-                className="w-full px-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-sm focus:outline-none focus:border-teal-500"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Announcement Banner */}
-        <div className="p-6 rounded-2xl bg-[#0f1b1e] border border-white/10 space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-bold text-teal-400 uppercase tracking-wider">
-              Top Announcement Banner
-            </h2>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={settings.announcement?.enabled || false}
-                onChange={(e) =>
-                  setSettings({
-                    ...settings,
-                    announcement: {
-                      enabled: e.target.checked,
-                      text: settings.announcement?.text || "",
-                    },
-                  })
-                }
-                className="rounded size-4 accent-teal-500"
-              />
-              <span className="text-xs font-semibold text-white">
-                Show Announcement Banner
-              </span>
-            </label>
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-stone-300 mb-1.5">
-              Banner Message
-            </label>
+        <Section title="Announcement bar">
+          <label className="flex items-center gap-2 text-xs text-stone-300">
             <input
-              type="text"
-              value={settings.announcement?.text || ""}
-              onChange={(e) =>
-                setSettings({
-                  ...settings,
-                  announcement: {
-                    enabled: settings.announcement?.enabled || false,
-                    text: e.target.value,
-                  },
-                })
-              }
-              placeholder="e.g. Special Offer: Book 2 excursions and get a complimentary airport transfer!"
-              className="w-full px-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white text-sm focus:outline-none focus:border-teal-500"
+              type="checkbox"
+              checked={settings.announcement.enabled}
+              onChange={(e) => set("announcement", { enabled: e.target.checked })}
+              className="size-4 rounded accent-teal-500"
             />
-          </div>
-        </div>
+            Show the announcement bar
+          </label>
+          <Field label="Text">
+            <input className={input} value={settings.announcement.text} onChange={(e) => set("announcement", { text: e.target.value })} />
+          </Field>
+        </Section>
 
-        <div className="flex justify-end">
+        <Section title="Trust claims (admin-confirmed only)">
+          <p className="text-[11px] text-stone-500 leading-relaxed">
+            These render on the homepage ONLY when filled in. Never publish a
+            claim you cannot evidence — the audit removed every invented number.
+          </p>
+          <Field label="Years operating (e.g. “since 2015”)">
+            <input className={input} value={settings.trust.yearsOperating ?? ""} onChange={(e) => set("trust", { yearsOperating: e.target.value })} />
+          </Field>
+          <Field label="Guests served (e.g. “20,000+”)">
+            <input className={input} value={settings.trust.guestsServed ?? ""} onChange={(e) => set("trust", { guestsServed: e.target.value })} />
+          </Field>
+        </Section>
+
+        <Section title="Currency">
+          <p className="text-[11px] text-stone-500 leading-relaxed">
+            Prices are stored in the base currency; visitors can switch the
+            display currency themselves. Rates are 1 base unit in each currency.
+            Language never implies currency.
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Base currency (prices stored in)">
+              <input className={`${input} uppercase`} value={settings.currency.base} onChange={(e) => set("currency", { base: e.target.value.toUpperCase() })} />
+            </Field>
+            <Field label="Default display currency">
+              <input className={`${input} uppercase`} value={settings.currency.display} onChange={(e) => set("currency", { display: e.target.value.toUpperCase() })} />
+            </Field>
+          </div>
+          <div>
+            <span className="block text-[11px] font-semibold text-stone-400 mb-1.5">Rates</span>
+            <div className="space-y-2">
+              {Object.entries(settings.currency.rates).map(([code, rate]) => (
+                <div key={code} className="flex items-center gap-2">
+                  <input
+                    className={`${input} w-24 uppercase`}
+                    value={code}
+                    onChange={(e) => {
+                      const next = { ...settings.currency.rates };
+                      delete next[code];
+                      next[e.target.value.toUpperCase()] = rate;
+                      set("currency", { rates: next });
+                    }}
+                  />
+                  <input
+                    type="number"
+                    step="0.0001"
+                    className={input}
+                    value={rate}
+                    onChange={(e) =>
+                      set("currency", { rates: { ...settings.currency.rates, [code]: Number(e.target.value) } })
+                    }
+                  />
+                  <button
+                    onClick={() => {
+                      const next = { ...settings.currency.rates };
+                      delete next[code];
+                      set("currency", { rates: next });
+                    }}
+                    className="p-2 text-stone-500 hover:text-red-400"
+                  >
+                    <Trash2 className="size-4" />
+                  </button>
+                </div>
+              ))}
+              <button
+                onClick={() => set("currency", { rates: { ...settings.currency.rates, XXX: 1 } })}
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-teal-400 hover:text-teal-300"
+              >
+                <Plus className="size-3.5" /> Add currency
+              </button>
+            </div>
+          </div>
+        </Section>
+
+        <Section title="Languages">
+          <p className="text-[11px] text-stone-500 leading-relaxed">
+            Enabled languages appear in the site language switcher and in the
+            tour editor&apos;s translation tabs. Content falls back to English until
+            a translation is written.
+          </p>
+          <ul className="space-y-2">
+            {settings.languages.map((l, i) => (
+              <li key={l.code} className="flex items-center justify-between bg-black/20 rounded-xl px-3 py-2">
+                <div>
+                  <p className="text-xs font-semibold text-white">
+                    {l.label} <span className="text-stone-500">({l.code})</span>
+                  </p>
+                  <p className="text-[10px] text-stone-500">{l.dir === "rtl" ? "right-to-left" : "left-to-right"}</p>
+                </div>
+                <label className="flex items-center gap-2 text-xs text-stone-300">
+                  <input
+                    type="checkbox"
+                    checked={l.enabled}
+                    onChange={(e) => {
+                      const next = [...settings.languages];
+                      next[i] = { ...l, enabled: e.target.checked };
+                      set("languages", next);
+                    }}
+                    className="size-4 rounded accent-teal-500"
+                  />
+                  Enabled
+                </label>
+              </li>
+            ))}
+          </ul>
+        </Section>
+
+        <Section title="Email notifications">
+          <div className="flex items-center gap-2 text-xs">
+            {smtpConfigured ? (
+              <span className="inline-flex items-center gap-1.5 text-teal-300">
+                <CheckCircle2 className="size-4" /> SMTP configured (credentials from environment — never stored here)
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 text-amber-300">
+                <XCircle className="size-4" /> SMTP not configured — set SMTP_HOST, SMTP_USER, SMTP_PASS in the environment
+              </span>
+            )}
+          </div>
+          <div>
+            <span className="block text-[11px] font-semibold text-stone-400 mb-1.5">Notification recipients</span>
+            <div className="space-y-2">
+              {settings.email.notifyTo.map((addr, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <input
+                    className={input}
+                    value={addr}
+                    onChange={(e) => {
+                      const next = [...settings.email.notifyTo];
+                      next[i] = e.target.value;
+                      set("email", { notifyTo: next });
+                    }}
+                  />
+                  <button
+                    onClick={() => set("email", { notifyTo: settings.email.notifyTo.filter((_, j) => j !== i) })}
+                    className="p-2 text-stone-500 hover:text-red-400"
+                  >
+                    <Trash2 className="size-4" />
+                  </button>
+                </div>
+              ))}
+              <button
+                onClick={() => set("email", { notifyTo: [...settings.email.notifyTo, ""] })}
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-teal-400 hover:text-teal-300"
+              >
+                <Plus className="size-3.5" /> Add recipient
+              </button>
+            </div>
+          </div>
+          <label className="flex items-center gap-2 text-xs text-stone-300">
+            <input
+              type="checkbox"
+              checked={settings.email.notifyOnInquiry}
+              onChange={(e) => set("email", { notifyOnInquiry: e.target.checked })}
+              className="size-4 rounded accent-teal-500"
+            />
+            Email me when a booking request arrives
+          </label>
+          <label className="flex items-center gap-2 text-xs text-stone-300">
+            <input
+              type="checkbox"
+              checked={settings.email.notifyOnReview}
+              onChange={(e) => set("email", { notifyOnReview: e.target.checked })}
+              className="size-4 rounded accent-teal-500"
+            />
+            Email me when a review needs moderation
+          </label>
+          <label className="flex items-center gap-2 text-xs text-stone-300">
+            <input
+              type="checkbox"
+              checked={settings.email.customerConfirmation}
+              onChange={(e) => set("email", { customerConfirmation: e.target.checked })}
+              className="size-4 rounded accent-teal-500"
+            />
+            Send guests a confirmation email (requires their email address)
+          </label>
+          <Field label="From name">
+            <input className={input} value={settings.email.fromName} onChange={(e) => set("email", { fromName: e.target.value })} />
+          </Field>
+          <div className="flex items-end gap-2 pt-2 border-t border-white/10">
+            <Field label="Send a test email to">
+              <input className={input} value={testTo} onChange={(e) => setTestTo(e.target.value)} />
+            </Field>
+            <button
+              onClick={sendTest}
+              disabled={busy || !smtpConfigured}
+              className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 disabled:opacity-40 text-white text-xs font-semibold rounded-xl px-3.5 py-2.5 shrink-0"
+            >
+              <Send className="size-3.5" /> Send
+            </button>
+          </div>
+        </Section>
+
+        <Section title="Admin password">
+          <p className="text-[11px] text-stone-500 leading-relaxed">
+            Change the seeded password on first use. Changing it signs out every
+            other session immediately.
+          </p>
+          <Field label="New password (min 10 characters)">
+            <input
+              type="password"
+              className={input}
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              autoComplete="new-password"
+            />
+          </Field>
           <button
-            type="submit"
-            disabled={saving}
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-black font-bold text-xs shadow-md shadow-teal-500/20 transition-all disabled:opacity-50"
+            onClick={changePassword}
+            disabled={busy || newPassword.length < 10}
+            className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 disabled:opacity-40 text-white text-xs font-semibold rounded-xl px-3.5 py-2.5"
           >
-            <Save className="size-4" />
-            {saving ? "Saving Changes..." : "Save Settings"}
+            <KeyRound className="size-3.5" /> Update password
           </button>
-        </div>
-      </form>
+        </Section>
+      </div>
     </div>
+  );
+}
+
+const input =
+  "w-full bg-black/30 border border-white/10 rounded-xl px-3 py-2 text-sm text-white placeholder:text-stone-600 focus:outline-none focus:border-teal-500/60";
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="bg-[#101c1f] border border-white/10 rounded-2xl p-5 space-y-4">
+      <h2 className="text-xs font-bold uppercase tracking-wider text-teal-400">{title}</h2>
+      {children}
+    </section>
+  );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <label className="block">
+      <span className="block text-[11px] font-semibold text-stone-400 mb-1.5">{label}</span>
+      {children}
+    </label>
   );
 }

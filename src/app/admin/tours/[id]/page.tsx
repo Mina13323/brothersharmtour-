@@ -1,19 +1,30 @@
 import { notFound } from "next/navigation";
-import { getToursList } from "@/lib/cms";
-import { TourForm } from "@/components/admin/TourForm";
+import TourEditor from "@/components/admin/TourEditor";
+import { requireAdmin } from "@/lib/auth";
+import { tourById } from "@/lib/store/repo";
+import { getSiteView } from "@/lib/siteview";
 
-export default async function EditTourPage({
+export const dynamic = "force-dynamic";
+
+export default async function AdminTourEditPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requireAdmin();
   const { id } = await params;
-  const tours = await getToursList();
-  const tour = tours.find((t) => t.slug === id || t.id === id);
+  const tour = tourById(id);
+  if (!tour) notFound();
 
-  if (!tour) {
-    return notFound();
-  }
+  const view = await getSiteView();
 
-  return <TourForm initialData={tour} isNew={false} />;
+  return (
+    <TourEditor
+      initialTour={tour}
+      settings={view.settings}
+      catalogue={view.catalogue}
+      currency={view.currency}
+      isNew={false}
+    />
+  );
 }

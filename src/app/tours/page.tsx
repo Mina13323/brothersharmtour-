@@ -7,6 +7,7 @@ import { ToursExplorerWithQuery } from "@/components/ToursExplorerWithQuery";
 import { Breadcrumbs, CTASection } from "@/components/sections";
 import { BookButton } from "@/components/BookingProvider";
 import { localizeTour, publishedTours } from "@/lib/store/repo";
+import { getSiteView } from "@/lib/siteview";
 import { media } from "@/lib/media";
 
 export const metadata: Metadata = buildMetadata({
@@ -17,9 +18,10 @@ export const metadata: Metadata = buildMetadata({
   image: media.sharmHero,
 });
 
-export default function ToursPage() {
+export default async function ToursPage() {
   const url = process.env.NEXT_PUBLIC_SITE_URL ?? "https://brothersharmtour.com";
-  const tours = publishedTours().map((t) => localizeTour(t));
+  const lang = (await getSiteView()).lang;
+  const tours = publishedTours().map((t) => localizeTour(t, lang));
 
   const schema = {
     "@context": "https://schema.org",

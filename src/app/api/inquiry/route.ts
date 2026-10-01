@@ -1,14 +1,19 @@
 import { NextResponse } from "next/server";
-import { tours } from "@/data/tours";
+import { createInquiry, tourBySlug } from "@/lib/store/repo";
+import { getSettings } from "@/lib/store/repo";
+import { adminInquiryEmail, customerInquiryEmail, sendMail } from "@/lib/mail";
+import { clientIp, rateLimit, sweep } from "@/lib/ratelimit";
 
 /**
  * Single intake endpoint for every enquiry on the site (booking drawer,
  * /book page, contact form).
  *
- * Today it validates, normalises and logs. It is written as the one place to
- * wire a real destination later — set INQUIRY_WEBHOOK_URL and the payload is
- * forwarded as JSON to a CRM, Zapier/Make scenario, an email service or the
- * WhatsApp Cloud API without touching any component.
+ * Writes the inquiry to the CMS store with a NEW status (the start of the
+ * NEW → CONTACTED → CONFIRMED → COMPLETED / CANCELLED lifecycle), then sends:
+ *  - a notification to each admin address in settings.email.notifyTo
+ *  - a confirmation to the guest when settings.email.customerConfirmation is on
+ *
+ * Rate limited per IP. Honeypot field silently swallows bot submissions.
  */
 
 export const runtime = "nodejs";
@@ -21,8 +26,11 @@ interface Payload {
   date?: string;
   adults?: string | number;
   children?: string | number;
+  hotel?: string;
+  room_number?: string;
   notes?: string;
   source?: string;
+  currency?: string;
   /** Honeypot — bots fill hidden fields, humans don't. */
   company?: string;
 }
@@ -30,15 +38,21 @@ interface Payload {
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 export async function POST(request: Request) {
-  let body: Payload;
+  sweep();
+  const ip = clientIp(request);
+  const limit = rateLimit(`inquiry:${ip}`, { limit: 5, windowMs: 10 * 60 * 1000 });
+  if (!limit.ok) {
+    return NextResponse.json(
+      { ok: false, message: "Too many requests — please try again in a few minutes." },
+      { status: 429, headers: { "Retry-After": String(limit.retryAfter) } },
+    );
+  }
 
+  let body: Payload;
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json(
-      { ok: false, message: "Invalid request body." },
-      { status: 400 },
-    );
+    return NextResponse.json({ ok: false, message: "Invalid request body." }, { status: 400 });
   }
 
   // Silently accept honeypot hits so bots don't learn anything.
@@ -50,72 +64,87 @@ export async function POST(request: Request) {
   const phone = body.phone?.trim() ?? "";
 
   if (name.length < 2) errors.push("Please tell us your name.");
-  if (!EMAIL.test(email)) errors.push("Please enter a valid email address.");
+  if (email && !EMAIL.test(email)) errors.push("Please enter a valid email address.");
   if (phone.replace(/\D/g, "").length < 6)
     errors.push("Please enter a phone or WhatsApp number we can reach you on.");
+  if (!email && phone.replace(/\D/g, "").length < 6)
+    errors.push("Please leave either an email or a phone number.");
 
-  if (body.tourSlug && !tours.some((t) => t.slug === body.tourSlug)) {
-    errors.push("That experience no longer exists.");
-  }
+  const tour = body.tourSlug ? tourBySlug(body.tourSlug) : undefined;
+  if (body.tourSlug && !tour) errors.push("That experience no longer exists.");
 
   if (errors.length) {
-    return NextResponse.json(
-      { ok: false, message: errors[0], errors },
-      { status: 422 },
-    );
+    return NextResponse.json({ ok: false, message: errors[0], errors }, { status: 422 });
   }
 
-  const inquiry = {
-    receivedAt: new Date().toISOString(),
-    source: body.source ?? "booking",
-    name,
-    email,
-    phone,
-    tourSlug: body.tourSlug || null,
-    tourTitle: tours.find((t) => t.slug === body.tourSlug)?.title ?? null,
-    date: body.date || null,
-    adults: Number(body.adults ?? 0) || null,
+  const settings = getSettings();
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://brothersharmtour.com";
+
+  const inquiry = createInquiry({
+    tourSlug: tour?.slug ?? null,
+    tourTitle: tour?.title ?? null,
+    guestName: name,
+    guestEmail: email || null,
+    guestPhone: phone,
+    preferredDate: body.date || null,
+    adults: Number(body.adults ?? 0) || (body.source === "contact" ? 0 : 1),
     children: Number(body.children ?? 0) || 0,
-    notes: body.notes?.trim() || null,
-  };
+    hotel: body.hotel?.trim() || undefined,
+    roomNumber: body.room_number?.trim() || undefined,
+    notes: body.notes?.trim() || undefined,
+    source: (body.source ?? "booking").slice(0, 40),
+    currency: body.currency,
+  });
 
-  // Structured log — visible in the platform's logs until a real sink is wired.
-  console.info("[bro-tour:inquiry]", JSON.stringify(inquiry));
-
-  // Persist directly to Supabase inquiries table
-  try {
-    const { createClient } = await import("@/lib/supabase/server");
-    const supabase = await createClient();
-    await supabase.from("inquiries").insert({
-      tour_id: body.tourSlug || null,
-      tour_title: inquiry.tourTitle,
-      guest_name: name,
-      guest_email: email || null,
-      guest_phone: phone,
-      preferred_date: body.date || null,
-      adults: Number(body.adults ?? 1) || 1,
-      children: Number(body.children ?? 0) || 0,
-      notes: body.notes?.trim() || null,
-      status: "new",
+  /* ── Email notifications ── */
+  let emailStatus = "skipped";
+  if (settings.email.notifyOnInquiry && settings.email.notifyTo.length) {
+    const mail = adminInquiryEmail({
+      guestName: inquiry.guestName,
+      guestEmail: inquiry.guestEmail,
+      guestPhone: inquiry.guestPhone,
+      tourTitle: inquiry.tourTitle,
+      preferredDate: inquiry.preferredDate,
+      adults: inquiry.adults,
+      children: inquiry.children,
+      hotel: inquiry.hotel,
+      notes: inquiry.notes,
+      source: inquiry.source,
+      currency: inquiry.currency,
+      adminUrl: `${siteUrl}/admin/inquiries`,
     });
-  } catch (dbErr) {
-    console.warn("[bro-tour:inquiry] Supabase save note:", dbErr);
+    const results = await Promise.all(
+      settings.email.notifyTo.map((to) => sendMail({ ...mail, to })),
+    );
+    emailStatus = results.some((r) => r.status === "sent")
+      ? "sent"
+      : results[0]?.status === "not-configured"
+        ? "not-configured"
+        : "failed";
   }
 
-  const webhook = process.env.INQUIRY_WEBHOOK_URL;
-  if (webhook) {
+  if (settings.email.customerConfirmation && inquiry.guestEmail) {
+    await sendMail({
+      ...customerInquiryEmail({
+        guestName: inquiry.guestName,
+        tourTitle: inquiry.tourTitle,
+        preferredDate: inquiry.preferredDate,
+        siteUrl,
+        whatsapp: settings.contact.whatsapp,
+      }),
+      to: inquiry.guestEmail,
+    });
+  }
+
+  // Record delivery outcome so the admin can see why a notification is missing.
+  if (emailStatus !== "skipped") {
     try {
-      await fetch(webhook, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(inquiry),
-      });
-    } catch (err) {
-      // Never fail the visitor's submission because a downstream system is
-      // down — the enquiry is already logged and recoverable.
-      console.error("[bro-tour:inquiry] webhook failed", err);
+      const { updateInquiry } = await import("@/lib/store/repo");
+      updateInquiry(inquiry.id, { emailStatus });
+    } catch {
+      /* non-fatal */
     }
   }
 
-  return NextResponse.json({ ok: true, message: "Request received." });
+  return NextResponse.json({ ok: true, message: "Request received.", id: inquiry.id });
 }

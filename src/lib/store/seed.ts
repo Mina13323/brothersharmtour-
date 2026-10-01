@@ -10,7 +10,6 @@
 
 import { destinations as seedDestinations } from "@/data/destinations";
 import { experiences as seedExperiences } from "@/data/experiences";
-import { site } from "@/data/site";
 import { tours as seedTours } from "@/data/tours";
 import { hashPassword } from "@/lib/auth";
 import { defaultSettings } from "./settings";

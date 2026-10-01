@@ -5,13 +5,14 @@
  */
 
 import { cookies } from "next/headers";
-import { FALLBACK_CONTEXT, type CurrencyContext } from "@/lib/currency";
+import type { CurrencyContext } from "@/lib/currency";
 import { approvedReviews, buildCatalogue, getSettings, tourBySlug } from "@/lib/store/repo";
 import type { ReviewRecord } from "@/lib/store/types";
 import type { CatalogueTour } from "@/lib/store/types";
 import type { PublicSettings } from "@/components/SiteProvider";
 
 export const CURRENCY_COOKIE = "bt_currency";
+export const LANGUAGE_COOKIE = "bt_lang";
 
 /** Server-side WhatsApp deep link from CMS settings (same shape as the client
  * hook's whatsappLink — kept in one module so the two can never diverge). */
@@ -43,6 +44,19 @@ export async function getPublicSettings(): Promise<PublicSettings> {
 }
 
 /** Display currency: visitor cookie → admin default. Language never decides it. */
+/**
+ * Visitor language for CONTENT localisation (translated fields only — never
+ * machine translation, never currency). Falls back to English when the cookie
+ * is missing or the language isn't enabled in settings.
+ */
+export async function getVisitorLanguage(): Promise<string> {
+  const [store, jar] = await Promise.all([getSettings(), cookies()]);
+  const wanted = jar.get(LANGUAGE_COOKIE)?.value;
+  const enabled = store.languages.filter((l) => l.enabled).map((l) => l.code);
+  if (wanted && enabled.includes(wanted)) return wanted;
+  return "en";
+}
+
 export async function getCurrencyContext(): Promise<CurrencyContext> {
   const [store, jar] = await Promise.all([getSettings(), cookies()]);
   const wanted = jar.get(CURRENCY_COOKIE)?.value?.toUpperCase();
@@ -72,6 +86,8 @@ export interface PublicReview {
 export interface SiteView {
   settings: PublicSettings;
   currency: CurrencyContext;
+  /** Content language (cookie → settings → "en"). */
+  lang: string;
   catalogue: CatalogueTour[];
   reviews: PublicReview[];
   reviewStats: { average: number | null; count: number };
@@ -98,9 +114,10 @@ function toPublicReview(r: ReviewRecord): PublicReview {
 }
 
 export async function getSiteView(): Promise<SiteView> {
-  const [settings, currency] = await Promise.all([
+  const [settings, currency, lang] = await Promise.all([
     getPublicSettings(),
     getCurrencyContext(),
+    getVisitorLanguage(),
   ]);
   const approved = approvedReviews()
     .sort((a, b) => (b.publishedAt ?? b.submittedAt).localeCompare(a.publishedAt ?? a.submittedAt))
@@ -114,5 +131,5 @@ export async function getSiteView(): Promise<SiteView> {
           count,
         }
       : { average: null, count: 0 };
-  return { settings, currency, catalogue: buildCatalogue(), reviews, reviewStats };
+  return { settings, currency, lang, catalogue: buildCatalogue(), reviews, reviewStats };
 }

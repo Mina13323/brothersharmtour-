@@ -7,6 +7,7 @@ import { useSite } from "./SiteProvider";
 import { cn } from "@/lib/utils";
 import { WhatsAppIcon } from "./sections";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import { CurrencySwitcher } from "./CurrencySwitcher";
 import { Logo } from "./ui/Logo";
 
 /**
@@ -113,14 +114,14 @@ export function Navbar() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
 
-  if (pathname?.startsWith("/admin")) return null;
-
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  if (pathname?.startsWith("/admin")) return null;
 
   function isActive(href: string) {
     if (href === "/") return pathname === "/";
@@ -179,6 +180,7 @@ export function Navbar() {
 
           {/* Right actions: Language Switcher + Book on WhatsApp */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <CurrencySwitcher tone="ink" />
             <LanguageSwitcher tone="ink" />
             <a
               href={whatsappLink()}

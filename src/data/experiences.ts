@@ -1,5 +1,5 @@
 import { media } from "@/lib/media";
-import type { Experience, ExperienceSlug } from "@/lib/types";
+import type { Experience } from "@/lib/types";
 
 /**
  * Experience categories. These are the discovery layer that sits between a

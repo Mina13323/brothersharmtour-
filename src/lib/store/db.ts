@@ -20,7 +20,7 @@ import {
   statSync,
   writeFileSync,
 } from "node:fs";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
 
 import { buildSeedDatabase } from "./seed";
 import type { Database } from "./types";

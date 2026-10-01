@@ -114,8 +114,8 @@ export function VideoSection({
             className="media relative aspect-[4/5] w-full overflow-hidden rounded-2xl ring-1 ring-white/10 sm:aspect-[16/9] sm:rounded-3xl shadow-2xl"
           >
             <Image
-              src={video.poster.src}
-              alt={video.poster.alt}
+              src={video.poster?.src ?? "/media/films/hero-poster.jpg"}
+              alt={video.poster?.alt ?? "Video still"}
               fill
               sizes="(max-width: 768px) 100vw, 90vw"
               className={`object-cover transition-opacity duration-1000 ${
@@ -133,7 +133,7 @@ export function VideoSection({
                 loop
                 muted={muted}
                 preload="metadata"
-                poster={video.poster.src}
+                poster={video.poster?.src}
                 aria-label={video.label}
               >
                 <source src={video.src} type="video/mp4" />

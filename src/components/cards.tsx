@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Destination, Experience, MediaImage, Tour } from "@/lib/types";
-import type { CatalogueTour } from "@/lib/store/types";
 import {
   cn,
   tourRating,

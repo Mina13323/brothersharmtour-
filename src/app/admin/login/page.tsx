@@ -1,144 +1,122 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
-import { Shield, Lock, Mail, ArrowRight, CheckCircle2, AlertCircle } from "lucide-react";
+import { useState } from "react";
+import { ShieldCheck, Lock, Mail } from "lucide-react";
+
+/**
+ * Admin sign-in. Posts to /api/admin/auth which rate limits attempts and sets
+ * an HttpOnly session cookie. There is no demo mode, no localStorage flag and
+ * no bypass — the seed credentials must be changed from Settings on first use.
+ */
 
 export default function AdminLoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
-    setErrorMsg(null);
-
+    setBusy(true);
+    setError(null);
     try {
-      const supabase = createClient();
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const res = await fetch("/api/admin/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
       });
-
-      if (error) {
-        setErrorMsg(error.message);
-      } else if (data.session) {
-        localStorage.setItem("bro_admin_auth", "true");
-        router.push("/admin");
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(data.message ?? "Sign-in failed.");
+        return;
       }
-    } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : "Failed to sign in");
+      router.push("/admin");
+      router.refresh();
+    } catch {
+      setError("Network error — please try again.");
     } finally {
-      setLoading(false);
+      setBusy(false);
     }
-  };
-
-  // Instant direct access bypass if user hasn't yet created Supabase auth user
-  const handleDirectAccess = () => {
-    localStorage.setItem("bro_admin_auth", "true");
-    router.push("/admin");
-  };
+  }
 
   return (
-    <div className="min-h-screen bg-[#070e10] flex items-center justify-center p-4 antialiased">
-      <div className="w-full max-w-md">
-        {/* Header / Brand */}
+    <div className="min-h-screen bg-[#0a1214] flex items-center justify-center p-6">
+      <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-teal-500/10 border border-teal-500/30 text-teal-400 mb-4 shadow-lg shadow-teal-500/10">
-            <Shield className="size-7" />
+          <div className="mx-auto w-14 h-14 rounded-2xl bg-gradient-to-br from-teal-500/30 to-emerald-500/20 border border-teal-500/40 flex items-center justify-center text-teal-400 mb-4">
+            <ShieldCheck className="size-7" />
           </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">
-            Brother Sharm Admin CMS
+          <h1 className="text-xl font-bold text-white tracking-wide">
+            BROTHER SHARM TOUR
           </h1>
-          <p className="text-sm text-stone-400 mt-1.5">
-            Manage tours, pricing, custom packages & guest bookings
+          <p className="text-xs text-teal-400 font-medium tracking-wider uppercase mt-1">
+            Admin Portal
           </p>
         </div>
 
-        {/* Card */}
-        <div className="rounded-2xl bg-[#0e191c] border border-white/10 p-7 shadow-2xl backdrop-blur-xl">
-          {errorMsg && (
-            <div className="mb-6 p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-300 text-sm flex items-start gap-2.5">
-              <AlertCircle className="size-5 shrink-0 text-red-400 mt-0.5" />
-              <span>{errorMsg}</span>
+        <form
+          onSubmit={submit}
+          className="bg-[#0d1618] border border-white/10 rounded-2xl p-6 space-y-4 shadow-xl"
+        >
+          <div>
+            <label className="block text-xs font-semibold text-stone-300 mb-1.5" htmlFor="email">
+              Email
+            </label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-stone-500" />
+              <input
+                id="email"
+                type="email"
+                required
+                autoComplete="username"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full bg-black/30 border border-white/10 rounded-xl pl-10 pr-3 py-2.5 text-sm text-white placeholder:text-stone-600 focus:outline-none focus:border-teal-500/60 focus:ring-1 focus:ring-teal-500/30"
+                placeholder="admin@brothersharmtour.com"
+              />
             </div>
-          )}
-
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label className="block text-xs font-semibold text-stone-300 uppercase tracking-wider mb-1.5">
-                Admin Email
-              </label>
-              <div className="relative">
-                <Mail className="size-4 text-stone-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@brothersharm.com"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white placeholder-stone-600 text-sm focus:outline-none focus:border-teal-500/60 focus:ring-1 focus:ring-teal-500/40"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-stone-300 uppercase tracking-wider mb-1.5">
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="size-4 text-stone-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••••••"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/40 border border-white/10 text-white placeholder-stone-600 text-sm focus:outline-none focus:border-teal-500/60 focus:ring-1 focus:ring-teal-500/40"
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full mt-2 py-3 rounded-xl bg-teal-500 hover:bg-teal-400 text-black font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-teal-500/20 disabled:opacity-50"
-            >
-              {loading ? "Verifying..." : "Sign in to Dashboard"}
-              <ArrowRight className="size-4" />
-            </button>
-          </form>
-
-          {/* Quick Access Helper */}
-          <div className="mt-6 pt-5 border-t border-white/10 text-center">
-            <p className="text-xs text-stone-400 mb-3">
-              Testing or first time setting up?
-            </p>
-            <button
-              type="button"
-              onClick={handleDirectAccess}
-              className="w-full py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-stone-200 text-xs font-medium flex items-center justify-center gap-2 transition-colors"
-            >
-              <CheckCircle2 className="size-4 text-teal-400" />
-              Quick Admin Access (Bypass)
-            </button>
           </div>
-        </div>
 
-        {/* Back Link */}
-        <div className="text-center mt-6">
-          <Link
-            href="/"
-            className="text-xs text-stone-400 hover:text-stone-200 transition-colors"
+          <div>
+            <label className="block text-xs font-semibold text-stone-300 mb-1.5" htmlFor="password">
+              Password
+            </label>
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-stone-500" />
+              <input
+                id="password"
+                type="password"
+                required
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full bg-black/30 border border-white/10 rounded-xl pl-10 pr-3 py-2.5 text-sm text-white placeholder:text-stone-600 focus:outline-none focus:border-teal-500/60 focus:ring-1 focus:ring-teal-500/30"
+                placeholder="••••••••••"
+              />
+            </div>
+          </div>
+
+          {error ? (
+            <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+              {error}
+            </p>
+          ) : null}
+
+          <button
+            type="submit"
+            disabled={busy}
+            className="w-full bg-teal-600 hover:bg-teal-500 disabled:opacity-50 text-white font-semibold text-sm rounded-xl py-2.5 transition-colors"
           >
-            ← Return to public website
-          </Link>
-        </div>
+            {busy ? "Signing in…" : "Sign in"}
+          </button>
+
+          <p className="text-[11px] text-stone-500 text-center leading-relaxed pt-1">
+            Sign-in is rate limited. Sessions expire automatically and are
+            invalidated when the admin password changes.
+          </p>
+        </form>
       </div>
     </div>
   );

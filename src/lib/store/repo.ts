@@ -257,7 +257,10 @@ export function updateReview(
   return updateDb((db) => {
     const review = db.reviews.find((r) => r.id === id);
     if (!review) return undefined;
-    Object.assign(review, patch);
+    // Skip undefined keys — Object.assign would otherwise wipe them.
+    for (const [key, value] of Object.entries(patch)) {
+      if (value !== undefined) (review as unknown as Record<string, unknown>)[key] = value;
+    }
     if (patch.rating !== undefined) {
       review.rating = Math.min(5, Math.max(1, Math.round(patch.rating)));
     }
@@ -295,7 +298,7 @@ export function allInquiries(): InquiryRecord[] {
 
 export function updateInquiry(
   id: string,
-  patch: Partial<Pick<InquiryRecord, "status" | "adminNotes">>,
+  patch: Partial<Pick<InquiryRecord, "status" | "adminNotes" | "emailStatus">>,
 ): InquiryRecord | undefined {
   return updateDb((db) => {
     const inquiry = db.inquiries.find((i) => i.id === id);

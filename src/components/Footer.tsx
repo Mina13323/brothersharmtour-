@@ -7,6 +7,7 @@ import { Logo } from "./ui/Logo";
 import { WhatsAppIcon } from "./sections";
 import { WaveDivider } from "./WaveDivider";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import { CurrencySwitcher } from "./CurrencySwitcher";
 
 export function Footer() {
   const pathname = usePathname();
@@ -111,6 +112,7 @@ export function Footer() {
             © {year} {site.legalName}. All rights reserved.
           </p>
           <div className="flex flex-wrap items-center gap-4">
+            <CurrencySwitcher tone="light" />
             <LanguageSwitcher tone="light" />
             <ul className="flex flex-wrap gap-x-6 gap-y-2">
               <li>

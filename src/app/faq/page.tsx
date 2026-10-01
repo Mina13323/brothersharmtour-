@@ -4,7 +4,7 @@ import { buildMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { Reveal } from "@/components/Reveal";
 import { Accordion } from "@/components/Accordion";
-import { Breadcrumbs, CTASection, WhatsAppIcon } from "@/components/sections";
+import { CTASection, WhatsAppIcon } from "@/components/sections";
 import { generalFaq } from "@/data/testimonials";
 import { getPublicSettings, serverWhatsappLink } from "@/lib/siteview";
 import { media } from "@/lib/media";

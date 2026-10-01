@@ -110,5 +110,16 @@ export async function checkCredentials(
   );
 }
 
+/**
+ * Page-level guard for admin routes — the definitive server-side gate.
+ * Every admin page calls this before reading anything from the store.
+ */
+export async function requireAdmin(): Promise<void> {
+  if (!(await isAdmin())) {
+    const { redirect } = await import("next/navigation");
+    redirect("/admin/login");
+  }
+}
+
 export const ADMIN_COOKIE = COOKIE_NAME;
 export const SESSION_COOKIE_MAX_AGE = SESSION_TTL_MS / 1000;

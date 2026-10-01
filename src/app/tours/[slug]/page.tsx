@@ -10,7 +10,7 @@ import {
   reviewStats,
   tourBySlug,
 } from "@/lib/store/repo";
-import { getPublicSettings } from "@/lib/siteview";
+import { getPublicSettings, getSiteView } from "@/lib/siteview";
 import { destinationName } from "@/lib/store/labels";
 
 /**
@@ -58,11 +58,12 @@ export default async function TourDetailPage({
   const settings = await getPublicSettings();
   const url = process.env.NEXT_PUBLIC_SITE_URL ?? "https://brothersharmtour.com";
 
-  const tour = localizeTour(record);
+  const lang = (await getSiteView()).lang;
+  const tour = localizeTour(record, lang);
   const stats = reviewStats(record.slug);
   const view = { ...tour, rating: stats.average ?? undefined, reviewCount: stats.count };
 
-  const related = relatedTours(record, 3).map((r) => localizeTour(r));
+  const related = relatedTours(record, 3).map((r) => localizeTour(r, lang));
   const reviews = approvedReviews(record.slug)
     .sort((a, b) => (b.publishedAt ?? b.submittedAt).localeCompare(a.publishedAt ?? a.submittedAt))
     .slice(0, 6)

@@ -174,7 +174,11 @@ export default async function RootLayout({
   };
 
   return (
-    <html lang="en" className={augsburg.variable}>
+    <html
+      lang={view.lang}
+      dir={view.lang === "ar" ? "rtl" : "ltr"}
+      className={augsburg.variable}
+    >
       <head>
         {/*
           No-JS fallback for the scroll-reveal system.

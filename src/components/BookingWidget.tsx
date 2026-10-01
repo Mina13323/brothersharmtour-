@@ -41,7 +41,6 @@ export function BookingWidget({
   const [notes, setNotes] = useState("");
 
   const [touched, setTouched] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const adultPrice = tour?.priceFrom ?? null;
   const childPrice =
@@ -115,8 +114,6 @@ export function BookingWidget({
       setTouched(true);
       return;
     }
-
-    setIsSubmitting(true);
 
     // Record the booking in the CMS (best effort — the WhatsApp hand-off is primary)
     try {

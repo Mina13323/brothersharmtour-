@@ -55,17 +55,50 @@ export function Hero({
         ?.saveData === true;
     if (reduced || saveData) return;
 
-    // Wait for first paint + idle so the hero image is never delayed by video.
-    const schedule =
-      window.requestIdleCallback ??
-      ((cb: () => void) => window.setTimeout(cb, 600));
-    const id = schedule(() => setAttachVideo(true));
-    return () => {
-      if (window.cancelIdleCallback && typeof id === "number") {
-        window.cancelIdleCallback(id);
-      }
-    };
+    setAttachVideo(true);
   }, [video]);
+
+  // Mobile-safe imperative autoplay handling
+  useEffect(() => {
+    if (!attachVideo) return;
+    const el = videoRef.current;
+    if (!el) return;
+
+    el.muted = true;
+    el.defaultMuted = true;
+    el.playsInline = true;
+
+    const onReady = () => setVideoReady(true);
+    el.addEventListener("playing", onReady);
+    el.addEventListener("canplay", onReady);
+    el.addEventListener("loadeddata", onReady);
+
+    const playPromise = el.play();
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => setVideoReady(true))
+        .catch(() => {
+          // Fallback on first user interaction if browser blocked initial autoplay
+          const onFirstInteraction = () => {
+            if (el) {
+              el.play().then(() => setVideoReady(true)).catch(() => {});
+            }
+            window.removeEventListener("touchstart", onFirstInteraction);
+            window.removeEventListener("click", onFirstInteraction);
+            window.removeEventListener("scroll", onFirstInteraction);
+          };
+          window.addEventListener("touchstart", onFirstInteraction, { passive: true });
+          window.addEventListener("click", onFirstInteraction, { passive: true });
+          window.addEventListener("scroll", onFirstInteraction, { passive: true });
+        });
+    }
+
+    return () => {
+      el.removeEventListener("playing", onReady);
+      el.removeEventListener("canplay", onReady);
+      el.removeEventListener("loadeddata", onReady);
+    };
+  }, [attachVideo]);
 
   // Framed card variant matching the modern reference
   if (variant === "card") {
@@ -81,7 +114,7 @@ export function Hero({
               priority
               sizes="100vw"
               className={cn(
-                "slow-zoom object-cover transition-opacity duration-[1400ms]",
+                "slow-zoom object-cover transition-opacity duration-700",
                 videoReady ? "opacity-0" : "opacity-100",
               )}
               style={image.position ? { objectPosition: image.position } : undefined}
@@ -94,12 +127,11 @@ export function Hero({
                 muted
                 loop
                 playsInline
-                preload="none"
+                preload="auto"
                 poster={image.src}
-                onPlaying={() => setVideoReady(true)}
                 aria-hidden
                 className={cn(
-                  "size-full object-cover transition-opacity duration-[1400ms]",
+                  "size-full object-cover transition-opacity duration-700",
                   videoReady ? "opacity-100" : "opacity-0",
                 )}
               >
@@ -202,12 +234,11 @@ export function Hero({
             muted
             loop
             playsInline
-            preload="none"
+            preload="auto"
             poster={image.src}
-            onPlaying={() => setVideoReady(true)}
             aria-hidden
             className={cn(
-              "size-full object-cover transition-opacity duration-[1400ms]",
+              "size-full object-cover transition-opacity duration-700",
               videoReady ? "opacity-100" : "opacity-0",
             )}
           >

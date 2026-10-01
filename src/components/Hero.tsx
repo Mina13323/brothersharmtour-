@@ -108,8 +108,7 @@ export function Hero({
             ) : null}
           </div>
 
-          {/* Scrim overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/50 -z-10" />
+          {/* Scrim overlay removed as requested */}
 
           {/* Hero Content */}
           <div className="shell relative w-full pt-28 sm:pt-36 lg:pt-44 pb-20 sm:pb-28 lg:pb-32">

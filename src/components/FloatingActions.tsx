@@ -6,6 +6,7 @@ import { useSite } from "./SiteProvider";
 import { useBooking } from "./BookingProvider";
 import { WhatsAppIcon } from "./sections";
 import { X, Send } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export function FloatingActions() {
   const { whatsappLink } = useSite();
@@ -13,6 +14,11 @@ export function FloatingActions() {
   const { isOpen } = useBooking();
   const [showPopup, setShowPopup] = useState(false);
   const [hasUnread, setHasUnread] = useState(true);
+
+  const isDetailPage = Boolean(
+    (pathname?.startsWith("/tours/") && pathname !== "/tours") ||
+    (pathname?.startsWith("/packages/") && pathname !== "/packages")
+  );
 
   // Automatically show the WhatsApp pop-up after a brief delay
   useEffect(() => {
@@ -52,7 +58,14 @@ export function FloatingActions() {
   }
 
   return (
-    <div className="fixed z-[90] bottom-20 right-3.5 sm:bottom-7 sm:right-7 flex flex-col items-end">
+    <div
+      className={cn(
+        "fixed z-[90] right-3.5 sm:right-7 flex flex-col items-end transition-all duration-300",
+        isDetailPage
+          ? "bottom-[calc(9.25rem+max(0px,env(safe-area-inset-bottom,0px)))] lg:bottom-20"
+          : "bottom-20 sm:bottom-7"
+      )}
+    >
       {/* ─── WhatsApp Interactive Pop-up Card ─── */}
       {showPopup && (
         <div

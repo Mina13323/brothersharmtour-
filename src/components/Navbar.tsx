@@ -201,7 +201,7 @@ export function Navbar() {
       {/* ─── Mobile Floating Pill Dock (Exact match to Reference Screenshot) ─── */}
       <nav
         aria-label="Mobile Bottom Navigation"
-        className="fixed bottom-5 inset-x-4 max-w-sm sm:max-w-md mx-auto z-[100] rounded-full bg-white/95 backdrop-blur-xl border border-sand/60 shadow-[0_16px_48px_rgba(15,65,74,0.18)] px-5 py-2.5 flex items-center justify-between lg:hidden"
+        className="fixed bottom-[max(1.25rem,env(safe-area-inset-bottom,0px))] inset-x-4 max-w-sm sm:max-w-md mx-auto z-[100] rounded-full bg-white/95 backdrop-blur-xl border border-sand/60 shadow-[0_16px_48px_rgba(15,65,74,0.18)] px-5 py-2.5 flex items-center justify-between lg:hidden"
       >
         {navItems.map((item) => {
           const active = isActive(item.href);

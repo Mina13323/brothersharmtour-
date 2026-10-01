@@ -4,15 +4,15 @@ import { useState } from "react";
 import { Reveal } from "./Reveal";
 import { SectionHeading } from "./sections";
 import { TourCard } from "./cards";
-import { tours } from "@/data/tours";
-import type { Tour } from "@/lib/types";
+import type { CatalogueTour } from "@/lib/store/types";
+import { useCatalogue } from "./SiteProvider";
 
 /**
  * Homepage catalogue — mirrors the reference "Full List of Available Tours"
  * block: a category filter bar plus per-category sections (heading, caption and
  * count) rendered as a grid of tour cards. "All Tours" stacks every group.
  */
-const GROUPS: { name: string; caption: string; categories: Tour["category"][] }[] = [
+const GROUPS: { name: string; caption: string; categories: string[] }[] = [
   { name: "Sea & Diving", caption: "Discover the Red Sea", categories: ["sea-water"] },
   { name: "Safari", caption: "Breathe in the desert", categories: ["desert", "adventure"] },
   { name: "Historical", caption: "Where history began", categories: ["culture"] },
@@ -23,13 +23,14 @@ const GROUPS: { name: string; caption: string; categories: Tour["category"][] }[
   },
 ];
 
-function toursIn(categories: Tour["category"][]) {
-  return tours
+function toursIn(categories: string[], catalogue: CatalogueTour[]) {
+  return catalogue
     .filter((t) => categories.includes(t.category))
-    .sort((a, b) => (a.priority ?? 99) - (b.priority ?? 99));
+    .sort((a, b) => a.priority - b.priority);
 }
 
 export function HomeCatalogue() {
+  const catalogue = useCatalogue();
   const [active, setActive] = useState("All Tours");
   const tabs = ["All Tours", ...GROUPS.map((g) => g.name)];
   const visible = active === "All Tours" ? GROUPS : GROUPS.filter((g) => g.name === active);
@@ -59,7 +60,7 @@ export function HomeCatalogue() {
         {/* Groups */}
         <div className="mt-12 space-y-16">
           {visible.map((group) => {
-            const list = toursIn(group.categories);
+            const list = toursIn(group.categories, catalogue);
             if (!list.length) return null;
             return (
               <div key={group.name}>

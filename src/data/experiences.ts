@@ -160,5 +160,5 @@ export const experiences: Experience[] = [
 export const experienceBySlug = (slug: string) =>
   experiences.find((e) => e.slug === slug);
 
-export const experienceName = (slug: ExperienceSlug) =>
+export const experienceName = (slug: string) =>
   experiences.find((e) => e.slug === slug)?.name ?? slug;

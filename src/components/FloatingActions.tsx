@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { whatsappLink } from "@/data/site";
+import { useSite } from "./SiteProvider";
 import { cn } from "@/lib/utils";
 import { useBooking } from "./BookingProvider";
 import { WhatsAppIcon } from "./sections";
@@ -18,6 +18,7 @@ import { WhatsAppIcon } from "./sections";
  * yield cleanly to StickyBookBar.
  */
 export function FloatingActions() {
+  const { whatsappLink } = useSite();
   const pathname = usePathname();
   const { open, isOpen } = useBooking();
   const [visible, setVisible] = useState(false);

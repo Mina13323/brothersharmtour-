@@ -11,3 +11,11 @@ next-env.d.ts
 .vercel
 tsconfig.tsbuildinfo
 .kilo
+
+# CMS runtime data (content lives in the store at runtime; never commit secrets)
+content/secret.key
+content/uploads
+google_drive
+
+# CMS runtime store (auto-seeds on first boot)
+content/

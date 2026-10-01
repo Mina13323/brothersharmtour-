@@ -10,14 +10,13 @@ import { ToursExplorer } from "@/components/ToursExplorer";
 import { Breadcrumbs, CTASection, ArrowRight } from "@/components/sections";
 import { BookButton } from "@/components/BookingProvider";
 
-import { experiences, experienceBySlug } from "@/data/experiences";
-import { toursByCategory } from "@/data/tours";
-import { destinationName } from "@/data/destinations";
-import { site } from "@/data/site";
-
-export function generateStaticParams() {
-  return experiences.map((e) => ({ slug: e.slug }));
-}
+import {
+  activeExperiences,
+  experienceBySlug,
+  localizeTour,
+  toursByCategory,
+} from "@/lib/store/repo";
+import { destinationName } from "@/lib/store/labels";
 
 export async function generateMetadata({
   params,
@@ -37,6 +36,8 @@ export async function generateMetadata({
   });
 }
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://brothersharmtour.com";
+
 export default async function ExperienceCategoryPage({
   params,
 }: {
@@ -46,8 +47,8 @@ export default async function ExperienceCategoryPage({
   const experience = experienceBySlug(slug);
   if (!experience) notFound();
 
-  const list = toursByCategory(experience.slug);
-  const others = experiences.filter((e) => e.slug !== experience.slug);
+  const list = toursByCategory(experience.slug).map((t) => localizeTour(t));
+  const others = activeExperiences().filter((e) => e.slug !== experience.slug);
 
   const schema = {
     "@context": "https://schema.org",
@@ -56,7 +57,7 @@ export default async function ExperienceCategoryPage({
         "@type": "CollectionPage",
         name: `${experience.name} experiences in Egypt`,
         description: experience.description,
-        url: `${site.url}/experiences/${experience.slug}`,
+        url: `${SITE_URL}/experiences/${experience.slug}`,
         mainEntity: {
           "@type": "ItemList",
           numberOfItems: list.length,
@@ -64,25 +65,25 @@ export default async function ExperienceCategoryPage({
             "@type": "ListItem",
             position: i + 1,
             name: tour.title,
-            url: `${site.url}/tours/${tour.slug}`,
+            url: `${SITE_URL}/tours/${tour.slug}`,
           })),
         },
       },
       {
         "@type": "BreadcrumbList",
         itemListElement: [
-          { "@type": "ListItem", position: 1, name: "Home", item: site.url },
+          { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
           {
             "@type": "ListItem",
             position: 2,
             name: "Experiences",
-            item: `${site.url}/experiences`,
+            item: `${SITE_URL}/experiences`,
           },
           {
             "@type": "ListItem",
             position: 3,
             name: experience.name,
-            item: `${site.url}/experiences/${experience.slug}`,
+            item: `${SITE_URL}/experiences/${experience.slug}`,
           },
         ],
       },

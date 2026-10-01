@@ -4,10 +4,10 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { Tour, MediaImage } from "@/lib/types";
-import { destinationName } from "@/data/destinations";
-import { experienceName } from "@/data/experiences";
+import { destinationName, experienceName } from "@/lib/store/labels";
 import { BookButton } from "./BookingProvider";
 import { Breadcrumbs } from "./sections";
+import { useSite } from "./SiteProvider";
 
 export interface CapsuleHeroProps {
   title: string;
@@ -281,11 +281,17 @@ export function CapsuleHero({
 }
 
 /** Convenience wrapper for Tour detail pages */
-export function TourHero({ tour }: { tour: Tour }) {
+export function TourHero({
+  tour,
+}: {
+  tour: Tour & { priceOverrides?: Record<string, number> };
+}) {
+  const { money } = useSite();
+  const price = money(tour.priceFrom, tour.priceOverrides);
   return (
     <CapsuleHero
       title={tour.title}
-      eyebrow={`${destinationName(tour.destination)} • ${experienceName(tour.category)} • FROM £${tour.priceFrom}`}
+      eyebrow={`${destinationName(tour.destination)} • ${experienceName(tour.category)}${price ? ` • FROM ${price.toUpperCase()}` : ""}`}
       summary={tour.summary}
       images={tour.images}
       breadcrumbs={[

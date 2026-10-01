@@ -1,45 +1,76 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { Reveal } from "./Reveal";
 import { SectionHeading, WhatsAppIcon } from "./sections";
 import { WaveDivider } from "./WaveDivider";
-import { site, whatsappLink } from "@/data/site";
-import { featuredTours, tours } from "@/data/tours";
-import { destinationName } from "@/data/destinations";
-import { money } from "@/lib/utils";
+import { useSite, useCatalogue } from "./SiteProvider";
 import { media } from "@/lib/media";
 import { GuideLanguageBadge } from "./DynamicGuideLanguage";
-
-const TOUR_COUNT = tours.length;
+import { cn } from "@/lib/utils";
 
 /* ───────────────────────── Hero trust row ───────────────────────── */
-/* Avatar cluster + rating + head stat chips — sits under the hero search. */
+/*
+ * Honest, CMS-derived stat chips under the hero search: the size of the live
+ * catalogue, how booking works, and — only when real approved reviews or
+ * admin-confirmed trust claims exist — those. Never a fabricated number.
+ */
 
 export function HeroTrust() {
+  const { settings } = useSite();
+  const catalogue = useCatalogue();
+
+  const reviewCount = catalogue.reduce((n, t) => n + (t.reviewCount ?? 0), 0);
+  const rated = catalogue.filter((t) => typeof t.rating === "number");
+  const avg =
+    rated.length > 0
+      ? Math.round((rated.reduce((s, t) => s + (t.rating ?? 0), 0) / rated.length) * 10) / 10
+      : null;
+
   return (
     <div className="w-full pt-6 pb-4">
       <div className="shell">
         {/* Highlight Stats Bar (Soft rounded pill cards - no straight divider lines) */}
         <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-center sm:text-left">
-          <div className="flex items-center gap-3 rounded-full bg-paper-warm/60 px-5 py-2.5 shadow-2xs">
-            <Avatars dark />
-            <div>
-              <p className="flex items-center gap-1.5 text-sm font-bold text-ink">
-                <span className="text-yellow-500">★</span> 4.9 / 5 Rating
-              </p>
-              <p className="text-xs text-stone">150,000+ happy travellers</p>
+          {avg !== null && reviewCount > 0 ? (
+            <div className="flex items-center gap-3 rounded-full bg-paper-warm/60 px-5 py-2.5 shadow-2xs">
+              <Avatars dark />
+              <div>
+                <p className="flex items-center gap-1.5 text-sm font-bold text-ink">
+                  <span className="text-yellow-500">★</span> {avg.toFixed(1)} / 5
+                </p>
+                <p className="text-xs text-stone">
+                  from {reviewCount} verified guest {reviewCount === 1 ? "review" : "reviews"}
+                </p>
+              </div>
             </div>
-          </div>
+          ) : null}
 
           <div className="rounded-full bg-paper-warm/60 px-5 py-2.5 shadow-2xs">
-            <p className="font-display text-lg font-bold leading-none text-ink">From £15</p>
-            <p className="mt-0.5 text-xs text-stone">per person</p>
+            <p className="font-display text-lg font-bold leading-none text-ink">
+              {catalogue.length} tours
+            </p>
+            <p className="mt-0.5 text-xs text-stone">across Sharm El Sheikh &amp; Cairo</p>
           </div>
 
-          <div className="rounded-full bg-paper-warm/60 px-5 py-2.5 shadow-2xs">
-            <p className="font-display text-lg font-bold leading-none text-ink">17+ Years</p>
-            <p className="mt-0.5 text-xs text-stone">of local experience</p>
-          </div>
+          {settings.trust.yearsOperating ? (
+            <div className="rounded-full bg-paper-warm/60 px-5 py-2.5 shadow-2xs">
+              <p className="font-display text-lg font-bold leading-none text-ink">
+                {settings.trust.yearsOperating}
+              </p>
+              <p className="mt-0.5 text-xs text-stone">of local experience</p>
+            </div>
+          ) : null}
+
+          {settings.trust.guestsServed ? (
+            <div className="rounded-full bg-paper-warm/60 px-5 py-2.5 shadow-2xs">
+              <p className="font-display text-lg font-bold leading-none text-ink">
+                {settings.trust.guestsServed}
+              </p>
+              <p className="mt-0.5 text-xs text-stone">guests hosted</p>
+            </div>
+          ) : null}
 
           <div className="rounded-full bg-paper-warm/60 px-5 py-2.5 shadow-2xs">
             <p className="font-display text-lg font-bold leading-none text-ink">Pay on the Day</p>
@@ -80,12 +111,12 @@ export function Avatars({ dark = false }: { dark?: boolean }) {
 /* ───────────────────────── Value props (6) ───────────────────────── */
 
 const valueProps: { icon: string; title: string; body: React.ReactNode }[] = [
-  { icon: "💰", title: "Affordable Prices", body: "Amazing experiences from £15 per person with no hidden fees." },
-  { icon: "🤝", title: "No Prepayment", body: "Reserve today and pay on the day in GBP, USD, EUR or EGP." },
-  { icon: "⚡", title: "Instant Booking", body: "Fast WhatsApp confirmation in just a few minutes." },
-  { icon: "🚌", title: "Free Hotel Transfer", body: "Comfortable transfers included with every tour." },
+  { icon: "🤝", title: "No Prepayment", body: "Reserve today and pay on the day of your tour — cash, in your currency." },
+  { icon: "⚡", title: "Instant Booking", body: "Message us on WhatsApp with your date and hotel — we confirm from there." },
+  { icon: "🚌", title: "Hotel Transfer", body: "Pickup and drop-off from your hotel is included with every excursion." },
   { icon: "🗣️", title: "Expert Guides", body: <>Every tour is led by an experienced <GuideLanguageBadge format="speaking-guide" />.</> },
-  { icon: "🛡️", title: "Insurance Included", body: "Every traveller is insured for the entire duration of the tour." },
+  { icon: "🧭", title: "Local Operator", body: "We live and work in Sharm El Sheikh — not a call centre in another country." },
+  { icon: "🛟", title: "Clear Cancellation", body: "If weather or the coastguard stops a trip, we move you to another date or refund in full." },
 ];
 
 export function ValueProps() {
@@ -131,7 +162,7 @@ export function ValueProps() {
               Thoughtful excursions made for slower, memorable days
             </h3>
             <p className="mt-4 text-stone text-sm sm:text-base leading-relaxed">
-              Every tour is operated directly by our local crew in Sharm El Sheikh. We provide free hotel transfers, clear pricing in your currency, and instant confirmation on WhatsApp.
+              Every tour is operated by our local crew in Sharm El Sheikh. We provide hotel transfers, clear pricing in your currency, and confirmation on WhatsApp.
             </p>
             <Link
               href="/about"
@@ -203,13 +234,18 @@ export function ValueProps() {
 }
 
 /* ───────────────────────── Trust marquee ───────────────────────── */
+/* Structural service facts — never borrowed ratings or traveller counts. */
 
 export function TrustMarquee() {
   const item = (
     <span className="flex shrink-0 items-center gap-4 whitespace-nowrap px-6 text-[0.95rem] font-medium tracking-[0.02em] text-white/85">
-      Trusted by <span className="font-display text-lg text-reef-bright">150,000+</span> travellers
+      Operated by our local team in Sharm El Sheikh
       <span className="text-reef-bright">•</span>
-      Highly rated on Google, Tripadvisor &amp; GetYourGuide
+      No prepayment — pay on the day
+      <span className="text-reef-bright">•</span>
+      Hotel pickup across Sharm El Sheikh
+      <span className="text-reef-bright">•</span>
+      Full price confirmed before you book
       <span className="text-reef-bright">•</span>
     </span>
   );
@@ -229,37 +265,29 @@ export function TrustMarquee() {
 }
 
 /* ───────────────────────── Bestsellers ───────────────────────── */
+/* Derived from the live catalogue's featured tours — prices and titles come
+ * from the CMS, so this section can never drift from the real offer. */
 
 export function Bestsellers() {
-  const topPicks = [
-    {
-      title: "White Island & Ras Mohamed",
-      slug: "white-island",
-      tag: "Red Sea Marine",
-      image: media.whiteIsland.card,
-      price: 22,
-      duration: "Full day · 8 hrs",
-      desc: "Snorkel pristine coral reefs and step onto the white sandbar rising in the Red Sea.",
-    },
-    {
-      title: "Sinai Desert Super Safari",
-      slug: "super-safari",
-      tag: "Desert Adventure",
-      image: media.superSafari.card,
-      price: 15,
-      duration: "Evening · 5 hrs",
-      desc: "Quad biking, camel ride, authentic Bedouin barbecue dinner and desert stargazing.",
-    },
-    {
-      title: "Cairo & Giza Pyramids",
-      slug: "cairo-bus",
-      tag: "Ancient Heritage",
-      image: media.pyramids.card,
-      price: 45,
-      duration: "Full day · Guided",
-      desc: "The Great Pyramids, Sphinx, and the Grand Egyptian Museum with English Egyptologist.",
-    },
-  ];
+  const catalogue = useCatalogue();
+  const { money, whatsappLink } = useSite();
+
+  const topPicks = catalogue
+    .filter((t) => t.featured)
+    .sort((a, b) => a.priority - b.priority)
+    .slice(0, 3)
+    .map((t) => ({
+      title: t.title,
+      slug: t.slug,
+      tag: t.category.replace(/-/g, " "),
+      image: t.image ?? media.whiteIsland.card,
+      price: t.priceFrom,
+      priceOverrides: t.priceOverrides,
+      duration: t.duration ?? "Flexible",
+      desc: t.summary,
+    }));
+
+  if (!topPicks.length) return null;
 
   return (
     <section className="band bg-paper">
@@ -274,7 +302,7 @@ export function Bestsellers() {
               Real Adventures. Real Memories. The Best of Egypt.
             </h2>
             <p className="mt-3 text-stone text-sm sm:text-base leading-relaxed">
-              Handpicked excursions operated directly by our team with guaranteed departures, free hotel transfers and zero prepayment.
+              Handpicked excursions operated directly by our team, with hotel transfers included and no prepayment.
             </p>
           </div>
 
@@ -283,7 +311,7 @@ export function Bestsellers() {
               href="/tours"
               className="inline-flex items-center gap-2 rounded-full bg-sun hover:bg-sun-bright text-white px-6 py-2.5 text-xs font-semibold uppercase tracking-wider shadow-sm hover:shadow-md transition-all"
             >
-              <span>All 20+ Tours</span>
+              <span>All {catalogue.length} Tours</span>
               <span aria-hidden="true">→</span>
             </Link>
           </div>
@@ -332,7 +360,7 @@ export function Bestsellers() {
                   <div>
                     <span className="text-[10px] uppercase tracking-wider text-stone block">From</span>
                     <span className="font-display text-xl font-bold text-ink leading-none">
-                      £{tour.price}
+                      {money(tour.price, tour.priceOverrides) ?? "On request"}
                     </span>
                   </div>
                   <Link
@@ -368,7 +396,9 @@ export function Bestsellers() {
 
             <div className="mt-6">
               <a
-                href={whatsappLink("Hi Brother Sharm Tour, I'd like a custom itinerary planned for my trip.")}
+                href={whatsappLink(
+                "Hi Brother Sharm Tour, I'd like a custom itinerary planned for my trip.",
+              )}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-whatsapp w-full rounded-full shadow-sm hover:shadow-md text-xs py-2.5"
@@ -380,7 +410,7 @@ export function Bestsellers() {
               <div className="mt-5 flex items-center gap-3">
                 <Avatars dark />
                 <span className="text-[11px] font-semibold text-ink">
-                  150,000+ Happy Guests
+                  A real team, on the ground in Sharm
                 </span>
               </div>
             </div>
@@ -392,14 +422,26 @@ export function Bestsellers() {
 }
 
 /* ───────────────────────── Rating panel ───────────────────────── */
-/* Wave designs preserved as user requested */
+/*
+ * Shows the site's real review record — the aggregate of approved customer
+ * reviews and a link to read/write them. With no reviews yet it becomes an
+ * honest invitation. Platform links appear only when the admin has configured
+ * the matching social profile.
+ */
 
-export function RatingPanel() {
-  const platforms = [
-    { name: "Google Reviews", rating: "4.9 ★★★★★", reviews: "1,200+ Reviews" },
-    { name: "Tripadvisor", rating: "Travellers' Choice", reviews: "Top 10% Worldwide" },
-    { name: "GetYourGuide", rating: "Certified Partner", reviews: "Verified Operator" },
-  ];
+export function RatingPanel({
+  average,
+  count,
+}: {
+  average: number | null;
+  count: number;
+}) {
+  const { settings } = useSite();
+  const socials = [
+    settings.social.instagram && { name: "Instagram", href: settings.social.instagram, note: "Our profile" },
+    settings.social.facebook && { name: "Facebook", href: settings.social.facebook, note: "Our page" },
+    settings.social.tripadvisor && { name: "Tripadvisor", href: settings.social.tripadvisor, note: "Our listing" },
+  ].filter(Boolean) as { name: string; href: string; note: string }[];
 
   return (
     <section className="on-ink relative bg-ink text-white">
@@ -407,37 +449,82 @@ export function RatingPanel() {
       <div className="shell py-16 md:py-24">
         <div className="grid items-center gap-10 lg:grid-cols-[1fr_1.2fr] lg:gap-16">
           <Reveal>
-            <p className="eyebrow text-reef-bright">{site.name} · Since 2009</p>
-            <div className="mt-6 flex items-end gap-4">
-              <span className="font-display text-[4.5rem] leading-none">4.9</span>
-              <div className="pb-2">
-                <p className="text-reef-bright">★★★★★</p>
-                <p className="text-[0.9rem] text-white/70">Excellent</p>
-              </div>
-            </div>
-            <p className="mt-6 lede text-white/80">
-              Trusted by <span className="font-semibold text-white">150,000+</span>{" "}
-              travellers since 2009.
-            </p>
+            <p className="eyebrow text-reef-bright">Guest reviews · verified by our team</p>
+            {average !== null && count > 0 ? (
+              <>
+                <div className="mt-6 flex items-end gap-4">
+                  <span className="font-display text-[4.5rem] leading-none">{average.toFixed(1)}</span>
+                  <div className="pb-2">
+                    <p className="text-reef-bright">★★★★★</p>
+                    <p className="text-[0.9rem] text-white/70">
+                      from {count} guest {count === 1 ? "review" : "reviews"}
+                    </p>
+                  </div>
+                </div>
+                <p className="mt-6 lede text-white/80">
+                  Every review below was submitted by a real customer after their trip and
+                  published by our team — unedited.
+                </p>
+              </>
+            ) : (
+              <>
+                <div className="mt-6 flex items-end gap-4">
+                  <span className="font-display text-[3.5rem] leading-none">★</span>
+                  <div className="pb-2">
+                    <p className="text-[0.9rem] text-white/70">Reviews, published honestly</p>
+                  </div>
+                </div>
+                <p className="mt-6 lede text-white/80">
+                  We publish customer reviews exactly as they are written — no invented
+                  ratings, no stock testimonials. Been out with us? Be the first to tell
+                  other travellers how it went.
+                </p>
+              </>
+            )}
+            <Link
+              href="/review"
+              className="mt-7 inline-flex items-center gap-2 rounded-full bg-sun hover:bg-sun-bright text-white px-6 py-2.5 text-xs font-semibold uppercase tracking-wider shadow-sm hover:shadow-md transition-all"
+            >
+              <span>Write a review</span>
+              <span aria-hidden="true">→</span>
+            </Link>
           </Reveal>
 
           {/* Clean frameless glass cards - no straight lines */}
           <div className="grid gap-3.5">
-            {platforms.map((p, i) => (
+            {socials.map((s, i) => (
               <Reveal
                 as="div"
-                key={p.name}
+                key={s.name}
                 variant="card"
                 delay={i * 80}
+              >
+                <a
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between rounded-2xl bg-white/[0.06] hover:bg-white/[0.1] px-6 py-5 shadow-xs transition-all duration-300 hover:scale-[1.02]"
+                >
+                  <div>
+                    <span className="font-display text-[1.35rem] block">{s.name}</span>
+                    <span className="text-xs text-white/60">{s.note}</span>
+                  </div>
+                  <span className="text-reef-bright font-semibold text-sm">Follow →</span>
+                </a>
+              </Reveal>
+            ))}
+            <Reveal as="div" variant="card" delay={socials.length * 80}>
+              <Link
+                href="/review"
                 className="flex items-center justify-between rounded-2xl bg-white/[0.06] hover:bg-white/[0.1] px-6 py-5 shadow-xs transition-all duration-300 hover:scale-[1.02]"
               >
                 <div>
-                  <span className="font-display text-[1.35rem] block">{p.name}</span>
-                  <span className="text-xs text-white/60">{p.reviews}</span>
+                  <span className="font-display text-[1.35rem] block">Leave a review</span>
+                  <span className="text-xs text-white/60">Takes two minutes — published after moderation</span>
                 </div>
-                <span className="text-reef-bright font-semibold text-sm">{p.rating}</span>
-              </Reveal>
-            ))}
+                <span className="text-reef-bright font-semibold text-sm">Start →</span>
+              </Link>
+            </Reveal>
           </div>
         </div>
       </div>
@@ -449,20 +536,20 @@ export function RatingPanel() {
 /* ───────────────────────── No compromises (7) ───────────────────────── */
 
 const guarantees: { title: React.ReactNode; body: React.ReactNode }[] = [
-  { title: "No prepayment", body: "Pay on the day of your tour — in cash, in any currency." },
-  { title: "No hidden fees", body: "The final price includes everything — no surprises." },
-  { title: "Hotel transfer", body: "Free pickup and drop-off from any hotel." },
-  { title: "24/7 support", body: <>A real person on WhatsApp, <GuideLanguageBadge format="in-language" />.</> },
-  { title: <><GuideLanguageBadge format="adjective" />-speaking guides</>, body: "Professionals who love every route they lead." },
-  { title: "17 years of experience", body: "Since 2009. Over 150,000 happy travellers." },
-  { title: "Real offices", body: "In Sharm El Sheikh and Cairo — real people." },
+  { title: "No prepayment", body: "Pay on the day of your tour — in cash, in your currency." },
+  { title: "No hidden fees", body: "The final price is confirmed with you before you commit." },
+  { title: "Hotel transfer", body: "Pickup and drop-off from your hotel in Sharm El Sheikh." },
+  { title: "24/7 WhatsApp", body: <>A real person on WhatsApp, <GuideLanguageBadge format="in-language" />.</> },
+  { title: <><GuideLanguageBadge format="adjective" />-speaking guides</>, body: "Professionals who know every route they lead." },
+  { title: "Local team", body: "We live and work here — in Sharm El Sheikh, not behind a call centre." },
+  { title: "Weather guarantee", body: "If the coastguard closes the sea, we move your trip or refund in full." },
 ];
 
 export function NoCompromises() {
   return (
     <section className="band bg-paper-warm/40">
       <div className="shell">
-        <SectionHeading eyebrow="Our promise" title="No compromises" intro="Since 2009." />
+        <SectionHeading eyebrow="Our promise" title="No compromises" />
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {guarantees.map((g, i) => (
             <Reveal
@@ -487,13 +574,14 @@ export function NoCompromises() {
 
 /* ───────────────────────── Three steps ───────────────────────── */
 
-const steps = [
-  { title: "Choose a tour", body: `${TOUR_COUNT}+ routes — sea, desert, history. Prices from £15.` },
-  { title: "Message us on WhatsApp", body: "We reply in 3 minutes. Book with no prepayment." },
-  { title: "We pick you up from your hotel", body: "Guide, transfer and an unforgettable day — all included." },
-];
-
 export function ThreeSteps() {
+  const catalogue = useCatalogue();
+  const steps = [
+    { title: "Choose a tour", body: `${catalogue.length} experiences — sea, desert and history.` },
+    { title: "Message us on WhatsApp", body: "Send your date, hotel and group size. We confirm and answer questions." },
+    { title: "We pick you up from your hotel", body: "Guide, transfer and the day itself — pay when it's over." },
+  ];
+
   return (
     <section className="band-tight">
       <div className="shell">
@@ -517,9 +605,9 @@ export function ThreeSteps() {
         {/* Stats bar - no straight border lines */}
         <div className="mt-12 grid grid-cols-3 gap-4 rounded-3xl bg-paper-warm/80 p-6 sm:p-8 text-center shadow-xs">
           {[
-            { n: "17+", l: "years" },
-            { n: "150k+", l: "travellers" },
-            { n: `${TOUR_COUNT}+`, l: "tours" },
+            { n: `${catalogue.length}`, l: "tours" },
+            { n: "2", l: "destinations" },
+            { n: "£0", l: "deposit" },
           ].map((s) => (
             <div key={s.l}>
               <p className="font-display text-[2.25rem] leading-none text-reef-deep">{s.n}</p>
@@ -535,12 +623,13 @@ export function ThreeSteps() {
 /* ───────────────────── Geography + book-a-tour card ───────────────────── */
 
 export function GeographyBook() {
+  const { settings, whatsappLink } = useSite();
   const benefits: React.ReactNode[] = [
     "No prepayment",
     "Hotel transfer included",
-    "Book in 3 minutes",
+    "Full price confirmed before you book",
     <GuideLanguageBadge key="guides" format="speaking-guides" />,
-    "Insurance included",
+    "Free date changes if your plans move",
   ];
   return (
     <section className="band bg-paper-warm/40">
@@ -549,15 +638,12 @@ export function GeographyBook() {
           <Reveal>
             <p className="eyebrow text-reef">Geography</p>
             <h2 className="headline mt-4 text-[clamp(2rem,1.4rem+2vw,3.25rem)]">
-              The world flies to us
+              One team, two Egypts
             </h2>
-            <div className="mt-8 flex items-center gap-4">
-              <Avatars dark />
-              <div>
-                <p className="font-display text-[1.75rem] leading-none text-ink">+150,000</p>
-                <p className="text-[0.85rem] text-stone">travellers with us</p>
-              </div>
-            </div>
+            <p className="mt-4 max-w-md text-stone">
+              The reefs and deserts of Sinai from our base in Sharm El Sheikh, and the
+              pyramids and museums of Cairo — booked with the same local team.
+            </p>
           </Reveal>
 
           <Reveal delay={120}>
@@ -565,10 +651,10 @@ export function GeographyBook() {
             <div className="rounded-[2rem] bg-paper p-7 shadow-[var(--shadow-lift)] md:p-9 hover:shadow-[var(--shadow-panel)] transition-shadow">
               <p className="eyebrow text-reef">Book a tour</p>
               <p className="mt-2 font-display text-[1.75rem] leading-tight text-ink">
-                We reply in 3 minutes
+                Talk to a real person
               </p>
               <p className="mt-1 text-[0.9rem] text-stone">
-                from <span className="font-semibold text-ink">£15</span> / person
+                Message us on WhatsApp — we usually reply within minutes.
               </p>
               <ul className="mt-6 space-y-2.5">
                 {benefits.map((b, i) => (
@@ -587,7 +673,7 @@ export function GeographyBook() {
                 Message us on WhatsApp
               </a>
               <p className="mt-3 text-center text-[0.78rem] text-stone">
-                Instant confirmation. We reply fast.
+                No prepayment. No booking fees.
               </p>
             </div>
           </Reveal>
@@ -608,18 +694,30 @@ function Check() {
 }
 
 /* ───────────────────────── Contact channels ───────────────────────── */
+/* Social channels come from CMS settings — one source of truth. */
 
 export function ContactChannels() {
+  const { whatsappLink, settings } = useSite();
   const channels = [
     { name: "WhatsApp", caption: "Message us now", href: whatsappLink(), icon: <WhatsAppIcon className="size-6" /> },
-    { name: "Instagram", caption: "Follow & DM us", href: site.social.instagram, icon: <InstagramGlyph /> },
-    { name: "Telegram", caption: "Message us on Telegram", href: "https://t.me/brothersharmtour", icon: <TelegramGlyph /> },
-  ];
+    settings.social.instagram && {
+      name: "Instagram",
+      caption: "Follow & DM us",
+      href: settings.social.instagram,
+      icon: <InstagramGlyph />,
+    },
+    settings.social.telegram && {
+      name: "Telegram",
+      caption: "Message us on Telegram",
+      href: settings.social.telegram,
+      icon: <TelegramGlyph />,
+    },
+  ].filter(Boolean) as { name: string; caption: string; href: string; icon: React.ReactNode }[];
   return (
     <section className="band-tight">
       <div className="shell">
         <SectionHeading eyebrow="Get in touch" title="Reach us on your favourite messenger" />
-        <div className="mt-10 grid gap-4 sm:grid-cols-3">
+        <div className={cn("mt-10 grid gap-4", channels.length === 1 ? "sm:grid-cols-1" : "sm:grid-cols-3")}>
           {channels.map((c, i) => (
             <Reveal as="div" key={c.name} variant="card" delay={i * 70}>
               <a

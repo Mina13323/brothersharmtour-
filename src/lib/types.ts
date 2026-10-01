@@ -62,7 +62,7 @@ export interface SeoMeta {
 
 export interface Destination {
   name: string;
-  slug: DestinationSlug;
+  slug: string;
   /** Short line used on discovery cards. */
   tagline: string;
   /** One-paragraph editorial summary used on the destination hero. */
@@ -74,7 +74,7 @@ export interface Destination {
   cardImage: MediaImage;
   gallery: MediaImage[];
   /** Experience categories that are actually bookable in this destination. */
-  experiences: ExperienceSlug[];
+  experiences: string[];
   /** Ordered list of highlight places — powers the "Things to do" grid. */
   highlights: { title: string; blurb: string; image: MediaImage }[];
   /** Practical panel. Facts only — no invented specifics. */
@@ -82,19 +82,23 @@ export interface Destination {
   priority: number;
   /** Authored search metadata. Falls back to derived text when absent. */
   seo?: SeoMeta;
+  /** CMS lifecycle. */
+  status?: "published" | "draft";
 }
 
 export interface Experience {
   name: string;
-  slug: ExperienceSlug;
+  slug: string;
   /** Verb-led line that sets the mood on the category card. */
   tagline: string;
   description: string;
   image: MediaImage;
-  destinations: DestinationSlug[];
+  destinations: string[];
   priority: number;
   /** Authored search metadata. Falls back to derived text when absent. */
   seo?: SeoMeta;
+  /** CMS lifecycle. */
+  status?: "published" | "draft";
 }
 
 export interface ItineraryStop {
@@ -111,8 +115,10 @@ export interface FaqItem {
 export interface Tour {
   title: string;
   slug: string;
-  destination: DestinationSlug;
-  category: ExperienceSlug;
+  /** Destination slug — loose so admin-created destinations type-check. */
+  destination: string;
+  /** Experience/category slug. */
+  category: string;
   type: TourType;
   /** Card + meta description. One or two sentences, no marketing filler. */
   summary: string;
@@ -124,11 +130,17 @@ export interface Tour {
   duration: string | null;
   /** Machine-readable duration in hours — powers the duration filter. */
   durationHours: number | null;
-  /** "From" price per adult in USD. Null renders as "Price on request". */
+  /** "From" price per adult, stored in the base currency. Null renders as "Price on request". */
   priceFrom: number | null;
-  currency: "USD";
+  /** Base currency code the stored prices are denominated in. */
+  currency: string;
   /** Optional original ("was") price for a struck-through discount display. */
   priceOriginal?: number | null;
+  /**
+   * Explicit per-currency display prices that override rate conversion
+   * (e.g. { GBP: 35 }). Authored by the admin — never derived.
+   */
+  priceOverrides?: Record<string, number>;
   /** Star rating shown on cards and the detail page, e.g. 4.9. */
   rating?: number;
   /** Number of reviews behind the rating. */
@@ -141,6 +153,20 @@ export interface Tour {
   childPrice?: number | null;
   /** Optional paid extras shown as counters in the booking widget. */
   addons?: { label: string; price: number; unit?: string }[];
+  /** What guests should bring — structured requirements list. */
+  bring?: string[];
+  /** Restrictions, age rules and access notes. */
+  restrictions?: string[];
+  /** Spoken guide languages. */
+  languages?: string[];
+  /** Booking availability state. */
+  availability?: "open" | "on_request" | "closed";
+  /** Operational pickup / drop-off detail. */
+  pickupTime?: string;
+  dropoff?: string;
+  transportation?: string;
+  minParticipants?: number | null;
+  maxParticipants?: number | null;
   highlights: string[];
   included: string[];
   excluded: string[];

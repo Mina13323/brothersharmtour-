@@ -4,7 +4,7 @@ import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { tours } from "@/data/tours";
 import { destinationName } from "@/data/destinations";
-import { site, whatsappLink } from "@/data/site";
+import { useSite } from "./SiteProvider";
 import { cn } from "@/lib/utils";
 
 const today = () => new Date().toISOString().split("T")[0];
@@ -24,6 +24,7 @@ export function BookingForm({
   initialTour?: string;
   compact?: boolean;
 }) {
+  const { settings: site, whatsappLink } = useSite();
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
   const [tourSlug, setTourSlug] = useState(initialTour ?? "");

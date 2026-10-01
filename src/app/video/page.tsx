@@ -6,10 +6,11 @@ import { buildMetadata } from "@/lib/seo";
 import { VideoSection } from "@/components/VideoSection";
 import { CTASection, SectionHeading } from "@/components/sections";
 import { Reveal, SplitHeadline } from "@/components/Reveal";
-import { featuredTours } from "@/data/tours";
-import { destinationName } from "@/data/destinations";
+import { localizeTour, publishedTours } from "@/lib/store/repo";
+import { destinationName } from "@/lib/store/labels";
 import { media } from "@/lib/media";
 import { money } from "@/lib/utils";
+import { getSiteView } from "@/lib/siteview";
 
 import { Hero } from "@/components/Hero";
 
@@ -21,8 +22,15 @@ export const metadata: Metadata = buildMetadata({
   image: media.heroFilm.poster,
 });
 
-export default function VideoPage() {
-  const reels = featuredTours().slice(0, 6);
+export default async function VideoPage() {
+  const [{ currency }, records] = await Promise.all([
+    getSiteView(),
+    Promise.resolve(publishedTours()),
+  ]);
+  const reels = records
+    .filter((t) => t.featured)
+    .slice(0, 6)
+    .map((t) => localizeTour(t));
 
   return (
     <>
@@ -90,7 +98,7 @@ export default function VideoPage() {
                       </h3>
                       {tour.priceFrom !== null ? (
                         <span className="shrink-0 text-[0.85rem] font-semibold text-reef-deep">
-                          {money(tour.priceFrom)}
+                          {money(tour.priceFrom, currency, tour.priceOverrides)}
                         </span>
                       ) : null}
                     </div>

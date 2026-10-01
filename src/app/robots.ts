@@ -1,10 +1,10 @@
 import type { MetadataRoute } from "next";
-import { site } from "@/data/site";
 
 export default function robots(): MetadataRoute.Robots {
+  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://brothersharmtour.com";
   return {
-    rules: [{ userAgent: "*", allow: "/", disallow: ["/api/"] }],
-    sitemap: `${site.url}/sitemap.xml`,
-    host: site.url,
+    rules: [{ userAgent: "*", allow: "/", disallow: ["/api/", "/admin"] }],
+    sitemap: `${base}/sitemap.xml`,
+    host: base,
   };
 }

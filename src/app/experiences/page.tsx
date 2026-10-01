@@ -7,9 +7,8 @@ import Image from "next/image";
 import { Hero } from "@/components/Hero";
 import { Reveal } from "@/components/Reveal";
 import { Breadcrumbs, CTASection, ArrowRight } from "@/components/sections";
-import { experiences } from "@/data/experiences";
-import { toursByCategory } from "@/data/tours";
-import { destinationName } from "@/data/destinations";
+import { activeExperiences, localizeTour, toursByCategory } from "@/lib/store/repo";
+import { destinationName } from "@/lib/store/labels";
 import { media } from "@/lib/media";
 
 export const metadata: Metadata = buildMetadata({
@@ -21,6 +20,7 @@ export const metadata: Metadata = buildMetadata({
 });
 
 export default function ExperiencesPage() {
+  const experiences = activeExperiences();
   return (
     <>
       <Hero
@@ -42,7 +42,7 @@ export default function ExperiencesPage() {
           {/* Editorial index — elevated rounded cards rather than bordered rows */}
           <ul className="mt-12 flex flex-col gap-6">
             {experiences.map((experience, index) => {
-              const list = toursByCategory(experience.slug);
+              const list = toursByCategory(experience.slug).map((t) => localizeTour(t));
               const reverse = index % 2 === 1;
 
               return (

@@ -18,14 +18,13 @@ import {
 import { BookButton } from "@/components/BookingProvider";
 import { WaveDivider } from "@/components/WaveDivider";
 
-import { destinations, destinationBySlug } from "@/data/destinations";
-import { experiences } from "@/data/experiences";
-import { toursByDestination, tours } from "@/data/tours";
-import { site } from "@/data/site";
-
-export function generateStaticParams() {
-  return destinations.map((d) => ({ slug: d.slug }));
-}
+import {
+  activeDestinations,
+  activeExperiences,
+  destinationBySlug,
+  localizeTour,
+  toursByDestination,
+} from "@/lib/store/repo";
 
 export async function generateMetadata({
   params,
@@ -54,13 +53,15 @@ export default async function DestinationPage({
   const destination = destinationBySlug(slug);
   if (!destination) notFound();
 
-  const destinationTours = toursByDestination(destination.slug);
+  const destinationTours = toursByDestination(destination.slug).map((t) =>
+    localizeTour(t),
+  );
   const popular = destinationTours.filter((t) => t.featured).slice(0, 3);
   const showcase = popular.length ? popular : destinationTours.slice(0, 3);
 
   /* Group this destination's tours by experience category so the page reads as
      "here is what there is to do", not "here is a list of products". */
-  const categories = experiences
+  const categories = activeExperiences()
     .filter((exp) => destination.experiences.includes(exp.slug))
     .map((exp) => ({
       experience: exp,
@@ -68,6 +69,7 @@ export default async function DestinationPage({
     }))
     .filter((group) => group.list.length > 0);
 
+  const url = process.env.NEXT_PUBLIC_SITE_URL ?? "https://brothersharmtour.com";
   const schema = {
     "@context": "https://schema.org",
     "@graph": [
@@ -75,8 +77,8 @@ export default async function DestinationPage({
         "@type": "TouristDestination",
         name: destination.name,
         description: destination.intro,
-        url: `${site.url}/destinations/${destination.slug}`,
-        image: `${site.url}${destination.heroImage.src}`,
+        url: `${url}/destinations/${destination.slug}`,
+        image: `${url}${destination.heroImage.src}`,
         touristType: ["Families", "Couples", "Adventure travellers"],
         includesAttraction: destination.highlights.map((h) => ({
           "@type": "TouristAttraction",
@@ -87,18 +89,18 @@ export default async function DestinationPage({
       {
         "@type": "BreadcrumbList",
         itemListElement: [
-          { "@type": "ListItem", position: 1, name: "Home", item: site.url },
+          { "@type": "ListItem", position: 1, name: "Home", item: url },
           {
             "@type": "ListItem",
             position: 2,
             name: "Destinations",
-            item: `${site.url}/destinations`,
+            item: `${url}/destinations`,
           },
           {
             "@type": "ListItem",
             position: 3,
             name: destination.name,
-            item: `${site.url}/destinations/${destination.slug}`,
+            item: `${url}/destinations/${destination.slug}`,
           },
         ],
       },
@@ -317,10 +319,10 @@ export default async function DestinationPage({
 }
 
 function OtherDestination({ current }: { current: string }) {
-  const other = destinations.find((d) => d.slug !== current);
+  const other = activeDestinations().find((d) => d.slug !== current);
   if (!other) return null;
 
-  const count = tours.filter((t) => t.destination === other.slug).length;
+  const count = toursByDestination(other.slug).length;
 
   return (
     <section className="band-tight">

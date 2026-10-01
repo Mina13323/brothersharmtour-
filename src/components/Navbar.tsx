@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { site, whatsappLink } from "@/data/site";
+import { useSite } from "./SiteProvider";
 import { cn } from "@/lib/utils";
 import { WhatsAppIcon } from "./sections";
 import { LanguageSwitcher } from "./LanguageSwitcher";
@@ -109,6 +109,7 @@ const navItems = [
 ];
 
 export function Navbar() {
+  const { settings: site, whatsappLink } = useSite();
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
 

@@ -6,7 +6,7 @@ import { Reveal } from "@/components/Reveal";
 import { Accordion } from "@/components/Accordion";
 import { Breadcrumbs, CTASection, WhatsAppIcon } from "@/components/sections";
 import { generalFaq } from "@/data/testimonials";
-import { site, whatsappLink } from "@/data/site";
+import { getPublicSettings, serverWhatsappLink } from "@/lib/siteview";
 import { media } from "@/lib/media";
 
 import { Hero } from "@/components/Hero";
@@ -19,7 +19,9 @@ export const metadata: Metadata = buildMetadata({
   image: media.sharmHero,
 });
 
-export default function FaqPage() {
+export default async function FaqPage() {
+  const site = await getPublicSettings();
+  const whatsappLink = (m?: string) => serverWhatsappLink(site.contact.whatsapp, m);
   const schema = {
     "@context": "https://schema.org",
     "@type": "FAQPage",

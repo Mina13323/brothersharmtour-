@@ -4,6 +4,22 @@ import "@fontsource-variable/inter";
 import "@fontsource-variable/cormorant-garamond";
 import "./globals.css";
 
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
+import { BookingProvider } from "@/components/BookingProvider";
+import { FloatingActions } from "@/components/FloatingActions";
+import { SmoothScroll } from "@/components/SmoothScroll";
+import { SiteProvider } from "@/components/SiteProvider";
+import { OG_IMAGE } from "@/lib/media";
+import { getSiteView } from "@/lib/siteview";
+
+/*
+ * Every route renders per request because every route derives from the CMS
+ * (settings, tours, reviews). The store read is an mtime-guarded JSON load —
+ * microseconds — and it guarantees an admin edit is live the moment it saves.
+ */
+export const dynamic = "force-dynamic";
+
 const augsburg = localFont({
   src: [
     {
@@ -61,60 +77,57 @@ const augsburg = localFont({
   display: "swap",
 });
 
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
-import { BookingProvider } from "@/components/BookingProvider";
-import { FloatingActions } from "@/components/FloatingActions";
-import { SmoothScroll } from "@/components/SmoothScroll";
-import { site } from "@/data/site";
-import { OG_IMAGE } from "@/lib/media";
+export async function generateMetadata(): Promise<Metadata> {
+  const { settings } = await getSiteView();
+  const url = process.env.NEXT_PUBLIC_SITE_URL ?? "https://brothersharmtour.com";
 
-export const metadata: Metadata = {
-  metadataBase: new URL(site.url),
-  title: {
-    default: `${site.name} — Tours & Experiences in Sharm El Sheikh and Cairo`,
-    template: `%s · ${site.name}`,
-  },
-  description: site.description,
-  applicationName: site.name,
-  keywords: [
-    "Sharm El Sheikh tours",
-    "Red Sea excursions",
-    "Egypt day trips",
-    "Ras Mohamed snorkelling",
-    "White Island",
-    "Tiran Island",
-    "Sinai desert safari",
-    "Cairo day trip from Sharm",
-    "Sharm El Sheikh airport transfer",
-  ],
-  authors: [{ name: site.legalName }],
-  alternates: { canonical: "/" },
-  openGraph: {
-    type: "website",
-    siteName: site.name,
-    title: `${site.name} — Explore Egypt Differently`,
-    description: site.description,
-    url: site.url,
-    locale: "en_GB",
-    images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: `${site.name}` }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `${site.name} — Explore Egypt Differently`,
-    description: site.description,
-    images: [OG_IMAGE],
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: { index: true, follow: true, "max-image-preview": "large" },
-  },
-  icons: {
-    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
-    apple: [{ url: "/icon.svg" }],
-  },
-};
+  return {
+    metadataBase: new URL(url),
+    title: {
+      default: `${settings.name} — Tours & Experiences in Sharm El Sheikh and Cairo`,
+      template: `%s · ${settings.name}`,
+    },
+    description: settings.description,
+    applicationName: settings.name,
+    keywords: [
+      "Sharm El Sheikh tours",
+      "Red Sea excursions",
+      "Egypt day trips",
+      "Ras Mohamed snorkelling",
+      "White Island",
+      "Tiran Island",
+      "Sinai desert safari",
+      "Cairo day trip from Sharm",
+      "Sharm El Sheikh airport transfer",
+    ],
+    authors: [{ name: "Brother Sharm Tour Egypt" }],
+    alternates: { canonical: "/" },
+    openGraph: {
+      type: "website",
+      siteName: settings.name,
+      title: `${settings.name} — ${settings.tagline}`,
+      description: settings.description,
+      url,
+      locale: "en_GB",
+      images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: settings.name }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${settings.name} — ${settings.tagline}`,
+      description: settings.description,
+      images: [OG_IMAGE],
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: { index: true, follow: true, "max-image-preview": "large" },
+    },
+    icons: {
+      icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+      apple: [{ url: "/icon.svg" }],
+    },
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: [
@@ -126,20 +139,25 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-/** Organisation + site-level structured data. */
-function OrganisationSchema() {
+export default async function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
+  const view = await getSiteView();
+  const url = process.env.NEXT_PUBLIC_SITE_URL ?? "https://brothersharmtour.com";
+
+  /** Organisation + site-level structured data, from CMS values. */
   const schema = {
     "@context": "https://schema.org",
     "@type": "TravelAgency",
-    "@id": `${site.url}/#organisation`,
-    name: site.legalName,
-    alternateName: site.name,
-    url: site.url,
-    description: site.description,
-    slogan: site.tagline,
-    image: `${site.url}${OG_IMAGE}`,
-    telephone: site.contact.phone,
-    email: site.contact.email,
+    "@id": `${url}/#organisation`,
+    name: "Brother Sharm Tour Egypt",
+    alternateName: view.settings.name,
+    url,
+    description: view.settings.description,
+    slogan: view.settings.tagline,
+    image: `${url}${OG_IMAGE}`,
+    telephone: view.settings.contact.phone,
+    email: view.settings.contact.email,
     address: {
       "@type": "PostalAddress",
       addressLocality: "Sharm El Sheikh",
@@ -150,21 +168,11 @@ function OrganisationSchema() {
       { "@type": "City", name: "Sharm El Sheikh" },
       { "@type": "City", name: "Cairo" },
     ],
-    sameAs: [site.social.instagram, site.social.facebook],
+    sameAs: Object.values(view.settings.social).filter(
+      (v): v is string => Boolean(v),
+    ),
   };
 
-  return (
-    <script
-      type="application/ld+json"
-       
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-    />
-  );
-}
-
-export default function RootLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={augsburg.variable}>
       <head>
@@ -175,11 +183,8 @@ export default function RootLayout({
           behind a mask; both are resolved by IntersectionObserver. With
           scripting disabled that never happens, so this forces the end state.
 
-          This used to be a `no-js` class on <html> stripped by an inline
-          script. That mutates the DOM before React hydrates, so the server
-          markup and the client tree disagree and React reports a hydration
-          mismatch. A <noscript> block needs no script, mutates nothing, and
-          applies in exactly the case it is meant to.
+          A <noscript> block needs no script, mutates nothing, and applies in
+          exactly the case it is meant to.
         */}
         <noscript>
           <style>{`
@@ -191,7 +196,10 @@ export default function RootLayout({
             .lines > .line > span { transform: none !important; }
           `}</style>
         </noscript>
-        <OrganisationSchema />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        />
       </head>
       <body>
         <a
@@ -201,13 +209,19 @@ export default function RootLayout({
           Skip to content
         </a>
 
-        <BookingProvider>
-          <SmoothScroll />
-          <Navbar />
-          <main id="main">{children}</main>
-          <Footer />
-          <FloatingActions />
-        </BookingProvider>
+        <SiteProvider
+          settings={view.settings}
+          catalogue={view.catalogue}
+          currency={view.currency}
+        >
+          <BookingProvider>
+            <SmoothScroll />
+            <Navbar />
+            <main id="main">{children}</main>
+            <Footer />
+            <FloatingActions />
+          </BookingProvider>
+        </SiteProvider>
       </body>
     </html>
   );

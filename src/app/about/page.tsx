@@ -11,7 +11,7 @@ import { Breadcrumbs, CTASection, SectionHeading } from "@/components/sections";
 import { BookButton } from "@/components/BookingProvider";
 import { WaveDivider } from "@/components/WaveDivider";
 import { media } from "@/lib/media";
-import { site } from "@/data/site";
+import { getPublicSettings } from "@/lib/siteview";
 
 export const metadata: Metadata = buildMetadata({
   fallbackTitle: "About Brother Sharm Tour \u2014 Sharm El Sheikh Tour Operator",
@@ -43,7 +43,8 @@ const localExpertise = [
   { value: "24/7", label: "Someone on the end of WhatsApp" },
 ];
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const site = await getPublicSettings();
   const gallery = [
     media.whiteIsland.hero,
     media.superSafari.card,
@@ -271,7 +272,7 @@ export default function AboutPage() {
       <CTASection
         image={media.colorCanyon.hero}
         title="Come and see it"
-        text={`We're in ${site.contact.base.split(",")[0]}, and we answer quickly.`}
+        text={`We're in ${site.contact.address.split(",")[0]}, and we answer quickly.`}
       />
     </>
   );

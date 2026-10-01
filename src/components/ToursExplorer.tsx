@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { destinations } from "@/data/destinations";
-import { experiences } from "@/data/experiences";
-import { durationBuckets } from "@/data/tours";
+import { durationBuckets } from "@/lib/store/labels";
+import { destinationName, experienceName } from "@/lib/store/labels";
 import type { Tour } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { TourCard } from "./cards";
@@ -296,7 +295,10 @@ export function ToursExplorer({
                   onChange={setDestination}
                   options={[
                     { id: "all", label: "All" },
-                    ...destinations.map((d) => ({ id: d.slug, label: d.name })),
+                    ...Array.from(new Set(tours.map((t) => t.destination))).map((slug) => ({
+                      id: slug,
+                      label: destinationName(slug),
+                    })),
                   ]}
                 />
               </FilterGroup>
@@ -309,7 +311,10 @@ export function ToursExplorer({
                   onChange={setCategory}
                   options={[
                     { id: "all", label: "All" },
-                    ...experiences.map((e) => ({ id: e.slug, label: e.name })),
+                    ...Array.from(new Set(tours.map((t) => t.category))).map((slug) => ({
+                      id: slug,
+                      label: experienceName(slug),
+                    })),
                   ]}
                 />
               </FilterGroup>

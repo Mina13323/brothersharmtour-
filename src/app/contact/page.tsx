@@ -5,7 +5,7 @@ import { Reveal } from "@/components/Reveal";
 import { ContactForm } from "@/components/ContactForm";
 import { Breadcrumbs, WhatsAppIcon } from "@/components/sections";
 import { WaveDivider } from "@/components/WaveDivider";
-import { site, whatsappLink } from "@/data/site";
+import { getPublicSettings, serverWhatsappLink } from "@/lib/siteview";
 
 import { Hero } from "@/components/Hero";
 import { media } from "@/lib/media";
@@ -17,7 +17,9 @@ export const metadata: Metadata = buildMetadata({
   path: "/contact",
 });
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const site = await getPublicSettings();
+  const whatsappLink = (m?: string) => serverWhatsappLink(site.contact.whatsapp, m);
   return (
     <>
       <Hero
@@ -82,7 +84,7 @@ export default function ContactPage() {
                     <p className="text-[0.6875rem] uppercase tracking-[0.16em] text-stone">
                       Based in
                     </p>
-                    <p className="mt-1 font-display text-[1.2rem] text-ink">{site.contact.base}</p>
+                    <p className="mt-1 font-display text-[1.2rem] text-ink">{site.contact.address}</p>
                     <p className="mt-0.5 text-[0.8rem] text-stone">
                       {site.contact.hours}
                     </p>
@@ -155,7 +157,7 @@ export default function ContactPage() {
                 <div className="rounded-2xl bg-paper/95 px-6 py-5 text-center shadow-sm">
                   <p className="eyebrow text-stone">Map</p>
                   <p className="mt-2 font-display text-[1.375rem] leading-tight">
-                    {site.contact.base}
+                    {site.contact.address}
                   </p>
                   <p className="mt-2 max-w-xs text-[0.75rem] leading-relaxed text-stone">
                     Embed slot reserved — add the Maps iframe once the office

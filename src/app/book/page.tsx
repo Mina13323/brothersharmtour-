@@ -6,7 +6,7 @@ import { Suspense } from "react";
 import { Reveal } from "@/components/Reveal";
 import { BookingFormWithQuery } from "@/components/BookingFormWithQuery";
 import { Breadcrumbs, WhatsAppIcon } from "@/components/sections";
-import { site, whatsappLink } from "@/data/site";
+import { getPublicSettings, serverWhatsappLink } from "@/lib/siteview";
 import { media } from "@/lib/media";
 
 import { Hero } from "@/components/Hero";
@@ -35,7 +35,9 @@ const reassurance = [
   },
 ];
 
-export default function BookPage() {
+export default async function BookPage() {
+  const site = await getPublicSettings();
+  const whatsappLink = (m?: string) => serverWhatsappLink(site.contact.whatsapp, m);
   return (
     <>
       <Hero

@@ -1,12 +1,19 @@
 import type { MetadataRoute } from "next";
-import { site } from "@/data/site";
-import { destinations } from "@/data/destinations";
-import { experiences } from "@/data/experiences";
-import { tours } from "@/data/tours";
+import {
+  activeDestinations,
+  activeExperiences,
+  publishedPackages,
+  publishedTours,
+} from "@/lib/store/repo";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
-  const url = (path: string) => `${site.url}${path}`;
+  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://brothersharmtour.com";
+  const url = (path: string) => `${base}${path}`;
+  const destinations = activeDestinations();
+  const experiences = activeExperiences();
+  const tours = publishedTours();
+  const packages = publishedPackages();
 
   /* Only canonical, indexable URLs belong here. /book is a transactional
      form marked noindex, so listing it would invite crawl waste. */
@@ -36,9 +43,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
     ...tours.map((t) => ({
       url: url(`/tours/${t.slug}`),
-      lastModified: now,
+      lastModified: new Date(t.updatedAt),
       changeFrequency: "monthly" as const,
       priority: t.featured ? 0.8 : 0.6,
+    })),
+    ...packages.map((p) => ({
+      url: url(`/packages/${p.slug}`),
+      lastModified: new Date(p.updatedAt),
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
     })),
   ];
 }

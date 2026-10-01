@@ -6,8 +6,7 @@ import { Hero } from "@/components/Hero";
 import { Reveal } from "@/components/Reveal";
 import { DestinationCard } from "@/components/cards";
 import { Breadcrumbs, CTASection, ArrowRight } from "@/components/sections";
-import { destinations } from "@/data/destinations";
-import { toursByDestination } from "@/data/tours";
+import { activeDestinations, toursByDestination } from "@/lib/store/repo";
 import { media } from "@/lib/media";
 
 export const metadata: Metadata = buildMetadata({
@@ -19,6 +18,7 @@ export const metadata: Metadata = buildMetadata({
 });
 
 export default function DestinationsPage() {
+  const destinations = activeDestinations();
   return (
     <>
       <Hero

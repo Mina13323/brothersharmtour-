@@ -2,18 +2,16 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { tours } from "@/data/tours";
-import { destinationName } from "@/data/destinations";
-import { site, whatsappLink } from "@/data/site";
 import { WhatsAppIcon } from "./sections";
+import { useSite, useCatalogue } from "./SiteProvider";
+import { destinationName } from "@/lib/store/labels";
 import {
   cn,
-  money,
   tourPriceUnit,
   tourRating,
   tourReviewCount,
 } from "@/lib/utils";
-import type { Tour } from "@/lib/types";
+import type { CatalogueTour } from "@/lib/store/types";
 import { User, Phone, Hotel, DoorClosed, FileText } from "lucide-react";
 
 export function BookingWidget({
@@ -23,6 +21,8 @@ export function BookingWidget({
   initialTour?: string;
   onClose?: () => void;
 }) {
+  const { settings: site, whatsappLink, money } = useSite();
+  const tours = useCatalogue();
   const [slug, setSlug] = useState(initialTour ?? "");
   const tour = tours.find((t) => t.slug === slug);
 
@@ -88,7 +88,7 @@ export function BookingWidget({
       ...addons
         .filter((a) => (addonQty[a.label] ?? 0) > 0)
         .map((a) => `• Add-on: ${a.label} × ${addonQty[a.label]}`),
-      total !== null ? `• Estimated total: ${money(total)} (Pay on the day)` : null,
+      total !== null ? `• Estimated total: ${money(total, tour?.priceOverrides)} (Pay on the day)` : null,
       notes.trim() ? `• Special Notes: ${notes.trim()}` : null,
       "",
       "Please confirm availability and pickup schedule. Thank you!",
@@ -118,7 +118,7 @@ export function BookingWidget({
 
     setIsSubmitting(true);
 
-    // Save inquiry to Supabase in the background
+    // Record the booking in the CMS (best effort — the WhatsApp hand-off is primary)
     try {
       fetch("/api/inquiry", {
         method: "POST",
@@ -150,7 +150,7 @@ export function BookingWidget({
   };
 
   const grouped = Object.entries(
-    tours.reduce<Record<string, Tour[]>>((acc, t) => {
+    tours.reduce<Record<string, CatalogueTour[]>>((acc, t) => {
       const key = destinationName(t.destination);
       (acc[key] ??= []).push(t);
       return acc;
@@ -191,15 +191,15 @@ export function BookingWidget({
               {list.map((t) => (
                 <option key={t.slug} value={t.slug}>
                   {t.title}
-                  {t.priceFrom !== null ? ` — from ${money(t.priceFrom)}` : ""}
+                  {t.priceFrom !== null && money(t.priceFrom, t.priceOverrides) ? ` — from ${money(t.priceFrom, t.priceOverrides)}` : ""}
                 </option>
               ))}
             </optgroup>
           ))}
         </select>
-        {tour ? (
+        {tour && tourRating(tour) !== null ? (
           <div className="mt-2 flex items-center gap-2 text-[0.8rem] text-stone">
-            <Stars value={tourRating(tour)} />
+            <Stars value={tourRating(tour) ?? 0} />
             <span className="font-medium text-ink">{tourRating(tour)}</span>
             <span>({tourReviewCount(tour)} reviews)</span>
           </div>
@@ -223,7 +223,7 @@ export function BookingWidget({
         <div className="flex flex-col divide-y divide-sand/70 overflow-hidden rounded-2xl border border-sand/80 bg-paper-warm/30">
           <Counter
             label="Adults"
-            sub={adultPrice !== null && !perBoat ? money(adultPrice) : "12+ years"}
+            sub={adultPrice !== null && !perBoat ? money(adultPrice, tour?.priceOverrides) ?? "" : "12+"}
             value={adults}
             min={1}
             onChange={setAdults}
@@ -233,7 +233,7 @@ export function BookingWidget({
               label="Children"
               sub={
                 childPrice !== null
-                  ? `${money(childPrice)} · ages 5–10`
+                  ? `${money(childPrice, tour?.priceOverrides)} · ages 5–10`
                   : "ages 5–10"
               }
               value={children}
@@ -262,7 +262,7 @@ export function BookingWidget({
               <Counter
                 key={a.label}
                 label={a.label}
-                sub={`${money(a.price)}${a.unit ? ` ${a.unit}` : " each"}`}
+                sub={`${money(a.price, tour?.priceOverrides)}${a.unit ? ` ${a.unit}` : " each"}`}
                 value={addonQty[a.label] ?? 0}
                 onChange={(v) => setAddon(a.label, v - (addonQty[a.label] ?? 0))}
               />
@@ -375,7 +375,7 @@ export function BookingWidget({
               Estimated total
             </p>
             <p className="font-display text-[2rem] leading-none text-ink">
-              {total !== null ? money(total) : "On request"}
+              {total !== null ? money(total, tour?.priceOverrides) ?? "On request" : "On request"}
             </p>
             <p className="mt-1 text-[0.75rem] text-stone">
               {tour ? `${guests} guest${guests === 1 ? "" : "s"} · ` : ""}

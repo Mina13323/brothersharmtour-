@@ -6,8 +6,7 @@ import { Hero } from "@/components/Hero";
 import { ToursExplorerWithQuery } from "@/components/ToursExplorerWithQuery";
 import { Breadcrumbs, CTASection } from "@/components/sections";
 import { BookButton } from "@/components/BookingProvider";
-import { tours } from "@/data/tours";
-import { site } from "@/data/site";
+import { localizeTour, publishedTours } from "@/lib/store/repo";
 import { media } from "@/lib/media";
 
 export const metadata: Metadata = buildMetadata({
@@ -19,6 +18,9 @@ export const metadata: Metadata = buildMetadata({
 });
 
 export default function ToursPage() {
+  const url = process.env.NEXT_PUBLIC_SITE_URL ?? "https://brothersharmtour.com";
+  const tours = publishedTours().map((t) => localizeTour(t));
+
   const schema = {
     "@context": "https://schema.org",
     "@type": "ItemList",
@@ -28,7 +30,7 @@ export default function ToursPage() {
       "@type": "ListItem",
       position: i + 1,
       name: tour.title,
-      url: `${site.url}/tours/${tour.slug}`,
+      url: `${url}/tours/${tour.slug}`,
     })),
   };
 

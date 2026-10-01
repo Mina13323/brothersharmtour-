@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useBooking } from "./BookingProvider";
 import { WhatsAppIcon } from "./sections";
-import { money, tourPriceUnit } from "@/lib/utils";
+import { tourPriceUnit } from "@/lib/utils";
+import { useSite } from "./SiteProvider";
 import type { Tour } from "@/lib/types";
 
 /**
@@ -13,6 +14,7 @@ import type { Tour } from "@/lib/types";
  */
 export function StickyBookBar({ tour }: { tour: Tour }) {
   const { open } = useBooking();
+  const { money } = useSite();
   const [show, setShow] = useState(false);
 
   useEffect(() => {
@@ -39,7 +41,7 @@ export function StickyBookBar({ tour }: { tour: Tour }) {
             {price !== null ? (
               <>
                 <span className="font-display text-[1.05rem] text-ink">
-                  {money(price)}
+                  {money(price, tour.priceOverrides)}
                 </span>{" "}
                 {tourPriceUnit(tour)} · pay on the day
               </>

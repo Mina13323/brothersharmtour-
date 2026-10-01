@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { whatsappLink } from "@/data/site";
+import { useSite } from "./SiteProvider";
 import { WhatsAppIcon } from "./sections";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
 /** General enquiry form. Shares the /api/inquiry endpoint with the booking flow. */
 export function ContactForm() {
+  const { whatsappLink } = useSite();
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
 

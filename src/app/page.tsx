@@ -7,7 +7,7 @@ import { HeroSearch } from "@/components/HeroSearch";
 import { SplitHeadline } from "@/components/Reveal";
 import { SectionHeading } from "@/components/sections";
 import { Accordion } from "@/components/Accordion";
-import { TestimonialSlider } from "@/components/TestimonialSlider";
+import { ReviewSlider, ReviewInvite } from "@/components/TestimonialSlider";
 import { HomeCatalogue } from "@/components/HomeCatalogue";
 import {
   Bestsellers,
@@ -19,6 +19,7 @@ import {
 
 import { media, videoAvailable } from "@/lib/media";
 import type { FaqItem } from "@/lib/types";
+import { getSiteView } from "@/lib/siteview";
 
 export const metadata: Metadata = buildMetadata({
   fallbackTitle: "Sharm El Sheikh Excursions & Egypt Day Trips",
@@ -67,7 +68,11 @@ const homeFaq: FaqItem[] = [
   },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const view = await getSiteView();
+  const publicReviews = view.reviews;
+  const { count, average } = view.reviewStats;
+
   return (
     <>
       {/* 01 · HERO (Framed Card with Floating Dock) */}
@@ -86,7 +91,7 @@ export default function HomePage() {
       {/* 02 · REVIEWS */}
       <section id="reviews" className="band-tight scroll-mt-24 bg-paper">
         <div className="shell">
-          <TestimonialSlider />
+          {count > 0 ? <ReviewSlider reviews={publicReviews} /> : <ReviewInvite />}
         </div>
       </section>
 
@@ -97,7 +102,7 @@ export default function HomePage() {
       <HomeCatalogue />
 
       {/* 06 · RATING PANEL */}
-      <RatingPanel />
+      <RatingPanel average={average} count={count} />
 
       {/* 07 · FAQ */}
       <section id="faq" className="band scroll-mt-24">

@@ -46,12 +46,22 @@ export const media = {
     gallery: [
       img(
         "/media/white-island/gallery-01.jpg",
-        "Snorkellers in clear shallow water beside White Island",
+        "Boats at anchor off the White Island sandbank",
         CARD,
       ),
       img(
         "/media/white-island/gallery-02.jpg",
-        "Aerial view of the sandbank surrounded by reef",
+        "Guests wading across the sand at White Island",
+        CARD,
+      ),
+      img(
+        "/media/white-island/gallery-03.jpg",
+        "The sandbank seen from the water at low tide",
+        CARD,
+      ),
+      img(
+        "/media/white-island/gallery-04.jpg",
+        "Shallow reef water beside the sandbank",
         CARD,
       ),
     ],
@@ -105,6 +115,16 @@ export const media = {
       "Glass bottom boat floating above a shallow coral reef",
       CARD,
     ),
+    hero: img(
+      "/media/glass-boat/hero.jpg",
+      "Glass bottom boat over coral in Sharm El Sheikh",
+      WIDE,
+    ),
+    gallery: [
+      img("/media/glass-boat/gallery-01.jpg", "Viewing pane of a glass bottom boat over coral", CARD),
+      img("/media/glass-boat/gallery-02.jpg", "Fish seen through the glass hull", CARD),
+      img("/media/glass-boat/gallery-03.jpg", "Glass bottom boat at the jetty", CARD),
+    ],
   },
   submarine: {
     card: img(
@@ -112,6 +132,15 @@ export const media = {
       "Semi submarine viewing deck looking out into the Red Sea",
       CARD,
     ),
+    hero: img(
+      "/media/submarine/hero.jpg",
+      "Semi submarine at sea off Sharm El Sheikh",
+      WIDE,
+    ),
+    gallery: [
+      img("/media/submarine/gallery-01.jpg", "Underwater viewing cabin of the semi submarine", CARD),
+      img("/media/submarine/gallery-02.jpg", "Coral reef seen from the viewing cabin", CARD),
+    ],
   },
   speedBoat: {
     card: img(
@@ -119,6 +148,16 @@ export const media = {
       "Speed boat cutting across the surface of the Red Sea",
       CARD,
     ),
+    hero: img(
+      "/media/speed-boat/hero.jpg",
+      "Speed boat at speed off the Sharm El Sheikh coast",
+      WIDE,
+    ),
+    gallery: [
+      img("/media/speed-boat/gallery-01.jpg", "Speed boat heading out from the marina", CARD),
+      img("/media/speed-boat/gallery-02.jpg", "Guests on a private speed boat charter", CARD),
+      img("/media/speed-boat/gallery-03.jpg", "Speed boat anchored at a swim stop", CARD),
+    ],
   },
   parasailing: {
     card: img(
@@ -126,6 +165,16 @@ export const media = {
       "Parasail canopy lifting above the Red Sea behind a boat",
       CARD,
     ),
+    hero: img(
+      "/media/parasailing/hero.jpg",
+      "Parasailers rising above Sharm El Sheikh bay",
+      WIDE,
+    ),
+    gallery: [
+      img("/media/parasailing/gallery-01.jpg", "Parasail canopy above the bay", CARD),
+      img("/media/parasailing/gallery-02.jpg", "Take-off from the parasailing platform", CARD),
+      img("/media/parasailing/gallery-03.jpg", "View from altitude over the coastline", CARD),
+    ],
   },
 
   /* ---- Sharm El Sheikh — desert --------------------------------------- */
@@ -140,8 +189,18 @@ export const media = {
       "Camp fire and seating at a Bedouin camp in the Sinai desert",
       CARD,
     ),
+    gallery: [
+      img("/media/super-safari/gallery-01.jpg", "Camel ride near the Bedouin camp", CARD),
+      img("/media/super-safari/gallery-02.jpg", "Dinner and tea at the camp fire", CARD),
+      img("/media/super-safari/gallery-03.jpg", "Quad convoy on the way to the camp", CARD),
+    ],
   },
   desertSafari: {
+    hero: img(
+      "/media/safari/hero.jpg",
+      "Quad bikes lined up at the desert base outside Sharm El Sheikh",
+      WIDE,
+    ),
     card: img(
       "/media/safari/card.jpg",
       "Quad bikes crossing open desert outside Sharm El Sheikh",
@@ -153,6 +212,8 @@ export const media = {
         "Dust trail behind quad bikes in the Sinai desert",
         CARD,
       ),
+      img("/media/safari/gallery-02.jpg", "Riding through a desert wadi", CARD),
+      img("/media/safari/gallery-03.jpg", "Tea stop at a Bedouin tent", CARD),
     ],
   },
   colorCanyon: {
@@ -166,6 +227,13 @@ export const media = {
       "Narrow passage between layered rock walls in the Coloured Canyon",
       CARD,
     ),
+    gallery: [
+      img("/media/color-canyon/gallery-01.jpg", "Layered rock formations inside the canyon", CARD),
+      img("/media/color-canyon/gallery-02.jpg", "Walking the canyon floor", CARD),
+      img("/media/color-canyon/gallery-03.jpg", "Camel ride on the coast near Dahab", CARD),
+      img("/media/color-canyon/gallery-04.jpg", "The canyon walls narrowing overhead", CARD),
+      img("/media/color-canyon/gallery-05.jpg", "Open desert on the drive north", CARD),
+    ],
   },
   horseRiding: {
     card: img(
@@ -182,6 +250,17 @@ export const media = {
       "Dolphins swimming in clear open water",
       CARD,
     ),
+    hero: img(
+      "/media/swim-dolphin/hero.jpg",
+      "A dolphin swim session in Sharm El Sheikh",
+      WIDE,
+    ),
+    gallery: [
+      img("/media/swim-dolphin/gallery-01.jpg", "Guests in the water with a dolphin", CARD),
+      img("/media/swim-dolphin/gallery-02.jpg", "A close pass during the swim session", CARD),
+      img("/media/swim-dolphin/gallery-03.jpg", "Watching from the poolside platform", CARD),
+      img("/media/swim-dolphin/gallery-04.jpg", "Dolphins at play in the pool", CARD),
+    ],
   },
   dolphinShow: {
     card: img(
@@ -189,6 +268,14 @@ export const media = {
       "Dolphin performance arena in Sharm El Sheikh",
       CARD,
     ),
+    hero: img(
+      "/media/dolphin-show/hero.jpg",
+      "The covered dolphin show arena",
+      WIDE,
+    ),
+    gallery: [
+      img("/media/dolphin-show/gallery-01.jpg", "A leap during the dolphin show", CARD),
+    ],
   },
 
   /* ---- Sharm El Sheikh — town & leisure ------------------------------- */
@@ -271,6 +358,11 @@ export const media = {
       CARD,
     ),
   },
+  cairoGallery: [
+    img("/media/cairo/gallery-01.jpg", "The road out to the Giza plateau", CARD),
+    img("/media/cairo/gallery-02.jpg", "Inside the Grand Egyptian Museum galleries", CARD),
+    img("/media/cairo/gallery-03.jpg", "Old Cairo streetscapes", CARD),
+  ],
 
   /* ---- Destination + brand -------------------------------------------- */
   sharmDestination: img(
@@ -304,6 +396,30 @@ export const media = {
     TALL,
   ),
 
+  /* ---- Tour films (operator footage) ----------------------------------- */
+  tourVideos: {
+    superSafari: {
+      src: "/media/videos/super-safari.mp4",
+      poster: img("/media/super-safari/card.jpg", "Super Safari evening in the Sinai desert", CARD),
+      label: "Super Safari — film from the trip",
+    },
+    desertSafari: {
+      src: "/media/videos/desert-safari.mp4",
+      poster: img("/media/safari/card.jpg", "Quad safari in the Sinai desert", CARD),
+      label: "Quad Safari — film from the trip",
+    },
+    rasMohamed: {
+      src: "/media/videos/ras-mohamed.mp4",
+      poster: img("/media/ras-mohamed/card.jpg", "Ras Mohamed National Park", CARD),
+      label: "Ras Mohamed — film from the trip",
+    },
+    horseRiding: {
+      src: "/media/videos/horse-riding.mp4",
+      poster: img("/media/horse-riding/card.jpg", "Horse riding on the shore", CARD),
+      label: "Horse Riding — film from the trip",
+    },
+  },
+
   /* ---- Film ------------------------------------------------------------ */
   film: {
     src: "/media/films/reel.mp4",
@@ -323,6 +439,33 @@ export const media = {
     ),
     label: "Sharm El Sheikh from the water",
   },
+  extraFilms: [
+    {
+      src: "/media/films/extra-1.mp4",
+      poster: img(
+        "/media/films/extra-1-poster.jpg",
+        "Still frame from a Brother Sharm Tour film",
+        { w: 1280, h: 720 },
+      ),
+      label: "From our trips",
+    },
+    {
+      src: "/media/films/extra-2.mp4",
+      poster: img(
+        "/media/films/extra-2-poster.jpg",
+        "Still frame from a Brother Sharm Tour film",
+        { w: 1280, h: 720 },
+      ),
+      label: "From our trips",
+    },
+  ],
+  filmStills: [
+    img("/media/films/still-01.jpg", "Film still from a Brother Sharm Tour trip", CARD),
+    img("/media/films/still-02.jpg", "Film still from a Brother Sharm Tour trip", CARD),
+    img("/media/films/still-03.jpg", "Film still from a Brother Sharm Tour trip", CARD),
+    img("/media/films/still-04.jpg", "Film still from a Brother Sharm Tour trip", CARD),
+    img("/media/films/still-05.jpg", "Film still from a Brother Sharm Tour trip", CARD),
+  ],
 } as const;
 
 /** Site-wide social share image. */

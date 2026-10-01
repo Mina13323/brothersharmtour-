@@ -1,16 +1,19 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import { experienceName } from "@/data/experiences";
 import type { Destination, Experience, MediaImage, Tour } from "@/lib/types";
+import type { CatalogueTour } from "@/lib/store/types";
 import {
   cn,
-  money,
   tourRating,
   tourSchedule,
   tourPriceUnit,
   tourOriginalPrice,
   tourDiscountPct,
 } from "@/lib/utils";
+import { experienceName } from "@/lib/store/labels";
+import { useSite } from "./SiteProvider";
 
 /* ═══════════════════════════ Tour card ═══════════════════════════ */
 
@@ -20,51 +23,70 @@ import {
  * (duration · schedule), a "from £X /pp" price with a struck-through original
  * and a discount badge, and a clear "View details" button.
  */
+/** Structural card input — satisfied by the full public Tour view AND the
+ * client catalogue, so both render through the exact same card. */
+export type TourCardTour = Pick<Tour, "slug" | "title" | "summary" | "category" | "duration"> & {
+  images?: MediaImage[];
+  image?: MediaImage | null;
+  priceFrom: number | null;
+  priceOriginal?: number | null;
+  priceOverrides?: Record<string, number>;
+  priceUnit?: string;
+  type?: string;
+  schedule?: string | null;
+  rating?: number | null;
+};
+
 export function TourCard({
   tour,
   priority = false,
   sizes = "(max-width: 640px) 78vw, (max-width: 1024px) 45vw, 30vw",
 }: {
-  tour: Tour;
+  tour: TourCardTour;
   priority?: boolean;
   sizes?: string;
 }) {
-  const price = money(tour.priceFrom);
-  const original = money(tourOriginalPrice(tour));
+  const { money } = useSite();
+  const price = money(tour.priceFrom, tour.priceOverrides);
+  const original = money(tourOriginalPrice(tour), tour.priceOverrides);
   const discount = tourDiscountPct(tour);
   const rating = tourRating(tour);
   const unit = tourPriceUnit(tour);
   const unitShort = unit === "per person" ? "/pp" : unit.replace("per ", "/ ");
-  const image = tour.images[0];
+  const image = tour.images?.[0] ?? tour.image ?? null;
 
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-[1.5rem] sm:rounded-[1.75rem] border border-sand/70 bg-paper shadow-[var(--shadow-lift)] transition-all duration-500 hover:shadow-[var(--shadow-panel)] hover:border-reef/30 hover:-translate-y-1">
       <Link href={`/tours/${tour.slug}`} className="flex h-full flex-col">
-        <div className="media aspect-[3/2] w-full rounded-t-[1.5rem] sm:rounded-t-[1.75rem] rounded-b-none">
-          <Image
-            src={image.src}
-            alt={image.alt}
-            fill
-            sizes={sizes}
-            priority={priority}
-            className="object-cover transition-transform duration-[900ms] [transition-timing-function:var(--ease-premium)] group-hover:scale-[1.05]"
-            style={image.position ? { objectPosition: image.position } : undefined}
-          />
-          {/* Category tag — top left */}
-          <span className="absolute left-3.5 top-3.5 rounded-pill bg-ink/85 px-3 py-1 text-[0.625rem] font-semibold uppercase tracking-[0.16em] text-white backdrop-blur-sm shadow-xs">
-            {experienceName(tour.category)}
-          </span>
-          {/* Rating pill — top right */}
-          <span className="absolute right-3.5 top-3.5 inline-flex items-center gap-1 rounded-pill bg-paper/95 px-2.5 py-1 text-[0.6875rem] font-semibold text-ink shadow-xs">
-            <span className="text-sun" aria-hidden>★</span>
-            {rating.toFixed(1)}
-          </span>
-          {discount ? (
-            <span className="absolute bottom-3.5 right-3.5 rounded-pill bg-sun px-2.5 py-1 text-[0.6875rem] font-bold text-white shadow-sm">
-              −{discount}%
+        {image ? (
+          <div className="media relative aspect-[3/2] w-full rounded-t-[1.5rem] sm:rounded-t-[1.75rem] rounded-b-none">
+            <Image
+              src={image.src}
+              alt={image.alt}
+              fill
+              sizes={sizes}
+              priority={priority}
+              className="object-cover transition-transform duration-[900ms] [transition-timing-function:var(--ease-premium)] group-hover:scale-[1.05]"
+              style={image.position ? { objectPosition: image.position } : undefined}
+            />
+            {/* Category tag — top left */}
+            <span className="absolute left-3.5 top-3.5 rounded-pill bg-ink/85 px-3 py-1 text-[0.625rem] font-semibold uppercase tracking-[0.16em] text-white backdrop-blur-sm shadow-xs">
+              {experienceName(tour.category)}
             </span>
-          ) : null}
-        </div>
+            {/* Rating pill — only when real approved reviews exist */}
+            {rating !== null ? (
+              <span className="absolute right-3.5 top-3.5 inline-flex items-center gap-1 rounded-pill bg-paper/95 px-2.5 py-1 text-[0.6875rem] font-semibold text-ink shadow-xs">
+                <span className="text-sun" aria-hidden>★</span>
+                {rating.toFixed(1)}
+              </span>
+            ) : null}
+            {discount ? (
+              <span className="absolute bottom-3.5 right-3.5 rounded-pill bg-sun px-2.5 py-1 text-[0.6875rem] font-bold text-white shadow-sm">
+                −{discount}%
+              </span>
+            ) : null}
+          </div>
+        ) : null}
 
         <div className="flex grow flex-col p-4 sm:p-5">
           <h3 className="font-display text-[1.35rem] sm:text-[1.4rem] leading-[1.15] transition-colors duration-[var(--duration-ui)] group-hover:text-reef">
@@ -74,8 +96,12 @@ export function TourCard({
           {/* Meta row — duration · schedule */}
           <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.75rem] uppercase tracking-[0.1em] text-stone">
             <span>{tour.duration ?? "Flexible"}</span>
-            <span className="opacity-40">·</span>
-            <span>{tourSchedule(tour)}</span>
+            {tourSchedule(tour) ? (
+              <>
+                <span className="opacity-40">·</span>
+                <span>{tourSchedule(tour)}</span>
+              </>
+            ) : null}
           </p>
 
           <p className="mt-2.5 line-clamp-2 text-[0.8125rem] leading-relaxed text-stone">

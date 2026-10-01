@@ -3,10 +3,10 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { destinations } from "@/data/destinations";
-import { experiences } from "@/data/experiences";
 import { durationBuckets } from "@/data/tours";
 import { cn } from "@/lib/utils";
+import { useCatalogue } from "./SiteProvider";
+import { destinationName, experienceName } from "@/lib/store/labels";
 
 /**
  * BROTHER SHARM TOUR — hero search
@@ -37,6 +37,9 @@ const popular: { label: string; href: string }[] = [
 ];
 
 export function HeroSearch() {
+  const catalogue = useCatalogue();
+  const destinationOptions = Array.from(new Set(catalogue.map((t) => t.destination)));
+  const categoryOptions = Array.from(new Set(catalogue.map((t) => t.category)));
   const router = useRouter();
   const [tab, setTab] = useState<TabId>("tours");
   const [destination, setDestination] = useState("all");
@@ -123,9 +126,9 @@ export function HeroSearch() {
               className="w-full bg-transparent text-sm font-semibold text-ink border-0 p-0 focus:ring-0 focus:outline-none cursor-pointer truncate"
             >
               <option value="all">Choose a destination</option>
-              {destinations.map((d) => (
-                <option key={d.slug} value={d.slug}>
-                  {d.name}
+              {destinationOptions.map((slug) => (
+                <option key={slug} value={slug}>
+                  {destinationName(slug)}
                 </option>
               ))}
             </select>
@@ -163,9 +166,9 @@ export function HeroSearch() {
                 className="w-full bg-transparent text-sm font-semibold text-ink border-0 p-0 focus:ring-0 focus:outline-none cursor-pointer truncate"
               >
                 <option value="all">Select experience</option>
-                {experiences.map((x) => (
-                  <option key={x.slug} value={x.slug}>
-                    {x.name}
+                {categoryOptions.map((slug) => (
+                  <option key={slug} value={slug}>
+                    {experienceName(slug)}
                   </option>
                 ))}
               </select>

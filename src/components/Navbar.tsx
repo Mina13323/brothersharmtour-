@@ -179,7 +179,7 @@ export function Navbar() {
           </nav>
 
           {/* Right actions: Currency Switcher + Language Switcher + Book on WhatsApp */}
-          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <CurrencySwitcher tone="ink" />
             <LanguageSwitcher tone="ink" />
             <a
@@ -187,10 +187,10 @@ export function Navbar() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Book on WhatsApp"
-              className="h-8 sm:h-9 px-2.5 sm:px-4 rounded-full bg-sun hover:bg-sun-bright text-white text-[11px] sm:text-xs font-bold uppercase tracking-wider shadow-sm hover:shadow-md shrink-0 whitespace-nowrap flex items-center gap-1.5 transition-all cursor-pointer"
+              className="hidden md:inline-flex h-9 px-4 rounded-full bg-sun hover:bg-sun-bright text-white text-xs font-bold uppercase tracking-wider shadow-sm hover:shadow-md shrink-0 whitespace-nowrap items-center gap-1.5 transition-all cursor-pointer"
             >
               <WhatsAppIcon className="size-3.5 shrink-0" />
-              <span className="hidden sm:inline">
+              <span>
                 Book <span className="hidden xl:inline">on WhatsApp</span>
               </span>
             </a>

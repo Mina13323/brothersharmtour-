@@ -112,19 +112,60 @@ export function getGuideTerms(langCode: string): GuideLanguageConfig {
   return GUIDE_LANGUAGE_MAP[langCode] || GUIDE_LANGUAGE_MAP.en;
 }
 
+const SEARCH_ADJECTIVES = [
+  "English",
+  "German",
+  "Deutsch",
+  "Italian",
+  "Italiano",
+  "Polish",
+  "Polski",
+  "Russian",
+  "Русский",
+  "Ukrainian",
+  "Українська",
+  "French",
+  "Français",
+  "Arabic",
+  "العربية",
+  "Romanian",
+  "Română",
+  "Dutch",
+  "Nederlands",
+];
+
+const ADJ_PATTERN = SEARCH_ADJECTIVES.join("|");
+
+/**
+ * Localizes any guide-related text string (e.g. "English-speaking guide",
+ * "English-speaking Brother Sharm Tour guide", "English-speaking drivers", "English guides", "in English")
+ * into the target language adjective (e.g. "German-speaking guide", "German-speaking drivers").
+ */
+export function localizeGuideText(val: string, langCode: string): string {
+  if (!val) return val;
+  const target = getGuideTerms(langCode);
+
+  let res = val;
+  // Replace "{Language}-speaking" -> "{Target}-speaking" (handles "English-speaking guide", "English-speaking Brother Sharm Tour guide", "English-speaking drivers", etc.)
+  res = res.replace(new RegExp(`\\b(${ADJ_PATTERN})-speaking\\b`, "gi"), `${target.adjective}-speaking`);
+  // Replace "{Language} guides" -> "{Target} guides"
+  res = res.replace(new RegExp(`\\b(${ADJ_PATTERN}) guides\\b`, "gi"), `${target.adjective} guides`);
+  // Replace "{Language} guide" -> "{Target} guide"
+  res = res.replace(new RegExp(`\\b(${ADJ_PATTERN}) guide\\b`, "gi"), `${target.adjective} guide`);
+  // Replace "in {Language}" -> "in {Target}"
+  res = res.replace(new RegExp(`\\bin (${ADJ_PATTERN})\\b`, "gi"), `in ${target.adjective}`);
+  // Replace "{Language} on all our trips" -> "{Target} on all our trips"
+  res = res.replace(new RegExp(`\\b(${ADJ_PATTERN}) on all our trips\\b`, "gi"), `${target.adjective} on all our trips`);
+
+  return res;
+}
+
 /**
  * Replaces any existing guide language text in the DOM with the newly selected language.
  * Handles both plain English and previously swapped language adjectives.
  */
 export function updateDomGuideTerms(langCode: string) {
   if (typeof window === "undefined" || !document.body) return;
-
-  const target = getGuideTerms(langCode);
-  const allAdjectives = Object.values(GUIDE_LANGUAGE_MAP).map((c) => c.adjective);
-  const regexPattern = new RegExp(
-    `(${allAdjectives.join("|")})(-speaking guides?|-speaking Brother Sharm Tour guide|-speaking drivers?| guides?| on WhatsApp, in [A-Za-z]+)`,
-    "gi"
-  );
 
   const walker = document.createTreeWalker(
     document.body,
@@ -146,32 +187,10 @@ export function updateDomGuideTerms(langCode: string) {
       continue;
     }
 
-    let val = node.nodeValue;
-    let modified = false;
-
-    // Replace "{Adjective}-speaking guide(s)" -> "{TargetAdjective}-speaking guide(s)"
-    if (regexPattern.test(val)) {
-      val = val.replace(
-        new RegExp(`(${allAdjectives.join("|")})-speaking guide`, "gi"),
-        `${target.adjective}-speaking guide`
-      );
-      val = val.replace(
-        new RegExp(`(${allAdjectives.join("|")})-speaking drivers`, "gi"),
-        `${target.adjective}-speaking drivers`
-      );
-      val = val.replace(
-        new RegExp(`(${allAdjectives.join("|")}) guides`, "gi"),
-        `${target.adjective} guides`
-      );
-      val = val.replace(
-        new RegExp(`in (${allAdjectives.join("|")})`, "gi"),
-        `in ${target.adjective}`
-      );
-      modified = true;
-    }
-
-    if (modified) {
-      node.nodeValue = val;
+    const newVal = localizeGuideText(node.nodeValue, langCode);
+    if (newVal !== node.nodeValue) {
+      node.nodeValue = newVal;
     }
   }
 }
+

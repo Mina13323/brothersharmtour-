@@ -15,6 +15,7 @@ import "server-only";
 import { destinations as seedDestinations, destinationName } from "@/data/destinations";
 import { experiences as seedExperiences, experienceName } from "@/data/experiences";
 import type { Tour } from "@/lib/types";
+import { localizeGuideText } from "@/lib/i18n/guideTerms";
 import { loadDb, updateDb } from "./db";
 import type {
   CatalogueTour,
@@ -144,13 +145,22 @@ export function relatedTours(tour: TourRecord, limit = 3): TourRecord[] {
 export function localizeTour(tour: TourRecord, lang?: string | null): Tour {
   const t = lang && lang !== "en" ? tour.translations?.[lang] : undefined;
   const overlay = (base: string, loc?: string) => (loc && loc.trim() ? loc : base);
+  const targetLang = lang || "en";
+  const rawIncluded = t?.included?.length ? t.included : tour.included;
+  const rawHighlights = t?.highlights?.length ? t.highlights : tour.highlights;
+  const rawDesc = t?.description?.length ? t.description : tour.description;
+
+  const included = targetLang !== "en" ? rawIncluded.map((item) => localizeGuideText(item, targetLang)) : rawIncluded;
+  const highlights = targetLang !== "en" ? rawHighlights.map((h) => localizeGuideText(h, targetLang)) : rawHighlights;
+  const description = targetLang !== "en" ? rawDesc.map((p) => localizeGuideText(p, targetLang)) : rawDesc;
+
   return {
     ...tour,
     title: overlay(tour.title, t?.title),
     summary: overlay(tour.summary, t?.summary),
-    description: t?.description?.length ? t.description : tour.description,
-    highlights: t?.highlights?.length ? t.highlights : tour.highlights,
-    included: t?.included?.length ? t.included : tour.included,
+    description,
+    highlights,
+    included,
     excluded: t?.excluded?.length ? t.excluded : tour.excluded,
     bring: t?.bring?.length ? t.bring : tour.bring,
     itinerary: t?.itinerary?.length ? t.itinerary : tour.itinerary,

@@ -7,7 +7,10 @@ export function useGuideLanguage(): GuideLanguageConfig {
   const [lang, setLang] = useState("en");
 
   useEffect(() => {
-    const saved = localStorage.getItem("bst-lang") || "en";
+    const storedCookie = typeof document !== "undefined"
+      ? document.cookie.split("; ").find((c) => c.startsWith("bt_lang="))?.split("=")[1]
+      : null;
+    const saved = localStorage.getItem("bst-lang") || storedCookie || "en";
     setLang(saved);
 
     const onLangChange = (e: Event) => {

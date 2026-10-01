@@ -22,7 +22,8 @@ import { StickyBookBar } from "./StickyBookBar";
 import { Accordion } from "./Accordion";
 import { CTASection, SectionHeading, WhatsAppIcon } from "./sections";
 import { BookButton } from "./BookingProvider";
-import { GuideLanguageBadge } from "./DynamicGuideLanguage";
+import { GuideLanguageBadge, useGuideLanguage } from "./DynamicGuideLanguage";
+import { localizeGuideText } from "@/lib/i18n/guideTerms";
 import { useSite } from "./SiteProvider";
 import type { PublicReview } from "@/lib/siteview";
 import { destinationName, experienceName } from "@/lib/store/labels";
@@ -54,6 +55,7 @@ export function TourBody({
   preview?: boolean;
 }) {
   const { money, whatsappLink, settings } = useSite();
+  const guideLang = useGuideLanguage();
 
   const price = money(tour.priceFrom, tour.priceOverrides);
   const original = money(tourOriginalPrice(tour), tour.priceOverrides);
@@ -213,7 +215,7 @@ export function TourBody({
                       {tour.included.map((item) => (
                         <li key={item} className="flex gap-3 text-[0.9375rem] leading-relaxed">
                           <Check />
-                          {item}
+                          {localizeGuideText(item, guideLang.code)}
                         </li>
                       ))}
                     </ul>

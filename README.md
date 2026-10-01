@@ -40,7 +40,7 @@ Copy `.env.example` → `.env.local` and fill in:
 
 ### First run — change the admin password
 
-The seeded admin is `admin@brothersharmtour.com` / `Brotour-Admin-2026`
+The seeded admin is `admin@brothersharmtour.com` / `Admin@Sitemanagment@26!`
 (overridable via the env vars above **before first boot**). Sign in at
 `/admin/login` and change the password from **Settings → Admin password**
 immediately. Changing it signs out every other session.

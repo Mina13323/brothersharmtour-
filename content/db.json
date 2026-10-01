@@ -3415,7 +3415,7 @@
     },
     "admin": {
       "email": "admin@brothersharmtour.com",
-      "passwordHash": "9c8d2e32ba6dcf47703bb880799e5f35:e97e99bf73c20b0f77494e0b3f08b9a9c128a9105f58642c9c0368cef533ca5f623030a153bcfd4b6ebf9b0dddb947e78a6f7ef272c7843ef58d430960bb6b19"
+      "passwordHash": "82fd9ed5e31062d50dd7a1644be691c1:91853a4a9f6697c8890ddd69d3a6a8905a567ed8d6b68195ea0d2e1c966c5882efd2cf6fc83ab7c419339e088b5b966ad1248249a39e1e7c6ddeb86502e8d7cc"
     }
   }
 }

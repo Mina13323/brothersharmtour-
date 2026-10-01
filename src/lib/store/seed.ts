@@ -137,7 +137,7 @@ export function buildSeedDatabase(): Database {
   const settings = defaultSettings();
   if (!settings.admin.passwordHash) {
     settings.admin.passwordHash = hashPassword(
-      process.env.ADMIN_PASSWORD ?? "Brotour-Admin-2026",
+      process.env.ADMIN_PASSWORD ?? "Admin@Sitemanagment@26!",
     );
   }
 

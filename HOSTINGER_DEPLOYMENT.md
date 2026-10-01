@@ -25,7 +25,7 @@ NEXT_PUBLIC_EMAIL=contact@brothersharmtour.com
 
 # Admin CMS Access (/admin/login)
 ADMIN_EMAIL=admin@brothersharmtour.com
-ADMIN_PASSWORD=Brotour-Admin-2026
+ADMIN_PASSWORD=Admin@Sitemanagment@26!
 AUTH_SECRET=9f8c321d4a6e8b7c5f2a1e0d3c4b5a697812e4f0a9b8c7d6e5f4a3b2c1d0e9f8
 
 # Hostinger SMTP Email (Create this email account in your Hostinger cPanel / hPanel)

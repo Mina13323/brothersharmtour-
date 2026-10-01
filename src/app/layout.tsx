@@ -12,6 +12,11 @@ import { SmoothScroll } from "@/components/SmoothScroll";
 import { SiteProvider } from "@/components/SiteProvider";
 import { OG_IMAGE } from "@/lib/media";
 import { getSiteView } from "@/lib/siteview";
+import { Geist } from "next/font/google";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+
 
 /*
  * Every route renders per request because every route derives from the CMS
@@ -177,7 +182,7 @@ export default async function RootLayout({
     <html
       lang={view.lang}
       dir={view.lang === "ar" ? "rtl" : "ltr"}
-      className={augsburg.variable}
+      className={cn(augsburg.variable, geist.variable)}
     >
       <head>
         {/*

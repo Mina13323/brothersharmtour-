@@ -23,6 +23,7 @@ import type { CatalogueTour, TourRecord, TourTranslation } from "@/lib/store/typ
 import type { CurrencyContext } from "@/lib/currency";
 import type { Tour } from "@/lib/types";
 import { destinationName, experienceName } from "@/lib/store/labels";
+import { MediaGalleryEditor, MediaVideoEditor } from "./MediaGalleryEditor";
 
 type EditorTour = TourRecord;
 
@@ -471,56 +472,19 @@ export default function TourEditor({
 
           {/* ── Media ── */}
           <Section title="Media">
-            <ListEditor
-              label="Images (public paths or /uploads/... URLs, first = hero)"
-              items={tour.images.map((i) => JSON.stringify(i))}
-              onChange={(items) =>
-                set(
-                  "images",
-                  items
-                    .map((s) => {
-                      try {
-                        return JSON.parse(s) as { src: string; alt: string; width?: number; height?: number; position?: string };
-                      } catch {
-                        return null;
-                      }
-                    })
-                    .filter((x): x is NonNullable<typeof x> => Boolean(x)),
-                )
-              }
-              newItem={() => JSON.stringify({ src: "/media/white-island/hero.jpg", alt: tour.title, width: 1600, height: 900 })}
-              mono
+            <MediaGalleryEditor
+              images={tour.images}
+              onChange={(imgs) => set("images", imgs)}
+              title={tour.title}
+              label="Tour Photos (First photo is the main hero cover)"
             />
-            <Field label="Video (optional)">
-              <div className="grid grid-cols-2 gap-2">
-                <input
-                  className={input}
-                  placeholder="/media/videos/super-safari.mp4"
-                  value={tour.video?.src ?? ""}
-                  onChange={(e) =>
-                    set("video", e.target.value ? { ...tour.video, src: e.target.value } : undefined)
-                  }
-                />
-                <input
-                  className={input}
-                  placeholder="poster path"
-                  value={tour.video?.poster?.src ?? ""}
-                  onChange={(e) =>
-                    set(
-                      "video",
-                      tour.video
-                        ? {
-                            ...tour.video,
-                            poster: e.target.value
-                              ? { src: e.target.value, alt: `${tour.title} video poster`, width: 1600, height: 900 }
-                              : undefined,
-                          }
-                        : undefined,
-                    )
-                  }
-                />
-              </div>
-            </Field>
+            <div className="pt-4 border-t border-white/10">
+              <MediaVideoEditor
+                video={tour.video}
+                onChange={(v) => set("video", v)}
+                tourTitle={tour.title}
+              />
+            </div>
           </Section>
 
           {/* ── Content lists ── */}

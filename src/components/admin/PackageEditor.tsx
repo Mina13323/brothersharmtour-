@@ -12,6 +12,7 @@ import { Save, Plus, Trash2, ArrowUp, ArrowDown } from "lucide-react";
 
 import type { PackageRecord } from "@/lib/store/types";
 import { destinationName } from "@/lib/store/labels";
+import { MediaGalleryEditor, SingleImageUploader } from "./MediaGalleryEditor";
 
 const DESTINATIONS = ["sharm-el-sheikh", "cairo"];
 
@@ -205,40 +206,20 @@ export default function PackageEditor({
         </Section>
 
         <Section title="Media">
-          <Field label="Cover image (public path or /uploads/... URL)">
-            <input
-              className={`${input} font-mono text-[11px]`}
-              value={pkg.coverImage?.src ?? ""}
-              onChange={(e) =>
-                set(
-                  "coverImage",
-                  e.target.value
-                    ? { src: e.target.value, alt: pkg.title, width: 1600, height: 900 }
-                    : null,
-                )
-              }
-            />
-          </Field>
-          <ListEditor
-            label="Gallery"
-            items={pkg.gallery.map((g) => JSON.stringify(g))}
-            onChange={(items) =>
-              set(
-                "gallery",
-                items
-                  .map((s) => {
-                    try {
-                      return JSON.parse(s) as { src: string; alt: string; width?: number; height?: number };
-                    } catch {
-                      return null;
-                    }
-                  })
-                  .filter((x): x is NonNullable<typeof x> => Boolean(x)),
-              )
-            }
-            newItem={() => JSON.stringify({ src: "/media/white-island/hero.jpg", alt: pkg.title, width: 1600, height: 900 })}
-            mono
+          <SingleImageUploader
+            image={pkg.coverImage}
+            onChange={(img) => set("coverImage", img)}
+            label="Package Cover Photo"
+            defaultAlt={pkg.title}
           />
+          <div className="pt-4 border-t border-white/10">
+            <MediaGalleryEditor
+              images={pkg.gallery}
+              onChange={(imgs) => set("gallery", imgs)}
+              title={pkg.title}
+              label="Package Photo Gallery"
+            />
+          </div>
         </Section>
 
         <Section title="Story">

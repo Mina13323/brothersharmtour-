@@ -9,8 +9,8 @@ export const site = {
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://brothersharmtour.com",
   locale: "en",
   contact: {
-    whatsapp: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "201000000000",
-    phone: process.env.NEXT_PUBLIC_PHONE ?? "+20 100 000 0000",
+    whatsapp: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "201042441923",
+    phone: process.env.NEXT_PUBLIC_PHONE ?? "+20 10 4244 1923",
     email: process.env.NEXT_PUBLIC_EMAIL ?? "hello@brothersharmtour.com",
     base: "Sharm El Sheikh, South Sinai, Egypt",
     hours: "Daily · 08:00 – 23:00 (EET)",

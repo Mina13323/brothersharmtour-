@@ -19,8 +19,8 @@ Ensure the following values match your live setup:
 NEXT_PUBLIC_SITE_URL=https://brothersharmtour.com
 
 # Contact Info
-NEXT_PUBLIC_WHATSAPP_NUMBER=201000000000
-NEXT_PUBLIC_PHONE=+20 100 000 0000
+NEXT_PUBLIC_WHATSAPP_NUMBER=201042441923
+NEXT_PUBLIC_PHONE=+20 10 4244 1923
 NEXT_PUBLIC_EMAIL=hello@brothersharmtour.com
 
 # Admin CMS Access (/admin/login)

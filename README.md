@@ -1,9 +1,12 @@
 # BROTHER SHARM TOUR
 
-Premium tourism website for **Brother Sharm Tour**, an Egyptian tour operator based in
-Sharm El Sheikh (primary destination) with Cairo as the secondary destination.
+Tourism website + CMS for **Brother Sharm Tour**, an Egyptian tour operator
+based in Sharm El Sheikh (primary destination) with Cairo as the secondary
+destination.
 
 Built with **Next.js 15 (App Router)**, **TypeScript** and **Tailwind CSS v4**.
+The CMS is built in — a file-backed store (`content/db.json`) with atomic
+writes, an authenticated admin at `/admin`, and no external database required.
 
 ---
 
@@ -11,59 +14,114 @@ Built with **Next.js 15 (App Router)**, **TypeScript** and **Tailwind CSS v4**.
 
 ```bash
 npm install
-npm run dev        # http://localhost:3000
+npm run dev        # http://localhost:3000 — CMS auto-seeds on first boot
 ```
 
 | Script | What it does |
 | --- | --- |
 | `npm run dev` | Dev server on `0.0.0.0:3000` |
-| `npm run build` | Production build (45 prerendered routes) |
+| `npm run build` | Production build |
 | `npm run start` | Serve the production build |
 | `npm run lint` | ESLint (flat config, `next/core-web-vitals` + `next/typescript`) |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run media` | Regenerate every image in `public/media/**` from `media-src/` |
+| `npm run lifecycle` | End-to-end HTTP test of the CMS (40 checks — build first) |
+
+### Environment
+
+Copy `.env.example` → `.env.local` and fill in:
+
+- `NEXT_PUBLIC_SITE_URL` — canonical URL (sitemap, robots, JSON-LD)
+- `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASS` — Hostinger mailbox for
+  booking + review notifications. Credentials live **only** in the environment;
+  the CMS settings page controls recipients and toggles, never credentials.
+- `ADMIN_EMAIL` / `ADMIN_PASSWORD` — *only consulted on the very first boot*
+  when the store seeds. Defaults exist for local development.
+
+### First run — change the admin password
+
+The seeded admin is `admin@brothersharmtour.com` / `Brotour-Admin-2026`
+(overridable via the env vars above **before first boot**). Sign in at
+`/admin/login` and change the password from **Settings → Admin password**
+immediately. Changing it signs out every other session.
 
 ---
 
 ## Architecture
 
-Nothing is hardcoded per page. Every route is composed from shared components
-reading shared, typed data.
-
 ```
+content/db.json        ← the CMS store (auto-seeded; git-ignored)
+content/uploads/       ← CMS-uploaded media (git-ignored)
+media-src/             ← source photography for the derived media pipeline
+public/media/**        ← generated images + copied videos (npm run media)
+
 src/
-├── lib/
-│   ├── types.ts        Destination · Experience · Tour · MediaImage · MediaVideo
-│   │                   ItineraryStop · FaqItem · Testimonial · BookingInquiry
-│   ├── media.ts        Single asset manifest — every image path in one file
-│   └── utils.ts        cn() · formatPrice() · slugToLabel()
-│
-├── data/               ← the CMS-ready layer (see "Connecting a CMS")
-│   ├── site.ts         Brand, contact, WhatsApp deep-link builder, navigation
-│   ├── destinations.ts 2 destinations
-│   ├── experiences.ts  7 experience categories
-│   ├── tours.ts        21 tours
-│   └── testimonials.ts Testimonials + general FAQ
-│
-├── components/         Hero · ToursExplorer · Gallery · TestimonialSlider
-│                       VideoSection · Accordion · BookingForm · BookingProvider
-│                       Navbar · Footer · FloatingActions · cards · sections
-│
-└── app/                Routes (below)
+├── lib/store/         The CMS: types, db (atomic JSON writes, mtime cache),
+│                      seed, settings, repo (CRUD, catalogue, integrity check)
+├── lib/auth.ts        scrypt + HMAC session cookie, requireAdmin()
+├── lib/ratelimit.ts   per-IP fixed windows for public + admin endpoints
+├── lib/mail.ts        Hostinger SMTP (env-only credentials)
+├── lib/currency.ts    multi-currency context + conversion + overrides
+├── lib/siteview.ts    server view assembly (settings, currency, language,
+│                      catalogue, public reviews)
+├── lib/uploads.ts     validated upload storage (magic-byte sniffing)
+├── lib/seo.ts         metadata builder (brand values from the store)
+├── lib/media.ts       asset manifest for the generated media pipeline
+├── data/              seed content (21 tours, 2 destinations, 7 categories)
+├── components/        design system + SiteProvider (client CMS context)
+│   ├── TourBody.tsx   shared tour renderer — public pages AND CMS preview
+│   └── admin/         CMS UI (editors, moderation, pipeline, media)
+└── app/
+    ├── (public)       / · /tours · /tours/[slug] · /destinations ·
+    │                  /experiences · /packages · /review · /book ·
+    │                  /contact · /faq · /about · /video
+    ├── admin/         CMS (server-guarded pages; noindex)
+    └── api/           inquiry · review · currency · admin/*
 ```
 
-### Routes
+### How the CMS connects to the site
 
-| Route | Type |
-| --- | --- |
-| `/` | Static |
-| `/destinations`, `/destinations/[slug]` | Static + SSG (2) |
-| `/experiences`, `/experiences/[slug]` | Static + SSG (7) |
-| `/tours` | Static (client-side filtering) |
-| `/tours/[slug]` | SSG (21) |
-| `/about`, `/contact`, `/faq`, `/book` | Static |
-| `/api/inquiry` | Route handler (POST) |
-| `/sitemap.xml`, `/robots.txt`, `/icon.svg`, `404` | Generated |
+- **Server pages** read the store directly (`getSiteView()`, repo functions).
+- **Client components** receive live values through `<SiteProvider>`
+  (`useSite()` for settings/money/WhatsApp, `useCatalogue()` for the tours).
+- The root layout is **`force-dynamic`**: an admin edit is live on the site on
+  the next request — no rebuild, no revalidation to configure.
+- `src/data/*` remains only as the **seed source** (the store bootstraps from
+  it on first run). Editing those files after the store exists has no effect;
+  edit through the CMS.
+
+### Multi-currency
+
+Prices are stored in one base currency (default USD). Visitors switch display
+currency with the header/footer switcher (`bt_currency` cookie); the admin sets
+the rate table and the default. A tour can pin exact per-currency prices
+(`priceOverrides`) that win over conversion. **Language never implies
+currency** — they are separate cookies and separate settings.
+
+### Multi-language
+
+Enabled languages are admin-controlled. Tour editors carry per-language fields
+(title, summary, description, lists, SEO) — the public site overlays them via
+`localizeTour` when the visitor picks that language (`bt_lang` cookie).
+Untranslated fields fall back to English. There is **no machine translation**.
+
+### Reviews
+
+Public form at `/review?tour=<slug>` (or without, for a general review) →
+stored as **PENDING** with any photos (validated uploads). Nothing is public
+until an admin approves it in `/admin/reviews`. `verified` is a separate,
+explicit admin mark that the booking could be matched to a real inquiry.
+Ratings and review counts anywhere on the site — including structured data —
+are computed **only** from approved reviews.
+
+### Bookings
+
+The booking drawer, `/book` and the contact form all post to `/api/inquiry`:
+rate-limited, honeypot-guarded, stored with status **NEW** and the currency the
+visitor was viewing. Admin works them through
+NEW → CONTACTED → CONFIRMED → COMPLETED (or CANCELLED) with internal notes.
+Notification emails go to every address in Settings → Email (Hostinger SMTP);
+the delivery outcome is recorded on the inquiry.
 
 ---
 
@@ -73,146 +131,110 @@ The whole visual language lives in `src/app/globals.css` as Tailwind v4
 `@theme` tokens plus a small set of component classes — no utility soup
 duplicated across files.
 
-- **Palette** — the Brother Sharm Tour five-colour system: Midnight Blue
-  `#0F414A` (ink / dark surfaces), Alabaster `#EFE8DF` (paper), Tan `#D8BA98`
-  (sand / warm fill), Maroon `#7F0303` (primary CTA / “sun”) and Light Blue
-  `#96C0CE` (soft “reef” accent), plus tints derived from those five.
-- **Type** — Cormorant Garamond (display) + Inter (text), both self-hosted via
-  `@fontsource-variable/*`. Fluid `clamp()` scale, no breakpoint jumps.
-- **Geometry** — `--radius-card: 2px`. Sharp, editorial, deliberately *not*
-  a deck of rounded cards.
+- **Palette** — Midnight Blue `#0F414A` (ink), Alabaster `#EFE8DF` (paper),
+  Tan `#D8BA98` (sand), Maroon `#7F0303` (sun/CTA), Light Blue `#96C0CE`
+  (reef), plus derived tints.
+- **Type** — Cormorant Garamond (display) + Inter (text), self-hosted, fluid
+  `clamp()` scale.
+- **Geometry** — sharp editorial cards (`--radius-card: 2px`), rounded pills
+  for CTAs.
 - **Classes** — `.shell .band .eyebrow .display .headline .lede .btn-* .media
   .rule .rail .field .chip .link-rule .on-ink`.
 - **Motion** — one `.reveal` scroll primitive (IntersectionObserver, respects
-  `prefers-reduced-motion`), slow image zooms on hover, editorial easing
-  curves. No parallax, no bounce, no scroll-jacking.
+  `prefers-reduced-motion`), slow image zooms, editorial easing. No parallax,
+  no scroll-jacking.
 
 ### Performance
 
-- Every image is `next/image` with explicit intrinsic dimensions and real
-  `sizes` — no layout shift, AVIF/WebP negotiated automatically.
-- Only the hero poster is `priority`; everything below the fold is lazy.
-- Videos are never loaded eagerly: the hero attaches its file on
-  `requestIdleCallback` and only on fine-pointer, non-`saveData`,
-  non-reduced-motion devices. The film section waits for an
-  IntersectionObserver and pauses the moment it scrolls away.
-- Galleries render thumbnails; the full-size image is fetched only when a
-  lightbox opens.
-- Shared JS is ~103 kB First Load across the site.
-
----
-
-## Connecting a CMS
-
-The `src/data/*.ts` files are the seam. Each exports plain arrays that satisfy
-the interfaces in `src/lib/types.ts`. To move to Sanity / Contentful / Strapi /
-a database, replace the array literal with a fetch that returns the same shape —
-no component changes.
-
-The lookup helpers (`tourBySlug`, `toursByCategory`, `destinationBySlug`,
-`relatedTours`, …) are the only API the pages use, so they are the natural
-place to swap in queries.
-
-### Inquiries
-
-`POST /api/inquiry` is the single intake endpoint for the booking drawer, the
-`/book` page and the contact form. It validates, normalises, drops honeypot
-submissions and logs a structured record.
-
-Set `INQUIRY_WEBHOOK_URL` (see `.env.example`) and the normalised payload is
-forwarded as JSON — point it at a CRM, an email service, a Zapier/Make
-scenario or the WhatsApp Cloud API. A downstream failure never fails the
-visitor's submission.
+- `next/image` everywhere with explicit `sizes`; AVIF/WebP negotiated.
+- Fixed-size responsive crops from the media pipeline (no runtime resizing).
+- Videos never load eagerly (poster-first, attach on interaction/idle).
+- ~103 kB First Load JS.
+- Deliberate trade-off: `force-dynamic` rendering for instant CMS edits. If
+  traffic ever demands it, move to tag-based `revalidate` per entity.
 
 ---
 
 ## Media pipeline
 
-`public/media/**` is **generated**. The sources live in `media-src/` as one
-flat `<name>.jpg` per subject, and `scripts/build-media.mjs` derives every crop
-(wide 2400×1350, card 1800×1200, tall 1600×2000, OG 1200×630, poster 1920×1080)
-with sharp using attention-based cropping.
-
-To swap in real photography: drop the originals into `media-src/` using the
-same base names and run `npm run media`. Nothing else changes.
+`public/media/**` is **generated** — never edit it directly. Sources live in
+`media-src/` (flat `<name>.jpg|.webp` per subject) and
+`scripts/build-media.mjs` derives every crop (wide 2400×1350, card 1800×1200,
+tall 1600×2000, OG 1200×630, poster 1920×1080) with sharp, attention-based
+cropping, and copies tour/film videos. The `MAP` in that script is the
+definitive asset→output mapping, including the exclusion log.
 
 ---
 
 ## ⚠ Launch checklist
 
-The site is structurally complete. These items need real data before it goes
-live — all are isolated and flagged in code.
+Structurally complete and fully wired. Verify these before going live:
 
-### 1. Photography and film — **placeholder**
+### 1. Photography — mostly real, some placeholders
 
-The real Brother Sharm Tour library (180 files across 17 folders) could not be pulled
-into this environment. Every image currently in `public/media/**` is
-**AI-generated placeholder imagery** standing in for the real shoot.
+75 of 81 image sources are the operator's real Google Drive photography,
+curated by folder and filename. Remaining AI **placeholders** (generic
+equivalents, not the actual venues) — replace with a shoot or licensed images:
 
-- Real originals go in `media-src/`, then `npm run media`.
-- The script prints which slots are still running a stand-in.
-- 20 subjects have a matched generated source. **2 slots still borrow another
-  subject's image** and should be replaced first: `dolphin-swim` (currently
-  showing the reef image) and `soho-square` (currently showing the desert
-  camp).
-- Four of the generated subjects are **generic equivalents, not the actual
-  venues** — *Farsha Cafe, Soho Square, Old Market, Naama Bay*. They are a
-  cliffside lantern-lit cafe, a plaza, a bazaar alley and a resort bay
-  respectively. Do not present them as photographs of those specific places.
-- Five subjects have **no source imagery at all** in the client library and
-  will need a shoot or a licensed image: *private airport transfer, Farsha
-  Cafe, Soho Square, Old Market, Naama Bay*.
-- Both films (`public/media/films/hero.mp4`, `reel.mp4`) are absent. The
-  `videoAvailable` flag in `src/lib/media.ts` is `false`, so the hero and the
-  film section render their posters as intentional full-bleed stills — no dead
-  play buttons. Drop the files in and flip the flag to `true`.
+- `sharm-hero`, `airport-transfer` (subject: transfer), `naama-bay`,
+  `old-market`, `farsha-cafe`, `horse-riding` (still — the real video is used)
 
-### 2. Tour prices, durations and timings — **unverified**
+One **stand-in mapping** remains: `soho-square` renders the super-safari image.
 
-Every `Tour` carries `verified: false`. Prices, durations and itinerary times
-are structurally correct placeholders, **not confirmed commercial data**.
+Excluded from the Drive library for licensing (never used):
+istockphoto / shutterstock / 360_F / maxresdefault / getty / audley watermarks.
+One cairo asset (Pyramids-Giza-Cairo-Egypt.webp) 404'd on Drive and was dropped.
 
-```ts
-tours.filter((t) => !t.verified) // everything awaiting sign-off
-```
+**Before launch: visually confirm** each `media-src/*.jpg` actually shows its
+named subject (curation was by folder + filename; do a human pass), then
+`npm run media`.
 
-Tour pages show a visible notice while `verified` is false. Set it to `true`
-per tour as operations confirms each one, and the notice disappears.
+### 2. Tour prices, durations and timings — unverified
 
-### 3. Testimonials — **placeholder**
+Every seeded tour has `verified: false`; tour pages show a "pricing indicative"
+notice until operations signs each one off in the CMS (`/admin/tours/[id]`).
+Prices/durations are the operator's own seed values, not invented, but need
+commercial confirmation.
 
-`src/data/testimonials.ts` entries carry `placeholder: true` and
-`hasRealTestimonials` is `false`. They are realistic, clearly-structured
-examples ready for real review data — **not fabricated attributed reviews**.
-The UI surfaces a notice while the flag is false.
+### 3. Reviews — start empty by design
 
-### 4. Still to fill in
+No seeded reviews, no seeded ratings. The homepage shows an honest invite
+panel until the first real reviews arrive. Never hand-edit reviews into the
+store — use the public form + moderation so provenance is kept.
 
-- `site.contact` in `src/data/site.ts` — phone, email, address, hours are
-  placeholders. The WhatsApp number drives every WhatsApp CTA on the site.
-- `site.url` — used for canonicals, OG URLs, sitemap and JSON-LD.
-- `site.social` — Instagram and Facebook URLs.
-- The map embed slot on `/contact` (sized, so adding the iframe shifts nothing).
-- `INQUIRY_WEBHOOK_URL` in the deployment environment.
+### 4. Settings to fill in
+
+`/admin/settings`: WhatsApp number, phone, email, address, hours, social
+links, announcement bar, SMTP notification recipients, trust claims (only
+admin-confirmed values — they render only when non-empty).
+
+### 5. Environment
+
+- `NEXT_PUBLIC_SITE_URL` (production domain)
+- SMTP credentials for Hostinger
+- Change the admin password on first sign-in
 
 ---
 
 ## SEO
 
-- Unique title (templated `%s · Brother Sharm Tour`), description and canonical per page.
-- Open Graph + Twitter card metadata, shared OG image.
-- JSON-LD: `TravelAgency` (root), `TouristDestination`, `CollectionPage`,
-  `TouristTrip` with `offers` and `itinerary`, `FAQPage`, `BreadcrumbList`,
-  `ItemList`.
-- Semantic heading order, one `<h1>` per page, skip-to-content link,
-  generated `sitemap.xml` and `robots.txt`.
+- Unique title (`%s · Brother Sharm Tour` template), description and canonical
+  per page; metadata for tours/packages/destinations comes from their authored
+  `seo` fields via `generateMetadata`.
+- JSON-LD: `TravelAgency`/`LocalBusiness` (layout, CMS values), `TouristTrip`
+  with `Offer` + `itinerary`, `AggregateRating` + `Review` **only when real
+  approved reviews exist**, `FAQPage`, `BreadcrumbList`, `ItemList`,
+  `TouristDestination`, `CollectionPage`.
+- `sitemap.xml` from the store (published records only, `lastModified` from
+  `updatedAt`); `robots.txt` disallows `/api/` and `/admin`.
 
 ---
 
 ## Attribution
 
-The UX structure and visual hierarchy were informed by studying modern premium
-travel sites. All copy, branding, the logo mark, the colour and type system,
-the component library and the imagery in this repository are **original work
-produced for Brother Sharm Tour** — no third-party branding, text or photography has
-been copied.
+The information architecture was informed by studying a reference tourism site
+(documented in `docs/sharmtours-reference-teardown.md`) — structure and
+conversion flow only. All copy, branding, the logo mark, the colour and type
+system, the component library and the imagery pipeline in this repository are
+**original work produced for Brother Sharm Tour** — no third-party branding,
+text, design or photography has been copied.

@@ -11,6 +11,11 @@ import { getSettings } from "@/lib/store/repo";
 
 export const dynamic = "force-dynamic";
 
+export const metadata = {
+  title: "Admin CMS",
+  robots: { index: false, follow: false },
+};
+
 export default async function AdminLayout({
   children,
 }: {

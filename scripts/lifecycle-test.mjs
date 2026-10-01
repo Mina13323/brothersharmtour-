@@ -106,13 +106,31 @@ if (hadContent) cpSync(CONTENT, BACKUP, { recursive: true });
 const server = spawn("npx", ["next", "start", "-p", String(PORT)], {
   stdio: ["ignore", "pipe", "pipe"],
   env: { ...process.env, PORT: String(PORT) },
+  detached: true, // own process group so shutdown kills next-server too
 });
+server.on("exit", (code) => {
+  if (!exiting && code !== 0 && code !== null) {
+    console.error(`server exited early with code ${code}`);
+  }
+});
+let exiting = false;
 
 server.stdout.on("data", (d) => process.env.VERBOSE && process.stdout.write(d));
 server.stderr.on("data", (d) => process.env.VERBOSE && process.stderr.write(d));
 
-function shutdown(code) {
-  server.kill("SIGTERM");
+async function shutdown(code) {
+  exiting = true;
+  try {
+    process.kill(-server.pid, "SIGTERM");
+  } catch {}
+  // wait for the port to actually free, then force-kill leftovers
+  for (let i = 0; i < 20; i++) {
+    if (await portFree()) break;
+    await new Promise((r) => setTimeout(r, 250));
+  }
+  try {
+    process.kill(-server.pid, "SIGKILL");
+  } catch {}
   // restore the original content store
   try {
     if (hadContent) {
@@ -124,6 +142,24 @@ function shutdown(code) {
   }
   rmSync(BACKUP, { recursive: true, force: true });
   process.exit(code);
+}
+
+async function portFree() {
+  try {
+    await fetch(`${BASE}/api/admin/auth`, { signal: AbortSignal.timeout(1000) });
+    return false; // something answered
+  } catch {
+    return true;
+  }
+}
+
+if (!(await portFree())) {
+  console.error(
+    `Port ${PORT} is already serving — a previous test server may still be running.\n` +
+      `Kill it first (pkill -f next-server) and re-run.`,
+  );
+  rmSync(BACKUP, { recursive: true, force: true });
+  process.exit(2);
 }
 
 try {
@@ -215,8 +251,10 @@ try {
   const beforeApprove = await get("/tours/ras-mohamed");
   ok("pending review NOT public", !beforeApprove.body.includes(REVIEW_BODY));
 
-  const reviewsList = JSON.parse((await get("/api/admin/reviews", adminCookie)).body);
-  const pending = reviewsList.reviews.find((r) => r.body === REVIEW_BODY);
+  const reviewsRaw = await get("/api/admin/reviews", adminCookie);
+  const reviewsList = reviewsRaw.status === 200 ? JSON.parse(reviewsRaw.body) : null;
+  ok("admin reviews endpoint answers for session", reviewsList?.ok === true);
+  const pending = reviewsList?.reviews?.find((r) => r.body === REVIEW_BODY);
   ok("review lands in admin queue as pending", Boolean(pending && pending.status === "pending"));
 
   const approve = await patch(`/api/admin/reviews/${pending.id}`, { status: "approved" }, adminCookie);
@@ -250,8 +288,10 @@ try {
   });
   ok("inquiry accepted", inquiry.status === 200 && inquiry.json?.ok === true, inquiry.json?.message);
 
-  const inquiriesList = JSON.parse((await get("/api/admin/inquiries", adminCookie)).body);
-  const created = inquiriesList.inquiries.find((i) => i.guestName === "Test Booker");
+  const inquiriesRaw = await get("/api/admin/inquiries", adminCookie);
+  const inquiriesList = inquiriesRaw.status === 200 ? JSON.parse(inquiriesRaw.body) : null;
+  ok("admin inquiries endpoint answers for session", inquiriesList?.ok === true);
+  const created = inquiriesList?.inquiries?.find((i) => i.guestName === "Test Booker");
   ok("inquiry stored with NEW status", Boolean(created && created.status === "new"));
 
   const contacted = await patch(`/api/admin/inquiries/${created.id}`, { status: "contacted" }, adminCookie);
@@ -320,8 +360,8 @@ try {
     console.log("\nFailures:");
     failures.forEach((f) => console.log(`  - ${f}`));
   }
-  shutdown(failed === 0 ? 0 : 1);
+  await shutdown(failed === 0 ? 0 : 1);
 } catch (err) {
   console.error("\nlifecycle test crashed:", err);
-  shutdown(1);
+  await shutdown(1);
 }

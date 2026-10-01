@@ -5,7 +5,7 @@ import { buildMetadata } from "@/lib/seo";
 import { Hero } from "@/components/Hero";
 import { HeroSearch } from "@/components/HeroSearch";
 import { SplitHeadline } from "@/components/Reveal";
-import { SectionHeading, CTASection } from "@/components/sections";
+import { SectionHeading } from "@/components/sections";
 import { Accordion } from "@/components/Accordion";
 import { TestimonialSlider } from "@/components/TestimonialSlider";
 import { HomeCatalogue } from "@/components/HomeCatalogue";
@@ -15,7 +15,6 @@ import {
   NoCompromises,
   ThreeSteps,
   GeographyBook,
-  ContactChannels,
 } from "@/components/homeSections";
 
 import { media, videoAvailable } from "@/lib/media";
@@ -122,17 +121,6 @@ export default function HomePage() {
 
       {/* 10 · GEOGRAPHY + BOOK-A-TOUR CARD */}
       <GeographyBook />
-
-      {/* 11 · CLOSING CTA */}
-      <CTASection
-        image={media.tiranIsland.hero}
-        eyebrow="Start planning"
-        title="Ready to discover Egypt?"
-        text="Tell us your dates and what you love — we'll build the perfect trip for your group and budget. Reply in minutes, no prepayment."
-      />
-
-      {/* 12 · GET IN TOUCH */}
-      <ContactChannels />
 
       {/* Quick link out to the full tours page for crawlers / no-JS */}
       <div className="sr-only">

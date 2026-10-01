@@ -3318,7 +3318,7 @@
     "contact": {
       "whatsapp": "201042441923",
       "phone": "+20 10 4244 1923",
-      "email": "hello@brothersharmtour.com",
+      "email": "contact@brothersharmtour.com",
       "address": "Sharm El Sheikh, South Sinai, Egypt",
       "addressCairo": "Cairo, Egypt",
       "hours": "Daily · 08:00 – 23:00 (EET)"
@@ -3406,7 +3406,7 @@
     ],
     "email": {
       "notifyTo": [
-        "hello@brothersharmtour.com"
+        "contact@brothersharmtour.com"
       ],
       "notifyOnInquiry": true,
       "notifyOnReview": true,

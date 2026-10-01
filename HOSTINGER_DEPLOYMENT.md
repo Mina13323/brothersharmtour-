@@ -21,7 +21,7 @@ NEXT_PUBLIC_SITE_URL=https://brothersharmtour.com
 # Contact Info
 NEXT_PUBLIC_WHATSAPP_NUMBER=201042441923
 NEXT_PUBLIC_PHONE=+20 10 4244 1923
-NEXT_PUBLIC_EMAIL=hello@brothersharmtour.com
+NEXT_PUBLIC_EMAIL=contact@brothersharmtour.com
 
 # Admin CMS Access (/admin/login)
 ADMIN_EMAIL=admin@brothersharmtour.com
@@ -31,11 +31,11 @@ AUTH_SECRET=9f8c321d4a6e8b7c5f2a1e0d3c4b5a697812e4f0a9b8c7d6e5f4a3b2c1d0e9f8
 # Hostinger SMTP Email (Create this email account in your Hostinger cPanel / hPanel)
 SMTP_HOST=smtp.hostinger.com
 SMTP_PORT=465
-SMTP_USER=bookings@brothersharmtour.com
+SMTP_USER=contact@brothersharmtour.com
 SMTP_PASS=YourHostingerEmailPasswordHere
 SMTP_SECURE=true
 SMTP_FROM_NAME="Brother Sharm Tour"
-EMAIL_FROM=bookings@brothersharmtour.com
+EMAIL_FROM=contact@brothersharmtour.com
 ```
 
 ---

@@ -11,7 +11,7 @@ export const site = {
   contact: {
     whatsapp: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "201042441923",
     phone: process.env.NEXT_PUBLIC_PHONE ?? "+20 10 4244 1923",
-    email: process.env.NEXT_PUBLIC_EMAIL ?? "hello@brothersharmtour.com",
+    email: process.env.NEXT_PUBLIC_EMAIL ?? "contact@brothersharmtour.com",
     base: "Sharm El Sheikh, South Sinai, Egypt",
     hours: "Daily · 08:00 – 23:00 (EET)",
   },

@@ -1,7 +1,21 @@
 import type { Metadata } from "next";
 
 import { site } from "@/data/site";
+import { getSettings } from "@/lib/store/repo";
 import type { MediaImage, SeoMeta } from "./types";
+
+/**
+ * CMS values when the store is reachable, static seed values otherwise (e.g.
+ * during `next build` module evaluation before the store exists). Brand-level
+ * SEO values (name, url) live in ONE place — the settings store.
+ */
+function brand(): { name: string; url: string } {
+  try {
+    return { name: getSettings().site.name, url: getSettings().site.url };
+  } catch {
+    return { name: site.name, url: site.url };
+  }
+}
 
 /**
  * BROTHER SHARM TOUR — metadata builder
@@ -36,13 +50,14 @@ export function buildMetadata({
    */
   absoluteTitle?: boolean;
 }): Metadata {
+  const { name: brandName, url: baseUrl } = brand();
   const title = seo?.title ?? fallbackTitle;
   const description = seo?.description ?? fallbackDescription;
   const ogImage = seo?.ogImage ?? image;
-  const url = `${site.url}${path}`;
+  const url = `${baseUrl}${path}`;
 
   return {
-    title: absoluteTitle ? { absolute: `${title} | ${site.name}` } : title,
+    title: absoluteTitle ? { absolute: `${title} | ${brandName}` } : title,
     description,
     alternates: { canonical: path },
     ...(noindex
@@ -52,10 +67,10 @@ export function buildMetadata({
       : {}),
     openGraph: {
       type: "website",
-      siteName: site.name,
+      siteName: brandName,
       // Titles carry the brand explicitly here: a social card is seen out of
       // context, where the layout's title template does not apply.
-      title: `${title} | ${site.name}`,
+      title: `${title} | ${brandName}`,
       description,
       url,
       ...(ogImage
@@ -64,7 +79,7 @@ export function buildMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: `${title} | ${site.name}`,
+      title: `${title} | ${brandName}`,
       description,
       ...(ogImage ? { images: [ogImage.src] } : {}),
     },

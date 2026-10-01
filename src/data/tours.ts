@@ -194,7 +194,7 @@ export const tours: Tour[] = [
     summary:
       "A full day in the Strait of Tiran, anchoring over the coral gardens that sit between the Sinai and the Saudi coast.",
     description: [
-      "The Strait of Tiran is the narrow channel where the Gulf of Aqaba meets the open Red Sea. Four large reefs sit in the middle of it, and the water moving through the gap keeps them in remarkable condition.",
+      "The Strait of Tiran is the narrow channel where the Gulf of Aqaba meets the open Red Sea. Four reefs sit in the middle of it — Gordon, Woodhouse, Thomas and Jackson — and the water moving through the gaps keeps them in remarkable condition.",
       "It is the classic Sharm boat day — a long, unhurried one, with several anchorages and plenty of time in the water at each.",
     ],
     images: [media.tiranIsland.hero, ...media.tiranIsland.gallery],
@@ -558,7 +558,7 @@ export const tours: Tour[] = [
       "A day trip north into the Sinai interior to walk the Coloured Canyon, with time in Dahab on the way back.",
     description: [
       "The Coloured Canyon is a narrow sandstone corridor where the rock is banded in rust, ochre and violet — the result of mineral deposits laid down over a very long time. You walk through it rather than look at it from above.",
-      "Because it's a long drive north, we pair it with Dahab: a slower, low-rise town on the coast where the afternoon is spent at a table by the water.",
+      "The canyon sits in the Sinai interior near Nuweiba on the Gulf of Aqaba, reached by a long drive north from Sharm. On the way back we stop in Dahab: a slower, low-rise town on the coast where the afternoon is spent at a table by the water.",
     ],
     images: [media.colorCanyon.hero, media.colorCanyon.card, ...media.colorCanyon.gallery],
     duration: "Full day",
@@ -851,7 +851,7 @@ export const tours: Tour[] = [
     summary:
       "Giza and the Grand Egyptian Museum in one day, run from Sharm El Sheikh by flight or from a Cairo hotel.",
     description: [
-      "The Giza plateau and the Grand Egyptian Museum sit within sight of each other, and seeing them on the same day is the right way round: the monuments first, then the objects that came out of them.",
+      "The Giza plateau and the Grand Egyptian Museum sit within sight of each other, and seeing them on the same day is the right way round: the monuments first, then the objects that came out of them. The museum, which opened fully in November 2025, holds the complete Tutankhamun collection — all of it together for the first time.",
       "From Sharm this runs as a long day by air. If you're already in Cairo, it starts at your hotel.",
     ],
     images: [media.pyramids.hero, media.sphinx.card, media.gem.card, ...media.cairoGallery],

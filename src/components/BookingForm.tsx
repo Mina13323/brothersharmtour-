@@ -2,9 +2,8 @@
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
-import { tours } from "@/data/tours";
-import { destinationName } from "@/data/destinations";
-import { useSite } from "./SiteProvider";
+import { useCatalogue, useSite } from "./SiteProvider";
+import { destinationName } from "@/lib/store/labels";
 import { cn } from "@/lib/utils";
 
 const today = () => new Date().toISOString().split("T")[0];
@@ -24,20 +23,22 @@ export function BookingForm({
   initialTour?: string;
   compact?: boolean;
 }) {
+  const catalogue = useCatalogue();
+  const { settings } = useSite();
   const { settings: site, whatsappLink } = useSite();
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
   const [tourSlug, setTourSlug] = useState(initialTour ?? "");
 
   const grouped = Object.entries(
-    tours.reduce<Record<string, typeof tours>>((acc, tour) => {
+    catalogue.reduce<Record<string, typeof catalogue>>((acc, tour) => {
       const key = destinationName(tour.destination);
       (acc[key] ??= []).push(tour);
       return acc;
     }, {}),
   );
 
-  const selected = tours.find((t) => t.slug === tourSlug);
+  const selected = catalogue.find((t) => t.slug === tourSlug);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

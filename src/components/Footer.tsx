@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { footerNav, site, whatsappLink } from "@/data/site";
+import { footerNav } from "@/data/site";
+import { useSite } from "./SiteProvider";
 import { Logo } from "./ui/Logo";
 import { WhatsAppIcon } from "./sections";
 import { WaveDivider } from "./WaveDivider";
@@ -10,6 +11,7 @@ import { LanguageSwitcher } from "./LanguageSwitcher";
 import { CurrencySwitcher } from "./CurrencySwitcher";
 
 export function Footer() {
+  const { settings: site, whatsappLink } = useSite();
   const pathname = usePathname();
   if (pathname?.startsWith("/admin")) return null;
 
@@ -71,7 +73,7 @@ export function Footer() {
                   {site.contact.email}
                 </a>
               </li>
-              <li className="text-paper/55">{site.contact.base}</li>
+              <li className="text-paper/55">{site.contact.address}</li>
               <li className="text-paper/55">{site.contact.hours}</li>
             </ul>
 
@@ -109,7 +111,7 @@ export function Footer() {
         {/* ---- Legal row ---- */}
         <div className="flex flex-col gap-4 py-8 text-xs text-paper/45 sm:flex-row sm:items-center sm:justify-between">
           <p>
-            © {year} {site.legalName}. All rights reserved.
+            © {year} {site.name}. All rights reserved.
           </p>
           <div className="flex flex-wrap items-center gap-4">
             <CurrencySwitcher tone="light" />

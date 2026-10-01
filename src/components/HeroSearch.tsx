@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { durationBuckets } from "@/data/tours";
+import { durationBuckets } from "@/lib/store/labels";
 import { cn } from "@/lib/utils";
 import { useCatalogue } from "./SiteProvider";
 import { destinationName, experienceName } from "@/lib/store/labels";

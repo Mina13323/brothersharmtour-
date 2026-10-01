@@ -1,7 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import type { ReactNode } from "react";
-import { whatsappLink } from "@/data/site";
+import { useSite } from "./SiteProvider";
 import { media } from "@/lib/media";
 import { cn } from "@/lib/utils";
 import { Reveal } from "./Reveal";
@@ -137,6 +139,7 @@ export function CTASection({
   bottomWave?: boolean;
   waveColor?: string;
 }) {
+  const { whatsappLink } = useSite();
   return (
     <section className="on-ink relative isolate overflow-hidden bg-ink text-paper">
       {topWave && (

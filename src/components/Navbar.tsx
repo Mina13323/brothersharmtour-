@@ -131,18 +131,18 @@ export function Navbar() {
   return (
     <>
       {/* ─── Desktop Top Floating Header ─── */}
-      <header className="fixed inset-x-0 top-0 z-[100] px-3 sm:px-6 pt-2 sm:pt-3 pointer-events-none transition-all duration-300">
+      <header className="fixed inset-x-0 top-0 z-[100] px-2 sm:px-6 pt-2 sm:pt-3 pointer-events-none transition-all duration-300">
         <div
           className={cn(
-            "max-w-6xl mx-auto flex items-center justify-between pointer-events-auto rounded-full bg-white/95 backdrop-blur-md border border-sand/50 shadow-md px-4 sm:px-5 lg:px-6 py-1.5 transition-all duration-300 gap-3",
-            scrolled ? "shadow-lg border-sand/70 py-1" : "shadow-md py-1.5",
+            "max-w-6xl mx-auto flex items-center justify-between pointer-events-auto rounded-full bg-white/95 backdrop-blur-md border border-sand/50 shadow-md px-3 sm:px-5 lg:px-6 py-1 sm:py-1.5 transition-all duration-300 gap-1.5 sm:gap-3",
+            scrolled ? "shadow-lg border-sand/70 py-1" : "shadow-md py-1 sm:py-1.5",
           )}
         >
           {/* Logo */}
           <Link
             href="/"
             aria-label={`${site.name} — home`}
-            className="shrink-0 transition-opacity hover:opacity-85"
+            className="shrink-0 transition-opacity hover:opacity-85 min-w-0"
           >
             <Logo tone="ink" />
           </Link>
@@ -178,18 +178,19 @@ export function Navbar() {
             })}
           </nav>
 
-          {/* Right actions: Language Switcher + Book on WhatsApp */}
-          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          {/* Right actions: Currency Switcher + Language Switcher + Book on WhatsApp */}
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
             <CurrencySwitcher tone="ink" />
             <LanguageSwitcher tone="ink" />
             <a
               href={whatsappLink()}
               target="_blank"
               rel="noopener noreferrer"
-              className="h-9 px-3.5 sm:px-4 rounded-full bg-sun hover:bg-sun-bright text-white text-xs font-bold uppercase tracking-wider shadow-sm hover:shadow-md shrink-0 whitespace-nowrap flex items-center gap-1.5 transition-all cursor-pointer"
+              aria-label="Book on WhatsApp"
+              className="h-8 sm:h-9 px-2.5 sm:px-4 rounded-full bg-sun hover:bg-sun-bright text-white text-[11px] sm:text-xs font-bold uppercase tracking-wider shadow-sm hover:shadow-md shrink-0 whitespace-nowrap flex items-center gap-1.5 transition-all cursor-pointer"
             >
               <WhatsAppIcon className="size-3.5 shrink-0" />
-              <span>
+              <span className="hidden sm:inline">
                 Book <span className="hidden xl:inline">on WhatsApp</span>
               </span>
             </a>

@@ -172,15 +172,15 @@ export function LanguageSwitcher({
         aria-expanded={open}
         aria-label="Change language"
         className={cn(
-          "inline-flex h-9 items-center gap-1.5 rounded-full border px-3 text-[0.8rem] font-semibold transition-all shadow-2xs hover:shadow-xs cursor-pointer",
+          "inline-flex h-8 sm:h-9 items-center gap-1 sm:gap-1.5 rounded-full border px-2 sm:px-3 text-[0.75rem] sm:text-[0.8rem] font-semibold transition-all shadow-2xs hover:shadow-xs cursor-pointer",
           tone === "light"
             ? "border-white/20 bg-white/10 text-white hover:bg-white/20"
             : "border-sand/60 bg-paper hover:bg-paper-warm text-ink"
         )}
       >
-        <Globe className="size-3.5 opacity-70" />
+        <Globe className="size-3 sm:size-3.5 opacity-70" />
         <span className="text-sm leading-none" aria-hidden>{active.flag}</span>
-        <span className="uppercase tracking-wider text-[11px]">{active.code}</span>
+        <span className="uppercase tracking-wider text-[10px] sm:text-[11px]">{active.code}</span>
         <svg
           width="8"
           height="5"
@@ -197,7 +197,7 @@ export function LanguageSwitcher({
       {open ? (
         <ul
           role="listbox"
-          className="absolute right-0 top-full z-[120] mt-2 w-52 overflow-hidden rounded-2xl border border-sand/70 bg-paper py-1.5 shadow-2xl backdrop-blur-md max-h-80 overflow-y-auto"
+          className="absolute right-0 top-full z-[120] mt-2 w-48 sm:w-52 max-w-[calc(100vw-24px)] overflow-hidden rounded-2xl border border-sand/70 bg-paper py-1.5 shadow-2xl backdrop-blur-md max-h-80 overflow-y-auto"
         >
           <li className="px-3.5 py-1.5 border-b border-sand/40 text-[10px] font-bold uppercase tracking-wider text-stone/70">
             Languages ({enabled.length})

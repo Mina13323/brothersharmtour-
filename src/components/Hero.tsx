@@ -49,12 +49,11 @@ export function Hero({
 
   useEffect(() => {
     if (!video) return;
-    const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const saveData =
       (navigator as Navigator & { connection?: { saveData?: boolean } }).connection
         ?.saveData === true;
-    if (!fine || reduced || saveData) return;
+    if (reduced || saveData) return;
 
     // Wait for first paint + idle so the hero image is never delayed by video.
     const schedule =

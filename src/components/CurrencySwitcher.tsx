@@ -68,7 +68,7 @@ export function CurrencySwitcher({
         aria-label="Change currency"
         disabled={busy}
         className={cn(
-          "flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[0.8rem] font-semibold transition-colors",
+          "flex items-center gap-1 sm:gap-1.5 rounded-full px-2 sm:px-3 py-1 sm:py-1.5 text-[0.75rem] sm:text-[0.8rem] font-semibold transition-colors cursor-pointer",
           tone === "light"
             ? "text-white/90 hover:bg-white/10"
             : "text-ink hover:bg-ink/5",

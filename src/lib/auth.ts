@@ -87,28 +87,52 @@ export async function isAdmin(): Promise<boolean> {
   const store = await cookies();
   const session = readSessionToken(store.get(COOKIE_NAME)?.value);
   if (!session) return false;
-  // Confirm against the current admin account (a changed password invalidates
-  // outstanding sessions).
+
+  const sessionEmail = session.email.toLowerCase();
+  const envEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+  if (envEmail && sessionEmail === envEmail) return true;
+
+  // Confirm against the database store
   const { loadDb } = await import("./store/db");
   try {
-    return loadDb().settings.admin.email === session.email;
+    const admin = loadDb().settings?.admin;
+    return admin?.email?.toLowerCase() === sessionEmail;
   } catch {
     return false;
   }
 }
 
-/** Credentials check — used by the login route. */
+/** Credentials check — used by the login route. Checks database hash & env master credentials. */
 export async function checkCredentials(
   email: string,
   password: string,
 ): Promise<boolean> {
+  const inputEmail = email.trim().toLowerCase();
+
+  // 1. Secure check against environment variables (fail-safe master)
+  const envEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+  const envPass = process.env.ADMIN_PASSWORD;
+  if (envEmail && envPass && inputEmail === envEmail && password === envPass) {
+    return true;
+  }
+
+  // 2. Secure check against database store (scrypt hash verification)
   const { loadDb } = await import("./store/db");
-  const admin = loadDb().settings.admin;
-  return (
-    email.trim().toLowerCase() === admin.email.toLowerCase() &&
-    verifyPassword(password, admin.passwordHash)
-  );
+  try {
+    const admin = loadDb().settings?.admin;
+    if (admin?.email && admin?.passwordHash) {
+      return (
+        inputEmail === admin.email.toLowerCase() &&
+        verifyPassword(password, admin.passwordHash)
+      );
+    }
+  } catch {
+    // Gracefully handled
+  }
+
+  return false;
 }
+
 
 /**
  * Page-level guard for admin routes — the definitive server-side gate.

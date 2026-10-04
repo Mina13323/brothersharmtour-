@@ -4321,6 +4321,10 @@
       "notifyOnReview": true,
       "customerConfirmation": true,
       "fromName": "Brother Sharm Tour"
+    },
+    "admin": {
+      "email": "admin@brothersharmtour.com",
+      "passwordHash": "82fd9ed5e31062d50dd7a1644be691c1:91853a4a9f6697c8890ddd69d3a6a8905a567ed8d6b68195ea0d2e1c966c5882efd2cf6fc83ab7c419339e088b5b966ad1248249a39e1e7c6ddeb86502e8d7cc"
     }
   }
 }

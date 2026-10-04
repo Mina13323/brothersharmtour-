@@ -96,10 +96,38 @@ export async function isAdmin(): Promise<boolean> {
   const { loadDb } = await import("./store/db");
   try {
     const admin = loadDb().settings?.admin;
-    return admin?.email?.toLowerCase() === sessionEmail;
+    if (admin?.email?.toLowerCase() === sessionEmail) return true;
   } catch {
-    return false;
+    // Fall through
   }
+
+  // Confirm against Supabase admin_users
+  try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey =
+      process.env.SUPABASE_SERVICE_ROLE_KEY ||
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (supabaseUrl && supabaseKey) {
+      const res = await fetch(
+        `${supabaseUrl.replace(/\/+$/, "")}/rest/v1/admin_users?email=eq.${encodeURIComponent(sessionEmail)}&select=id`,
+        {
+          headers: {
+            apikey: supabaseKey,
+            Authorization: `Bearer ${supabaseKey}`,
+          },
+          cache: "no-store",
+        },
+      );
+      if (res.ok) {
+        const rows = await res.json();
+        if (rows && rows.length > 0) return true;
+      }
+    }
+  } catch {
+    // Gracefully handle Supabase offline
+  }
+
+  return false;
 }
 
 /** Credentials check — used by the login route. Checks database hash & env master credentials. */
@@ -121,13 +149,43 @@ export async function checkCredentials(
   try {
     const admin = loadDb().settings?.admin;
     if (admin?.email && admin?.passwordHash) {
-      return (
+      if (
         inputEmail === admin.email.toLowerCase() &&
         verifyPassword(password, admin.passwordHash)
-      );
+      ) {
+        return true;
+      }
     }
   } catch {
     // Gracefully handled
+  }
+
+  // 3. Secure check against Supabase admin_users table (if configured)
+  try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey =
+      process.env.SUPABASE_SERVICE_ROLE_KEY ||
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (supabaseUrl && supabaseKey) {
+      const res = await fetch(
+        `${supabaseUrl.replace(/\/+$/, "")}/rest/v1/admin_users?email=eq.${encodeURIComponent(inputEmail)}&select=password_hash`,
+        {
+          headers: {
+            apikey: supabaseKey,
+            Authorization: `Bearer ${supabaseKey}`,
+          },
+          cache: "no-store",
+        },
+      );
+      if (res.ok) {
+        const rows = await res.json();
+        if (rows && rows.length > 0 && rows[0].password_hash) {
+          return verifyPassword(password, rows[0].password_hash);
+        }
+      }
+    }
+  } catch {
+    // Gracefully handle Supabase offline
   }
 
   return false;

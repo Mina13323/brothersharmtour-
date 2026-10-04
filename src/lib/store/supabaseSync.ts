@@ -412,6 +412,21 @@ export async function syncAllToSupabase(db: Database): Promise<{
         }),
       });
       settingsOk = settingsRes.ok;
+
+      // 4. Sync admin user to dedicated admin_users table
+      if (db.settings.admin?.email && db.settings.admin?.passwordHash) {
+        await fetch(`${url}/admin_users?on_conflict=email`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            id: "admin-primary",
+            email: db.settings.admin.email.toLowerCase(),
+            password_hash: db.settings.admin.passwordHash,
+            role: "admin",
+            updated_at: new Date().toISOString(),
+          }),
+        }).catch(() => {});
+      }
     }
 
     return {

@@ -121,7 +121,17 @@ CREATE TABLE IF NOT EXISTS public.settings (
   updated_at timestamptz DEFAULT now()
 );
 
--- 6. ENSURE COLUMNS EXIST (IN CASE TABLES WERE ALREADY PARTIALLY CREATED)
+-- 6. ADMIN USERS TABLE (Strictly secured for admin authentication)
+CREATE TABLE IF NOT EXISTS public.admin_users (
+  id text PRIMARY KEY,
+  email text UNIQUE NOT NULL,
+  password_hash text NOT NULL,
+  role text DEFAULT 'admin',
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
+-- 7. ENSURE COLUMNS EXIST (IN CASE TABLES WERE ALREADY PARTIALLY CREATED)
 ALTER TABLE public.tours ADD COLUMN IF NOT EXISTS child_price numeric;
 ALTER TABLE public.tours ADD COLUMN IF NOT EXISTS translations jsonb DEFAULT '{}'::jsonb;
 ALTER TABLE public.tours ADD COLUMN IF NOT EXISTS price_overrides jsonb DEFAULT '{}'::jsonb;
@@ -156,6 +166,15 @@ ALTER TABLE public.packages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.inquiries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.admin_users ENABLE ROW LEVEL SECURITY;
+
+-- ADMIN USERS POLICIES (Protected: only authenticated sessions / service role)
+DROP POLICY IF EXISTS "admin_users_policy" ON public.admin_users;
+CREATE POLICY "admin_users_policy" ON public.admin_users
+  FOR ALL
+  TO authenticated
+  USING (true)
+  WITH CHECK (true);
 
 -- TOURS POLICIES
 DROP POLICY IF EXISTS "tours_select" ON public.tours;
@@ -893,3 +912,15 @@ INSERT INTO public.settings (id, data, updated_at) VALUES (
 ) ON CONFLICT (id) DO UPDATE SET
   data = EXCLUDED.data,
   updated_at = now();
+
+
+-- INSERT ADMIN USER
+INSERT INTO public.admin_users (id, email, password_hash, role) VALUES (
+  'admin-primary',
+  'admin@brothersharmtour.com',
+  '82fd9ed5e31062d50dd7a1644be691c1:91853a4a9f6697c8890ddd69d3a6a8905a567ed8d6b68195ea0d2e1c966c5882efd2cf6fc83ab7c419339e088b5b966ad1248249a39e1e7c6ddeb86502e8d7cc',
+  'admin'
+) ON CONFLICT (email) DO UPDATE SET
+  password_hash = EXCLUDED.password_hash,
+  updated_at = now();
+

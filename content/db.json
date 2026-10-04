@@ -51,6 +51,7 @@
       "durationHours": 5,
       "priceFrom": 30,
       "childPrice": 15,
+      "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
       "priceOverrides": {},
@@ -190,7 +191,7 @@
       "status": "published",
       "seo": {},
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-04T16:10:29.355+00:00"
+      "updatedAt": "2026-10-04T18:42:41.864+00:00"
     },
     {
       "id": "seed-tour-ras-mohamed",
@@ -259,6 +260,7 @@
       "durationHours": 8,
       "priceFrom": 18,
       "childPrice": 9,
+      "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
       "priceOverrides": {},
@@ -392,7 +394,7 @@
       "status": "published",
       "seo": {},
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-04T16:10:29.355+00:00"
+      "updatedAt": "2026-10-04T18:42:41.864+00:00"
     },
     {
       "id": "seed-tour-tiran-island",
@@ -450,6 +452,38 @@
       "durationHours": 8,
       "priceFrom": 30,
       "childPrice": 15,
+      "tripPackages": [
+        {
+          "id": "tiran-pkg-without-snorkeling",
+          "order": 1,
+          "title": "Sea Trip Without Snorkeling Equipment",
+          "active": true,
+          "adultPrice": 30,
+          "childPrice": 15,
+          "description": "Enjoy snorkeling day trip by boat to Tiran Island.",
+          "infantPrice": 0
+        },
+        {
+          "id": "tiran-pkg-with-snorkeling",
+          "order": 2,
+          "title": "Sea Trip With Snorkeling Equipment",
+          "active": true,
+          "adultPrice": 40,
+          "childPrice": 25,
+          "description": "Enjoy snorkeling day trip with equipment included.",
+          "infantPrice": 0
+        },
+        {
+          "id": "tiran-pkg-with-snorkeling-dive",
+          "order": 3,
+          "title": "Sea Trip With Snorkeling Equipment + Dive",
+          "active": true,
+          "adultPrice": 50,
+          "childPrice": 40,
+          "description": "Snorkeling plus introductory dive.",
+          "infantPrice": 0
+        }
+      ],
       "currency": "USD",
       "priceOriginal": null,
       "priceOverrides": {},
@@ -569,9 +603,42 @@
       "featured": true,
       "priority": 3,
       "status": "published",
-      "seo": {},
+      "seo": {
+        "tripPackages": [
+          {
+            "id": "tiran-pkg-without-snorkeling",
+            "order": 1,
+            "title": "Sea Trip Without Snorkeling Equipment",
+            "active": true,
+            "adultPrice": 30,
+            "childPrice": 15,
+            "description": "Enjoy snorkeling day trip by boat to Tiran Island.",
+            "infantPrice": 0
+          },
+          {
+            "id": "tiran-pkg-with-snorkeling",
+            "order": 2,
+            "title": "Sea Trip With Snorkeling Equipment",
+            "active": true,
+            "adultPrice": 40,
+            "childPrice": 25,
+            "description": "Enjoy snorkeling day trip with equipment included.",
+            "infantPrice": 0
+          },
+          {
+            "id": "tiran-pkg-with-snorkeling-dive",
+            "order": 3,
+            "title": "Sea Trip With Snorkeling Equipment + Dive",
+            "active": true,
+            "adultPrice": 50,
+            "childPrice": 40,
+            "description": "Snorkeling plus introductory dive.",
+            "infantPrice": 0
+          }
+        ]
+      },
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-04T16:10:29.355+00:00"
+      "updatedAt": "2026-10-04T22:32:09.198+00:00"
     },
     {
       "id": "seed-tour-super-safari",
@@ -622,6 +689,7 @@
       "durationHours": 6,
       "priceFrom": 35,
       "childPrice": 18,
+      "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
       "priceOverrides": {},
@@ -768,7 +836,7 @@
       "status": "published",
       "seo": {},
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-04T16:10:29.355+00:00"
+      "updatedAt": "2026-10-04T18:42:41.864+00:00"
     },
     {
       "id": "seed-tour-parasailing",
@@ -811,6 +879,7 @@
       "durationHours": 2,
       "priceFrom": 17,
       "childPrice": 20,
+      "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
       "priceOverrides": {},
@@ -922,7 +991,7 @@
       "status": "published",
       "seo": {},
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-04T16:10:29.355+00:00"
+      "updatedAt": "2026-10-04T18:42:41.864+00:00"
     },
     {
       "id": "seed-tour-color-canyon",
@@ -1003,6 +1072,7 @@
       "durationHours": 10,
       "priceFrom": 25,
       "childPrice": 15,
+      "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
       "priceOverrides": {},
@@ -1146,7 +1216,7 @@
       "status": "published",
       "seo": {},
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-04T16:10:29.355+00:00"
+      "updatedAt": "2026-10-04T18:42:41.864+00:00"
     },
     {
       "id": "seed-tour-speed-boat",
@@ -1185,6 +1255,7 @@
       "durationHours": 1,
       "priceFrom": 80,
       "childPrice": 50,
+      "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
       "priceOverrides": {},
@@ -1305,7 +1376,7 @@
       "status": "published",
       "seo": {},
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-04T16:10:29.355+00:00"
+      "updatedAt": "2026-10-04T18:42:41.864+00:00"
     },
     {
       "id": "seed-tour-swim-with-dolphins",
@@ -1356,6 +1427,7 @@
       "durationHours": 4,
       "priceFrom": 80,
       "childPrice": 50,
+      "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
       "priceOverrides": {},
@@ -1467,7 +1539,7 @@
       "status": "published",
       "seo": {},
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-04T16:10:29.355+00:00"
+      "updatedAt": "2026-10-04T18:42:41.864+00:00"
     },
     {
       "id": "seed-tour-cairo-pyramids-gem",
@@ -1525,6 +1597,7 @@
       "durationHours": 23.5,
       "priceFrom": 90,
       "childPrice": 80,
+      "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
       "priceOverrides": {},
@@ -1677,7 +1750,7 @@
       "status": "published",
       "seo": {},
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-04T16:10:29.355+00:00"
+      "updatedAt": "2026-10-04T18:42:41.864+00:00"
     },
     {
       "id": "seed-tour-glass-boat",
@@ -1715,6 +1788,7 @@
       "durationHours": 1,
       "priceFrom": 15,
       "childPrice": 8,
+      "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
       "priceOverrides": {},
@@ -1822,7 +1896,7 @@
       "status": "published",
       "seo": {},
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-04T16:10:29.355+00:00"
+      "updatedAt": "2026-10-04T18:42:41.864+00:00"
     },
     {
       "id": "seed-tour-horse-riding",
@@ -1879,6 +1953,7 @@
       "durationHours": 1,
       "priceFrom": 35,
       "childPrice": 20,
+      "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
       "priceOverrides": {},
@@ -1993,7 +2068,7 @@
       "status": "published",
       "seo": {},
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-04T16:10:29.355+00:00"
+      "updatedAt": "2026-10-04T18:42:41.864+00:00"
     },
     {
       "id": "seed-tour-desert-safari",
@@ -2044,6 +2119,7 @@
       "durationHours": 4,
       "priceFrom": 15,
       "childPrice": 15,
+      "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
       "priceOverrides": {},
@@ -2162,7 +2238,7 @@
       "status": "published",
       "seo": {},
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-04T16:10:29.355+00:00"
+      "updatedAt": "2026-10-04T18:42:41.864+00:00"
     },
     {
       "id": "musous7we2tbvgvq",
@@ -2188,6 +2264,7 @@
       "durationHours": 3,
       "priceFrom": 35,
       "childPrice": 20,
+      "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
       "priceOverrides": {},
@@ -2274,7 +2351,7 @@
       "status": "published",
       "seo": {},
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-04T16:10:29.355+00:00"
+      "updatedAt": "2026-10-04T18:42:41.864+00:00"
     },
     {
       "id": "seed-tour-dolphin-show",
@@ -2331,6 +2408,7 @@
       "durationHours": 2,
       "priceFrom": 25,
       "childPrice": 15,
+      "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
       "priceOverrides": {},
@@ -2441,7 +2519,7 @@
       "status": "published",
       "seo": {},
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-04T16:10:29.355+00:00"
+      "updatedAt": "2026-10-04T18:42:41.864+00:00"
     },
     {
       "id": "seed-tour-soho-square",
@@ -2467,6 +2545,7 @@
       "durationHours": 4,
       "priceFrom": null,
       "childPrice": null,
+      "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
       "priceOverrides": {},
@@ -2572,7 +2651,7 @@
       "status": "published",
       "seo": {},
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-04T16:10:29.355+00:00"
+      "updatedAt": "2026-10-04T18:42:41.864+00:00"
     },
     {
       "id": "seed-tour-naama-bay",
@@ -2598,6 +2677,7 @@
       "durationHours": 4,
       "priceFrom": null,
       "childPrice": null,
+      "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
       "priceOverrides": {},
@@ -2703,7 +2783,7 @@
       "status": "published",
       "seo": {},
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-04T16:10:29.355+00:00"
+      "updatedAt": "2026-10-04T18:42:41.864+00:00"
     },
     {
       "id": "seed-tour-farsha-cafe",
@@ -2729,6 +2809,7 @@
       "durationHours": 3,
       "priceFrom": null,
       "childPrice": null,
+      "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
       "priceOverrides": {},
@@ -2835,7 +2916,7 @@
       "status": "published",
       "seo": {},
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-04T16:10:29.355+00:00"
+      "updatedAt": "2026-10-04T18:42:41.864+00:00"
     },
     {
       "id": "seed-tour-old-market",
@@ -2867,6 +2948,7 @@
       "durationHours": 3,
       "priceFrom": null,
       "childPrice": null,
+      "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
       "priceOverrides": {},
@@ -2972,7 +3054,7 @@
       "status": "published",
       "seo": {},
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-04T16:10:29.355+00:00"
+      "updatedAt": "2026-10-04T18:42:41.864+00:00"
     },
     {
       "id": "seed-tour-old-cairo",
@@ -3006,6 +3088,7 @@
       "durationHours": 8,
       "priceFrom": 55,
       "childPrice": 35,
+      "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
       "priceOverrides": {},
@@ -3138,7 +3221,7 @@
       "status": "published",
       "seo": {},
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-04T16:10:29.355+00:00"
+      "updatedAt": "2026-10-04T18:42:41.864+00:00"
     },
     {
       "id": "seed-tour-airport-transfer",
@@ -3170,6 +3253,7 @@
       "durationHours": 1,
       "priceFrom": null,
       "childPrice": null,
+      "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
       "priceOverrides": {},
@@ -3278,7 +3362,7 @@
       "status": "published",
       "seo": {},
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-04T16:10:29.355+00:00"
+      "updatedAt": "2026-10-04T18:42:41.864+00:00"
     },
     {
       "id": "seed-tour-private-transfer",
@@ -3304,6 +3388,7 @@
       "durationHours": null,
       "priceFrom": null,
       "childPrice": null,
+      "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
       "priceOverrides": {},
@@ -3410,7 +3495,7 @@
       "status": "published",
       "seo": {},
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-04T16:10:29.355+00:00"
+      "updatedAt": "2026-10-04T18:42:41.864+00:00"
     },
     {
       "id": "seed-tour-submarine",
@@ -3467,6 +3552,7 @@
       "durationHours": 2.5,
       "priceFrom": 30,
       "childPrice": 15,
+      "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
       "priceOverrides": {},
@@ -3577,105 +3663,172 @@
       "status": "published",
       "seo": {},
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-04T16:10:29.355+00:00"
+      "updatedAt": "2026-10-04T18:42:41.864+00:00"
     }
   ],
   "packages": [
     {
-      "id": "murhwf2bvocvu6ht",
-      "slug": "sharm-2-days-package",
+      "id": "pkg-escursione-di-un-giorno",
+      "slug": "escursione-di-un-giorno-sharm-combo",
       "tourId": "seed-tour-white-island",
       "tourSlug": "white-island",
-      "title": "package",
-      "tagline": "A boat morning out to the sandbank that appears in the middle of the sea, with snorkelling stops on the reefs either side of it.",
+      "includedTours": [
+        "white-island",
+        "ras-mohamed",
+        "super-safari"
+      ],
+      "title": "Escursione di un Giorno — Red Sea & Desert Safari Super Combo",
+      "tagline": "The ultimate Sharm 1-day package: White Island, Ras Mohamed coral reefs, desert quad safari, camel ride, and buffet lunch included.",
       "destination": "sharm-el-sheikh",
-      "duration": "2 days",
-      "priceFrom": 30,
-      "childPrice": 15,
-      "currency": "USD",
-      "priceOverrides": {},
+      "category": "sea-water",
+      "categories": [
+        "sea-water",
+        "desert",
+        "adventure"
+      ],
+      "duration": "1 Full Day",
+      "priceFrom": 65,
+      "childPrice": 40,
+      "currency": "EUR",
+      "priceOverrides": {
+        "EGP": 3400,
+        "GBP": 56,
+        "USD": 70
+      },
       "coverImage": {
-        "alt": "package",
-        "src": "/uploads/media/98e035f4-7857-465d-b2d8-0072c3ecbe04.jpeg",
-        "width": 1600,
-        "height": 900
+        "alt": "Brother Sharm - Escursione di un Giorno Flyer",
+        "src": "/media/packages/escursione-di-un-giorno.jpg",
+        "width": 1254,
+        "height": 1254
       },
       "gallery": [
         {
-          "alt": "package photo 1",
-          "src": "/uploads/media/f3ffedd4-dc72-4d48-8c86-1b2ac5bbc815.jpeg",
-          "width": 1600,
-          "height": 900
+          "alt": "Brother Sharm - Escursione di un Giorno Flyer",
+          "src": "/media/packages/escursione-di-un-giorno.jpg",
+          "width": 1254,
+          "height": 1254
+        },
+        {
+          "alt": "White Island Sandbank Sharm El Sheikh",
+          "src": "/media/white-island/hero.jpg",
+          "width": 2400,
+          "height": 1350
+        },
+        {
+          "alt": "Ras Mohamed Coral Reefs",
+          "src": "/media/ras-mohamed/hero.jpg",
+          "width": 2400,
+          "height": 1350
+        },
+        {
+          "alt": "Sinai Desert Quad Safari",
+          "src": "/media/super-safari/hero.jpg",
+          "width": 2400,
+          "height": 1350
         }
       ],
       "description": [
-        "Embark on an unforgettable Ras Mohamed & White Island Boat Trip from Sharm El Sheikh and explore the crystal-clear waters of the Red Sea. Discover Ras Mohamed National Park, famous for its colorful coral reefs, rich marine life, and breathtaking underwater scenery.",
-        "Your journey starts with hotel pickup and transfer to the marina, where you’ll board a modern, fully equipped yacht. Sail along the stunning Sinai coastline while relaxing on deck and learning about the area’s unique marine ecosystem from our experienced guides",
-        "Enjoy two amazing snorkeling stops at Ras Mohamed’s top reef sites and the iconic White Island. Swim among tropical fish, admire vibrant corals, and enjoy a tasty onboard lunch with soft drinks before returning to your hotel with unforgettable memories"
+        "Experience the very best of Sharm El Sheikh in a single, perfectly orchestrated day. This exclusive Brother Sharm package brings together the magical marine wonders of the Red Sea and the thrilling adventure of the Sinai desert.",
+        "Start your morning cruising on a luxury yacht towards the pristine waters of Ras Mohamed National Park and the legendary White Island sandbank. Snorkel alongside world-renowned coral walls and colorful tropical fish, followed by a freshly prepared open-buffet lunch and drinks on board.",
+        "In the afternoon, transition smoothly from the sea to the golden Sinai sands. Ride powerful quad bikes across desert trails, meet Bedouin hosts for a scenic camel trek, and enjoy traditional Bedouin herbal tea in a mountain canyon tent before a comfortable transfer back to your hotel."
       ],
-      "days": [],
+      "days": [
+        {
+          "day": 1,
+          "meals": "Buffet lunch & soft drinks on board, Bedouin tea in the desert",
+          "title": "Morning Red Sea & White Island Yacht Cruise, Afternoon Desert Quad & Camel Safari",
+          "optional": false,
+          "tourSlugs": [
+            "white-island",
+            "ras-mohamed",
+            "super-safari"
+          ],
+          "description": "08:00 AM hotel pickup to the marina for sailing to White Island and Ras Mohamed with 2 guided snorkeling stops and buffet lunch on deck. At 15:30 PM, transfer to the desert safari station for an adrenaline-pumping quad bike ride across mountain dunes, a traditional camel trek, and Bedouin tea before evening hotel drop-off.",
+          "accommodation": "Return to your Sharm El Sheikh hotel"
+        }
+      ],
       "included": [
-        "Hotel pickup and drop-off in an air-conditioned vehicle",
-        "Snorkeling at Ras Mohamed and White Island",
-        "Two snorkeling stops in the Red Sea",
-        "Professional instructor guidance.",
-        "Refreshments: water, coffee, tea, soda",
-        "Lunch includes chicken, rice, pasta, veggies, 3 salads",
-        "Spacious yacht with sun deck",
-        "National Park entrance fees",
-        "Life jacket"
+        "Round-trip hotel transfers in an air-conditioned modern vehicle",
+        "Full yacht cruise to Ras Mohamed National Park & White Island",
+        "Two guided snorkeling stops at pristine coral reefs with professional guides",
+        "Freshly prepared open-buffet lunch on board the yacht with soft drinks, tea & coffee",
+        "Quad bike desert safari through the Sinai mountain dunes",
+        "Scenic desert camel ride",
+        "Traditional Bedouin hospitality and herbal tea stop",
+        "All national park entry permits and fees",
+        "Life jackets and safety equipment"
       ],
       "excluded": [
-        "Optional underwater photos for purchase",
-        "snorkling equipment"
+        "Snorkeling gear rental (mask/fins available at marina if needed)",
+        "Bedouin scarf and dust goggles for quad biking (available on site)",
+        "Optional underwater photos and video package",
+        "Personal expenses and gratuities"
       ],
       "bring": [
-        "Swimwear worn under your clothes",
-        "Towel",
-        "Reef-safe sunscreen",
-        "Dry bag or plastic pouch for phones"
+        "Passport or ID (required for marina and checkpoints)",
+        "Swimwear (worn under clothes) and beach towel",
+        "Reef-safe sunscreen and sunglasses",
+        "Change of comfortable casual clothes & closed-toe shoes for quad biking",
+        "Light jacket or scarf for desert breeze"
       ],
       "translations": {
         "ar": {
-          "title": "جزيرة الرمال البيضاء",
-          "tagline": "رحلة بحرية صباحية إلى الجزيرة الرملية وسط البحر، مع وقفات للسباحة والسنوركلينج على الشعاب المرجانية."
+          "title": "بكج يوم كامل — رحلة بحرية ورأس محمد وسفاري الصحراء بالبيتش باجي والجمال",
+          "tagline": "البكج السياحي الأقوى في شرم الشيخ: الجزيرة البيضاء، رأس محمد، سفاري البيتش باجي في الصحراء، ركوب الجمال والغداء."
         },
         "de": {
-          "title": "White Island Sandbank",
-          "tagline": "Bootsausflug am Vormittag zur Sandbank mitten im Meer mit Schnorchelstopps an den Korallenriffen."
-        },
-        "fr": {
-          "title": "Banc de Sable de White Island",
-          "tagline": "Matinée en bateau vers le banc de sable émergeant en pleine mer, avec arrêts snorkeling sur les récifs."
+          "title": "Tagesausflug — Rotes Meer & Wüstensafari Super-Kombi",
+          "tagline": "Das ultimative Sharm-Paket: White Island, Ras Mohamed, Quad-Safari in der Wüste, Kamelritt und Buffet-Mittagessen inklusive."
         },
         "it": {
-          "title": "Isola Bianca (White Island)",
-          "tagline": "Escursione in barca alla lingua di sabbia bianca in mezzo al mare, con soste snorkeling sulla barriera corallina."
-        },
-        "pl": {
-          "title": "Biała Wyspa (White Island)",
-          "tagline": "Rejs statkiem na piaszczystą łachę pośrodku morza z przystankami na snurkowanie przy rafie koralowej."
+          "title": "Escursione di un Giorno — Red Sea & Desert Safari Super Combo",
+          "tagline": "Il pacchetto completo di Sharm: Isola Bianca, Ras Mohamed, safari in quad nel deserto, giro in cammello e pranzo a buffet."
         },
         "ru": {
-          "title": "Белый Остров (White Island)",
-          "tagline": "Морская прогулка на яхте к песчаной косе посреди моря с остановками для снорклинга на рифах."
+          "title": "Экскурсия на целый день — Белый остров, Рас Мохаммед и квадро-сафари",
+          "tagline": "Супер-комбо в Шарм-эль-Шейхе: Белый остров, рифы Рас-Мохаммеда, сафари на квадроциклах, верблюды и обед."
         }
       },
       "status": "published",
-      "featured": false,
-      "priority": 100,
-      "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-04T16:10:30.31+00:00",
-      "seo": {}
+      "featured": true,
+      "priority": 1,
+      "createdAt": "2026-10-04T20:03:49.325408+00:00",
+      "updatedAt": "2026-10-04T20:03:48.96+00:00",
+      "seo": {
+        "category": "sea-water",
+        "keywords": [
+          "escursione di un giorno sharm",
+          "white island ras mohamed quad combo",
+          "sharm el sheikh package tour",
+          "red sea and desert safari"
+        ],
+        "metaTitle": "Escursione di un Giorno — White Island, Ras Mohamed & Desert Safari | Brother Sharm",
+        "categories": [
+          "sea-water",
+          "desert",
+          "adventure"
+        ],
+        "includedTours": [
+          "white-island",
+          "ras-mohamed",
+          "super-safari"
+        ],
+        "metaDescription": "Book the ultimate 1-day package in Sharm El Sheikh: White Island yacht cruise, Ras Mohamed snorkeling, desert quad safari, camel ride and buffet lunch included for only 65€."
+      }
     },
     {
       "id": "",
       "slug": "",
       "tourId": "seed-tour-color-canyon",
       "tourSlug": "color-canyon",
+      "includedTours": [],
       "title": "Salama Red Canyons , Snorkeling ,Quad Biking, Camels, ,Jeep at Dahab 5*1",
       "tagline": "A day trip north into the Sinai interior to walk the Coloured Canyon, with time in Dahab on the way back.",
       "destination": "sharm-el-sheikh",
+      "category": "sea-water",
+      "categories": [
+        "sea-water"
+      ],
       "duration": "3 days",
       "priceFrom": 25,
       "childPrice": 15,
@@ -3802,7 +3955,99 @@
       "featured": false,
       "priority": 100,
       "createdAt": "2026-10-04T16:10:59.528544+00:00",
-      "updatedAt": "2026-10-04T16:10:57.687+00:00",
+      "updatedAt": "2026-10-04T18:42:42.11+00:00",
+      "seo": {}
+    },
+    {
+      "id": "murhwf2bvocvu6ht",
+      "slug": "sharm-2-days-package",
+      "tourId": "seed-tour-white-island",
+      "tourSlug": "white-island",
+      "includedTours": [],
+      "title": "package",
+      "tagline": "A boat morning out to the sandbank that appears in the middle of the sea, with snorkelling stops on the reefs either side of it.",
+      "destination": "sharm-el-sheikh",
+      "category": "sea-water",
+      "categories": [
+        "sea-water"
+      ],
+      "duration": "2 days",
+      "priceFrom": 30,
+      "childPrice": 15,
+      "currency": "USD",
+      "priceOverrides": {},
+      "coverImage": {
+        "alt": "package",
+        "src": "/uploads/media/98e035f4-7857-465d-b2d8-0072c3ecbe04.jpeg",
+        "width": 1600,
+        "height": 900
+      },
+      "gallery": [
+        {
+          "alt": "package photo 1",
+          "src": "/uploads/media/f3ffedd4-dc72-4d48-8c86-1b2ac5bbc815.jpeg",
+          "width": 1600,
+          "height": 900
+        }
+      ],
+      "description": [
+        "Embark on an unforgettable Ras Mohamed & White Island Boat Trip from Sharm El Sheikh and explore the crystal-clear waters of the Red Sea. Discover Ras Mohamed National Park, famous for its colorful coral reefs, rich marine life, and breathtaking underwater scenery.",
+        "Your journey starts with hotel pickup and transfer to the marina, where you’ll board a modern, fully equipped yacht. Sail along the stunning Sinai coastline while relaxing on deck and learning about the area’s unique marine ecosystem from our experienced guides",
+        "Enjoy two amazing snorkeling stops at Ras Mohamed’s top reef sites and the iconic White Island. Swim among tropical fish, admire vibrant corals, and enjoy a tasty onboard lunch with soft drinks before returning to your hotel with unforgettable memories"
+      ],
+      "days": [],
+      "included": [
+        "Hotel pickup and drop-off in an air-conditioned vehicle",
+        "Snorkeling at Ras Mohamed and White Island",
+        "Two snorkeling stops in the Red Sea",
+        "Professional instructor guidance.",
+        "Refreshments: water, coffee, tea, soda",
+        "Lunch includes chicken, rice, pasta, veggies, 3 salads",
+        "Spacious yacht with sun deck",
+        "National Park entrance fees",
+        "Life jacket"
+      ],
+      "excluded": [
+        "Optional underwater photos for purchase",
+        "snorkling equipment"
+      ],
+      "bring": [
+        "Swimwear worn under your clothes",
+        "Towel",
+        "Reef-safe sunscreen",
+        "Dry bag or plastic pouch for phones"
+      ],
+      "translations": {
+        "ar": {
+          "title": "جزيرة الرمال البيضاء",
+          "tagline": "رحلة بحرية صباحية إلى الجزيرة الرملية وسط البحر، مع وقفات للسباحة والسنوركلينج على الشعاب المرجانية."
+        },
+        "de": {
+          "title": "White Island Sandbank",
+          "tagline": "Bootsausflug am Vormittag zur Sandbank mitten im Meer mit Schnorchelstopps an den Korallenriffen."
+        },
+        "fr": {
+          "title": "Banc de Sable de White Island",
+          "tagline": "Matinée en bateau vers le banc de sable émergeant en pleine mer, avec arrêts snorkeling sur les récifs."
+        },
+        "it": {
+          "title": "Isola Bianca (White Island)",
+          "tagline": "Escursione in barca alla lingua di sabbia bianca in mezzo al mare, con soste snorkeling sulla barriera corallina."
+        },
+        "pl": {
+          "title": "Biała Wyspa (White Island)",
+          "tagline": "Rejs statkiem na piaszczystą łachę pośrodku morza z przystankami na snurkowanie przy rafie koralowej."
+        },
+        "ru": {
+          "title": "Белый Остров (White Island)",
+          "tagline": "Морская прогулка на яхте к песчаной косе посреди моря с остановками для снорклинга на рифах."
+        }
+      },
+      "status": "draft",
+      "featured": false,
+      "priority": 100,
+      "createdAt": "2026-10-04T02:05:47.616016+00:00",
+      "updatedAt": "2026-10-04T18:42:42.11+00:00",
       "seo": {}
     }
   ],

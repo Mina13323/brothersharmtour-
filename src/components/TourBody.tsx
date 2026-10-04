@@ -11,6 +11,7 @@
  * - prices render in the visitor's currency (per-tour overrides respected)
  */
 
+import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -21,14 +22,14 @@ import { GalleryCarousel } from "./GalleryCarousel";
 import { StickyBookBar } from "./StickyBookBar";
 import { Accordion } from "./Accordion";
 import { CTASection, SectionHeading, WhatsAppIcon } from "./sections";
-import { BookButton } from "./BookingProvider";
-import { GuideLanguageBadge, useGuideLanguage } from "./DynamicGuideLanguage";
-import { localizeGuideText } from "@/lib/i18n/guideTerms";
+import { BookButton, useBooking } from "./BookingProvider";
+import { GuideLanguageBadge } from "./DynamicGuideLanguage";
 import { useSite } from "./SiteProvider";
 import type { PublicReview } from "@/lib/siteview";
 import { destinationName, experienceName } from "@/lib/store/labels";
 import type { Tour } from "@/lib/types";
 import {
+  cn,
   tourRating,
   tourReviewCount,
   tourOriginalPrice,
@@ -55,7 +56,109 @@ export function TourBody({
   preview?: boolean;
 }) {
   const { money, whatsappLink, settings, t, lang } = useSite();
-  const guideLang = useGuideLanguage();
+  const { open } = useBooking();
+
+  const activeTripPackages = useMemo(() => {
+    return (tour.tripPackages ?? [])
+      .filter((p) => p.active !== false)
+      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  }, [tour.tripPackages]);
+
+  const [selectedPkgId, setSelectedPkgId] = useState<string>(() => {
+    const list = (tour.tripPackages ?? [])
+      .filter((p) => p.active !== false)
+      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    return list[0]?.id ?? "";
+  });
+
+  const [packageGuests, setPackageGuests] = useState<
+    Record<string, { adults: number; children: number; infants: number }>
+  >({});
+
+  const getPackageGuests = (pkgId: string) => {
+    if (packageGuests[pkgId]) return packageGuests[pkgId];
+    if (pkgId === selectedPkgId) return { adults: 2, children: 0, infants: 0 };
+    return { adults: 0, children: 0, infants: 0 };
+  };
+
+  const handleUpdateGuest = (
+    pkgId: string,
+    type: "adults" | "children" | "infants",
+    delta: number
+  ) => {
+    setSelectedPkgId(pkgId);
+    setPackageGuests((prev) => {
+      const current =
+        prev[pkgId] ??
+        (pkgId === selectedPkgId
+          ? { adults: 2, children: 0, infants: 0 }
+          : { adults: 0, children: 0, infants: 0 });
+      const min = 0;
+      const nextVal = Math.max(min, current[type] + delta);
+      return {
+        ...prev,
+        [pkgId]: {
+          ...current,
+          [type]: nextVal,
+        },
+      };
+    });
+  };
+
+  const selectedPkg = useMemo(() => {
+    if (!activeTripPackages.length) return null;
+    return (
+      activeTripPackages.find((p) => p.id === selectedPkgId) ??
+      activeTripPackages[0]
+    );
+  }, [activeTripPackages, selectedPkgId]);
+
+  const curSelectedGuests = selectedPkg
+    ? getPackageGuests(selectedPkg.id)
+    : { adults: 2, children: 0, infants: 0 };
+  const effectiveSelectedAdults =
+    curSelectedGuests.adults > 0 ? curSelectedGuests.adults : 1;
+  const effectiveSelectedChildren = curSelectedGuests.children;
+  const effectiveSelectedInfants = curSelectedGuests.infants;
+
+  const selectedPkgAdultPrice = selectedPkg?.adultPrice ?? 0;
+  const selectedPkgChildPrice = selectedPkg?.childPrice ?? 0;
+  const selectedPkgInfantPrice = selectedPkg?.infantPrice ?? 0;
+
+  const selectedPkgTotal = useMemo(() => {
+    if (!selectedPkg) return 0;
+    return (
+      effectiveSelectedAdults * selectedPkgAdultPrice +
+      effectiveSelectedChildren * selectedPkgChildPrice +
+      effectiveSelectedInfants * selectedPkgInfantPrice
+    );
+  }, [
+    selectedPkg,
+    effectiveSelectedAdults,
+    selectedPkgAdultPrice,
+    effectiveSelectedChildren,
+    selectedPkgChildPrice,
+    effectiveSelectedInfants,
+    selectedPkgInfantPrice,
+  ]);
+
+  const handleBookPackage = (
+    pkgId: string,
+    adultsCount?: number,
+    childrenCount?: number,
+    infantsCount?: number
+  ) => {
+    const g = getPackageGuests(pkgId);
+    const a = adultsCount !== undefined ? adultsCount : g.adults > 0 ? g.adults : 2;
+    const c = childrenCount !== undefined ? childrenCount : g.children;
+    const inf = infantsCount !== undefined ? infantsCount : g.infants;
+    open(tour.slug, {
+      tripPackageId: pkgId,
+      adults: a,
+      children: c,
+      infants: inf,
+    });
+  };
 
   const adultPrice = tour.priceFrom;
   const effectiveChildPrice =
@@ -132,7 +235,20 @@ export function TourBody({
             </dl>
 
             <div className="flex flex-col gap-3 sm:flex-row lg:shrink-0">
-              <BookButton tourSlug={tour.slug} className="btn btn-primary">
+              <BookButton
+                tourSlug={tour.slug}
+                options={
+                  selectedPkg
+                    ? {
+                        tripPackageId: selectedPkg.id,
+                        adults: effectiveSelectedAdults,
+                        children: effectiveSelectedChildren,
+                        infants: effectiveSelectedInfants,
+                      }
+                    : undefined
+                }
+                className="btn btn-primary"
+              >
                 {t("nav_book_now", "Book now")}
               </BookButton>
               <a
@@ -208,6 +324,246 @@ export function TourBody({
                   ))}
                 </div>
               </Reveal>
+
+              {/* ─── Trip Packages / Tour Options ─── */}
+              {activeTripPackages.length > 0 ? (
+                <Reveal className="mt-14">
+                  <div className="flex flex-wrap items-end justify-between gap-4">
+                    <div>
+                      <h2 className="eyebrow text-reef">
+                        {t("section_packages", "Tour Options & Packages")}
+                      </h2>
+                      <p className="mt-1 font-display text-[1.65rem] text-ink font-bold leading-tight">
+                        {t("select_your_package", "Select your package")}
+                      </p>
+                    </div>
+                    <span className="text-xs text-stone font-medium">
+                      {activeTripPackages.length}{" "}
+                      {activeTripPackages.length === 1 ? "option available" : "options available"}
+                    </span>
+                  </div>
+
+                  <div className="mt-6 space-y-4">
+                    {activeTripPackages.map((pkg, idx) => {
+                      const isSelected = selectedPkg?.id === pkg.id;
+                      const g = getPackageGuests(pkg.id);
+                      const cardAdults = g.adults;
+                      const cardChildren = g.children;
+                      const cardInfants = g.infants;
+                      const cardAdultPrice = pkg.adultPrice;
+                      const cardChildPrice = pkg.childPrice !== null && pkg.childPrice !== undefined ? pkg.childPrice : 0;
+                      const cardInfantPrice = pkg.infantPrice !== null && pkg.infantPrice !== undefined ? pkg.infantPrice : 0;
+                      const cardTotal =
+                        cardAdults * cardAdultPrice +
+                        cardChildren * cardChildPrice +
+                        cardInfants * cardInfantPrice;
+
+                      return (
+                        <div
+                          key={pkg.id || idx}
+                          onClick={() => setSelectedPkgId(pkg.id)}
+                          className={cn(
+                            "cursor-pointer rounded-2xl border p-5 md:p-6 transition-all duration-200",
+                            isSelected
+                              ? "border-reef bg-reef/[0.03] ring-1 ring-reef shadow-xs"
+                              : "border-sand bg-paper hover:bg-paper-warm/50 hover:border-sand-deep"
+                          )}
+                        >
+                          {/* Option Header */}
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-2.5">
+                                <span
+                                  className={cn(
+                                    "size-4 rounded-full border flex items-center justify-center shrink-0 transition-colors",
+                                    isSelected
+                                      ? "border-reef bg-reef text-white"
+                                      : "border-sand-deep/60 bg-paper"
+                                  )}
+                                >
+                                  {isSelected ? (
+                                    <span className="size-1.5 rounded-full bg-white" />
+                                  ) : null}
+                                </span>
+                                <h3 className="font-display text-[1.25rem] font-bold text-ink leading-snug">
+                                  {pkg.title}
+                                </h3>
+                              </div>
+                              {pkg.description ? (
+                                <p className="text-[0.9375rem] text-stone leading-relaxed pl-6.5">
+                                  {pkg.description}
+                                </p>
+                              ) : null}
+                            </div>
+                            {pkg.duration ? (
+                              <span className="shrink-0 rounded-pill border border-ink/10 px-2.5 py-0.5 text-[0.6875rem] uppercase tracking-wider text-stone">
+                                {pkg.duration}
+                              </span>
+                            ) : null}
+                          </div>
+
+                          {/* Pricing Row: $30 / adult     Child: $15     Infant: $0 */}
+                          <div className="mt-4 flex flex-wrap items-baseline gap-x-6 gap-y-1.5 py-2.5 border-y border-sand/70 text-sm pl-6.5">
+                            <div>
+                              <span className="font-display font-bold text-[1.25rem] text-ink">
+                                {money(cardAdultPrice)}
+                              </span>
+                              <span className="text-xs text-stone ml-1">/ {t("price_adult", "adult")}</span>
+                            </div>
+                            <div className="text-stone">
+                              {t("price_child", "Child")}:{" "}
+                              <strong className="text-ink font-semibold">
+                                {pkg.childPrice !== null && pkg.childPrice !== undefined ? money(pkg.childPrice) : "$0"}
+                              </strong>
+                            </div>
+                            <div className="text-stone">
+                              {t("guests_infants", "Infant")}:{" "}
+                              <strong className="text-ink font-semibold">
+                                {pkg.infantPrice ? money(pkg.infantPrice) : "$0"}
+                              </strong>
+                            </div>
+                          </div>
+
+                          {/* Quantity Counters */}
+                          <div className="mt-4 pl-6.5">
+                            <div className="flex flex-wrap items-center gap-3">
+                              {/* Adults */}
+                              <div className="flex items-center gap-2 rounded-xl border border-sand bg-paper px-3 py-1.5 shadow-2xs">
+                                <span className="text-xs font-medium text-ink mr-1">{t("guests_adults", "Adults")}</span>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleUpdateGuest(pkg.id, "adults", -1);
+                                  }}
+                                  className="size-7 rounded-full bg-paper-warm hover:bg-sand/70 grid place-items-center text-ink text-sm font-bold transition-colors cursor-pointer"
+                                  aria-label="Decrease adults"
+                                >
+                                  −
+                                </button>
+                                <span className="w-5 text-center font-bold text-sm text-ink">{cardAdults}</span>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleUpdateGuest(pkg.id, "adults", 1);
+                                  }}
+                                  className="size-7 rounded-full bg-paper-warm hover:bg-sand/70 grid place-items-center text-ink text-sm font-bold transition-colors cursor-pointer"
+                                  aria-label="Increase adults"
+                                >
+                                  +
+                                </button>
+                              </div>
+
+                              {/* Children */}
+                              <div className="flex items-center gap-2 rounded-xl border border-sand bg-paper px-3 py-1.5 shadow-2xs">
+                                <span className="text-xs font-medium text-ink mr-1">{t("guests_children", "Children")}</span>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleUpdateGuest(pkg.id, "children", -1);
+                                  }}
+                                  className="size-7 rounded-full bg-paper-warm hover:bg-sand/70 grid place-items-center text-ink text-sm font-bold transition-colors cursor-pointer"
+                                  aria-label="Decrease children"
+                                >
+                                  −
+                                </button>
+                                <span className="w-5 text-center font-bold text-sm text-ink">{cardChildren}</span>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleUpdateGuest(pkg.id, "children", 1);
+                                  }}
+                                  className="size-7 rounded-full bg-paper-warm hover:bg-sand/70 grid place-items-center text-ink text-sm font-bold transition-colors cursor-pointer"
+                                  aria-label="Increase children"
+                                >
+                                  +
+                                </button>
+                              </div>
+
+                              {/* Infants */}
+                              <div className="flex items-center gap-2 rounded-xl border border-sand bg-paper px-3 py-1.5 shadow-2xs">
+                                <span className="text-xs font-medium text-ink mr-1">{t("guests_infants", "Infants")}</span>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleUpdateGuest(pkg.id, "infants", -1);
+                                  }}
+                                  className="size-7 rounded-full bg-paper-warm hover:bg-sand/70 grid place-items-center text-ink text-sm font-bold transition-colors cursor-pointer"
+                                  aria-label="Decrease infants"
+                                >
+                                  −
+                                </button>
+                                <span className="w-5 text-center font-bold text-sm text-ink">{cardInfants}</span>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleUpdateGuest(pkg.id, "infants", 1);
+                                  }}
+                                  className="size-7 rounded-full bg-paper-warm hover:bg-sand/70 grid place-items-center text-ink text-sm font-bold transition-colors cursor-pointer"
+                                  aria-label="Increase infants"
+                                >
+                                  +
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Selected Total & Action Bar */}
+                          {isSelected && cardAdults > 0 ? (
+                            <div className="mt-5 pt-4 border-t border-sand/80 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pl-6.5">
+                              <div>
+                                <span className="text-[0.7rem] uppercase tracking-wider text-stone block">
+                                  {t("total_price", "Estimated Total")}
+                                </span>
+                                <div className="flex items-baseline gap-2">
+                                  <span className="font-display text-2xl font-bold text-ink">
+                                    {money(cardTotal)}
+                                  </span>
+                                  <span className="text-xs text-stone">
+                                    ({cardAdults} × {money(cardAdultPrice)}
+                                    {cardChildren > 0 ? ` + ${cardChildren} × ${money(cardChildPrice)}` : ""}
+                                    {cardInfants > 0 && cardInfantPrice > 0 ? ` + ${cardInfants} × ${money(cardInfantPrice)}` : ""})
+                                  </span>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-2.5">
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleBookPackage(pkg.id, cardAdults, cardChildren, cardInfants);
+                                  }}
+                                  className="btn btn-primary btn-sm cursor-pointer"
+                                >
+                                  {t("book_this_package", "Book Now")}
+                                </button>
+                                <a
+                                  href={whatsappLink(
+                                    `Hi Brother Sharm Tour — I want to book ${tour.title} (${pkg.title}) for ${cardAdults} adult(s)${cardChildren ? `, ${cardChildren} child` : ""}. Total: ${money(cardTotal)}.`
+                                  )}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="btn btn-outline btn-sm cursor-pointer"
+                                >
+                                  <WhatsAppIcon className="size-3.5" />
+                                  WhatsApp
+                                </a>
+                              </div>
+                            </div>
+                          ) : null}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </Reveal>
+              ) : null}
 
               {/* Highlights */}
               {tour.highlights.length ? (
@@ -416,26 +772,44 @@ export function TourBody({
                 <div className="rounded-3xl bg-paper-warm p-6 shadow-md md:p-8">
                   <div className="flex items-end justify-between gap-4 pb-5">
                     <div>
-                      <p className="eyebrow text-stone">{t("price_adult_label", "Adult Price")}</p>
-                      <p className="mt-1 font-display text-[2.25rem] leading-none font-bold text-ink">
-                        {price ?? t("price_on_request", "On request")}
+                      <p className="eyebrow text-stone">
+                        {selectedPkg ? selectedPkg.title : t("price_adult_label", "Adult Price")}
                       </p>
-                      {price ? (
+                      <p className="mt-1 font-display text-[2.25rem] leading-none font-bold text-ink">
+                        {selectedPkg
+                          ? money(selectedPkg.adultPrice)
+                          : (price ?? t("price_on_request", "On request"))}
+                      </p>
+                      {price || selectedPkg ? (
                         <p className="mt-1 text-[0.75rem] text-stone">/{t("price_adult", "adult")}</p>
                       ) : (
                         <p className="mt-1 text-[0.75rem] text-stone">quoted for your group</p>
                       )}
-                      {childPriceFormatted ? (
+                      {(selectedPkg ? selectedPkg.childPrice !== null && selectedPkg.childPrice !== undefined : childPriceFormatted) ? (
                         <div className="mt-3 pt-2 border-t border-sand/60">
                           <p className="eyebrow text-reef-deep text-[0.65rem]">{t("price_child_label", "Child Price (5–10 yrs)")}</p>
                           <p className="mt-0.5 font-display text-[1.4rem] font-bold text-reef-deep">
-                            {childPriceFormatted}
+                            {selectedPkg
+                              ? (selectedPkg.childPrice ? money(selectedPkg.childPrice) : "$0")
+                              : childPriceFormatted}
+                          </p>
+                        </div>
+                      ) : null}
+                      {selectedPkg && (curSelectedGuests.adults > 0 || curSelectedGuests.children > 0) ? (
+                        <div className="mt-3 pt-2 border-t border-sand/60">
+                          <p className="eyebrow text-stone text-[0.65rem]">{t("estimated_total", "Estimated Total")}</p>
+                          <p className="mt-0.5 font-display text-[1.5rem] font-bold text-ink">
+                            {money(selectedPkgTotal)}
+                          </p>
+                          <p className="text-[0.7rem] text-stone">
+                            {effectiveSelectedAdults} adult{effectiveSelectedAdults > 1 ? "s" : ""}
+                            {effectiveSelectedChildren > 0 ? `, ${effectiveSelectedChildren} child` : ""} · {t("pay_on_day", "pay on the day")}
                           </p>
                         </div>
                       ) : null}
                     </div>
                     <span className="rounded-pill border border-ink/15 px-3 py-1 text-[0.625rem] uppercase tracking-[0.14em] text-stone">
-                      {tour.duration ?? t("duration_flexible", "Flexible")}
+                      {selectedPkg?.duration ?? tour.duration ?? t("duration_flexible", "Flexible")}
                     </span>
                   </div>
 
@@ -455,12 +829,27 @@ export function TourBody({
                   </ul>
 
                   <div className="flex flex-col gap-3">
-                    <BookButton tourSlug={tour.slug} className="btn btn-primary w-full">
-                      Book now
+                    <BookButton
+                      tourSlug={tour.slug}
+                      options={
+                        selectedPkg
+                          ? {
+                              tripPackageId: selectedPkg.id,
+                              adults: effectiveSelectedAdults,
+                              children: effectiveSelectedChildren,
+                              infants: effectiveSelectedInfants,
+                            }
+                          : undefined
+                      }
+                      className="btn btn-primary w-full"
+                    >
+                      {selectedPkg ? t("book_this_package", "Book selected option") : t("book_now", "Book now")}
                     </BookButton>
                     <a
                       href={whatsappLink(
-                        `Hi Brother Sharm Tour — I'd like to ask about ${tour.title}.`,
+                        selectedPkg
+                          ? `Hi Brother Sharm Tour — I want to book ${tour.title} (${selectedPkg.title}) for ${effectiveSelectedAdults} adult(s)${effectiveSelectedChildren ? `, ${effectiveSelectedChildren} child` : ""}. Total: ${money(selectedPkgTotal)}.`
+                          : `Hi Brother Sharm Tour — I'd like to ask about ${tour.title}.`
                       )}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -562,7 +951,22 @@ export function TourBody({
         />
       ) : null}
 
-      {!preview ? <StickyBookBar tour={tour} /> : null}
+      {!preview ? (
+        <StickyBookBar
+          tour={tour}
+          selectedPackage={selectedPkg}
+          bookingOptions={
+            selectedPkg
+              ? {
+                  tripPackageId: selectedPkg.id,
+                  adults: effectiveSelectedAdults,
+                  children: effectiveSelectedChildren,
+                  infants: effectiveSelectedInfants,
+                }
+              : undefined
+          }
+        />
+      ) : null}
     </>
   );
 }

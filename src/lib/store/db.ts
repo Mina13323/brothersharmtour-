@@ -83,7 +83,18 @@ export function applySupabaseData(incoming: {
   let changed = false;
 
   if (incoming.tours && incoming.tours.length > 0) {
-    current.tours = incoming.tours;
+    current.tours = incoming.tours.map((inc) => {
+      const existing = current.tours.find((ct) => ct.id === inc.id || ct.slug === inc.slug);
+      if (
+        existing &&
+        (!inc.tripPackages || inc.tripPackages.length === 0) &&
+        existing.tripPackages &&
+        existing.tripPackages.length > 0
+      ) {
+        return { ...inc, tripPackages: existing.tripPackages };
+      }
+      return inc;
+    });
     changed = true;
   }
   if (incoming.packages) {

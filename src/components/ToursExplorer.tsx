@@ -21,6 +21,7 @@ const tourTypes = [
   { id: "group", label: "Small group" },
   { id: "private", label: "Private" },
   { id: "transfer", label: "Transfer" },
+  { id: "package", label: "Package" },
 ] as const;
 
 /**
@@ -96,7 +97,21 @@ export function ToursExplorer({
 
     const filtered = tours.filter((tour) => {
       if (destination !== "all" && tour.destination !== destination) return false;
-      if (category !== "all" && tour.category !== category) return false;
+      if (category !== "all") {
+        if (category === "packages" || category === "package") {
+          const isPkg = (tour as unknown as { isPackage?: boolean }).isPackage || tour.type === "package";
+          if (!isPkg) return false;
+        } else {
+          const tourRecord = tour as unknown as { category?: string; categories?: string[] };
+          const cats = [
+            (tourRecord.category || "").toLowerCase(),
+            ...(tourRecord.categories || []).map((c) => c.toLowerCase()),
+          ];
+          if (!cats.some((c) => c === category.toLowerCase() || c.includes(category.toLowerCase()))) {
+            return false;
+          }
+        }
+      }
       if (type !== "all" && tour.type !== type) return false;
 
       if (duration !== "all") {

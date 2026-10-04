@@ -75,13 +75,22 @@ export function tourToRow(tour: TourRecord): Record<string, unknown> {
     verified: Boolean(tour.verified),
     featured: Boolean(tour.featured),
     priority: tour.priority || 100,
-    status: tour.status || "published",
-    seo: tour.seo || {},
+    seo: {
+      ...(tour.seo || {}),
+      tripPackages: tour.tripPackages || [],
+    },
     updated_at: new Date().toISOString(),
   };
 }
 
 export function rowToTour(r: Record<string, unknown>): TourRecord {
+  const seo = (r.seo && typeof r.seo === "object" ? r.seo : {}) as Record<string, unknown>;
+  const tripPackages = Array.isArray(r.trip_packages)
+    ? (r.trip_packages as TourRecord["tripPackages"])
+    : Array.isArray(seo.tripPackages)
+    ? (seo.tripPackages as TourRecord["tripPackages"])
+    : [];
+
   return {
     id: String(r.id),
     slug: String(r.slug),
@@ -97,6 +106,7 @@ export function rowToTour(r: Record<string, unknown>): TourRecord {
     durationHours: r.duration_hours != null ? Number(r.duration_hours) : null,
     priceFrom: r.price_from != null ? Number(r.price_from) : null,
     childPrice: r.child_price != null ? Number(r.child_price) : null,
+    tripPackages,
     currency: (r.currency as string) || "USD",
     priceOriginal: r.price_original != null ? Number(r.price_original) : null,
     priceUnit: (r.price_unit as string) || undefined,
@@ -156,20 +166,38 @@ export function pkgToRow(pkg: PackageRecord): Record<string, unknown> {
     status: pkg.status || "published",
     featured: Boolean(pkg.featured),
     priority: pkg.priority || 100,
-    seo: pkg.seo || {},
+    seo: {
+      ...(pkg.seo || {}),
+      category: pkg.category || "sea-water",
+      categories: pkg.categories || [pkg.category || "sea-water"],
+      includedTours: pkg.includedTours || [],
+    },
     updated_at: new Date().toISOString(),
   };
 }
 
 export function rowToPackage(r: Record<string, unknown>): PackageRecord {
+  const seo = (r.seo && typeof r.seo === "object" ? r.seo : {}) as Record<string, unknown>;
+  const cat = (r.category as string) || (seo.category as string) || "sea-water";
+  const rawCats = (r.categories as string[]) || (seo.categories as string[]) || [cat];
+  const categories = Array.isArray(rawCats) ? rawCats : [cat];
+  const includedTours = Array.isArray(r.included_tours)
+    ? (r.included_tours as string[])
+    : Array.isArray(seo.includedTours)
+    ? (seo.includedTours as string[])
+    : [];
+
   return {
     id: String(r.id),
     slug: String(r.slug),
     tourId: (r.tour_id as string) || null,
     tourSlug: (r.tour_slug as string) || null,
+    includedTours,
     title: String(r.title || ""),
     tagline: (r.tagline as string) || "",
     destination: (r.destination as string) || "sharm-el-sheikh",
+    category: cat as PackageRecord["category"],
+    categories: categories as PackageRecord["categories"],
     duration: (r.duration as string) || "",
     priceFrom: r.price_from != null ? Number(r.price_from) : null,
     childPrice: r.child_price != null ? Number(r.child_price) : null,

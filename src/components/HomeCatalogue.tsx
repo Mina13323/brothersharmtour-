@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Reveal } from "./Reveal";
 import { SectionHeading } from "./sections";
 import { TourCard } from "./cards";
@@ -66,8 +66,15 @@ const GROUPS: CategoryGroup[] = [
 function matchTours(categories: string[], catalogue: CatalogueTour[]) {
   return catalogue
     .filter((t) => {
-      const cat = (t.category || "").toLowerCase();
-      return categories.some((c) => cat === c.toLowerCase() || cat.includes(c.toLowerCase()));
+      // Packages strictly belong to their own "Packages" filter
+      if (t.isPackage || t.type === "package") return false;
+      const tourCats = [
+        (t.category || "").toLowerCase(),
+        ...(t.categories || []).map((c) => c.toLowerCase()),
+      ];
+      return categories.some((c) =>
+        tourCats.some((tc) => tc === c.toLowerCase() || tc.includes(c.toLowerCase()))
+      );
     })
     .sort((a, b) => a.priority - b.priority);
 }
@@ -77,15 +84,34 @@ export function HomeCatalogue() {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<string>("all");
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const checkHash = () => {
+        if (window.location.hash === "#packages") {
+          setActiveTab("packages");
+        }
+      };
+      checkHash();
+      window.addEventListener("hashchange", checkHash);
+      return () => window.removeEventListener("hashchange", checkHash);
+    }
+  }, []);
+
   const tabs = [
     { id: "all", label: t("cat_all", "All Tours") },
     { id: "sea-diving", label: t("cat_sea_diving", "Sea & Diving") },
     { id: "safari", label: t("cat_safari", "Safari") },
     { id: "historical", label: t("cat_historical", "Historical") },
     { id: "entertainment", label: t("cat_entertainment", "Entertainment") },
+    { id: "packages", label: t("nav_packages", "Packages") },
   ];
 
+  const regularPackages = useMemo(() => {
+    return catalogue.filter((t) => t.isPackage || t.type === "package");
+  }, [catalogue]);
+
   const visibleGroups = useMemo(() => {
+    if (activeTab === "packages") return [];
     if (activeTab === "all") return GROUPS;
     return GROUPS.filter((g) => g.id === activeTab);
   }, [activeTab]);
@@ -95,15 +121,22 @@ export function HomeCatalogue() {
     if (activeTab !== "all") return [];
     const allKnown = GROUPS.flatMap((g) => g.categories);
     return catalogue.filter((t) => {
-      const cat = (t.category || "").toLowerCase();
-      return !allKnown.some((c) => cat === c.toLowerCase() || cat.includes(c.toLowerCase()));
+      if (t.isPackage || t.type === "package") return false;
+      const tourCats = [
+        (t.category || "").toLowerCase(),
+        ...(t.categories || []).map((c) => c.toLowerCase()),
+      ];
+      return !allKnown.some((c) =>
+        tourCats.some((tc) => tc === c.toLowerCase() || tc.includes(c.toLowerCase()))
+      );
     });
   }, [activeTab, catalogue]);
 
   const totalVisibleTours = useMemo(() => {
+    if (activeTab === "packages") return regularPackages.length;
     const fromGroups = visibleGroups.reduce((acc, g) => acc + matchTours(g.categories, catalogue).length, 0);
     return fromGroups + unassignedTours.length;
-  }, [visibleGroups, catalogue, unassignedTours]);
+  }, [activeTab, visibleGroups, catalogue, unassignedTours, regularPackages]);
 
   return (
     <section id="tours" className="band scroll-mt-24">
@@ -129,7 +162,40 @@ export function HomeCatalogue() {
 
         {/* Groups */}
         <div className="mt-12 space-y-16">
-          {totalVisibleTours === 0 && (
+          {activeTab === "packages" && (
+            <div>
+              <div className="flex items-end justify-between gap-4 pb-2">
+                <div>
+                  <h3 className="font-display text-[1.75rem] leading-tight text-ink">
+                    {t("nav_packages", "Packages")}
+                  </h3>
+                  <p className="mt-1 text-[0.9rem] text-stone">
+                    Curated regular packages & bundled day excursions
+                  </p>
+                </div>
+                <span className="shrink-0 rounded-pill bg-reef-deep/10 px-3 py-1 text-[0.8rem] font-semibold text-reef-deep">
+                  {regularPackages.length} {t("nav_packages", "Packages").toLowerCase()}
+                </span>
+              </div>
+
+              {regularPackages.length === 0 ? (
+                <div className="mt-8 rounded-3xl border border-sand/80 bg-paper-warm/50 p-12 text-center">
+                  <p className="font-display text-xl text-ink">
+                    {t("no_tours_found_in_category", "No packages currently available.")}
+                  </p>
+                </div>
+              ) : (
+                <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {regularPackages.map((pkg, i) => (
+                    <Reveal key={pkg.slug} variant="card" delay={(i % 4) * 70}>
+                      <TourCard tour={pkg} />
+                    </Reveal>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+          {totalVisibleTours === 0 && activeTab !== "packages" && (
             <div className="rounded-3xl border border-sand/80 bg-paper-warm/50 p-12 text-center">
               <p className="font-display text-xl text-ink">
                 {t("no_tours_found_in_category", "No tours currently available in this category.")}

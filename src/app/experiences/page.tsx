@@ -95,7 +95,7 @@ export default function ExperiencesPage() {
                           ·
                         </span>
                         <span>
-                          {experience.destinations.map(destinationName).join(" & ")}
+                          {experience.destinations.map((d) => destinationName(d)).join(" & ")}
                         </span>
                       </div>
                     </Reveal>

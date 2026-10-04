@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS public.tours (
   min_participants integer,
   max_participants integer,
   addons jsonb DEFAULT '[]'::jsonb,
+  trip_packages jsonb DEFAULT '[]'::jsonb,
   important_info jsonb DEFAULT '[]'::jsonb,
   faq jsonb DEFAULT '[]'::jsonb,
   related jsonb DEFAULT '[]'::jsonb,
@@ -56,10 +57,14 @@ CREATE TABLE IF NOT EXISTS public.packages (
   slug text UNIQUE NOT NULL,
   tour_id text,
   tour_slug text,
+  included_tours jsonb DEFAULT '[]'::jsonb,
   title text NOT NULL,
   tagline text,
   destination text NOT NULL,
+  category text,
+  categories jsonb DEFAULT '[]'::jsonb,
   duration text,
+  duration_hours numeric,
   price_from numeric,
   child_price numeric,
   currency text DEFAULT 'USD',
@@ -143,11 +148,16 @@ ALTER TABLE public.tours ADD COLUMN IF NOT EXISTS languages jsonb DEFAULT '[]'::
 ALTER TABLE public.tours ADD COLUMN IF NOT EXISTS min_participants integer;
 ALTER TABLE public.tours ADD COLUMN IF NOT EXISTS max_participants integer;
 ALTER TABLE public.tours ADD COLUMN IF NOT EXISTS addons jsonb DEFAULT '[]'::jsonb;
+ALTER TABLE public.tours ADD COLUMN IF NOT EXISTS trip_packages jsonb DEFAULT '[]'::jsonb;
 ALTER TABLE public.tours ADD COLUMN IF NOT EXISTS verified boolean DEFAULT false;
 ALTER TABLE public.tours ADD COLUMN IF NOT EXISTS seo jsonb DEFAULT '{}'::jsonb;
 
 ALTER TABLE public.packages ADD COLUMN IF NOT EXISTS tour_id text;
 ALTER TABLE public.packages ADD COLUMN IF NOT EXISTS tour_slug text;
+ALTER TABLE public.packages ADD COLUMN IF NOT EXISTS included_tours jsonb DEFAULT '[]'::jsonb;
+ALTER TABLE public.packages ADD COLUMN IF NOT EXISTS category text;
+ALTER TABLE public.packages ADD COLUMN IF NOT EXISTS categories jsonb DEFAULT '[]'::jsonb;
+ALTER TABLE public.packages ADD COLUMN IF NOT EXISTS duration_hours numeric;
 ALTER TABLE public.packages ADD COLUMN IF NOT EXISTS child_price numeric;
 ALTER TABLE public.packages ADD COLUMN IF NOT EXISTS translations jsonb DEFAULT '{}'::jsonb;
 ALTER TABLE public.packages ADD COLUMN IF NOT EXISTS price_overrides jsonb DEFAULT '{}'::jsonb;
@@ -883,6 +893,39 @@ INSERT INTO public.tours (
 
 
 -- INSERT PACKAGES
+INSERT INTO public.packages (
+  id, slug, tour_id, tour_slug, included_tours, title, tagline, destination, category, categories, duration,
+  price_from, child_price, currency, price_overrides, cover_image,
+  gallery, description, days, included, excluded, bring, translations,
+  status, featured, priority, seo
+) VALUES (
+  'pkg-escursione-di-un-giorno', 'escursione-di-un-giorno-sharm-combo', 'seed-tour-white-island', 'white-island',
+  '["white-island","ras-mohamed","super-safari"]'::jsonb,
+  'Escursione di un Giorno — Red Sea & Desert Safari Super Combo',
+  'The ultimate Sharm 1-day package: White Island, Ras Mohamed coral reefs, desert quad safari, camel ride, and buffet lunch included.',
+  'sharm-el-sheikh', 'sea-water', '["sea-water","desert","adventure"]'::jsonb, '1 Full Day',
+  65, 40, 'EUR', '{"USD":70,"GBP":56,"EGP":3400}'::jsonb,
+  '{"src":"/media/packages/escursione-di-un-giorno.jpg","alt":"Brother Sharm - Escursione di un Giorno Flyer","width":1254,"height":1254}'::jsonb,
+  '[{"src":"/media/packages/escursione-di-un-giorno.jpg","alt":"Brother Sharm - Escursione di un Giorno Flyer","width":1254,"height":1254},{"src":"/media/white-island/hero.jpg","alt":"White Island Sandbank","width":2400,"height":1350},{"src":"/media/ras-mohamed/hero.jpg","alt":"Ras Mohamed Coral Reefs","width":2400,"height":1350},{"src":"/media/super-safari/hero.jpg","alt":"Sinai Desert Quad Safari","width":2400,"height":1350}]'::jsonb,
+  '["Experience the very best of Sharm El Sheikh in a single, perfectly orchestrated day. This exclusive Brother Sharm package brings together the magical marine wonders of the Red Sea and the thrilling adventure of the Sinai desert.","Start your morning cruising on a luxury yacht towards the pristine waters of Ras Mohamed National Park and the legendary White Island sandbank. Snorkel alongside world-renowned coral walls and colorful tropical fish, followed by a freshly prepared open-buffet lunch and drinks on board.","In the afternoon, transition smoothly from the sea to the golden Sinai sands. Ride powerful quad bikes across desert trails, meet Bedouin hosts for a scenic camel trek, and enjoy traditional Bedouin herbal tea in a mountain canyon tent before a comfortable transfer back to your hotel."]'::jsonb,
+  '[{"day":1,"title":"Morning Red Sea & White Island Yacht Cruise, Afternoon Desert Quad & Camel Safari","description":"08:00 AM hotel pickup to the marina for sailing to White Island and Ras Mohamed with 2 guided snorkeling stops and buffet lunch on deck. At 15:30 PM, transfer to the desert safari station for an adrenaline-pumping quad bike ride across mountain dunes, a traditional camel trek, and Bedouin tea before evening hotel drop-off.","meals":"Buffet lunch & soft drinks on board, Bedouin tea in the desert","accommodation":"Return to your Sharm El Sheikh hotel","optional":false,"tourSlugs":["white-island","ras-mohamed","super-safari"]}]'::jsonb,
+  '["Round-trip hotel transfers in an air-conditioned modern vehicle","Full yacht cruise to Ras Mohamed National Park & White Island","Two guided snorkeling stops at pristine coral reefs with professional guides","Freshly prepared open-buffet lunch on board the yacht with soft drinks, tea & coffee","Quad bike desert safari through the Sinai mountain dunes","Scenic desert camel ride","Traditional Bedouin hospitality and herbal tea stop","All national park entry permits and fees","Life jackets and safety equipment"]'::jsonb,
+  '["Snorkeling gear rental (mask/fins available at marina if needed)","Bedouin scarf and dust goggles for quad biking (available on site)","Optional professional photos and video package","Personal expenses and gratuities"]'::jsonb,
+  '["Passport or ID (required for marina and checkpoints)","Swimwear (worn under clothes) and beach towel","Reef-safe sunscreen and sunglasses","Change of comfortable casual clothes & closed-toe shoes for quad biking","Light jacket or scarf for desert breeze"]'::jsonb,
+  '{"it":{"title":"Escursione di un Giorno — Red Sea & Desert Safari Super Combo","tagline":"Il pacchetto completo di Sharm: Isola Bianca, Ras Mohamed, safari in quad nel deserto, giro in cammello e pranzo a buffet."},"ar":{"title":"بكج يوم كامل — رحلة بحرية ورأس محمد وسفاري الصحراء بالبيتش باجي والجمال","tagline":"البكج السياحي الأقوى في شرم الشيخ: الجزيرة البيضاء، رأس محمد، سفاري البيتش باجي في الصحراء، ركوب الجمال والغداء."},"de":{"title":"Tagesausflug — Rotes Meer & Wüstensafari Super-Kombi","tagline":"Das ultimative Sharm-Paket: White Island, Ras Mohamed, Quad-Safari in der Wüste, Kamelritt und Buffet-Mittagessen inklusive."},"ru":{"title":"Экскурсия на целый день — Белый остров, Рас Мохаммед и квадро-сафари","tagline":"Супер-комбо в Шарм-эль-Шейхе: Белый остров, рифы Рас-Мохаммеда, сафари на квадроциклах, верблюды и обед."}}'::jsonb,
+  'published', true, 1,
+  '{"category":"sea-water","categories":["sea-water","desert","adventure"],"includedTours":["white-island","ras-mohamed","super-safari"],"metaTitle":"Escursione di un Giorno — White Island, Ras Mohamed & Desert Safari | Brother Sharm","metaDescription":"Book the ultimate 1-day package in Sharm El Sheikh: White Island yacht cruise, Ras Mohamed snorkeling, desert quad safari, camel ride and buffet lunch included for only 65€."}'::jsonb
+) ON CONFLICT (slug) DO UPDATE SET
+  title = EXCLUDED.title,
+  price_from = EXCLUDED.price_from,
+  child_price = EXCLUDED.child_price,
+  cover_image = EXCLUDED.cover_image,
+  gallery = EXCLUDED.gallery,
+  translations = EXCLUDED.translations,
+  featured = EXCLUDED.featured,
+  status = EXCLUDED.status,
+  updated_at = now();
+
 INSERT INTO public.packages (
   id, slug, tour_id, tour_slug, title, tagline, destination, duration,
   price_from, child_price, currency, price_overrides, cover_image,

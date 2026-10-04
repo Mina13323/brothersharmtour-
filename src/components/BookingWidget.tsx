@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { WhatsAppIcon } from "./sections";
 import { useSite, useCatalogue } from "./SiteProvider";
@@ -12,13 +12,16 @@ import {
   tourReviewCount,
 } from "@/lib/utils";
 import type { CatalogueTour } from "@/lib/store/types";
+import type { BookingOptions } from "@/lib/types";
 import { User, Phone, Hotel, DoorClosed, FileText } from "lucide-react";
 
 export function BookingWidget({
   initialTour,
+  initialOptions,
   onClose,
 }: {
   initialTour?: string;
+  initialOptions?: BookingOptions;
   onClose?: () => void;
 }) {
   const { settings: site, whatsappLink, money, t } = useSite();
@@ -26,11 +29,44 @@ export function BookingWidget({
   const [slug, setSlug] = useState(initialTour ?? "");
   const tour = tours.find((t) => t.slug === slug);
 
+  // Trip Packages
+  const activeTripPackages = useMemo(() => {
+    return (tour?.tripPackages ?? []).filter((p) => p.active !== false);
+  }, [tour?.tripPackages]);
+
+  const [selectedPackageId, setSelectedPackageId] = useState<string>(
+    initialOptions?.tripPackageId ?? ""
+  );
+
+  useEffect(() => {
+    if (activeTripPackages.length > 0) {
+      const matchInitial =
+        initialOptions?.tripPackageId &&
+        activeTripPackages.some((p) => p.id === initialOptions.tripPackageId);
+      const exists = activeTripPackages.some((p) => p.id === selectedPackageId);
+      if (matchInitial) {
+        setSelectedPackageId(initialOptions!.tripPackageId!);
+      } else if (!exists) {
+        setSelectedPackageId(activeTripPackages[0].id);
+      }
+    } else {
+      setSelectedPackageId("");
+    }
+  }, [activeTripPackages, initialOptions?.tripPackageId, selectedPackageId]);
+
+  const selectedPackage = useMemo(() => {
+    if (!activeTripPackages.length) return null;
+    return (
+      activeTripPackages.find((p) => p.id === selectedPackageId) ??
+      activeTripPackages[0]
+    );
+  }, [activeTripPackages, selectedPackageId]);
+
   // Booking Parameters
   const [date, setDate] = useState<string | null>(null);
-  const [adults, setAdults] = useState(2);
-  const [children, setChildren] = useState(0);
-  const [infants, setInfants] = useState(0);
+  const [adults, setAdults] = useState(initialOptions?.adults ?? 2);
+  const [children, setChildren] = useState(initialOptions?.children ?? 0);
+  const [infants, setInfants] = useState(initialOptions?.infants ?? 0);
   const [addonQty, setAddonQty] = useState<Record<string, number>>({});
 
   // Personal & Hotel Details
@@ -40,12 +76,28 @@ export function BookingWidget({
   const [roomNumber, setRoomNumber] = useState("");
   const [notes, setNotes] = useState("");
 
+  useEffect(() => {
+    if (initialOptions) {
+      if (initialOptions.adults !== undefined) setAdults(initialOptions.adults);
+      if (initialOptions.children !== undefined) setChildren(initialOptions.children);
+      if (initialOptions.infants !== undefined) setInfants(initialOptions.infants);
+      if (initialOptions.tripPackageId) setSelectedPackageId(initialOptions.tripPackageId);
+    }
+  }, [initialOptions]);
+
   const [touched, setTouched] = useState(false);
 
-  const adultPrice = tour?.priceFrom ?? null;
-  const childPrice =
-    tour?.childPrice ??
-    (adultPrice !== null ? Math.round(adultPrice * 0.8) : null);
+  const adultPrice = selectedPackage
+    ? selectedPackage.adultPrice
+    : (tour?.priceFrom ?? null);
+
+  const childPrice = selectedPackage
+    ? (selectedPackage.childPrice !== undefined && selectedPackage.childPrice !== null
+        ? selectedPackage.childPrice
+        : 0)
+    : (tour?.childPrice ?? (adultPrice !== null ? Math.round(adultPrice * 0.8) : null));
+
+  const infantPrice = selectedPackage ? (selectedPackage.infantPrice ?? 0) : 0;
   const addons = tour?.addons ?? [];
   const unit = tour ? tourPriceUnit(tour) : "per person";
   const perBoat = /per (boat|car)/.test(unit);
@@ -54,9 +106,10 @@ export function BookingWidget({
     if (adultPrice === null) return null;
     let sum = perBoat ? adultPrice : adults * adultPrice;
     if (!perBoat && childPrice !== null) sum += children * childPrice;
+    if (selectedPackage && infantPrice > 0) sum += infants * infantPrice;
     for (const a of addons) sum += (addonQty[a.label] ?? 0) * a.price;
     return sum;
-  }, [adultPrice, childPrice, adults, children, addons, addonQty, perBoat]);
+  }, [adultPrice, childPrice, infantPrice, adults, children, infants, selectedPackage, addons, addonQty, perBoat]);
 
   const guests = adults + children + infants;
   const dateValid = Boolean(date);
@@ -73,6 +126,7 @@ export function BookingWidget({
       `Hello ${site.name}! I would like to reserve a tour.`,
       "",
       `• Tour: ${tour.title}`,
+      selectedPackage ? `• Selected Option: ${selectedPackage.title}` : null,
       date ? `• Date: ${prettyDate(date)}` : null,
       name.trim() ? `• Guest Name: ${name.trim()}` : null,
       phone.trim() ? `• WhatsApp / Phone: ${phone.trim()}` : null,
@@ -83,7 +137,7 @@ export function BookingWidget({
         : null,
       `• Guests: ${adults} adult${adults === 1 ? "" : "s"}` +
         (children ? `, ${children} child (5–10)` : "") +
-        (infants ? `, ${infants} infant (0–4, free)` : ""),
+        (infants ? `, ${infants} infant (0–4${infantPrice === 0 ? ", free" : ""})` : ""),
       ...addons
         .filter((a) => (addonQty[a.label] ?? 0) > 0)
         .map((a) => `• Add-on: ${a.label} × ${addonQty[a.label]}`),
@@ -95,6 +149,7 @@ export function BookingWidget({
     return lines.join("\n");
   }, [
     tour,
+    selectedPackage,
     date,
     name,
     phone,
@@ -103,10 +158,13 @@ export function BookingWidget({
     adults,
     children,
     infants,
+    infantPrice,
     addons,
     addonQty,
     total,
     notes,
+    site.name,
+    money,
   ]);
 
   const handleBook = () => {
@@ -114,6 +172,14 @@ export function BookingWidget({
       setTouched(true);
       return;
     }
+
+    const inquiryNotes = [
+      selectedPackage ? `Option: ${selectedPackage.title}` : null,
+      notes.trim() || null,
+      roomNumber.trim() ? `Room: ${roomNumber.trim()}` : null,
+    ]
+      .filter(Boolean)
+      .join(" | ");
 
     // Record the booking in the CMS (best effort — the WhatsApp hand-off is primary)
     try {
@@ -129,11 +195,7 @@ export function BookingWidget({
           children: children,
           hotel: hotel.trim(),
           room_number: roomNumber.trim(),
-          notes: notes.trim()
-            ? `${notes.trim()}${roomNumber ? ` (Room: ${roomNumber})` : ""}`
-            : roomNumber
-            ? `Room: ${roomNumber}`
-            : undefined,
+          notes: inquiryNotes || undefined,
           source: "booking_drawer",
         }),
       }).catch((e) => console.warn("Supabase inquiry sync note:", e));
@@ -179,7 +241,10 @@ export function BookingWidget({
       <Field step={1} label={t("step_tour", "Choose your excursion")}>
         <select
           value={slug}
-          onChange={(e) => setSlug(e.target.value)}
+          onChange={(e) => {
+            setSlug(e.target.value);
+            setSelectedPackageId("");
+          }}
           className="field"
         >
           <option value="">{t("select_tour_placeholder", "Select an excursion…")}</option>
@@ -205,6 +270,85 @@ export function BookingWidget({
             <span>({tourReviewCount(tour)} reviews)</span>
           </div>
         ) : null}
+
+        {/* Trip Package / Tour Option selection */}
+        {activeTripPackages.length > 0 ? (
+          <div className="mt-4 pt-3.5 border-t border-sand/70">
+            <p className="text-[0.78rem] font-semibold text-ink mb-2.5">
+              {t("select_package_option", "Select Package Option")}
+            </p>
+            <div className="space-y-2.5">
+              {activeTripPackages.map((pkg) => {
+                const isSelected = selectedPackage?.id === pkg.id;
+                return (
+                  <button
+                    key={pkg.id}
+                    type="button"
+                    onClick={() => setSelectedPackageId(pkg.id)}
+                    className={cn(
+                      "w-full text-left p-3.5 rounded-2xl border transition-all flex flex-col gap-1.5",
+                      isSelected
+                        ? "border-reef bg-reef/[0.08] ring-1 ring-reef text-ink shadow-2xs"
+                        : "border-sand/90 bg-paper-warm/40 hover:bg-paper-warm/80 text-ink/90"
+                    )}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-2.5">
+                        <span
+                          className={cn(
+                            "size-4 rounded-full border flex items-center justify-center shrink-0 transition-colors",
+                            isSelected
+                              ? "border-reef bg-reef text-white"
+                              : "border-sand-deep/60 bg-paper"
+                          )}
+                        >
+                          {isSelected ? (
+                            <span className="size-1.5 rounded-full bg-white" />
+                          ) : null}
+                        </span>
+                        <span className="font-bold text-[0.875rem] text-ink leading-snug">
+                          {pkg.title}
+                        </span>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <span className="font-display font-bold text-sm text-reef-deep">
+                          {money(pkg.adultPrice)}
+                        </span>
+                        <span className="text-[0.65rem] text-stone block -mt-0.5">
+                          /{t("price_adult", "adult")}
+                        </span>
+                      </div>
+                    </div>
+                    {pkg.description ? (
+                      <p className="text-[0.75rem] text-stone leading-relaxed pl-6.5">
+                        {pkg.description}
+                      </p>
+                    ) : null}
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.72rem] text-stone pl-6.5 mt-0.5">
+                      {pkg.childPrice !== null && pkg.childPrice !== undefined ? (
+                        <span>
+                          {t("price_child", "Child")}:{" "}
+                          <strong className="text-ink font-semibold">
+                            {money(pkg.childPrice)}
+                          </strong>
+                        </span>
+                      ) : null}
+                      {pkg.infantPrice !== null && pkg.infantPrice !== undefined ? (
+                        <span>
+                          {t("guests_infants", "Infant")}:{" "}
+                          <strong className="text-ink font-semibold">
+                            {pkg.infantPrice === 0 ? t("free", "Free") : money(pkg.infantPrice)}
+                          </strong>
+                        </span>
+                      ) : null}
+                      {pkg.duration ? <span>· {pkg.duration}</span> : null}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
       </Field>
 
       {/* 2 · Date */}
@@ -224,7 +368,11 @@ export function BookingWidget({
         <div className="flex flex-col divide-y divide-sand/70 overflow-hidden rounded-2xl border border-sand/80 bg-paper-warm/30">
           <Counter
             label={t("guests_adults", "Adults")}
-            sub={adultPrice !== null && !perBoat ? money(adultPrice, tour?.priceOverrides) ?? "" : t("age_adults", "12+ yrs")}
+            sub={
+              adultPrice !== null && !perBoat
+                ? `${money(adultPrice, selectedPackage ? undefined : tour?.priceOverrides)} · ${t("age_adults", "12+ yrs")}`
+                : t("age_adults", "12+ yrs")
+            }
             value={adults}
             min={1}
             onChange={setAdults}
@@ -243,7 +391,11 @@ export function BookingWidget({
           ) : null}
           <Counter
             label={t("guests_infants", "Infants")}
-            sub={t("age_infants", "ages 0–4 · free")}
+            sub={
+              infantPrice > 0
+                ? `${money(infantPrice)} · ${t("age_infants", "ages 0–4")}`
+                : t("age_infants", "ages 0–4 · free")
+            }
             value={infants}
             onChange={setInfants}
           />

@@ -113,6 +113,7 @@ export function buildSeedDatabase(): Database {
     featured: t.featured,
     priority: t.priority ?? i + 1,
     status: "published",
+    tripPackages: t.tripPackages || [],
     seo: t.seo,
     createdAt: ts,
     updatedAt: ts,

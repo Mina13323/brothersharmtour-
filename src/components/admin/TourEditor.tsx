@@ -21,7 +21,7 @@ import { TourHero } from "@/components/TourHero";
 import { TourBody } from "@/components/TourBody";
 import type { CatalogueTour, TourRecord, TourTranslation } from "@/lib/store/types";
 import type { CurrencyContext } from "@/lib/currency";
-import type { Tour } from "@/lib/types";
+import type { Tour, TripPackage } from "@/lib/types";
 import { destinationName, experienceName } from "@/lib/store/labels";
 import { MediaGalleryEditor, MediaVideoEditor } from "./MediaGalleryEditor";
 
@@ -69,6 +69,7 @@ export default function TourEditor({
     related: Array.isArray(initialTour.related) ? initialTour.related : [],
     translations: initialTour.translations || {},
     addons: Array.isArray(initialTour.addons) ? initialTour.addons : [],
+    tripPackages: Array.isArray(initialTour.tripPackages) ? initialTour.tripPackages : [],
     languages: Array.isArray(initialTour.languages) ? initialTour.languages : ["English"],
     importantInfo: Array.isArray(initialTour.importantInfo) ? initialTour.importantInfo : [],
   }));
@@ -427,6 +428,210 @@ export default function TourEditor({
             </div>
           </Section>
 
+          {/* ── Trip Packages / Tour Options ── */}
+          <Section title="Trip Packages / Tour Options">
+            <p className="text-xs text-stone-400">
+              Purchasable tiers or options for this specific excursion (e.g. Without Snorkeling Gear, With Gear, With Gear + Dive). When configured, visitors select an option on the tour page and in the booking drawer.
+            </p>
+            <div className="space-y-4">
+              {(tour.tripPackages ?? []).map((pkg, i) => (
+                <div key={pkg.id || i} className="bg-black/25 border border-white/10 rounded-xl p-4 space-y-3">
+                  <div className="flex items-center justify-between gap-2 border-b border-white/5 pb-2">
+                    <span className="text-xs font-bold text-teal-400 uppercase tracking-wider">
+                      Option {i + 1}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <label className="flex items-center gap-1.5 text-xs text-stone-300 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={pkg.active !== false}
+                          onChange={(e) => {
+                            const next = [...(tour.tripPackages ?? [])];
+                            next[i] = { ...pkg, active: e.target.checked };
+                            set("tripPackages", next);
+                          }}
+                          className="size-3.5 rounded accent-teal-500"
+                        />
+                        Active
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (i === 0) return;
+                          const next = [...(tour.tripPackages ?? [])];
+                          [next[i - 1], next[i]] = [next[i], next[i - 1]];
+                          set("tripPackages", next);
+                        }}
+                        className="p-1 text-stone-400 hover:text-white"
+                        title="Move Up"
+                      >
+                        <ArrowUp className="size-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (i === (tour.tripPackages?.length ?? 0) - 1) return;
+                          const next = [...(tour.tripPackages ?? [])];
+                          [next[i + 1], next[i]] = [next[i], next[i + 1]];
+                          set("tripPackages", next);
+                        }}
+                        className="p-1 text-stone-400 hover:text-white"
+                        title="Move Down"
+                      >
+                        <ArrowDown className="size-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          set(
+                            "tripPackages",
+                            (tour.tripPackages ?? []).filter((_, j) => j !== i)
+                          )
+                        }
+                        className="p-1 text-stone-400 hover:text-red-400"
+                        title="Delete Option"
+                      >
+                        <Trash2 className="size-3.5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <Field label="Option title / name *">
+                    <input
+                      className={input}
+                      placeholder="e.g. Sea Trip With Snorkeling Equipment"
+                      value={pkg.title}
+                      onChange={(e) => {
+                        const next = [...(tour.tripPackages ?? [])];
+                        next[i] = { ...pkg, title: e.target.value };
+                        set("tripPackages", next);
+                      }}
+                    />
+                  </Field>
+
+                  <Field label="Description / what's included in this option">
+                    <textarea
+                      rows={2}
+                      className={input}
+                      placeholder="e.g. Includes full snorkeling gear (mask, fins, life jacket) and lunch buffet on board."
+                      value={pkg.description ?? ""}
+                      onChange={(e) => {
+                        const next = [...(tour.tripPackages ?? [])];
+                        next[i] = { ...pkg, description: e.target.value };
+                        set("tripPackages", next);
+                      }}
+                    />
+                  </Field>
+
+                  <div className="grid grid-cols-3 gap-3">
+                    <Field label={`Adult Price (${tour.currency || "USD"}) *`}>
+                      <input
+                        type="number"
+                        className={input}
+                        placeholder="Adult price"
+                        value={pkg.adultPrice ?? ""}
+                        onChange={(e) => {
+                          const next = [...(tour.tripPackages ?? [])];
+                          next[i] = {
+                            ...pkg,
+                            adultPrice: e.target.value === "" ? 0 : Number(e.target.value),
+                          };
+                          set("tripPackages", next);
+                        }}
+                      />
+                    </Field>
+                    <Field label={`Child Price (${tour.currency || "USD"})`}>
+                      <input
+                        type="number"
+                        className={input}
+                        placeholder="Child price"
+                        value={pkg.childPrice ?? ""}
+                        onChange={(e) => {
+                          const next = [...(tour.tripPackages ?? [])];
+                          next[i] = {
+                            ...pkg,
+                            childPrice: e.target.value === "" ? null : Number(e.target.value),
+                          };
+                          set("tripPackages", next);
+                        }}
+                      />
+                    </Field>
+                    <Field label={`Infant Price (${tour.currency || "USD"})`}>
+                      <input
+                        type="number"
+                        className={input}
+                        placeholder="Infant price"
+                        value={pkg.infantPrice ?? ""}
+                        onChange={(e) => {
+                          const next = [...(tour.tripPackages ?? [])];
+                          next[i] = {
+                            ...pkg,
+                            infantPrice: e.target.value === "" ? null : Number(e.target.value),
+                          };
+                          set("tripPackages", next);
+                        }}
+                      />
+                    </Field>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <Field label="Option duration (optional, e.g. 6 hours)">
+                      <input
+                        className={input}
+                        placeholder="e.g. 6 hours (leaves empty to inherit tour duration)"
+                        value={pkg.duration ?? ""}
+                        onChange={(e) => {
+                          const next = [...(tour.tripPackages ?? [])];
+                          next[i] = { ...pkg, duration: e.target.value || undefined };
+                          set("tripPackages", next);
+                        }}
+                      />
+                    </Field>
+                    <Field label="Display Order">
+                      <input
+                        type="number"
+                        className={input}
+                        placeholder="1"
+                        value={pkg.order ?? i + 1}
+                        onChange={(e) => {
+                          const next = [...(tour.tripPackages ?? [])];
+                          next[i] = {
+                            ...pkg,
+                            order: e.target.value === "" ? i + 1 : Number(e.target.value),
+                          };
+                          set("tripPackages", next);
+                        }}
+                      />
+                    </Field>
+                  </div>
+                </div>
+              ))}
+
+              <button
+                type="button"
+                onClick={() => {
+                  const newPkg: TripPackage = {
+                    id:
+                      typeof crypto !== "undefined" && crypto.randomUUID
+                        ? crypto.randomUUID().slice(0, 8)
+                        : Math.random().toString(36).slice(2, 10),
+                    title: "",
+                    description: "",
+                    adultPrice: tour.priceFrom ?? 0,
+                    childPrice: tour.childPrice ?? null,
+                    infantPrice: 0,
+                    active: true,
+                    order: (tour.tripPackages?.length ?? 0) + 1,
+                  };
+                  set("tripPackages", [...(tour.tripPackages ?? []), newPkg]);
+                }}
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-teal-400 hover:text-teal-300"
+              >
+                <Plus className="size-3.5" /> [+ Add Package]
+              </button>
+            </div>
+          </Section>
+
           {/* ── Operational ── */}
           <Section title="Operational details">
             <div className="grid grid-cols-2 gap-3">
@@ -780,6 +985,51 @@ export default function TourEditor({
                   onChange={(v) => setTr(lang, { excluded: v })}
                   newItem={() => ""}
                 />
+                {(tour.tripPackages ?? []).length > 0 ? (
+                  <div className="pt-3 border-t border-white/10 space-y-3">
+                    <p className="text-xs font-semibold text-teal-400">
+                      Trip Packages / Options ({lang.toUpperCase()})
+                    </p>
+                    {(tour.tripPackages ?? []).map((tp) => {
+                      const trList = tour.translations?.[lang]?.tripPackages ?? [];
+                      const curTr = trList.find((x) => x.id === tp.id) ?? { id: tp.id };
+                      return (
+                        <div key={tp.id} className="bg-black/20 border border-white/10 rounded-xl p-3 space-y-2">
+                          <p className="text-[11px] text-stone-400">Original: {tp.title}</p>
+                          <Field label="Translated Option Title">
+                            <input
+                              className={input}
+                              value={curTr.title ?? ""}
+                              placeholder={tp.title}
+                              onChange={(e) => {
+                                const nextList = [
+                                  ...trList.filter((x) => x.id !== tp.id),
+                                  { ...curTr, title: e.target.value },
+                                ];
+                                setTr(lang, { tripPackages: nextList });
+                              }}
+                            />
+                          </Field>
+                          <Field label="Translated Option Description">
+                            <textarea
+                              rows={2}
+                              className={input}
+                              value={curTr.description ?? ""}
+                              placeholder={tp.description ?? ""}
+                              onChange={(e) => {
+                                const nextList = [
+                                  ...trList.filter((x) => x.id !== tp.id),
+                                  { ...curTr, description: e.target.value },
+                                ];
+                                setTr(lang, { tripPackages: nextList });
+                              }}
+                            />
+                          </Field>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : null}
                 <Field label="SEO title">
                   <input className={input} value={tour.translations?.[lang]?.seoTitle ?? ""} onChange={(e) => setTr(lang, { seoTitle: e.target.value })} />
                 </Field>

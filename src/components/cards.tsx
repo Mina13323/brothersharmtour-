@@ -33,6 +33,9 @@ export type TourCardTour = Pick<Tour, "slug" | "title" | "summary" | "category" 
   priceOverrides?: Record<string, number>;
   priceUnit?: string;
   type?: string;
+  isPackage?: boolean;
+  href?: string;
+  categories?: string[];
   schedule?: string | null;
   rating?: number | null;
 };
@@ -47,6 +50,7 @@ export function TourCard({
   sizes?: string;
 }) {
   const { money, t, lang } = useSite();
+  const cardHref = tour.href ?? (tour.isPackage || tour.type === "package" ? `/packages/${tour.slug}` : `/tours/${tour.slug}`);
   const price = money(tour.priceFrom, tour.priceOverrides);
   const effectiveChildPrice =
     tour.childPrice !== null && tour.childPrice !== undefined
@@ -64,7 +68,7 @@ export function TourCard({
 
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-[1.5rem] sm:rounded-[1.75rem] border border-sand/70 bg-paper shadow-[var(--shadow-lift)] transition-all duration-500 hover:shadow-[var(--shadow-panel)] hover:border-reef/30 hover:-translate-y-1">
-      <Link href={`/tours/${tour.slug}`} className="flex h-full flex-col">
+      <Link href={cardHref} className="flex h-full flex-col">
         {image ? (
           <div className="media relative aspect-[3/2] w-full rounded-t-[1.5rem] sm:rounded-t-[1.75rem] rounded-b-none">
             <Image
@@ -77,8 +81,16 @@ export function TourCard({
               style={image.position ? { objectPosition: image.position } : undefined}
             />
             {/* Category tag — top left */}
-            <span className="absolute left-3.5 top-3.5 rounded-pill bg-ink/85 px-3 py-1 text-[0.625rem] font-semibold uppercase tracking-[0.16em] text-white backdrop-blur-sm shadow-xs">
-              {experienceName(tour.category, lang)}
+            <span className="absolute left-3.5 top-3.5 rounded-pill bg-ink/85 px-3 py-1 text-[0.625rem] font-semibold uppercase tracking-[0.16em] text-white backdrop-blur-sm shadow-xs flex items-center gap-1.5">
+              {tour.isPackage || tour.type === "package" ? (
+                <>
+                  <span className="text-sun font-bold">Package</span>
+                  <span className="opacity-60">•</span>
+                  <span>{experienceName(tour.category, lang)}</span>
+                </>
+              ) : (
+                experienceName(tour.category, lang)
+              )}
             </span>
             {/* Rating pill — only when real approved reviews exist */}
             {rating !== null ? (

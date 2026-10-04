@@ -279,7 +279,8 @@ export function Bestsellers() {
     .map((t) => ({
       title: t.title,
       slug: t.slug,
-      tag: t.category.replace(/-/g, " "),
+      href: t.href ?? (t.isPackage || t.type === "package" ? `/packages/${t.slug}` : `/tours/${t.slug}`),
+      tag: t.isPackage || t.type === "package" ? `Package • ${t.category.replace(/-/g, " ")}` : t.category.replace(/-/g, " "),
       image: t.image ?? media.whiteIsland.card,
       price: t.priceFrom,
       childPrice: t.childPrice,
@@ -328,7 +329,7 @@ export function Bestsellers() {
               delay={i * 70}
               className="flex flex-col rounded-[2rem] bg-paper overflow-hidden shadow-xs hover:shadow-xl transition-all duration-500 hover:-translate-y-1.5"
             >
-              <Link href={`/tours/${tour.slug}`} className="relative aspect-[4/3] block overflow-hidden group">
+              <Link href={tour.href} className="relative aspect-[4/3] block overflow-hidden group">
                 <Image
                   src={tour.image.src}
                   alt={tour.image.alt}
@@ -348,7 +349,7 @@ export function Bestsellers() {
               <div className="p-5 flex-1 flex flex-col justify-between">
                 <div>
                   <h3 className="font-display text-xl font-bold text-ink leading-snug">
-                    <Link href={`/tours/${tour.slug}`} className="hover:text-reef transition-colors">
+                    <Link href={tour.href} className="hover:text-reef transition-colors">
                       {tour.title}
                     </Link>
                   </h3>
@@ -379,7 +380,7 @@ export function Bestsellers() {
                     )}
                   </div>
                   <Link
-                    href={`/tours/${tour.slug}`}
+                    href={tour.href}
                     className="inline-flex items-center gap-1.5 text-xs font-bold text-reef hover:text-sun transition-colors shrink-0"
                   >
                     <span>{t("details", "Details")}</span>

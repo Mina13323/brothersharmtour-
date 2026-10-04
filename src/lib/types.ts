@@ -19,7 +19,7 @@ export type ExperienceSlug =
   | "leisure"
   | "private-transfers";
 
-export type TourType = "group" | "private" | "transfer";
+export type TourType = "group" | "private" | "transfer" | "package";
 
 /** A single image reference. Width/height are required to prevent layout shift. */
 export interface MediaImage {
@@ -113,6 +113,21 @@ export interface FaqItem {
   answer: string;
 }
 
+/** A purchasable option/tier inside an individual tour (e.g. without equipment vs with equipment). */
+export interface TripPackage {
+  id: string;
+  title: string;
+  description?: string;
+  adultPrice: number;
+  childPrice?: number | null;
+  infantPrice?: number | null;
+  duration?: string;
+  included?: string[];
+  excluded?: string[];
+  active?: boolean;
+  order?: number;
+}
+
 export interface Tour {
   title: string;
   slug: string;
@@ -152,6 +167,8 @@ export interface Tour {
   priceUnit?: string;
   /** Price per child (5–10). Falls back to ~80% of the adult price. */
   childPrice?: number | null;
+  /** Trip Packages / Tour Options belonging to this individual tour. */
+  tripPackages?: TripPackage[];
   /** Optional paid extras shown as counters in the booking widget. */
   addons?: { label: string; price: number; unit?: string }[];
   /** What guests should bring — structured requirements list. */
@@ -209,4 +226,11 @@ export interface BookingInquiry {
   adults: number;
   children: number;
   notes?: string;
+}
+
+export interface BookingOptions {
+  tripPackageId?: string;
+  adults?: number;
+  children?: number;
+  infants?: number;
 }

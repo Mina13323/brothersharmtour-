@@ -11,10 +11,19 @@ import { useRouter } from "next/navigation";
 import { Save, Plus, Trash2, ArrowUp, ArrowDown, Sparkles } from "lucide-react";
 
 import type { PackageRecord, TourRecord, Settings } from "@/lib/store/types";
-import { destinationName } from "@/lib/store/labels";
+import { destinationName, experienceName } from "@/lib/store/labels";
 import { MediaGalleryEditor, SingleImageUploader } from "./MediaGalleryEditor";
 
 const DESTINATIONS = ["sharm-el-sheikh", "cairo"];
+const CATEGORIES = [
+  "sea-water",
+  "desert",
+  "adventure",
+  "culture",
+  "wildlife",
+  "leisure",
+  "private-transfers",
+];
 
 export default function PackageEditor({
   initialPackage,
@@ -33,6 +42,13 @@ export default function PackageEditor({
   const [pkg, setPkg] = useState<PackageRecord>(() => ({
     ...initialPackage,
     destination: initialPackage.destination || "sharm-el-sheikh",
+    category: initialPackage.category || "sea-water",
+    categories: Array.isArray(initialPackage.categories) && initialPackage.categories.length
+      ? initialPackage.categories
+      : [initialPackage.category || "sea-water"],
+    includedTours: Array.isArray(initialPackage.includedTours)
+      ? initialPackage.includedTours
+      : (initialPackage.tourSlug ? [initialPackage.tourSlug] : []),
     gallery: Array.isArray(initialPackage.gallery) ? initialPackage.gallery : [],
     description: Array.isArray(initialPackage.description) ? initialPackage.description : [],
     days: Array.isArray(initialPackage.days) ? initialPackage.days : [],
@@ -223,79 +239,178 @@ export default function PackageEditor({
       ) : null}
 
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* ── Linked Tour Selection ── */}
+        {/* ── Included Tours in this Package ── */}
         <div className="lg:col-span-2">
-          <Section title="Tour Connection / Existing Tour Selection">
+          <Section title="Included Tours & Excursions (Public Tourism Offering Composition)">
             <div className="space-y-3">
-              <Field label="Select an existing tour from CMS database (reuses existing tour without duplicates)">
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <select
-                    className={`${input} flex-1`}
-                    value={pkg.tourId ?? tours.find((t) => t.slug === pkg.tourSlug)?.id ?? ""}
-                    onChange={(e) => handleSelectTour(e.target.value)}
-                  >
-                    <option value="">-- No linked tour (Independent Package) --</option>
-                    {tours.map((t) => {
-                      const localizedTitle = (lang !== "en" && t.translations?.[lang]?.title) || t.title;
-                      const adultDisplay = t.priceFrom !== null ? `Adult: ${t.priceFrom} ${t.currency}` : "Adult: On request";
-                      const childRate = t.childPrice ?? (t.priceFrom ? Math.round(t.priceFrom * 0.8) : null);
-                      const childDisplay = childRate !== null ? `Child: ${childRate} ${t.currency}` : "Child: N/A";
-                      return (
-                        <option key={t.id} value={t.id}>
-                          {localizedTitle} · {destinationName(t.destination, lang)} · {adultDisplay} · {childDisplay}
-                        </option>
-                      );
-                    })}
-                  </select>
-                  {selectedTour ? (
+              <p className="text-xs text-stone-400 leading-relaxed">
+                A Regular Package is a public product composed of multiple existing Tours. Select the tours included in this package from the database:
+              </p>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 max-h-64 overflow-y-auto p-3 rounded-xl bg-black/30 border border-white/10 [scrollbar-width:thin]">
+                {tours.map((t) => {
+                  const isIncluded = (pkg.includedTours || []).includes(t.slug) || (pkg.tourSlug === t.slug);
+                  return (
+                    <label
+                      key={t.id}
+                      className={`flex items-start gap-2.5 p-2.5 rounded-lg text-xs cursor-pointer transition-colors ${
+                        isIncluded ? "bg-teal-950/70 border border-teal-500/40 text-white shadow-2xs" : "hover:bg-white/5 text-stone-300"
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isIncluded}
+                        onChange={(e) => {
+                          const cur = pkg.includedTours || [];
+                          const next = e.target.checked
+                            ? Array.from(new Set([...cur, t.slug]))
+                            : cur.filter((s) => s !== t.slug);
+                          setPkg((p) => ({
+                            ...p,
+                            includedTours: next,
+                            tourSlug: next[0] ?? null,
+                            tourId: tours.find((x) => x.slug === next[0])?.id ?? null,
+                          }));
+                        }}
+                        className="mt-0.5 size-4 rounded accent-teal-500 shrink-0"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="font-semibold truncate">{t.title}</p>
+                        <p className="text-[10px] text-stone-400 mt-0.5">
+                          {experienceName(t.category)} · {destinationName(t.destination)}
+                        </p>
+                      </div>
+                    </label>
+                  );
+                })}
+              </div>
+
+              {/* Selected tours pill summary & quick actions */}
+              {(pkg.includedTours?.length ?? 0) > 0 ? (
+                <div className="p-3.5 rounded-xl bg-teal-950/40 border border-teal-500/25 space-y-2.5">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="text-xs font-semibold text-teal-300">
+                      {pkg.includedTours?.length} Included Tour{pkg.includedTours?.length === 1 ? "" : "s"}:
+                    </span>
                     <button
                       type="button"
-                      onClick={handleImportFromTour}
-                      className="inline-flex items-center gap-1.5 bg-teal-700 hover:bg-teal-600 text-white text-xs font-semibold px-4 py-2 rounded-xl border border-teal-500/30 whitespace-nowrap shadow-xs transition-colors"
-                      title="Import title, pricing, images, and description from this tour"
+                      onClick={() => {
+                        const selectedToursList = tours.filter((t) => pkg.includedTours?.includes(t.slug));
+                        const allInclusions = Array.from(new Set(selectedToursList.flatMap((t) => t.included || [])));
+                        const allExclusions = Array.from(new Set(selectedToursList.flatMap((t) => t.excluded || [])));
+                        const allBring = Array.from(new Set(selectedToursList.flatMap((t) => t.bring || [])));
+                        const daysDraft = selectedToursList.map((t, idx) => ({
+                          day: idx + 1,
+                          title: t.title,
+                          description: t.summary,
+                          inclusions: t.highlights?.slice(0, 3) || [],
+                          tourSlugs: [t.slug],
+                        }));
+                        setPkg((p) => ({
+                          ...p,
+                          included: p.included?.length ? p.included : allInclusions,
+                          excluded: p.excluded?.length ? p.excluded : allExclusions,
+                          bring: p.bring?.length ? p.bring : allBring,
+                          days: p.days?.length ? p.days : daysDraft,
+                        }));
+                        setMessage({ kind: "ok", text: "Auto-populated days & inclusions from included tours!" });
+                      }}
+                      className="inline-flex items-center gap-1.5 bg-teal-800/80 hover:bg-teal-700 text-white text-[11px] font-semibold px-3 py-1.5 rounded-lg border border-teal-500/30 transition-colors"
                     >
-                      <Sparkles className="size-3.5 text-amber-300" />
-                      Auto-fill from Tour
+                      <Sparkles className="size-3 text-amber-300" /> Auto-fill Itinerary &amp; Inclusions from Tours
                     </button>
-                  ) : null}
-                </div>
-              </Field>
-              {selectedTour ? (
-                <div className="flex items-center justify-between p-3 rounded-xl bg-teal-950/40 border border-teal-500/20 text-xs">
-                  <div className="flex items-center gap-2">
-                    <span className="size-2 rounded-full bg-teal-400" />
-                    <span className="text-stone-300">
-                      Linked to existing tour: <strong className="text-white">{selectedTour.title}</strong> ({selectedTour.slug})
-                    </span>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setPkg((p) => ({ ...p, tourId: null, tourSlug: null }))}
-                    className="text-stone-400 hover:text-red-400 text-xs transition-colors"
-                  >
-                    Unlink
-                  </button>
+                  <div className="flex flex-wrap gap-2">
+                    {pkg.includedTours?.map((slug) => {
+                      const t = tours.find((x) => x.slug === slug);
+                      return (
+                        <span
+                          key={slug}
+                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-900/70 border border-teal-500/40 text-xs text-white"
+                        >
+                          <span className="font-medium">{t?.title || slug}</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const next = (pkg.includedTours || []).filter((s) => s !== slug);
+                              setPkg((p) => ({ ...p, includedTours: next }));
+                            }}
+                            className="text-teal-300 hover:text-red-400 font-bold ml-1"
+                            title="Remove tour"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      );
+                    })}
+                  </div>
                 </div>
               ) : (
                 <p className="text-[11px] text-stone-500">
-                  Select an existing tour above to connect this package to it. The selection remains editable anytime and does not duplicate tour records.
+                  Select one or more existing tours above to bundle them into this regular package.
                 </p>
               )}
             </div>
           </Section>
         </div>
 
-        <Section title="Identity">
-          <Field label="Title">
+        <Section title="Identity & Public Discovery">
+          <Field label="Package Title / Name">
             <input className={input} value={pkg.title} onChange={(e) => set("title", e.target.value)} />
           </Field>
-          <Field label="Tagline">
+          <Field label="Short Description / Tagline (used on discovery cards & summary)">
             <input className={input} value={pkg.tagline} onChange={(e) => set("tagline", e.target.value)} />
           </Field>
-          <Field label="Slug (URL)">
+          <Field label="Slug (URL identifier)">
             <input className={input} value={pkg.slug} onChange={(e) => set("slug", e.target.value)} />
           </Field>
-          <div className="grid grid-cols-2 gap-3">
+
+          {/* Category selection - aligns with public filter architecture */}
+          <div className="space-y-3 pt-1">
+            <Field label="Primary Category (badge and primary filter placement)">
+              <select
+                className={input}
+                value={pkg.category || "sea-water"}
+                onChange={(e) => {
+                  const newCat = e.target.value;
+                  const cur = pkg.categories || [];
+                  const next = cur.includes(newCat) ? cur : [newCat, ...cur];
+                  setPkg((p) => ({ ...p, category: newCat, categories: next }));
+                }}
+              >
+                {CATEGORIES.map((c) => (
+                  <option key={c} value={c}>{experienceName(c)}</option>
+                ))}
+              </select>
+            </Field>
+
+            <Field label="Discoverable in Categories (participates in these public filters)">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 p-3 rounded-xl bg-black/20 border border-white/5">
+                {CATEGORIES.map((c) => {
+                  const isChecked = (pkg.categories || [pkg.category || "sea-water"]).includes(c);
+                  return (
+                    <label key={c} className="flex items-center gap-2 text-xs text-stone-300 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={(e) => {
+                          const cur = pkg.categories || [pkg.category || "sea-water"];
+                          const next = e.target.checked
+                            ? Array.from(new Set([...cur, c]))
+                            : cur.filter((x) => x !== c);
+                          setPkg((p) => ({ ...p, categories: next.length ? next : [p.category || "sea-water"] }));
+                        }}
+                        className="size-4 rounded accent-teal-500"
+                      />
+                      <span>{experienceName(c)}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            </Field>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 pt-2">
             <Field label="Destination">
               <select className={input} value={pkg.destination} onChange={(e) => set("destination", e.target.value)}>
                 {DESTINATIONS.map((d) => (
@@ -303,19 +418,21 @@ export default function PackageEditor({
                 ))}
               </select>
             </Field>
-            <Field label="Duration (e.g. 3 days)">
+            <Field label="Duration (e.g. 1 Full Day or 3 Days)">
               <input className={input} value={pkg.duration} onChange={(e) => set("duration", e.target.value)} />
             </Field>
           </div>
-          <div className="flex flex-wrap gap-4 pt-1">
-            <label className="flex items-center gap-2 text-xs text-stone-300">
+
+          <div className="flex flex-wrap items-center gap-6 pt-2">
+            <label className="flex items-center gap-2 text-xs text-stone-300 cursor-pointer">
               <input
                 type="checkbox"
                 checked={pkg.featured}
                 onChange={(e) => set("featured", e.target.checked)}
                 className="size-4 rounded accent-teal-500"
               />
-              Featured
+              <span className="font-semibold text-white">Popular / Featured Section</span>
+              <span className="text-stone-400 text-[11px]">(Eligible for Popular section &amp; Bestsellers)</span>
             </label>
             <label className="flex items-center gap-2 text-xs text-stone-300">
               Sort priority
@@ -506,6 +623,43 @@ export default function PackageEditor({
                     set("days", next);
                   }}
                 />
+                {pkg.includedTours && pkg.includedTours.length > 0 ? (
+                  <div className="pt-2 border-t border-white/5">
+                    <span className="text-[11px] text-stone-400 font-semibold block mb-1">
+                      Included Tours for Day {day.day}:
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {pkg.includedTours.map((tSlug) => {
+                        const tourItem = tours.find((t) => t.slug === tSlug);
+                        const isChecked = (day.tourSlugs || []).includes(tSlug);
+                        return (
+                          <label
+                            key={tSlug}
+                            className={`inline-flex items-center gap-1.5 text-xs cursor-pointer px-2.5 py-1 rounded-lg border transition-colors ${
+                              isChecked ? "bg-teal-950/70 border-teal-500/40 text-white" : "bg-white/5 border-white/5 text-stone-300 hover:bg-white/10"
+                            }`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={(e) => {
+                                const cur = day.tourSlugs || [];
+                                const next = e.target.checked
+                                  ? Array.from(new Set([...cur, tSlug]))
+                                  : cur.filter((s) => s !== tSlug);
+                                const daysNext = [...pkg.days];
+                                daysNext[i] = { ...day, tourSlugs: next };
+                                set("days", daysNext);
+                              }}
+                              className="size-3.5 rounded accent-teal-500"
+                            />
+                            <span className="truncate max-w-[200px]">{tourItem?.title || tSlug}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ) : null}
               </div>
             ))}
             <button

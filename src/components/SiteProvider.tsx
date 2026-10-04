@@ -109,6 +109,7 @@ export function SiteProvider({
   const t = useCallback(
     (key: keyof TranslationDictionary | (string & {}), fallback?: string) => {
       const val = getTranslation(lang, key as keyof TranslationDictionary);
+      if ((!val || val === key) && fallback) return fallback;
       return val || fallback || key;
     },
     [lang],

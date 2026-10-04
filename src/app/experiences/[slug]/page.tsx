@@ -99,7 +99,7 @@ export default async function ExperienceCategoryPage({
 
       <CapsuleHero
         title={experience.name}
-        eyebrow={`${experience.destinations.map(destinationName).join(" • ").toUpperCase()} • ${list.length} TOURS`}
+        eyebrow={`${experience.destinations.map((d) => destinationName(d)).join(" • ").toUpperCase()} • ${list.length} TOURS`}
         summary={experience.description || experience.tagline}
         images={[experience.image, ...list.flatMap((t) => t.images)]}
         breadcrumbs={[

@@ -21,15 +21,6 @@ import { destinationName, experienceName } from "@/lib/store/labels";
 
 type TabId = "tours" | "experiences" | "transfers";
 
-/** Quick links under the panel — the searches people actually run. */
-const popular: { label: string; href: string }[] = [
-  { label: "White Island", href: "/tours/white-island" },
-  { label: "Ras Mohamed", href: "/tours/ras-mohamed" },
-  { label: "Desert safari", href: "/experiences/desert" },
-  { label: "Pyramids day trip", href: "/destinations/cairo" },
-  { label: "Airport transfer", href: "/experiences/private-transfers" },
-];
-
 export function HeroSearch() {
   const { t, lang } = useSite();
   const catalogue = useCatalogue();
@@ -37,6 +28,15 @@ export function HeroSearch() {
   const categoryOptions = Array.from(new Set(catalogue.map((t) => t.category)));
   const router = useRouter();
   const [tab, setTab] = useState<TabId>("tours");
+
+  const popular = [
+    { label: "White Island", href: "/tours/white-island" },
+    { label: "Ras Mohamed", href: "/tours/ras-mohamed" },
+    { label: "Desert safari", href: "/experiences/desert" },
+    { label: "Pyramids day trip", href: "/destinations/cairo" },
+    { label: "Airport transfer", href: "/experiences/private-transfers" },
+    { label: t("nav_packages", "Packages"), href: "/packages" },
+  ];
 
   const tabs: { id: TabId; label: string }[] = [
     { id: "tours", label: t("tab_tours", "Tours") },

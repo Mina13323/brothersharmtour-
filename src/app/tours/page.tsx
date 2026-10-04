@@ -6,14 +6,15 @@ import { Hero } from "@/components/Hero";
 import { ToursExplorerWithQuery } from "@/components/ToursExplorerWithQuery";
 import { Breadcrumbs, CTASection } from "@/components/sections";
 import { BookButton } from "@/components/BookingProvider";
-import { localizeTour, publishedTours } from "@/lib/store/repo";
+import { localizeTour, publishedTours, publishedPackages, localizePackage } from "@/lib/store/repo";
 import { getSiteView } from "@/lib/siteview";
 import { media } from "@/lib/media";
+import type { Tour } from "@/lib/types";
 
 export const metadata: Metadata = buildMetadata({
   fallbackTitle: "Egypt Tours & Excursions",
   fallbackDescription:
-    "Browse every Brother Sharm Tour excursion: Red Sea snorkelling and boat trips, desert safari, dolphin experiences, Cairo day trips and private transfers. Filter by destination, type and duration.",
+    "Browse every Brother Sharm Tour excursion: Red Sea snorkelling and boat trips, desert safari, dolphin experiences, Cairo day trips, multi-day packages and private transfers. Filter by destination, type and duration.",
   path: "/tours",
   image: media.sharmHero,
 });
@@ -21,7 +22,28 @@ export const metadata: Metadata = buildMetadata({
 export default async function ToursPage() {
   const url = process.env.NEXT_PUBLIC_SITE_URL ?? "https://brothersharmtour.com";
   const lang = (await getSiteView()).lang;
-  const tours = publishedTours().map((t) => localizeTour(t, lang));
+  const toursList = publishedTours().map((t) => localizeTour(t, lang));
+  const packagesList = publishedPackages().map((p) => {
+    const loc = localizePackage(p, lang);
+    return {
+      ...loc,
+      type: "package" as const,
+      isPackage: true,
+      href: `/packages/${loc.slug}`,
+      summary: loc.tagline || (loc.description?.[0] ?? ""),
+      images: loc.coverImage ? [loc.coverImage] : [],
+      highlights: loc.included || [],
+      itinerary: [],
+      faq: [],
+      related: [],
+      meetingPoint: "Hotel pickup included",
+      verified: true,
+      featured: Boolean(loc.featured),
+      priority: loc.priority ?? 100,
+    } as unknown as Tour;
+  });
+
+  const tours = [...toursList, ...packagesList].sort((a, b) => (a.priority ?? 100) - (b.priority ?? 100));
 
   const schema = {
     "@context": "https://schema.org",
@@ -32,7 +54,7 @@ export default async function ToursPage() {
       "@type": "ListItem",
       position: i + 1,
       name: tour.title,
-      url: `${url}/tours/${tour.slug}`,
+      url: (tour as unknown as { href?: string }).href ? `${url}${(tour as unknown as { href?: string }).href}` : `${url}/tours/${tour.slug}`,
     })),
   };
 

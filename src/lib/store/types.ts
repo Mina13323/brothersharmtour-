@@ -20,6 +20,7 @@ import type {
   MediaVideo,
   SeoMeta,
   TourType,
+  TripPackage,
 } from "@/lib/types";
 
 export type DestinationSlug = string;
@@ -48,6 +49,7 @@ export interface TourTranslation {
   excluded?: string[];
   bring?: string[];
   itinerary?: ItineraryStop[];
+  tripPackages?: Array<{ id: string; title?: string; description?: string }>;
   seoTitle?: string;
   seoDescription?: string;
 }
@@ -75,6 +77,7 @@ export interface TourRecord {
   /** Explicit per-currency prices that override rate conversion, e.g. { GBP: 35 }. */
   priceOverrides?: Record<string, number>;
   childPrice?: number | null;
+  tripPackages?: TripPackage[];
   priceUnit?: string;
   schedule?: string;
   availability?: "open" | "on_request" | "closed";
@@ -105,7 +108,15 @@ export interface TourRecord {
   updatedAt: string;
 }
 
-/** A multi-day custom package, presented publicly in the tour design language. */
+export interface PackageDay {
+  day: number;
+  title: string;
+  description: string;
+  inclusions?: string[];
+  tourSlugs?: string[];
+}
+
+/** A multi-day or combo package, presented publicly in the tourism discovery ecosystem. */
 export interface PackageRecord {
   id: string;
   slug: string;
@@ -113,7 +124,9 @@ export interface PackageRecord {
   tagline: string;
   destination: DestinationSlug;
   category?: ExperienceSlug;
+  categories?: ExperienceSlug[];
   duration: string;
+  durationHours?: number | null;
   priceFrom: number | null;
   childPrice?: number | null;
   currency: string;
@@ -121,10 +134,12 @@ export interface PackageRecord {
   /** Selected / linked tour reference */
   tourId?: string | null;
   tourSlug?: string | null;
+  /** Included tours composing this package */
+  includedTours?: string[];
   coverImage: MediaImage | null;
   gallery: MediaImage[];
   description: string[];
-  days: { day: number; title: string; description: string; inclusions?: string[] }[];
+  days: PackageDay[];
   included: string[];
   excluded: string[];
   bring: string[];
@@ -288,19 +303,23 @@ export interface Database {
   settings: Settings;
 }
 
-/** The minimal tour fields the booking widget & explorer need client-side. */
+/** The minimal tour/package fields the booking widget, explorer & cards need client-side. */
 export interface CatalogueTour {
   slug: string;
   title: string;
   summary: string;
   destination: string;
   category: string;
+  categories?: string[];
   type: TourType;
+  isPackage?: boolean;
+  href?: string;
   duration: string | null;
   durationHours: number | null;
   priceFrom: number | null;
   currency: string;
   childPrice?: number | null;
+  tripPackages?: TripPackage[];
   priceUnit?: string;
   priceOriginal?: number | null;
   /** Explicit per-currency prices that win over rate conversion. */
@@ -316,4 +335,5 @@ export interface CatalogueTour {
   /** Resolved from approved reviews only — never fabricated. */
   rating?: number;
   reviewCount?: number;
+  includedTours?: string[];
 }

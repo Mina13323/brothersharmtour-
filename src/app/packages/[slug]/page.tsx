@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
 
 import { Hero } from "@/components/Hero";
 import { Reveal } from "@/components/Reveal";
@@ -8,11 +10,12 @@ import { CTASection, SectionHeading, WhatsAppIcon } from "@/components/sections"
 import { BookButton } from "@/components/BookingProvider";
 import { StickyBookBar } from "@/components/StickyBookBar";
 import { Gallery } from "@/components/Gallery";
-import { packageBySlug, localizePackage } from "@/lib/store/repo";
+import { packageBySlug, localizePackage, publishedTours, localizeTour } from "@/lib/store/repo";
 import { getPublicSettings, getSiteView, serverWhatsappLink } from "@/lib/siteview";
 import { money } from "@/lib/utils";
-import { destinationName } from "@/lib/store/labels";
-import type { FaqItem } from "@/lib/types";
+import { destinationName, experienceName } from "@/lib/store/labels";
+import type { FaqItem, Tour } from "@/lib/types";
+import type { TourRecord } from "@/lib/store/types";
 
 /**
  * Package detail — follows the tour page's design language (hero, facts bar,
@@ -70,6 +73,19 @@ export default async function PackageDetailPage({
   const childPriceFormatted =
     pkg.childPrice !== null && pkg.childPrice !== undefined ? money(pkg.childPrice, currency) : null;
   const whatsappLink = (m?: string) => serverWhatsappLink(settings.contact.whatsapp, m);
+
+  const allTours = publishedTours();
+  const includedTourSlugs = Array.from(
+    new Set([
+      ...(pkg.includedTours ?? []),
+      ...(pkg.tourSlug ? [pkg.tourSlug] : []),
+      ...pkg.days.flatMap((d) => d.tourSlugs ?? []),
+    ]),
+  );
+  const includedTours = includedTourSlugs
+    .map((slugOrId) => allTours.find((t) => t.slug === slugOrId || t.id === slugOrId))
+    .filter((t): t is TourRecord => Boolean(t))
+    .map((t) => localizeTour(t, lang));
 
   const schema = {
     "@context": "https://schema.org",
@@ -170,7 +186,7 @@ export default async function PackageDetailPage({
             </dl>
 
             <div className="flex flex-col gap-3 sm:flex-row lg:shrink-0">
-              <BookButton tourSlug={undefined} className="btn btn-primary">
+              <BookButton tourSlug={pkg.slug} className="btn btn-primary">
                 Start planning
               </BookButton>
               <a
@@ -214,6 +230,27 @@ export default async function PackageDetailPage({
                         <p className="mt-2 max-w-xl text-[0.9375rem] leading-relaxed text-stone">
                           {day.description}
                         </p>
+                        {day.tourSlugs?.length ? (
+                          <div className="mt-3 flex flex-wrap items-center gap-2">
+                            <span className="text-[11px] font-semibold text-stone uppercase tracking-wider">
+                              Day Tours:
+                            </span>
+                            {day.tourSlugs.map((tSlug) => {
+                              const match = allTours.find((t) => t.slug === tSlug || t.id === tSlug);
+                              return match ? (
+                                <Link
+                                  key={tSlug}
+                                  href={`/tours/${match.slug}`}
+                                  target="_blank"
+                                  className="inline-flex items-center gap-1 rounded-pill bg-paper px-2.5 py-1 text-[0.75rem] font-medium text-reef hover:text-sun border border-sand/80 shadow-2xs transition-colors"
+                                >
+                                  <span>{match.title}</span>
+                                  <span aria-hidden>↗</span>
+                                </Link>
+                              ) : null;
+                            })}
+                          </div>
+                        ) : null}
                         {day.inclusions?.length ? (
                           <ul className="mt-3 flex flex-wrap gap-2">
                             {day.inclusions.map((inc) => (
@@ -229,6 +266,68 @@ export default async function PackageDetailPage({
                       </li>
                     ))}
                   </ol>
+                </Reveal>
+              ) : null}
+
+              {/* ── Included Tours in this Package ── */}
+              {includedTours.length > 0 ? (
+                <Reveal className="mt-16">
+                  <div className="pb-2">
+                    <h2 className="eyebrow text-reef">Included Tours &amp; Excursions</h2>
+                    <h3 className="mt-1 font-display text-2xl sm:text-3xl text-ink">
+                      Tours included in this package
+                    </h3>
+                    <p className="mt-1 text-sm text-stone leading-relaxed">
+                      This package bundles the following authentic experiences operated directly by our team:
+                    </p>
+                  </div>
+
+                  <div className="mt-6 grid gap-5 sm:grid-cols-2">
+                    {includedTours.map((t) => (
+                      <div
+                        key={t.slug}
+                        className="group flex flex-col sm:flex-row gap-4 p-4 rounded-2xl bg-paper-warm/60 border border-sand/70 hover:border-reef/30 hover:shadow-md transition-all duration-300"
+                      >
+                        {t.images?.[0] ? (
+                          <div className="relative aspect-[4/3] sm:aspect-square w-full sm:w-28 shrink-0 rounded-xl overflow-hidden">
+                            <Image
+                              src={t.images[0].src}
+                              alt={t.images[0].alt}
+                              fill
+                              sizes="(max-width: 640px) 100vw, 120px"
+                              className="object-cover group-hover:scale-105 transition-transform duration-500"
+                            />
+                          </div>
+                        ) : null}
+                        <div className="flex flex-col justify-between flex-1 min-w-0">
+                          <div>
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-reef">
+                              {experienceName(t.category, lang)}
+                            </span>
+                            <h4 className="font-display text-base font-semibold text-ink line-clamp-1 group-hover:text-reef transition-colors">
+                              {t.title}
+                            </h4>
+                            <p className="mt-1 text-xs text-stone line-clamp-2 leading-relaxed">
+                              {t.summary}
+                            </p>
+                          </div>
+                          <div className="mt-3 flex items-center justify-between pt-2 border-t border-sand/40">
+                            <span className="text-[11px] text-stone font-medium">
+                              {t.duration ?? "Flexible"}
+                            </span>
+                            <Link
+                              href={`/tours/${t.slug}`}
+                              target="_blank"
+                              className="text-xs font-bold text-reef hover:text-sun inline-flex items-center gap-1 transition-colors"
+                            >
+                              <span>View excursion</span>
+                              <span>→</span>
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </Reveal>
               ) : null}
 
@@ -329,11 +428,11 @@ export default async function PackageDetailPage({
 
       <StickyBookBar
         tour={{
-          slug: "",
+          slug: pkg.slug,
           title: pkg.title,
           destination: pkg.destination,
-          category: "leisure",
-          type: "private",
+          category: pkg.category ?? "sea-water",
+          type: "package",
           summary: pkg.tagline,
           description: [],
           images: pkg.coverImage ? [pkg.coverImage] : [],

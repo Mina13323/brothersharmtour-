@@ -4,14 +4,23 @@ import { useEffect, useState } from "react";
 import { useBooking } from "./BookingProvider";
 import { WhatsAppIcon } from "./sections";
 import { useSite } from "./SiteProvider";
-import type { Tour } from "@/lib/types";
+import type { BookingOptions } from "./BookingProvider";
+import type { Tour, TripPackage } from "@/lib/types";
 
 /**
  * Sticky booking bar for tour pages — appears once the hero scrolls away, so a
  * "book" action is always one tap from reach. Mirrors the persistent booking
  * bar on the reference site. Opens the global booking drawer pre-filled.
  */
-export function StickyBookBar({ tour }: { tour: Tour }) {
+export function StickyBookBar({
+  tour,
+  selectedPackage,
+  bookingOptions,
+}: {
+  tour: Tour;
+  selectedPackage?: TripPackage | null;
+  bookingOptions?: BookingOptions;
+}) {
   const { open } = useBooking();
   const { money, t } = useSite();
   const [show, setShow] = useState(false);
@@ -23,8 +32,10 @@ export function StickyBookBar({ tour }: { tour: Tour }) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const price = tour.priceFrom;
-  const childPrice = tour.childPrice;
+  const price = selectedPackage ? selectedPackage.adultPrice : tour.priceFrom;
+  const childPrice = selectedPackage
+    ? (selectedPackage.childPrice ?? null)
+    : tour.childPrice;
 
   return (
     <div
@@ -38,12 +49,15 @@ export function StickyBookBar({ tour }: { tour: Tour }) {
         <div className="min-w-0">
           <p className="truncate text-[0.8rem] sm:text-sm font-medium text-ink">
             {tour.title}
+            {selectedPackage ? (
+              <span className="font-normal text-stone ml-1">· {selectedPackage.title}</span>
+            ) : null}
           </p>
           <div className="flex flex-wrap items-center gap-x-2 text-[0.8rem] text-stone">
             {price !== null ? (
               <>
                 <span className="font-display font-semibold text-[1.05rem] text-ink">
-                  {money(price, tour.priceOverrides)}
+                  {money(price, selectedPackage ? undefined : tour.priceOverrides)}
                 </span>{" "}
                 <span className="text-stone/90 text-xs">({t("price_adult", "Adult")})</span>
                 {typeof childPrice === "number" && childPrice >= 0 && (
@@ -63,7 +77,7 @@ export function StickyBookBar({ tour }: { tour: Tour }) {
           </div>
         </div>
         <button
-          onClick={() => open(tour.slug)}
+          onClick={() => open(tour.slug, bookingOptions)}
           className="btn btn-primary btn-sm shrink-0 shadow-sm"
         >
           <WhatsAppIcon className="size-4" />

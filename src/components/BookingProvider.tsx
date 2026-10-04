@@ -11,11 +11,19 @@ import {
 } from "react";
 import { BookingWidget } from "./BookingWidget";
 
+export interface BookingOptions {
+  tripPackageId?: string;
+  adults?: number;
+  children?: number;
+  infants?: number;
+}
+
 interface BookingContextValue {
-  open: (tourSlug?: string) => void;
+  open: (tourSlug?: string, options?: BookingOptions) => void;
   close: () => void;
   isOpen: boolean;
   tourSlug?: string;
+  initialOptions?: BookingOptions;
 }
 
 const BookingContext = createContext<BookingContextValue | null>(null);
@@ -33,13 +41,18 @@ export function useBooking() {
 export function BookingProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const [tourSlug, setTourSlug] = useState<string | undefined>();
+  const [initialOptions, setInitialOptions] = useState<BookingOptions | undefined>();
 
-  const open = useCallback((slug?: string) => {
+  const open = useCallback((slug?: string, options?: BookingOptions) => {
     setTourSlug(slug);
+    setInitialOptions(options);
     setIsOpen(true);
   }, []);
 
-  const close = useCallback(() => setIsOpen(false), []);
+  const close = useCallback(() => {
+    setIsOpen(false);
+    setInitialOptions(undefined);
+  }, []);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -54,8 +67,8 @@ export function BookingProvider({ children }: { children: ReactNode }) {
   }, [isOpen, close]);
 
   const value = useMemo(
-    () => ({ open, close, isOpen, tourSlug }),
-    [open, close, isOpen, tourSlug],
+    () => ({ open, close, isOpen, tourSlug, initialOptions }),
+    [open, close, isOpen, tourSlug, initialOptions],
   );
 
   return (
@@ -103,7 +116,7 @@ export function BookingProvider({ children }: { children: ReactNode }) {
 
           <div className="grow overflow-y-auto px-6 pt-6 pb-0 md:px-9 md:pt-8 md:pb-0">
             {isOpen ? (
-              <BookingWidget initialTour={tourSlug} onClose={close} />
+              <BookingWidget initialTour={tourSlug} initialOptions={initialOptions} onClose={close} />
             ) : null}
           </div>
         </div>
@@ -115,16 +128,18 @@ export function BookingProvider({ children }: { children: ReactNode }) {
 /** Convenience CTA that opens the global booking drawer. */
 export function BookButton({
   tourSlug,
+  options,
   className = "btn btn-primary",
   children = "Book Now",
 }: {
   tourSlug?: string;
+  options?: BookingOptions;
   className?: string;
   children?: ReactNode;
 }) {
   const { open } = useBooking();
   return (
-    <button type="button" onClick={() => open(tourSlug)} className={className}>
+    <button type="button" onClick={() => open(tourSlug, options)} className={className}>
       {children}
     </button>
   );

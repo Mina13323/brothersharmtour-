@@ -142,6 +142,7 @@ export function saveTour(input: Partial<TourRecord> & { slug: string }): TourRec
       "images",
       "description",
       "languages",
+      "tripPackages",
     ] as const) {
       if (record[key] === undefined && existing?.[key]) {
         (record as unknown as Record<string, unknown>)[key] = existing[key];
@@ -205,6 +206,16 @@ export function localizeTour(tour: TourRecord, lang?: string | null): Tour {
   const highlights = targetLang !== "en" ? rawHighlights.map((h) => localizeGuideText(h, targetLang)) : rawHighlights;
   const description = targetLang !== "en" ? rawDesc.map((p) => localizeGuideText(p, targetLang)) : rawDesc;
 
+  const tripPackages = (tour.tripPackages || []).map((tp) => {
+    const locTp = t?.tripPackages?.find((x) => x.id === tp.id);
+    if (!locTp) return tp;
+    return {
+      ...tp,
+      title: locTp.title && locTp.title.trim() ? locTp.title : tp.title,
+      description: locTp.description && locTp.description.trim() ? locTp.description : tp.description,
+    };
+  });
+
   return {
     ...tour,
     title: overlay(tour.title, t?.title),
@@ -215,6 +226,7 @@ export function localizeTour(tour: TourRecord, lang?: string | null): Tour {
     excluded: t?.excluded?.length ? t.excluded : tour.excluded,
     bring: t?.bring?.length ? t.bring : tour.bring,
     itinerary: t?.itinerary?.length ? t.itinerary : tour.itinerary,
+    tripPackages,
     seo: t?.seoTitle
       ? {
           ...(tour.seo ?? {}),
@@ -407,6 +419,13 @@ export function savePackage(input: Partial<PackageRecord> & { slug: string; titl
       (p) => p.id === input.id || (input.id === undefined && p.slug === input.slug),
     );
     const ts = now();
+    const primaryCat = input.category || existing?.category || (input.categories?.[0] ?? existing?.categories?.[0] ?? "sea-water");
+    const allCats = input.categories && input.categories.length
+      ? input.categories
+      : existing?.categories && existing.categories.length
+      ? existing.categories
+      : [primaryCat];
+
     const record: PackageRecord = {
       tagline: "",
       destination: "sharm-el-sheikh",
@@ -432,6 +451,9 @@ export function savePackage(input: Partial<PackageRecord> & { slug: string; titl
       id: existing?.id ?? input.id ?? rid(),
       slug: input.slug,
       title: input.title,
+      category: primaryCat,
+      categories: allCats,
+      includedTours: input.includedTours ?? existing?.includedTours ?? [],
       createdAt: existing?.createdAt ?? ts,
       updatedAt: ts,
     };
@@ -624,9 +646,8 @@ export function buildCatalogue(lang?: string): CatalogueTour[] {
     entry.average = Math.round((entry.sum / entry.count) * 10) / 10;
   }
 
-  return db.tours
+  const tours: CatalogueTour[] = db.tours
     .filter((t) => t.status === "published")
-    .sort((a, b) => a.priority - b.priority)
     .map((rawTour) => {
       const t = lang && lang !== "en" ? localizeTour(rawTour, lang) : rawTour;
       return {
@@ -635,12 +656,16 @@ export function buildCatalogue(lang?: string): CatalogueTour[] {
         summary: t.summary,
         destination: t.destination,
         category: t.category,
+        categories: [t.category],
         type: t.type,
+        isPackage: false,
+        href: `/tours/${t.slug}`,
         duration: t.duration,
         durationHours: t.durationHours,
         priceFrom: t.priceFrom,
         currency: t.currency,
         childPrice: t.childPrice ?? null,
+        tripPackages: t.tripPackages ?? [],
         priceUnit: t.priceUnit,
         priceOriginal: t.priceOriginal ?? null,
         priceOverrides: t.priceOverrides,
@@ -654,6 +679,45 @@ export function buildCatalogue(lang?: string): CatalogueTour[] {
         reviewCount: stats.get(t.slug)?.count ?? undefined,
       };
     });
+
+  // Regular Packages: first-class public tourism products in the discovery ecosystem
+  const packages: CatalogueTour[] = (db.packages || [])
+    .filter((p) => p.status === "published")
+    .map((rawPkg) => {
+      const p = lang && lang !== "en" ? localizePackage(rawPkg, lang) : rawPkg;
+      const primaryCat = p.category || (p.categories?.[0] ?? "sea-water");
+      const allCats = p.categories && p.categories.length ? p.categories : [primaryCat];
+      return {
+        slug: p.slug,
+        title: p.title,
+        summary: p.tagline || (p.description?.[0] ?? ""),
+        destination: p.destination,
+        category: primaryCat,
+        categories: allCats,
+        type: "package",
+        isPackage: true,
+        href: `/packages/${p.slug}`,
+        duration: p.duration,
+        durationHours: p.durationHours ?? null,
+        priceFrom: p.priceFrom,
+        currency: p.currency,
+        childPrice: p.childPrice ?? null,
+        priceUnit: undefined,
+        priceOriginal: null,
+        priceOverrides: p.priceOverrides,
+        schedule: null,
+        addons: [],
+        featured: Boolean(p.featured),
+        priority: p.priority,
+        image: p.coverImage ?? null, // Uses package's own hero/poster image
+        availability: "open",
+        rating: stats.get(p.slug)?.average ?? undefined,
+        reviewCount: stats.get(p.slug)?.count ?? undefined,
+        includedTours: p.includedTours ?? [],
+      };
+    });
+
+  return [...tours, ...packages].sort((a, b) => a.priority - b.priority);
 }
 
 /** Public tour view: record + real review stats. */

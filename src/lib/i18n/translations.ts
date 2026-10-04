@@ -1294,8 +1294,8 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
 };
 
 /** Get translated string for language with fallback to English */
-export function getTranslation(lang: string | undefined | null, key: keyof TranslationDictionary): string {
+export function getTranslation(lang: string | undefined | null, key: keyof TranslationDictionary): string | undefined {
   const code = (lang || "en").toLowerCase() as SupportedLanguage;
   const dict = TRANSLATIONS[code] || TRANSLATIONS.en;
-  return dict[key] || TRANSLATIONS.en[key] || key;
+  return dict[key] || TRANSLATIONS.en[key];
 }

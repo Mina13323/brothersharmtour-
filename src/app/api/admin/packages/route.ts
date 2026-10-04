@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { isAdmin } from "@/lib/auth";
 import { allPackages, savePackage } from "@/lib/store/repo";
+import { syncPackageToSupabase } from "@/lib/store/supabaseSync";
 import { slugify } from "@/lib/utils";
 
 /** Admin packages: list (incl. drafts) + create. */
@@ -27,6 +28,24 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, message: "Title is required." }, { status: 422 });
 
   const slug = slugify(String(body.slug ?? title));
-  const pkg = savePackage({ slug, title });
+
+  if (body.priceFrom !== undefined && body.priceFrom !== null && Number(body.priceFrom) < 0) {
+    return NextResponse.json({ ok: false, message: "Adult price cannot be negative." }, { status: 422 });
+  }
+
+  if (body.childPrice !== undefined && body.childPrice !== null && Number(body.childPrice) < 0) {
+    return NextResponse.json({ ok: false, message: "Child price cannot be negative." }, { status: 422 });
+  }
+
+  const pkg = savePackage({
+    ...body,
+    slug,
+    title,
+    status: body.status === "published" ? "published" : "draft",
+  });
+
+  await syncPackageToSupabase(pkg).catch(() => {});
+
   return NextResponse.json({ ok: true, package: pkg }, { status: 201 });
 }
+

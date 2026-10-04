@@ -28,6 +28,7 @@ export type TourCardTour = Pick<Tour, "slug" | "title" | "summary" | "category" 
   images?: MediaImage[];
   image?: MediaImage | null;
   priceFrom: number | null;
+  childPrice?: number | null;
   priceOriginal?: number | null;
   priceOverrides?: Record<string, number>;
   priceUnit?: string;
@@ -45,13 +46,17 @@ export function TourCard({
   priority?: boolean;
   sizes?: string;
 }) {
-  const { money } = useSite();
+  const { money, t } = useSite();
   const price = money(tour.priceFrom, tour.priceOverrides);
+  const childPrice =
+    tour.childPrice !== null && tour.childPrice !== undefined
+      ? money(tour.childPrice, tour.priceOverrides)
+      : null;
   const original = money(tourOriginalPrice(tour), tour.priceOverrides);
   const discount = tourDiscountPct(tour);
   const rating = tourRating(tour);
   const unit = tourPriceUnit(tour);
-  const unitShort = unit === "per person" ? "/pp" : unit.replace("per ", "/ ");
+  const unitShort = unit === "per person" ? `/${t("price_adult", "adult")}` : unit.replace("per ", "/ ");
   const image = tour.images?.[0] ?? tour.image ?? null;
 
   return (
@@ -94,7 +99,7 @@ export function TourCard({
 
           {/* Meta row — duration · schedule */}
           <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.75rem] uppercase tracking-[0.1em] text-stone">
-            <span>{tour.duration ?? "Flexible"}</span>
+            <span>{tour.duration ?? t("duration_flexible", "Flexible")}</span>
             {tourSchedule(tour) ? (
               <>
                 <span className="opacity-40">·</span>
@@ -111,35 +116,45 @@ export function TourCard({
           <div className="mt-auto flex flex-wrap items-end justify-between gap-3 pt-5">
             <div>
               {price ? (
-                <>
+                <div>
                   <span className="block text-[0.625rem] uppercase tracking-[0.18em] text-stone">
-                    from
+                    {t("price_from", "From")}
                   </span>
-                  <span className="flex items-baseline gap-1.5">
-                    <span className="font-display text-[1.5rem] leading-none text-ink">
-                      {price}
+                  <div className="flex flex-col">
+                    <span className="flex items-baseline gap-1.5">
+                      <span className="font-display text-[1.45rem] leading-none text-ink font-bold">
+                        {price}
+                      </span>
+                      <span className="text-[0.6875rem] text-stone">{unitShort}</span>
+                      {original && discount ? (
+                        <span className="text-[0.8125rem] text-stone line-through decoration-sun/70">
+                          {original}
+                        </span>
+                      ) : null}
                     </span>
-                    <span className="text-[0.6875rem] text-stone">{unitShort}</span>
-                    {original && discount ? (
-                      <span className="text-[0.8125rem] text-stone line-through decoration-sun/70">
-                        {original}
+                    {childPrice ? (
+                      <span className="mt-1 flex items-baseline gap-1.5 text-[0.75rem] text-reef-deep font-semibold">
+                        <span className="text-stone text-[0.6875rem] uppercase tracking-wider">{t("price_child", "Child")}:</span>
+                        <span>{childPrice}</span>
                       </span>
                     ) : null}
-                  </span>
-                </>
+                  </div>
+                </div>
               ) : (
                 <span className="text-[0.8125rem] font-semibold uppercase tracking-[0.1em] text-reef">
-                  Price on request
+                  {t("price_on_request", "Price on request")}
                 </span>
               )}
             </div>
 
-            <span className="btn btn-primary btn-sm shrink-0 shadow-xs">View details</span>
+            <span className="btn btn-primary btn-sm shrink-0 shadow-xs cursor-pointer">
+              {t("view_details", "View details")}
+            </span>
           </div>
 
           <span className="mt-3 flex items-center gap-1.5 text-[0.6875rem] text-stone">
             <span className="text-[#1faa54]" aria-hidden>✓</span>
-            No prepayment · pay on the day
+            {t("no_prepayment", "No prepayment · pay on the day")}
           </span>
         </div>
       </Link>

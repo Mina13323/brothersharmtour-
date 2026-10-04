@@ -5,14 +5,15 @@
     {
       "id": "seed-tour-white-island",
       "slug": "white-island",
-      "title": "White Island Sandbank",
+      "title": " Ras Mohamed and White Island  SnorKeling Tour Sharm El Sheikh",
       "destination": "sharm-el-sheikh",
       "category": "sea-water",
       "type": "group",
       "summary": "A boat morning out to the sandbank that appears in the middle of the sea, with snorkelling stops on the reefs either side of it.",
       "description": [
-        "White Island isn't an island so much as a bright strip of sand that surfaces out of open water when the tide drops. There is nothing on it — no shade, no buildings, no jetty — which is exactly why it is worth the crossing.",
-        "The trip is built around the tide. We leave the marina in the morning, take the reef stops first, then anchor off the sandbank at the point in the day when the most sand is exposed and the water around it is at its clearest."
+        "Embark on an unforgettable Ras Mohamed & White Island Boat Trip from Sharm El Sheikh and explore the crystal-clear waters of the Red Sea. Discover Ras Mohamed National Park, famous for its colorful coral reefs, rich marine life, and breathtaking underwater scenery.",
+        "Your journey starts with hotel pickup and transfer to the marina, where you’ll board a modern, fully equipped yacht. Sail along the stunning Sinai coastline while relaxing on deck and learning about the area’s unique marine ecosystem from our experienced guides",
+        "Enjoy two amazing snorkeling stops at Ras Mohamed’s top reef sites and the iconic White Island. Swim among tropical fish, admire vibrant corals, and enjoy a tasty onboard lunch with soft drinks before returning to your hotel with unforgettable memories"
       ],
       "images": [
         {
@@ -46,32 +47,35 @@
           "height": 1200
         }
       ],
-      "duration": "Half day",
+      "duration": "all day",
       "durationHours": 5,
-      "priceFrom": 45,
+      "priceFrom": 30,
       "currency": "USD",
       "priceOriginal": null,
-      "childPrice": 25,
+      "childPrice": 15,
       "availability": "open",
       "highlights": [
-        "Walk out onto a sandbank surrounded by open sea",
-        "Two snorkelling stops over shallow, sheltered reef",
-        "Small-boat trip rather than a large group cruise",
-        "Time in the water scheduled around the tide, not the clock"
+        "Luxurious yacht trip from Sharm El Sheikh to Ras Mohamed",
+        "Snorkel at two stunning coral reef sites with guided assistance",
+        "Discover vibrant marine life in crystal-clear Red Sea waters",
+        "Relax and sunbathe on the spacious upper deck",
+        "Enjoy a delicious gourmet lunch with soft drinks on board",
+        "Experience an unforgettable Red Sea adventure with a professional crew"
       ],
       "included": [
         "Hotel pickup and drop-off in an air-conditioned vehicle",
-        "English-speaking Brother Sharm Tour guide",
-        "All entrance fees and permits listed in the itinerary",
-        "Bottled water",
-        "Snorkelling mask, fins and vest",
-        "Lunch on board"
+        "Snorkeling at Ras Mohamed and White Island",
+        "Two snorkeling stops in the Red Sea",
+        "Professional instructor guidance.",
+        "Refreshments: water, coffee, tea, soda",
+        "Lunch includes chicken, rice, pasta, veggies, 3 salads",
+        "Spacious yacht with sun deck",
+        "National Park entrance fees",
+        "Life jacket"
       ],
       "excluded": [
-        "Personal expenses and souvenirs",
-        "Gratuities (optional, always appreciated)",
-        "Travel insurance",
-        "Underwater camera hire"
+        "Optional underwater photos for purchase",
+        "snorkling equipment"
       ],
       "bring": [
         "Swimwear worn under your clothes",
@@ -90,7 +94,7 @@
         },
         {
           "title": "Crossing and first reef stop",
-          "detail": "Boat out to the first snorkelling site, with a briefing on entry, exit and reef etiquette before anyone gets in."
+          "detail": "During the trip, the boat will stop 2 times at some of the best snorkeling spots around Ras Mohammed."
         },
         {
           "title": "White Island",
@@ -117,17 +121,16 @@
       "addons": [
         {
           "label": "Intro diving session",
-          "price": 20,
+          "price": 12,
           "unit": "per person"
         },
         {
           "label": "Underwater photos",
-          "price": 15,
+          "price": 0,
           "unit": "per booking"
         }
       ],
       "importantInfo": [
-        "Bring your passport or a photo of it — some checkpoints ask for ID.",
         "Sun protection, a hat and flat shoes make every trip more comfortable.",
         "Pickup times shift slightly by hotel zone; we confirm yours the evening before.",
         "The sandbank is tidal. On a high tide it can be reduced to a narrow strip — we plan departures around this but cannot control it.",
@@ -152,27 +155,61 @@
         "tiran-island",
         "glass-boat"
       ],
-      "translations": {},
+      "translations": {
+        "ar": {
+          "title": "جزيرة الرمال البيضاء",
+          "summary": "رحلة بحرية صباحية إلى الجزيرة الرملية وسط البحر، مع وقفات للسباحة والسنوركلينج على الشعاب المرجانية."
+        },
+        "de": {
+          "title": "White Island Sandbank",
+          "summary": "Bootsausflug am Vormittag zur Sandbank mitten im Meer mit Schnorchelstopps an den Korallenriffen."
+        },
+        "it": {
+          "title": "Isola Bianca (White Island)",
+          "summary": "Escursione in barca alla lingua di sabbia bianca in mezzo al mare, con soste snorkeling sulla barriera corallina."
+        },
+        "ru": {
+          "title": "Белый Остров (White Island)",
+          "summary": "Морская прогулка на яхте к песчаной косе посреди моря с остановками для снорклинга на рифах."
+        },
+        "pl": {
+          "title": "Biała Wyspa (White Island)",
+          "summary": "Rejs statkiem na piaszczystą łachę pośrodku morza z przystankami na snurkowanie przy rafie koralowej."
+        },
+        "fr": {
+          "title": "Banc de Sable de White Island",
+          "summary": "Matinée en bateau vers le banc de sable émergeant en pleine mer, avec arrêts snorkeling sur les récifs."
+        }
+      },
       "verified": false,
       "featured": true,
       "priority": 1,
       "status": "published",
       "createdAt": "2026-10-01T09:20:17.734Z",
-      "updatedAt": "2026-10-01T09:20:17.734Z"
+      "updatedAt": "2026-10-01T21:18:26.577Z",
+      "pickupTime": "8:00",
+      "dropoff": "17:00"
     },
     {
       "id": "seed-tour-ras-mohamed",
       "slug": "ras-mohamed",
-      "title": "Ras Mohamed National Park",
+      "title": "Ras Mohamed National Park By bus",
       "destination": "sharm-el-sheikh",
       "category": "sea-water",
       "type": "group",
       "summary": "Egypt's first national park, where the Sinai desert ends in a vertical reef wall. Snorkelling in one of the Red Sea's most protected marine areas.",
       "description": [
-        "Ras Mohamed sits at the southern tip of the Sinai peninsula, where the Gulf of Suez and the Gulf of Aqaba meet. It became Egypt's first national park in 1983, and the protection shows — the reef here is dense, steep and busy with fish.",
-        "We run it as a boat trip with several stops rather than a single long swim, so you see more than one type of reef in a day."
+        "Enjoy a comfortable bus trip from Sharm El Sheikh to Ras Mohamed National Park with hotel pickup included. Discover one of Egypt’s most beautiful natural reserves, combining scenic views, unique landscapes, and relaxing stops",
+        "Visit iconic highlights such as the Gate of Allah, Mangrove Lake, Magic Lake, the Earthquake Crack, and the junction of the two Red Sea gulfs. Each stop offers stunning photo opportunities and fascinating natural features",
+        "Swim in the Lake of Desire and enjoy snorkeling at Breka Bay, famous for colorful coral reefs and marine life. With a professional guide and easy transport, this tour is perfect for nature lovers and snorkelers."
       ],
       "images": [
+        {
+          "src": "/uploads/media/100c5e9f-1d52-40f9-b89c-a939a497dcf1.jpg",
+          "alt": "Ras Mohamed National Park By bus photo 4",
+          "width": 1600,
+          "height": 900
+        },
         {
           "src": "/media/ras-mohamed/hero.jpg",
           "alt": "Reef wall and deep blue water at Ras Mohamed National Park",
@@ -190,6 +227,30 @@
           "alt": "Desert cliffs meeting the Red Sea inside the national park",
           "width": 1800,
           "height": 1200
+        },
+        {
+          "src": "/uploads/media/5c449aca-7c6f-41a0-815c-7079092cd348.webp",
+          "alt": "Ras Mohamed National Park By bus photo 5",
+          "width": 1600,
+          "height": 900
+        },
+        {
+          "src": "/uploads/media/d6a3f117-becf-42d5-a4c7-a459097cd8e7.webp",
+          "alt": "Ras Mohamed National Park By bus photo 6",
+          "width": 1600,
+          "height": 900
+        },
+        {
+          "src": "/uploads/media/8cd1dcd0-45fa-4c14-a319-5b311f7950cc.jpg",
+          "alt": "Ras Mohamed National Park By bus photo 7",
+          "width": 1600,
+          "height": 900
+        },
+        {
+          "src": "/uploads/media/96032eb5-4ec1-44a1-8c84-793c9f5671af.webp",
+          "alt": "Ras Mohamed National Park By bus photo 8",
+          "width": 1600,
+          "height": 900
         }
       ],
       "video": {
@@ -204,36 +265,41 @@
       },
       "duration": "Full day",
       "durationHours": 8,
-      "priceFrom": 55,
+      "priceFrom": 18,
       "currency": "USD",
       "priceOriginal": null,
-      "childPrice": null,
+      "childPrice": 9,
       "availability": "open",
       "highlights": [
-        "Snorkelling inside a protected national park",
-        "Reef walls that drop away into deep blue water",
-        "Several stops across different reef systems",
-        "Lunch served on board between sites"
+        "Enter the mystical Gate of Allah.",
+        "Explore Mangrove Trees Lake.",
+        "Witness the enchanting Magic Lake.",
+        "Encounter the Earthquake Fissure.",
+        "Marvel at the Red Sea Gulf junction.",
+        "Swim in the Lake of Desire."
       ],
       "included": [
         "Hotel pickup and drop-off in an air-conditioned vehicle",
-        "English-speaking Brother Sharm Tour guide",
-        "All entrance fees and permits listed in the itinerary",
-        "Bottled water",
         "National park entrance fee",
-        "Snorkelling equipment",
-        "Lunch on board"
+        "Visit Gate of Allah",
+        "Visit Mangrove trees Lake",
+        "Visit Magic Lake.",
+        "Visit Earthquake fissure.",
+        "Visit Junction of the two Red Sea Gulf.",
+        "Swimming in the lake of desire.",
+        "One hour Snorkelling at Breka Bay.",
+        "Tour Guide."
       ],
       "excluded": [
         "Personal expenses and souvenirs",
-        "Gratuities (optional, always appreciated)",
-        "Travel insurance"
+        " Optional underwater photos for purchase"
       ],
       "bring": [
         "Swimwear worn under your clothes",
         "Towel",
         "Reef-safe sunscreen",
-        "Dry bag or plastic pouch for phones"
+        "Dry bag or plastic pouch for phones",
+        "bottel water"
       ],
       "restrictions": [
         "Basic swimming confidence is needed for in-water stops; vests are available."
@@ -242,23 +308,27 @@
         {
           "time": "Morning",
           "title": "Hotel pickup",
-          "detail": "Transfer to the marina."
+          "detail": "Our representative will pick you up from your hotel in Sharm El Sheikh at around 8:00 AM, after breakfast. Drive for approximately 50 minutes to Ras Mohammed National Park."
         },
         {
-          "title": "Into the park",
-          "detail": "Boat south along the coast into the national park boundary, with a briefing on the rules that keep the reef intact."
+          "title": "🕌 Allah Gate",
+          "detail": "ontinue to the famous Allah Gate, a large structure featuring the word “Allah” in Arabic and English. Stop for photos and enjoy the impressive surroundings."
         },
         {
-          "title": "Reef stops",
-          "detail": "Snorkelling at the day's selected sites. The captain picks them on the day based on current and wind."
+          "title": "💧 Magic Lake",
+          "detail": "Visit the beautiful Magic Lake, also known as the Wishes Lake. Admire the changing colors of the water, surrounding mountains, sand, and sky. You will also have time for swimming in the lake"
         },
         {
-          "title": "Lunch on board",
-          "detail": "Served between the morning and afternoon stops."
+          "title": "🌍 Earthquake Cracks",
+          "detail": "Explore the fascinating Earthquake Cracks, natural formations created by earthquakes thousands of years ago"
         },
         {
-          "title": "Return",
-          "detail": "Back to the marina and on to your hotel."
+          "title": "🤿 Snorkeling Stop",
+          "detail": "Finish the tour with a snorkeling stop at one of Ras Mohammed’s beautiful Red Sea spots. Swim among colorful coral reefs and a variety of tropical fish while enjoying the clear waters."
+        },
+        {
+          "title": " Return to Sharm El Sheikh",
+          "detail": "After completing the tour, drive back to Sharm El Sheikh and transfer to your hotel.\n\n"
         }
       ],
       "meetingPoint": "Hotel pickup across Sharm El Sheikh.",
@@ -296,97 +366,145 @@
         "tiran-island",
         "submarine"
       ],
-      "translations": {},
+      "translations": {
+        "ar": {
+          "title": "محمية رأس محمد والجزيرة البيضاء",
+          "summary": "رحلة يخت إلى أقدم محمية بحرية في مصر ومواقع الغوص الشهيرة والشعاب المرجانية البكر."
+        },
+        "de": {
+          "title": "Ras Mohammed Nationalpark & White Island",
+          "summary": "Ganztägiger Bootsausflug zum ältesten Meeresschutzgebiet Ägyptens mit weltberühmten Schnorchelplätzen."
+        },
+        "it": {
+          "title": "Parco Nazionale di Ras Mohammed & White Island",
+          "summary": "Giornata intera in barca nel parco marino più celebre d'Egitto con soste snorkeling su fondali incontaminati."
+        },
+        "ru": {
+          "title": "Заповедник Рас Мохаммед и Белый Остров",
+          "summary": "Морская прогулка на яхте в первый национальный морской заповедник Египта с богатейшим подводным миром."
+        },
+        "pl": {
+          "title": "Park Narodowy Ras Mohammed i Biała Wyspa",
+          "summary": "Całodniowy rejs jachtem do najsłynniejszego rezerwatu morskiego w Egipcie z niesamowitymi rafami."
+        },
+        "fr": {
+          "title": "Parc National de Ras Mohammed & White Island",
+          "summary": "Journée en mer dans la plus ancienne réserve marine d'Égypte avec arrêts snorkeling exceptionnels."
+        }
+      },
       "verified": false,
       "featured": true,
       "priority": 2,
       "status": "published",
       "createdAt": "2026-10-01T09:20:17.734Z",
-      "updatedAt": "2026-10-01T09:20:17.734Z"
+      "updatedAt": "2026-10-02T11:46:32.694Z"
     },
     {
       "id": "seed-tour-tiran-island",
       "slug": "tiran-island",
-      "title": "Tiran Island Snorkelling",
+      "title": "Tiran Island Snorkelling Boat Tour Sharm El Sheikh",
       "destination": "sharm-el-sheikh",
       "category": "sea-water",
       "type": "group",
       "summary": "A full day in the Strait of Tiran, anchoring over the coral gardens that sit between the Sinai and the Saudi coast.",
       "description": [
-        "The Strait of Tiran is the narrow channel where the Gulf of Aqaba meets the open Red Sea. Four reefs sit in the middle of it — Gordon, Woodhouse, Thomas and Jackson — and the water moving through the gaps keeps them in remarkable condition.",
-        "It is the classic Sharm boat day — a long, unhurried one, with several anchorages and plenty of time in the water at each."
+        "Embark on an unforgettable Tiran Island Boat Trip from Sharm El Sheikh. Explore the crystal-clear waters of the Red Sea and discover the stunning reefs around Tiran Island, famous for colorful coral reefs, crystal waters, and rich marine life.",
+        "Your journey starts with hotel pickup and transfer to the marina, where you’ll board a modern, fully equipped yacht. Sail along the beautiful Sinai coastline while relaxing on deck and enjoying breathtaking views of the Red Sea.",
+        "Enjoy amazing snorkeling stops at some of the best reef sites around Tiran Island, including famous coral areas filled with tropical fish and vibrant underwater life.",
+        "Swim in the warm turquoise waters, relax on board, and enjoy a tasty onboard lunch with soft drinks before returning to your hotel with unforgettable memories from your Red Sea adventure."
       ],
       "images": [
         {
-          "src": "/media/tiran-island/hero.jpg",
-          "alt": "Boats anchored over the reef in the Strait of Tiran",
-          "width": 2400,
-          "height": 1350
+          "src": "/uploads/media/4374d692-d353-45a0-8653-fef79041161f.jpeg",
+          "alt": "Tiran Island Snorkelling Boat Tour Sharm El Sheikh photo 5",
+          "width": 1600,
+          "height": 900
+        },
+        {
+          "src": "/uploads/media/c55cc297-4617-4baa-99d5-191e8fbfd5b3.jpeg",
+          "alt": "Tiran Island Snorkelling Boat Tour Sharm El Sheikh photo 4",
+          "width": 1600,
+          "height": 900
         },
         {
           "src": "/media/tiran-island/gallery-01.jpg",
           "alt": "Coral garden seen from the surface at Tiran",
           "width": 1800,
           "height": 1200
+        },
+        {
+          "src": "/uploads/media/2d3bb367-17f4-4108-871f-bcb3b628f0bb.jpg",
+          "alt": "Tiran Island Snorkelling Boat Tour Sharm El Sheikh photo 3",
+          "width": 1600,
+          "height": 900
+        },
+        {
+          "src": "/uploads/media/5129970f-9381-43e4-a920-d8c002e63539.jpeg",
+          "alt": "Tiran Island Snorkelling Boat Tour Sharm El Sheikh photo 5",
+          "width": 1600,
+          "height": 900
+        },
+        {
+          "src": "/uploads/media/7e2eb6a0-f073-4e21-b99c-5981d811fc22.jpg",
+          "alt": "Tiran Island Snorkelling Boat Tour Sharm El Sheikh photo 6",
+          "width": 1600,
+          "height": 900
         }
       ],
       "duration": "Full day",
       "durationHours": 8,
-      "priceFrom": 40,
+      "priceFrom": 30,
       "currency": "USD",
       "priceOriginal": null,
-      "childPrice": null,
+      "childPrice": 15,
       "availability": "open",
       "highlights": [
-        "Anchor over the reefs of the Strait of Tiran",
-        "Multiple snorkelling stops in one day",
-        "Views across to the mountains of Saudi Arabia",
-        "Sun deck and shaded seating on board"
+        "Explore vibrant coral reefs and colorful marine life at Tiran Island",
+        "Snorkel in the crystal-clear waters of the Red Sea",
+        "Enjoy two guided snorkeling stops at top reef locations",
+        "Savor a delicious onboard lunch with refreshing drinks",
+        "Travel in comfort with round-trip hotel transfers included"
       ],
       "included": [
         "Hotel pickup and drop-off in an air-conditioned vehicle",
-        "English-speaking Brother Sharm Tour guide",
-        "All entrance fees and permits listed in the itinerary",
-        "Bottled water",
-        "Snorkelling equipment",
-        "Lunch on board",
-        "Soft drinks"
+        "Snorkeling at Tiran Island.",
+        "Professional instructor guidance.",
+        "Refreshments: water, coffee, tea, sod",
+        "Lunch includes chicken, rice, pasta, veggies, 3 salads",
+        "Spacious yacht with sun deck",
+        "National Park entrance fees"
       ],
       "excluded": [
-        "Personal expenses and souvenirs",
-        "Gratuities (optional, always appreciated)",
-        "Travel insurance"
+        "Optional underwater photos for purchase"
       ],
       "bring": [
         "Swimwear worn under your clothes",
-        "Towel",
-        "Reef-safe sunscreen",
-        "Dry bag or plastic pouch for phones"
+        "Towel"
       ],
       "restrictions": [
-        "Basic swimming confidence is needed for in-water stops; vests are available."
+        " vests are available for free"
       ],
       "itinerary": [
         {
           "time": "Morning",
           "title": "Hotel pickup",
-          "detail": "Transfer to the marina and boarding."
+          "detail": "Our representative will pick you up from your hotel in Sharm El Sheikh and transfer you to the marina."
         },
         {
-          "title": "First anchorage",
-          "detail": "Out to the strait and the first reef stop of the day."
+          "title": "⛵ Boat Trip to Tiran Island",
+          "detail": "Board the boat and sail toward Tiran Island, enjoying the beautiful Red Sea views along the way."
         },
         {
-          "title": "Lunch on board",
-          "detail": "Served on deck at anchor."
+          "title": "🤿 Two Snorkeling Stops",
+          "detail": "Enjoy two snorkeling and swimming stops at beautiful locations around Tiran Island.\n\n🌊 First Stop – Blue Lagoon\nSwim and snorkel in clear, calm waters surrounded by colorful coral reefs and beautiful Red Sea fish.\n\n🐠 Second Stop – Tiran Island\nExplore vibrant coral reefs, swim in crystal-clear waters, and discover the amazing marine life beneath the surface."
         },
         {
-          "title": "Second anchorage",
-          "detail": "A second reef with time to swim and snorkel."
+          "title": "🍽️ Lunch on Board",
+          "detail": " enjoy lunch on board while relaxing and taking in the beautiful Red Sea views."
         },
         {
           "title": "Return",
-          "detail": "Back into the marina in the late afternoon."
+          "detail": "Upon arrival at the marina, our representative will transfer you back to your hotel in Sharm El Sheikh.\n\n"
         }
       ],
       "meetingPoint": "Hotel pickup across Sharm El Sheikh.",
@@ -399,7 +517,6 @@
       "minParticipants": null,
       "maxParticipants": null,
       "importantInfo": [
-        "Bring your passport or a photo of it — some checkpoints ask for ID.",
         "Sun protection, a hat and flat shoes make every trip more comfortable.",
         "Pickup times shift slightly by hotel zone; we confirm yours the evening before.",
         "This is a long day on a boat. Let us know in advance if anyone in your group is prone to seasickness."
@@ -423,24 +540,51 @@
         "white-island",
         "speed-boat"
       ],
-      "translations": {},
+      "translations": {
+        "ar": {
+          "title": "رحلة جزيرة تيران باليخت",
+          "summary": "رحلة إبحار ليوم كامل عبر مضيق تيران مع السباحة والسنوركلينج واستكشاف حطام السفن."
+        },
+        "de": {
+          "title": "Insel Tiran Bootsausflug",
+          "summary": "Ganztägige Segeltour durch die Straße von Tiran mit Schnorcheln an bunten Riffen und Lagunen."
+        },
+        "it": {
+          "title": "Isola di Tiran in Barca",
+          "summary": "Navigazione di una giornata nello stretto di Tiran con soste snorkeling vicino a barriere spettacolari."
+        },
+        "ru": {
+          "title": "Морская прогулка к острову Тиран",
+          "summary": "Круиз на целый день через пролив Тиран с плаванием и снорклингом у коралловых рифов."
+        },
+        "pl": {
+          "title": "Wyspa Tiran Rejs Jachtem",
+          "summary": "Całodniowy rejs cieśniną Tiran ze snurkowaniem przy zachwycających ścianach koralowych."
+        },
+        "fr": {
+          "title": "Croisière à l'Île de Tiran",
+          "summary": "Journée de navigation dans les détroits de Tiran avec sessions de snorkeling sur les plus beaux récifs."
+        }
+      },
       "verified": false,
       "featured": true,
       "priority": 3,
       "status": "published",
       "createdAt": "2026-10-01T09:20:17.734Z",
-      "updatedAt": "2026-10-01T09:20:17.734Z"
+      "updatedAt": "2026-10-02T12:19:10.031Z",
+      "pickupTime": "8:00",
+      "dropoff": "17:00"
     },
     {
       "id": "seed-tour-glass-boat",
       "slug": "glass-boat",
-      "title": "Glass Bottom Boat",
+      "title": "Glass Bottom Boat Sharm El Sheikh",
       "destination": "sharm-el-sheikh",
       "category": "sea-water",
       "type": "group",
       "summary": "The reef without getting wet. A short trip over the shallow coral gardens, viewed through the hull — the easiest option for small children and non-swimmers.",
       "description": [
-        "Not everyone wants to put a mask on, and the reef shouldn't be off-limits because of it. The glass-bottom boat runs over the shallow coral close to shore, where visibility through the hull is at its best.",
+        "Discover the beautiful underwater world of the Red Sea without getting wet! Enjoy a relaxing Glass Bottom Boat trip and admire colorful fish, coral reefs, and fascinating marine life through the boat’s viewing windows.",
         "It is short, calm and works for grandparents and toddlers alike."
       ],
       "images": [
@@ -449,12 +593,6 @@
           "alt": "Glass bottom boat over coral in Sharm El Sheikh",
           "width": 2400,
           "height": 1350
-        },
-        {
-          "src": "/media/glass-boat/gallery-01.jpg",
-          "alt": "Viewing pane of a glass bottom boat over coral",
-          "width": 1800,
-          "height": 1200
         },
         {
           "src": "/media/glass-boat/gallery-02.jpg",
@@ -469,50 +607,48 @@
           "height": 1200
         }
       ],
-      "duration": "1 hour",
+      "duration": "3 hour",
       "durationHours": 1,
-      "priceFrom": 20,
+      "priceFrom": 15,
       "currency": "USD",
       "priceOriginal": null,
-      "childPrice": null,
+      "childPrice": 8,
       "availability": "open",
       "highlights": [
         "See the reef without swimming",
         "Suited to young children and non-swimmers",
         "Short, calm, close to shore",
-        "Shaded seating throughout"
+        "Shaded seating throughout",
+        " Great photo opportunities"
       ],
       "included": [
         "Hotel pickup and drop-off",
         "Boat ticket",
-        "Bottled water"
+        "Round-trip transfer: Hotel → Marina → Hotel",
+        "Air-conditioned transportation"
       ],
       "excluded": [
         "Personal expenses and souvenirs",
         "Gratuities (optional, always appreciated)",
-        "Travel insurance"
+        " Food and drinks",
+        " Photos or videos"
       ],
       "bring": [
-        "Swimwear worn under your clothes",
-        "Towel",
-        "Reef-safe sunscreen",
-        "Dry bag or plastic pouch for phones"
+        "Camera or smartphone",
+        "Drinking water",
+        " Sun hat & Comfortable clothing"
       ],
-      "restrictions": [
-        "Basic swimming confidence is needed for in-water stops; vests are available."
-      ],
+      "restrictions": [],
       "itinerary": [
         {
-          "title": "Pickup",
-          "detail": "Collected from your hotel and driven to the jetty."
+          "title": "Pickup Around 10:20 AM, depending on your hotel location",
+          "detail": " Duration: Approximately 3 hours  /\n Drop-off: Around 1:00 PM",
+          "time": "1st Journey"
         },
         {
-          "title": "On the water",
-          "detail": "Out over the shallow reef with viewing time through the glass panels."
-        },
-        {
-          "title": "Return",
-          "detail": "Back to the jetty and on to your hotel."
+          "title": " Pickup: Around 2:20 PM, depending on your hotel location",
+          "detail": "Duration: Approximately 3 hours  /\n Drop-off: Around 5:00 PM",
+          "time": "2nd Journey"
         }
       ],
       "meetingPoint": "Hotel pickup across Sharm El Sheikh.",
@@ -525,7 +661,6 @@
       "minParticipants": null,
       "maxParticipants": null,
       "importantInfo": [
-        "Bring your passport or a photo of it — some checkpoints ask for ID.",
         "Sun protection, a hat and flat shoes make every trip more comfortable.",
         "Pickup times shift slightly by hotel zone; we confirm yours the evening before.",
         "Visibility through the hull depends on sunlight and sea state — midday trips are usually clearest."
@@ -549,25 +684,51 @@
         "white-island",
         "dolphin-show"
       ],
-      "translations": {},
+      "translations": {
+        "ar": {
+          "title": "القارب الزجاجي",
+          "summary": "استكشف الشعاب المرجانية الملونة والحياة البحرية في خليج نعمة دون الحاجة للسباحة."
+        },
+        "de": {
+          "title": "Glasbodenboot",
+          "summary": "Entdecken Sie die Korallengärten und Fische des Roten Meeres bequem durch den Glasboden des Bootes."
+        },
+        "it": {
+          "title": "Barca con Fondo di Vetro",
+          "summary": "Ammira la barriera corallina e i pesci tropicali senza bagnarti attraverso il fondo trasparente."
+        },
+        "ru": {
+          "title": "Лодка со стеклянным дном",
+          "summary": "Знакомство с кораллами и рыбками Красного моря через прозрачное дно катера, подходит для всей семьи."
+        },
+        "pl": {
+          "title": "Łódź ze Szklanym Dnem",
+          "summary": "Podziwianie rafy koralowej i morskiej fauny bez wchodzenia do wody przez panoramiczne dno łodzi."
+        },
+        "fr": {
+          "title": "Bateau à Fond de Verre",
+          "summary": "Observation des coraux et poissons tropicaux sans se mouiller à travers le fond vitré du bateau."
+        }
+      },
       "verified": false,
       "featured": false,
       "priority": 10,
       "status": "published",
       "createdAt": "2026-10-01T09:20:17.734Z",
-      "updatedAt": "2026-10-01T09:20:17.734Z"
+      "updatedAt": "2026-10-02T10:50:12.367Z"
     },
     {
       "id": "seed-tour-submarine",
       "slug": "submarine",
-      "title": "Semi-Submarine Reef Tour",
+      "title": "Sea Scope Submarine Boat",
       "destination": "sharm-el-sheikh",
       "category": "sea-water",
       "type": "group",
       "summary": "Descend into a viewing deck below the waterline and watch the reef pass by through panoramic windows — dry, air-conditioned and step-free.",
       "description": [
-        "The semi-submarine sits on the surface, but its viewing cabin is below it. You sit at eye level with the reef, behind a continuous run of windows, while the vessel tracks slowly along the coral.",
-        "It's the most accessible way we offer to see the Red Sea underwater — no swimming, no stairs into the water, no equipment."
+        "Explore the mesmerizing underwater world on a Sea Scope Submarine Tour in Sharm El Sheikh. Discover the Red Sea’s crystal-clear waters, vibrant coral reefs, and exotic marine life — all without getting wet.",
+        "Step aboard a modern Sea Scope submarine and enjoy panoramic underwater views during a relaxing journey beneath the waves. Learn fascinating facts about the Red Sea’s ecosystem from experienced guides.",
+        "Operating daily at 10:00, 11:30, and 15:00, this safe and comfortable tour is ideal for families and all ages. Capture stunning photos through large windows and enjoy a unique, educational underwater adventure."
       ],
       "images": [
         {
@@ -583,44 +744,60 @@
           "height": 1200
         },
         {
-          "src": "/media/submarine/gallery-02.jpg",
-          "alt": "Coral reef seen from the viewing cabin",
-          "width": 1800,
-          "height": 1200
+          "src": "/uploads/media/0eb21004-7ac2-48b8-9860-e51a6cd96818.jpg",
+          "alt": "Sea Scope Submarine Boat photo 3",
+          "width": 1600,
+          "height": 900
+        },
+        {
+          "src": "/uploads/media/9d46bfb7-321c-4335-b85d-c4e3cbe387f9.webp",
+          "alt": "Sea Scope Submarine Boat photo 4",
+          "width": 1600,
+          "height": 900
+        },
+        {
+          "src": "/uploads/media/8694d972-3e1f-452b-abe9-a86408273038.jpg",
+          "alt": "Sea Scope Submarine Boat photo 5",
+          "width": 1600,
+          "height": 900
+        },
+        {
+          "src": "/uploads/media/1158474b-2dae-4561-9129-899becd72563.jpg",
+          "alt": "Sea Scope Submarine Boat photo 6",
+          "width": 1600,
+          "height": 900
         }
       ],
       "duration": "2 hours",
-      "durationHours": 2,
-      "priceFrom": 35,
+      "durationHours": 2.5,
+      "priceFrom": 30,
       "currency": "USD",
       "priceOriginal": null,
-      "childPrice": null,
+      "childPrice": 15,
       "availability": "open",
       "highlights": [
-        "Below-waterline viewing deck with panoramic windows",
-        "Air-conditioned and completely dry",
-        "Step-free and accessible",
-        "Good for travellers who don't swim"
+        "Explore vibrant coral reefs and exotic marine life in the Red Sea",
+        "Enjoy an immersive underwater journey without getting wet",
+        "Capture breathtaking photos through large panoramic windows",
+        "Learn from expert guides about marine life and conservation",
+        "Experience a safe, family-friendly submarine adventure",
+        "Available daily with multiple convenient departure times"
       ],
       "included": [
-        "Hotel pickup and drop-off",
-        "Submarine ticket",
-        "Bottled water"
+        "Hotel pickup and drop-off in Sharm El Sheikh",
+        "1.5-hour Sea Scope submarine experience",
+        "Panoramic underwater viewing windows",
+        "Close-up views of coral reefs and marine life",
+        "Professional crew and guided commentary",
+        "Family-friendly experience suitable for all age"
       ],
       "excluded": [
-        "Personal expenses and souvenirs",
-        "Gratuities (optional, always appreciated)",
-        "Travel insurance"
+        "Optional underwater photos available for purchase on-site."
       ],
       "bring": [
-        "Swimwear worn under your clothes",
-        "Towel",
-        "Reef-safe sunscreen",
-        "Dry bag or plastic pouch for phones"
+        "Bottle of water"
       ],
-      "restrictions": [
-        "Basic swimming confidence is needed for in-water stops; vests are available."
-      ],
+      "restrictions": [],
       "itinerary": [
         {
           "title": "Pickup",
@@ -649,7 +826,6 @@
       "minParticipants": null,
       "maxParticipants": null,
       "importantInfo": [
-        "Bring your passport or a photo of it — some checkpoints ask for ID.",
         "Sun protection, a hat and flat shoes make every trip more comfortable.",
         "Pickup times shift slightly by hotel zone; we confirm yours the evening before."
       ],
@@ -672,13 +848,38 @@
         "ras-mohamed",
         "dolphin-show"
       ],
-      "translations": {},
+      "translations": {
+        "ar": {
+          "title": "الغواصة البحرية شبه المغمورة",
+          "summary": "رحلة استكشاف أعماق البحر الأحمر عبر نوافذ زجاجية بانورامية مناسبة لجميع أفراد العائلة."
+        },
+        "de": {
+          "title": "Halb-U-Boot Seascope",
+          "summary": "Beobachten Sie die Unterwasserwelt 3 Meter unter der Wasseroberfläche durch große Panoramafenster."
+        },
+        "it": {
+          "title": "Semi-Sommergibile",
+          "summary": "Esplora i fondali marini a 3 metri di profondità attraverso ampie vetrate panoramiche."
+        },
+        "ru": {
+          "title": "Батискаф (Полуподводная лодка)",
+          "summary": "Погружение на глубину 3 метра с панорамным обзором рифов и подводных обитателей через иллюминаторы."
+        },
+        "pl": {
+          "title": "Łódź Półpodwodna",
+          "summary": "Zejście pod wodę z panoramicznym widokiem na głębiny Morza Czerwonego przez duże okna."
+        },
+        "fr": {
+          "title": "Semi-Sous-Marin",
+          "summary": "Immersion sous-marine à 3 mètres sous le niveau de la mer avec larges hublots panoramiques."
+        }
+      },
       "verified": false,
       "featured": false,
-      "priority": 11,
+      "priority": 24,
       "status": "published",
       "createdAt": "2026-10-01T09:20:17.734Z",
-      "updatedAt": "2026-10-01T09:20:17.734Z"
+      "updatedAt": "2026-10-02T17:15:11.151Z"
     },
     {
       "id": "seed-tour-parasailing",
@@ -689,8 +890,7 @@
       "type": "group",
       "summary": "Lifted off the back of a boat and flown above the bay. A few minutes of very quiet air with the whole reef line laid out beneath you.",
       "description": [
-        "Parasailing is the shortest experience we sell and one of the ones people talk about most. You're clipped in on the boat's platform, the canopy fills, and you rise away from the noise of the engine.",
-        "From up there the structure of the coast makes sense — you can see where the shallow reef ends and the deep channel starts, in colours you never get from the beach."
+        "Board the speedboat and enjoy approximately 25 minutes on the boat, including around 5–7 minutes of parasailing in the air above the Red Sea."
       ],
       "images": [
         {
@@ -720,16 +920,17 @@
       ],
       "duration": "Short activity",
       "durationHours": 2,
-      "priceFrom": 30,
+      "priceFrom": 17,
       "currency": "USD",
       "priceOriginal": null,
-      "childPrice": null,
+      "childPrice": 20,
       "availability": "open",
       "highlights": [
         "Take-off and landing from the boat, not the beach",
         "Aerial view over the reef line and bay",
         "Tandem flights available",
-        "No experience required"
+        "No experience required",
+        "Enjoy breathtaking views of the Red Sea and Sharm El Sheikh coastline while flying safely above the water."
       ],
       "included": [
         "Hotel pickup and drop-off",
@@ -737,16 +938,11 @@
         "Boat time"
       ],
       "excluded": [
-        "Personal expenses and souvenirs",
-        "Gratuities (optional, always appreciated)",
-        "Travel insurance",
         "Photo and video package"
       ],
       "bring": [
-        "Scarves or a buff for the dust",
-        "Closed shoes",
-        "Sunscreen and sunglasses",
-        "A warm layer between November and March — the desert cools fast after sunset"
+        "towel",
+        "Swimwear worn under your clothes"
       ],
       "restrictions": [
         "Some activities have minimum age or height rules set by the operator — confirm for young children."
@@ -779,7 +975,6 @@
       "minParticipants": null,
       "maxParticipants": null,
       "importantInfo": [
-        "Bring your passport or a photo of it — some checkpoints ask for ID.",
         "Sun protection, a hat and flat shoes make every trip more comfortable.",
         "Pickup times shift slightly by hotel zone; we confirm yours the evening before.",
         "Flights are weather-dependent and are cancelled or rescheduled if the wind is outside safe limits.",
@@ -804,13 +999,39 @@
         "tiran-island",
         "desert-safari"
       ],
-      "translations": {},
+      "translations": {
+        "ar": {
+          "title": "باراسيلينج ومغامرة التزلج الهوائي",
+          "summary": "طيران بالمظلة فوق خليج شرم الشيخ وإطلالة بانورامية ساحرة على البحر وجبال سيناء."
+        },
+        "de": {
+          "title": "Parasailing über dem Roten Meer",
+          "summary": "Fliegen Sie mit dem Fallschirm über das Meer und genießen Sie den Panoramablick auf Küste und Berge."
+        },
+        "it": {
+          "title": "Parasailing",
+          "summary": "Volo panoramico col paracadute ascensionale trainato da un motoscafo sulle acque di Sharm."
+        },
+        "ru": {
+          "title": "Парасейлинг (Полет на парашюте)",
+          "summary": "Захватывающий полет на парашюте за катером с потрясающим видом на залив и горы Синая."
+        },
+        "pl": {
+          "title": "Parasailing",
+          "summary": "Lot spadochronem za motorówką nad wodami Szarm el-Szejk z widokiem na góry Synaj."
+        },
+        "fr": {
+          "title": "Parachute Ascensionnel (Parasailing)",
+          "summary": "Envolez-vous en parachute au-dessus de la mer Rouge avec vue imprenable sur la baie et les montagnes."
+        }
+      },
       "verified": false,
       "featured": true,
       "priority": 5,
       "status": "published",
       "createdAt": "2026-10-01T09:20:17.734Z",
-      "updatedAt": "2026-10-01T09:20:17.734Z"
+      "updatedAt": "2026-10-02T17:24:37.829Z",
+      "priceOverrides": {}
     },
     {
       "id": "seed-tour-speed-boat",
@@ -821,8 +1042,9 @@
       "type": "private",
       "summary": "A small, fast boat and an open stretch of the gulf — with a snorkelling stop somewhere quiet that the big cruise boats don't reach.",
       "description": [
-        "Large boats go where large boats can go. A speed boat gets you into the small bays along the coast, and gets you there quickly enough that you spend your time in the water rather than travelling to it.",
-        "Runs as a private charter, so the route flexes around what your group actually wants to do."
+        "Enjoy an exciting private speed boat trip in the crystal-clear waters of Sharm El Sheikh. This private experience is perfect for couples, families, and small groups looking to explore the beautiful Red Sea with comfort, privacy, and flexibili",
+        "Choose between a 1-hour, 2-hour, or 3-hour trip and discover stunning coastal views, turquoise water, colorful coral reefs, and amazing marine life. Your private speed boat allows you to enjoy the sea at your own pace while relaxing under the Egyptian sun.",
+        "During the trip, you can stop at beautiful snorkeling spots, swim in the clear Red Sea water, take unforgettable photos, and enjoy a unique private adventure away from crowded boats. Whether you want a short sea escape or a longer private experience, this speed boat trip is the perfect choice in Sharm El Sheikh."
       ],
       "images": [
         {
@@ -830,12 +1052,6 @@
           "alt": "Speed boat at speed off the Sharm El Sheikh coast",
           "width": 2400,
           "height": 1350
-        },
-        {
-          "src": "/media/speed-boat/gallery-01.jpg",
-          "alt": "Speed boat heading out from the marina",
-          "width": 1800,
-          "height": 1200
         },
         {
           "src": "/media/speed-boat/gallery-02.jpg",
@@ -851,34 +1067,34 @@
         }
       ],
       "duration": "Flexible",
-      "durationHours": 3,
-      "priceFrom": null,
+      "durationHours": 1,
+      "priceFrom": 80,
       "currency": "USD",
       "priceOriginal": null,
-      "childPrice": null,
+      "childPrice": 50,
       "availability": "open",
       "highlights": [
-        "Private boat for your group only",
-        "Reaches bays the larger boats skip",
-        "Flexible route and timing",
-        "Snorkelling stop included"
+        "Private speed boat experience for up to 6 people",
+        "Flexible trip options: 1, 2, or 3 hours",
+        "Amazing snorkeling and swimming spots",
+        "Beautiful Red Sea views and photo opportunities",
+        "Fast and comfortable private boat experience"
       ],
       "included": [
         "Hotel pickup and drop-off",
-        "Private boat and skipper",
-        "Snorkelling equipment"
+        "Snorkelling equipment",
+        "Private speed boat for up to 5 people",
+        "Professional boat captain",
+        "Snorkeling stops at beautiful coral reefs",
+        "Life jackets and safety equipment"
       ],
       "excluded": [
-        "Personal expenses and souvenirs",
-        "Gratuities (optional, always appreciated)",
-        "Travel insurance",
-        "Catering (available on request)"
+        "Personal expenses",
+        "🍽️ Food and drinks"
       ],
       "bring": [
-        "Scarves or a buff for the dust",
-        "Closed shoes",
-        "Sunscreen and sunglasses",
-        "A warm layer between November and March — the desert cools fast after sunset"
+        "towels",
+        " Swimwear"
       ],
       "restrictions": [
         "Some activities have minimum age or height rules set by the operator — confirm for young children."
@@ -889,12 +1105,12 @@
           "detail": "Transfer from your hotel to the marina."
         },
         {
-          "title": "Planning the run",
-          "detail": "Agree the route with the skipper based on conditions."
+          "title": "🌊 Boat Trip",
+          "detail": "Enjoy a fast and comfortable ride across the Red Sea with beautiful coastal views."
         },
         {
-          "title": "On the water",
-          "detail": "Coastal run with a stop to swim and snorkel."
+          "title": "🤿 Snorkeling",
+          "detail": "Stop at beautiful coral reefs near Tiran Island and enjoy snorkeling away from large tourist boats."
         },
         {
           "title": "Return",
@@ -935,13 +1151,44 @@
         "tiran-island",
         "white-island"
       ],
-      "translations": {},
+      "translations": {
+        "ar": {
+          "title": "قارب سريع خاص",
+          "summary": "تأجير قارب سريع خاص لجولات حصرية في مياه شرم الشيخ مع كابتن محترف."
+        },
+        "de": {
+          "title": "Privates Schnellboot",
+          "summary": "Exklusive private Schnellbootfahrt entlang der Küste von Sharm El Sheikh."
+        },
+        "it": {
+          "title": "Motoscafo Privato",
+          "summary": "Noleggio motoscafo privato con capitano esperto per tour esclusivi."
+        },
+        "ru": {
+          "title": "Индивидуальный скоростной катер",
+          "summary": "Аренда скоростного катера с капитаном для эксклюзивных прогулок по Красному морю."
+        },
+        "pl": {
+          "title": "Prywatna motorówka",
+          "summary": "Wynajem prywatnej motorówki ze sternikiem na ekskluzywne wycieczki w Szarm el-Szejk."
+        },
+        "fr": {
+          "title": "Bateau rapide privé",
+          "summary": "Location de bateau rapide privatisé avec skipper pour explorer les côtes de Charm el-Cheikh."
+        }
+      },
       "verified": false,
       "featured": false,
-      "priority": 12,
+      "priority": 6,
       "status": "published",
       "createdAt": "2026-10-01T09:20:17.734Z",
-      "updatedAt": "2026-10-01T09:20:17.734Z"
+      "updatedAt": "2026-10-02T17:39:07.283Z",
+      "addons": [
+        {
+          "label": "2 hours 140$",
+          "price": 23.3
+        }
+      ]
     },
     {
       "id": "seed-tour-horse-riding",
@@ -952,8 +1199,9 @@
       "type": "group",
       "summary": "Riding out along the shoreline and into the desert behind it, timed for the last hours of light.",
       "description": [
-        "A slower kind of adventure. Horses are matched to experience, so complete beginners ride at a walk with a handler alongside while confident riders can open up on the flat.",
-        "The late-afternoon slot is the one to take — the light on the water and the mountains behind is the whole point."
+        "Enjoy an unforgettable horse riding adventure in Sharm El Sheikh and explore the beautiful desert landscapes and coastal scenery on horseback. This experience is perfect for beginners, couples, families, and experienced riders looking for a relaxing and exciting outdoor activity.",
+        "After hotel pickup, head to the horse stable where professional trainers will help you prepare for the ride. Begin your journey through the stunning desert paths and enjoy breathtaking views of the mountains, open desert, and the Red Sea coastline.",
+        "Whether you choose a morning ride, sunset ride, or daytime adventure, horse riding in Sharm El Sheikh offers a peaceful and unique way to discover the natural beauty of Sinai. Enjoy unforgettable moments, amazing photo opportunities, and a memorable riding experience before returning to your hotel."
       ],
       "images": [
         {
@@ -961,6 +1209,36 @@
           "alt": "Horse and rider on the shoreline at sunset near Sharm El Sheikh",
           "width": 1800,
           "height": 1200
+        },
+        {
+          "src": "/uploads/media/269eee21-8c1b-409a-a8b5-fb35d8112dfd.jpg",
+          "alt": "Horse Riding on the Shore photo 2",
+          "width": 1600,
+          "height": 900
+        },
+        {
+          "src": "/uploads/media/a69b8279-3775-44df-b96d-9e0476b94d2d.png",
+          "alt": "Horse Riding on the Shore photo 3",
+          "width": 1600,
+          "height": 900
+        },
+        {
+          "src": "/uploads/media/769c9e73-14e7-4601-9aa3-f06a562be544.webp",
+          "alt": "Horse Riding on the Shore photo 4",
+          "width": 1600,
+          "height": 900
+        },
+        {
+          "src": "/uploads/media/7c1494d0-38c7-4015-9c60-e2d23455a6da.webp",
+          "alt": "Horse Riding on the Shore photo 5",
+          "width": 1600,
+          "height": 900
+        },
+        {
+          "src": "/uploads/media/f7d428cc-ba44-4dc4-a05f-f16def46b48f.webp",
+          "alt": "Horse Riding on the Shore photo 6",
+          "width": 1600,
+          "height": 900
         }
       ],
       "video": {
@@ -973,34 +1251,34 @@
         },
         "label": "Horse Riding — film from the trip"
       },
-      "duration": "1–2 hours",
-      "durationHours": 2,
-      "priceFrom": 30,
+      "duration": "1 hour",
+      "durationHours": 1,
+      "priceFrom": 35,
       "currency": "USD",
       "priceOriginal": null,
-      "childPrice": null,
+      "childPrice": 20,
       "availability": "open",
       "highlights": [
-        "Shoreline and desert riding",
-        "Horses matched to your riding experience",
-        "Beginners welcome, handlers on hand",
-        "Sunset slot available"
+        "50 to 60-minute horse riding experience",
+        "Beautiful desert and sea views",
+        "Suitable for beginners and experienced riders",
+        "Professional guides and trained horses",
+        "Amazing sunset and photo opportunities"
       ],
       "included": [
         "Hotel pickup and drop-off",
         "Horse, helmet and guide",
-        "Bottled water"
+        "Horse riding experience",
+        "Professional horse guide",
+        "Safety instructions before the ride"
       ],
       "excluded": [
-        "Personal expenses and souvenirs",
-        "Gratuities (optional, always appreciated)",
-        "Travel insurance"
+        " Photos or videos"
       ],
       "bring": [
         "Scarves or a buff for the dust",
         "Closed shoes",
-        "Sunscreen and sunglasses",
-        "A warm layer between November and March — the desert cools fast after sunset"
+        "Sunscreen and sunglasses"
       ],
       "restrictions": [
         "Some activities have minimum age or height rules set by the operator — confirm for young children."
@@ -1033,7 +1311,6 @@
       "minParticipants": null,
       "maxParticipants": null,
       "importantInfo": [
-        "Bring your passport or a photo of it — some checkpoints ask for ID.",
         "Sun protection, a hat and flat shoes make every trip more comfortable.",
         "Pickup times shift slightly by hotel zone; we confirm yours the evening before.",
         "Long trousers and closed shoes are essential.",
@@ -1058,25 +1335,51 @@
         "color-canyon",
         "super-safari"
       ],
-      "translations": {},
+      "translations": {
+        "ar": {
+          "title": "ركوب الخيل على شاطئ البحر والصحراء",
+          "summary": "جولة ركوب خيل أصيل على طول الشاطئ أو في دروب صحراء سيناء برفقة مدربين محترفين."
+        },
+        "de": {
+          "title": "Reitausflug am Strand & in der Wüste",
+          "summary": "Geführter Ausritt auf edlen Pferden entlang des Meeres oder durch die ruhigen Wüstentäler."
+        },
+        "it": {
+          "title": "Passeggiata a Cavallo",
+          "summary": "Cavalca lungo la spiaggia o tra i sentieri del deserto con istruttori esperti."
+        },
+        "ru": {
+          "title": "Прогулка на лошадях по пляжу и пустыне",
+          "summary": "Верховая езда на арабских скакунах вдоль морского побережья или по ущельям пустыни."
+        },
+        "pl": {
+          "title": "Jazda Konna na Plaży i Pustyni",
+          "summary": "Przejażdżka konna wzdłuż wybrzeża lub przez malownicze pustynne kaniony z instruktorem."
+        },
+        "fr": {
+          "title": "Balade à Cheval Plage & Désert",
+          "summary": "Équitation le long du littoral ou dans les vallées désertiques avec guides expérimentés."
+        }
+      },
       "verified": false,
       "featured": false,
       "priority": 13,
       "status": "published",
       "createdAt": "2026-10-01T09:20:17.734Z",
-      "updatedAt": "2026-10-01T09:20:17.734Z"
+      "updatedAt": "2026-10-02T17:48:14.137Z"
     },
     {
       "id": "seed-tour-super-safari",
       "slug": "super-safari",
-      "title": "Super Safari & Bedouin Night",
+      "title": "Desert  Super Safari & Bedouin Night",
       "destination": "sharm-el-sheikh",
       "category": "desert",
       "type": "group",
       "summary": "The long version of the desert trip — quad biking, a camel ride, dinner at a Bedouin camp and a sky with no light pollution in it.",
       "description": [
-        "Super Safari is the full evening. It combines the activities people usually book separately — the quad ride out, the camel leg, the camp — into one run that finishes after dark.",
-        "The camp is the part that stays with people. Bread baked on the fire, tea poured from height, and once the generators go quiet, more stars than most visitors have ever seen at once."
+        "Begin your desert adventure in Sharm El Sheikh with an exciting quad bike ride across golden sand dunes and scenic desert trails. Feel the thrill of riding through the Sinai Desert before slowing down with a peaceful camel ride and enjoying authentic desert views.",
+        "Arrive at a traditional Bedouin camp and enjoy warm hospitality with aromatic Bedouin tea. Learn about Bedouin traditions as the sun sets over the desert, then enjoy a delicious Bedouin-style dinner featuring traditional Middle Eastern dishes.",
+        "End your evening with an entertaining folklore show under the stars, including belly dancing, Tanoura spinning, and fire performances. After a night full of adventure and culture, relax on your comfortable transfer back to your hotel."
       ],
       "images": [
         {
@@ -1122,37 +1425,34 @@
       },
       "duration": "Half day into evening",
       "durationHours": 6,
-      "priceFrom": 45,
+      "priceFrom": 35,
       "currency": "USD",
       "priceOriginal": null,
       "childPrice": 18,
       "availability": "open",
       "highlights": [
-        "Quad bike run into the open desert",
-        "Short camel ride",
-        "Dinner at a Bedouin camp",
-        "Stargazing away from the resort lights"
+        "Thrilling 60-Minute Quad Bike Ride Across the Sinai Desert",
+        "Camel Ride Experience & Authentic Bedouin Camp Visit",
+        "Delicious Bedouin Dinner with Traditional Middle Eastern Dishes",
+        "Live Evening Show with Belly Dance, Tanoura & Fire Performance"
       ],
       "included": [
         "Hotel pickup and drop-off in an air-conditioned vehicle",
-        "English-speaking Brother Sharm Tour guide",
-        "All entrance fees and permits listed in the itinerary",
-        "Bottled water",
-        "Quad bike and safety equipment",
-        "Camel ride",
-        "Bedouin dinner and tea"
+        "Enjoy traditional Bedouin tea at the camp",
+        "45 to 60-minute ATV Quad bike tour in the desert.",
+        "Stop at the Echo Temple for exploration.",
+        "Visit an authentic Bedouin tent.",
+        "Oriental Show, Camel Ride, and Bedouin Dinner experience."
       ],
       "excluded": [
         "Personal expenses and souvenirs",
-        "Gratuities (optional, always appreciated)",
-        "Travel insurance",
-        "Alcoholic drinks (not served at the camp)"
+        "Optional photos available for purchase on-site.",
+        "Optional scarf available for purchase on-site."
       ],
       "bring": [
         "Scarves or a buff for the dust",
         "Closed shoes",
-        "Sunscreen and sunglasses",
-        "A warm layer between November and March — the desert cools fast after sunset"
+        "Sunscreen and sunglasses"
       ],
       "restrictions": [],
       "itinerary": [
@@ -1162,24 +1462,36 @@
           "detail": "Driven out of town towards the Sinai interior."
         },
         {
-          "title": "Quad briefing and ride",
-          "detail": "Controls and safety, then the ride out across open desert."
+          "title": "🚐 Hotel Pickup",
+          "detail": "Your adventure begins with pickup from your hotel in Sharm El Sheikh and transfer to the"
         },
         {
-          "title": "Camel ride",
-          "detail": "A short leg on camelback near the camp."
+          "title": "🏍️ Quad Bike Safar",
+          "detail": "Upon arrival, receive a safety briefing and learn about the itinerary from a professional multilingual guide. Then hop on your quad bike and enjoy an exciting ride for approximately 1 hour in tow ways through the spectacular Sinai desert"
         },
         {
-          "title": "Bedouin camp",
-          "detail": "Dinner, tea and time by the fire as the light goes."
+          "title": "🔊 Echo Sound Area",
+          "detail": "Ride to the famous Echo Sound area, where you can experience the unique natural sound effects of the deser"
         },
         {
-          "title": "Stargazing",
-          "detail": "Camp lights down for the sky."
+          "title": "🐪 Camel Ride & Sunse",
+          "detail": "Enjoy a traditional camel ride through the desert while admiring the beautiful sunset views over the vast Sinai landscap"
         },
         {
-          "title": "Return",
-          "detail": "Drive back into Sharm and on to your hotel."
+          "title": "🏕️ Bedouin Tent",
+          "detail": "Continue to a traditional Bedouin tent, where you can discover the local Bedouin lifestyle and enjoy the authentic desert atmosphere"
+        },
+        {
+          "title": "🍽️ Bedouin Dinner",
+          "detail": "Enjoy a delicious Bedouin-style dinner including rice, salads, vegetables, fried chicken, tahini, shish kebab, local bread, soft drinks, and mineral water."
+        },
+        {
+          "title": "🎭 Traditional Entertainment",
+          "detail": "After dinner, enjoy a spectacular evening show featuring Tanoura dancing, belly dancing, and an exciting fire show."
+        },
+        {
+          "title": "🚐 Hotel Drop-off",
+          "detail": "At the end of the experience, you will be transferred back to your hotel or preferred location in Sharm El Sheikh."
         }
       ],
       "meetingPoint": "Hotel pickup across Sharm El Sheikh.",
@@ -1204,7 +1516,6 @@
         }
       ],
       "importantInfo": [
-        "Bring your passport or a photo of it — some checkpoints ask for ID.",
         "Sun protection, a hat and flat shoes make every trip more comfortable.",
         "Pickup times shift slightly by hotel zone; we confirm yours the evening before.",
         "Desert evenings get genuinely cold. Bring a jacket even in summer.",
@@ -1229,13 +1540,38 @@
         "color-canyon",
         "horse-riding"
       ],
-      "translations": {},
+      "translations": {
+        "ar": {
+          "title": "سوبر سفاري وصحراء سيناء",
+          "summary": "مغامرة بيتش باجي وخيل وجمال وعشاء بدوي تقليدي تحت النجوم مع عروض شرقية."
+        },
+        "de": {
+          "title": "Sinai Super-Safari",
+          "summary": "Quad-Fahrt, Kamelreiten, Beduinen-Abendessen unter dem Sternenhimmel und orientalische Show."
+        },
+        "it": {
+          "title": "Super Safari nel Deserto del Sinai",
+          "summary": "Quad, passeggiata a dorso di cammello, cena tradizionale beduina sotto le stelle e spettacolo orientale."
+        },
+        "ru": {
+          "title": "Супер Сафари в пустыне Синая",
+          "summary": "Поездка на квадроциклах, катание на верблюдах, ужин в бедуинском шатре и восточное шоу."
+        },
+        "pl": {
+          "title": "Super Safari na Pustyni Synaj",
+          "summary": "Quady, przejażdżka na wielbłądach, tradycyjna kolacja u Beduinów pod gwiazdami i pokaz orientalny."
+        },
+        "fr": {
+          "title": "Super Safari dans le Désert du Sinaï",
+          "summary": "Quad, balade à dos de chameau, dîner bédouin sous les étoiles et spectacle oriental."
+        }
+      },
       "verified": false,
       "featured": true,
       "priority": 4,
       "status": "published",
       "createdAt": "2026-10-01T09:20:17.734Z",
-      "updatedAt": "2026-10-01T09:20:17.734Z"
+      "updatedAt": "2026-10-02T20:33:19.471Z"
     },
     {
       "id": "seed-tour-desert-safari",
@@ -1246,8 +1582,9 @@
       "type": "group",
       "summary": "The shorter desert run — quad bikes out into the Sinai, a stop for tea, and back before dinner.",
       "description": [
-        "The stripped-back version of the desert trip for people who want the ride itself rather than a whole evening. Out into the open, a stop at a Bedouin tent for tea, and back.",
-        "Morning and late-afternoon departures. The afternoon one gives you the better light."
+        "Embark on a Desert Quad Bike Sunrise Tour in Sharm El Sheikh and enjoy an early morning ride through the Sinai desert. This tour is perfect for guests who prefer cooler temperatures, peaceful desert views, and soft sunrise light.",
+        "Your experience begins with early hotel pickup and transfer to the quad bike station. After a safety briefing and basic driving instructions, you will start your quad bike ride across open desert trails and sandy landscapes as the sun rises over the mountains.",
+        "Stop along the way to enjoy sunrise views and take photos before continuing the ride back to the base. After finishing the tour, relax with a short rest before returning to your hotel."
       ],
       "images": [
         {
@@ -1293,53 +1630,52 @@
       },
       "duration": "Half day",
       "durationHours": 4,
-      "priceFrom": 25,
+      "priceFrom": 15,
       "currency": "USD",
       "priceOriginal": null,
-      "childPrice": null,
+      "childPrice": 15,
       "availability": "open",
       "highlights": [
-        "Quad bike ride across open desert",
-        "Tea stop at a Bedouin tent",
-        "Morning or sunset departures",
-        "No licence or experience needed"
+        "Early morning quad bike ride in the Sinai desert",
+        "Beautiful sunrise views with photo stops",
+        "Cooler temperatures and quieter desert routes",
+        "Hotel pickup and drop-off included"
       ],
       "included": [
         "Hotel pickup and drop-off in an air-conditioned vehicle",
-        "English-speaking Brother Sharm Tour guide",
-        "All entrance fees and permits listed in the itinerary",
-        "Bottled water",
-        "Quad bike and safety equipment",
-        "Bedouin tea"
+        "Sunrise quad bike ride in the desert",
+        "Stop at the Echo Temple for exploration",
+        "Visit an authentic Bedouin tent",
+        "Traditional Bedouin tea at the camp",
+        ""
       ],
       "excluded": [
-        "Personal expenses and souvenirs",
-        "Gratuities (optional, always appreciated)",
-        "Travel insurance"
+        " Optional photos available for purchase on-site. ",
+        "Optional scarf available for purchase on-site."
       ],
       "bring": [
         "Scarves or a buff for the dust",
         "Closed shoes",
         "Sunscreen and sunglasses",
-        "A warm layer between November and March — the desert cools fast after sunset"
+        "Bottel water"
       ],
       "restrictions": [],
       "itinerary": [
         {
           "title": "Pickup",
-          "detail": "Collected from your hotel and driven to the desert base."
+          "detail": "You will be picked up from your hotel in Sharm El Sheikh and transferred by air-conditioned vehicle to the quad bike station."
         },
         {
-          "title": "Briefing",
-          "detail": "Controls, safety and a short practice loop."
+          "title": "🏍️ Quad Bike Desert Safar",
+          "detail": "After putting on your helmet and receiving a safety briefing, begin your exciting 3-hour quad bike adventure through the multi-colored sands of the Sinai desert. Explore the spectacular desert landscape and make scenic stops along the way to take memorable photos."
         },
         {
-          "title": "The ride",
-          "detail": "Out into the open desert in convoy with a guide."
+          "title": "🏕️ Bedouin Tent & Arabic Tea",
+          "detail": "After approximately one hour of quad biking, arrive at a traditional Bedouin tent. Relax, enjoy traditional Arabic tea, and learn about the traditional lifestyle and culture of the Bedouin peop"
         },
         {
-          "title": "Tea stop",
-          "detail": "Break at a Bedouin tent."
+          "title": "🏍️ Ride Back",
+          "detail": "After your visit to the Bedouin tent, get back on your quad bike and continue your desert adventure through the sand dunes back to the quad bike center"
         },
         {
           "title": "Return",
@@ -1356,7 +1692,6 @@
       "minParticipants": null,
       "maxParticipants": null,
       "importantInfo": [
-        "Bring your passport or a photo of it — some checkpoints ask for ID.",
         "Sun protection, a hat and flat shoes make every trip more comfortable.",
         "Pickup times shift slightly by hotel zone; we confirm yours the evening before.",
         "Closed shoes are required to ride. Bring a scarf for the dust and sunglasses.",
@@ -1381,27 +1716,59 @@
         "color-canyon",
         "horse-riding"
       ],
-      "translations": {},
+      "translations": {
+        "ar": {
+          "title": "سفاري بيتش باجي في الصحراء",
+          "summary": "جولة دبابات ورباعيات الدفع عبر وديان صحراء سيناء مع شاي بدوي وقت الغروب."
+        },
+        "de": {
+          "title": "Wüstensafari mit dem Quad",
+          "summary": "Aufregende Quad-Tour durch die Wüstentäler des Sinai mit traditionellem Beduinentee zum Sonnenuntergang."
+        },
+        "it": {
+          "title": "Safari in Quad nel Deserto",
+          "summary": "Avventura in quad tra le valli del Sinai con sosta tè beduino al tramonto."
+        },
+        "ru": {
+          "title": "Мотосафари на квадроциклах",
+          "summary": "Захватывающая поездка на квадроциклах по песчаным долинам Синая с чаем у бедуинов на закате."
+        },
+        "pl": {
+          "title": "Safari na Quadach",
+          "summary": "Przejazd quadami przez malownicze doliny pustyni Synaj z herbatą beduińską o zachodzie słońca."
+        },
+        "fr": {
+          "title": "Safari Quad dans le Désert",
+          "summary": "Randonnée en quad à travers les vallées désertiques du Sinaï avec thé bédouin au coucher du soleil."
+        }
+      },
       "verified": false,
       "featured": false,
       "priority": 14,
       "status": "published",
       "createdAt": "2026-10-01T09:20:17.734Z",
-      "updatedAt": "2026-10-01T09:20:17.734Z"
+      "updatedAt": "2026-10-02T20:32:21.573Z"
     },
     {
       "id": "seed-tour-color-canyon",
       "slug": "color-canyon",
-      "title": "Coloured Canyon & Dahab",
+      "title": "Salama Red Canyons , Snorkeling ,Quad Biking, Camels, ,Jeep at Dahab 5*1",
       "destination": "sharm-el-sheikh",
       "category": "desert",
       "type": "group",
       "summary": "A day trip north into the Sinai interior to walk the Coloured Canyon, with time in Dahab on the way back.",
       "description": [
-        "The Coloured Canyon is a narrow sandstone corridor where the rock is banded in rust, ochre and violet — the result of mineral deposits laid down over a very long time. You walk through it rather than look at it from above.",
-        "The canyon sits in the Sinai interior near Nuweiba on the Gulf of Aqaba, reached by a long drive north from Sharm. On the way back we stop in Dahab: a slower, low-rise town on the coast where the afternoon is spent at a table by the water."
+        "Embark on an unforgettable Dahab excursion from Sharm El Sheikh, where adventure, culture, and relaxation blend into one memorable day. Enjoy comfortable hotel pickup and drop-off in an air-conditioned vehicle for a hassle-free journey.",
+        "Experience a camel ride along Dahab’s beautiful coastline, taking in panoramic views of the Red Sea and Sinai Mountains. Discover the vibrant underwater world at the famous , home to colorful coral reefs and exotic marine life.",
+        "Savor a traditional Bedouin-style lunch served in a beachside tent and enjoy free time to explore Dahab City, shopping for handmade crafts and souvenirs. Continue to the stunning Salama Canyon, known for its unique rock formations shaped over millions of years."
       ],
       "images": [
+        {
+          "src": "/media/color-canyon/gallery-03.jpg",
+          "alt": "Camel ride on the coast near Dahab",
+          "width": 1800,
+          "height": 1200
+        },
         {
           "src": "/media/color-canyon/hero.jpg",
           "alt": "Banded sandstone walls inside the Coloured Canyon in Sinai",
@@ -1427,12 +1794,6 @@
           "height": 1200
         },
         {
-          "src": "/media/color-canyon/gallery-03.jpg",
-          "alt": "Camel ride on the coast near Dahab",
-          "width": 1800,
-          "height": 1200
-        },
-        {
           "src": "/media/color-canyon/gallery-04.jpg",
           "alt": "The canyon walls narrowing overhead",
           "width": 1800,
@@ -1443,67 +1804,102 @@
           "alt": "Open desert on the drive north",
           "width": 1800,
           "height": 1200
+        },
+        {
+          "src": "/uploads/media/6f250b66-3323-446d-a877-d4a888bad4a6.webp",
+          "alt": "Salama Red Canyons , Snorkeling ,Quad Biking, Camels, ,Jeep at Dahab 5*1 photo 8",
+          "width": 1600,
+          "height": 900
+        },
+        {
+          "src": "/uploads/media/6cc0dd9a-3aa2-41c5-866a-135ca4291244.webp",
+          "alt": "Salama Red Canyons , Snorkeling ,Quad Biking, Camels, ,Jeep at Dahab 5*1 photo 9",
+          "width": 1600,
+          "height": 900
+        },
+        {
+          "src": "/uploads/media/ea1da672-2639-4bde-baa3-facbd5ea789e.webp",
+          "alt": "Salama Red Canyons , Snorkeling ,Quad Biking, Camels, ,Jeep at Dahab 5*1 photo 10",
+          "width": 1600,
+          "height": 900
         }
       ],
       "duration": "Full day",
       "durationHours": 10,
-      "priceFrom": 55,
+      "priceFrom": 25,
       "currency": "USD",
       "priceOriginal": null,
-      "childPrice": null,
+      "childPrice": 15,
       "availability": "open",
       "highlights": [
-        "Walk the length of the Coloured Canyon",
-        "Banded sandstone walls in rust, ochre and violet",
-        "Free time on the waterfront in Dahab",
-        "Jeep transfer on the final desert section"
+        "🤿 Snorkeling among beautiful coral reefs",
+        " 🐠 Discover colorful fish and vibrant marine life",
+        "🏍️ Exciting quad biking through the Sinai desert",
+        "🚙 4×4 Jeep adventure through the mountains and Wadi",
+        "🐪 Traditional camel ride in the Dahab desert",
+        "🍽️ Delicious Bedouin lunch by the shore",
+        "🏜️ Explore the spectacular Salama Canyon",
+        "🪨 See unique rock formations and natural colors",
+        "🛍️ Free time for shopping at Dahab Bazaar",
+        "🚐 Hotel pickup and drop-off from Sharm El Sheikh"
       ],
       "included": [
         "Hotel pickup and drop-off in an air-conditioned vehicle",
-        "English-speaking Brother Sharm Tour guide",
         "All entrance fees and permits listed in the itinerary",
-        "Bottled water",
         "Jeep transfer to the canyon",
-        "Guide through the canyon",
-        "Lunch"
+        " Professional guide / tour assistance",
+        "Lunch in a Bedouin Tent on the beach in Dahab",
+        "Visit to Salama Canyon and canyon history description",
+        " Camel ride"
       ],
       "excluded": [
-        "Personal expenses and souvenirs",
-        "Gratuities (optional, always appreciated)",
-        "Travel insurance"
+        " DVD / video recording of the trip",
+        "Snorkeling equipment rental, if you do not have your own equipment"
       ],
       "bring": [
         "Scarves or a buff for the dust",
         "Closed shoes",
         "Sunscreen and sunglasses",
-        "A warm layer between November and March — the desert cools fast after sunset"
+        "Swimsuit",
+        "Beach sandals or water shoe",
+        "Drinking water",
+        "Your own snorkeling equipment, if available",
+        " Towel"
       ],
       "restrictions": [],
       "itinerary": [
         {
           "time": "Early morning",
           "title": "Hotel pickup",
-          "detail": "Long drive north along the Gulf of Aqaba."
+          "detail": " Around 8:00 AM, depending on your hotel location in Sharm El Sheikh."
         },
         {
-          "title": "Jeep transfer",
-          "detail": "Swap to 4x4s for the desert track to the canyon entrance."
+          "title": " Coral Reef Snorkeling",
+          "detail": "Upon arrival in Dahab, enjoy a snorkeling experience in the beautiful coral reef area. Swim in the clear waters and discover colorful fish and vibrant coral reefs up close. You can also relax by the sea and enjoy the beautiful surroundings"
         },
         {
-          "title": "Canyon walk",
-          "detail": "Guided walk through the canyon at a relaxed pace."
+          "title": "🏍️ Quad Bike Adventure",
+          "detail": "After snorkeling, experience the thrill of riding a quad bike through the desert trails. Enjoy an exciting ride through the spectacular Sinai Wadi and mountains."
         },
         {
-          "title": "Lunch",
-          "detail": "Lunch stop before continuing to the coast."
+          "title": "🚙 Jeep Desert Adventure",
+          "detail": "Continue the adventure by 4×4 Jeep, traveling through the desert and enjoying the breathtaking views of the Sinai landscape."
         },
         {
-          "title": "Dahab",
-          "detail": "Free time on the waterfront."
+          "title": "🐪 Camel Ride",
+          "detail": "Enjoy a traditional camel ride through the Dahab desert and experience the beauty of the desert in a unique way"
         },
         {
-          "title": "Return",
-          "detail": "Drive back to Sharm, arriving in the evening."
+          "title": "🍽️ Bedouin Lunch:",
+          "detail": "After the desert activities, relax at a traditional Bedouin tent by the shore and enjoy a delicious lunch"
+        },
+        {
+          "title": "🏜️ Salama Canyon",
+          "detail": "Explore Salama Canyon, a spectacular natural area featuring unique rock formations, narrow passages, and beautiful natural colors and shapes."
+        },
+        {
+          "title": "🏨 Hotel Drop-off",
+          "detail": "After your shopping time in Dahab, return to your hotel in Sharm El Sheikh"
         }
       ],
       "meetingPoint": "Hotel pickup across Sharm El Sheikh.",
@@ -1541,13 +1937,38 @@
         "desert-safari",
         "horse-riding"
       ],
-      "translations": {},
+      "translations": {
+        "ar": {
+          "title": "الوادي الملون ودهب",
+          "summary": "مغامرة مشي واستكشاف لتكوينات الصخور الرملية الملونة وزيارة مدينة دهب الساحلية."
+        },
+        "de": {
+          "title": "Colored Canyon & Dahab",
+          "summary": "Wanderung durch die farbenfrohen Felsschluchten des Sinai und Besuch der charmanten Küstenstadt Dahab."
+        },
+        "it": {
+          "title": "Canyon Colorato e Dahab",
+          "summary": "Trekking tra le spettacolari formazioni rocciose colorate e visita alla cittadina costiera di Dahab."
+        },
+        "ru": {
+          "title": "Цветной Каньон и Дахаб",
+          "summary": "Пеший маршрут по живописным разноцветным скалам каньона и посещение колоритного города Дахаб."
+        },
+        "pl": {
+          "title": "Kolorowy Kanion i Dahab",
+          "summary": "Wyprawa piesza przez wielobarwne formacje skalne kanionu oraz wizyta w klimatycznym Dahab."
+        },
+        "fr": {
+          "title": "Canyon Coloré et Dahab",
+          "summary": "Randonnée dans les gorges multicolores du Sinaï et découverte de la ville balnéaire de Dahab."
+        }
+      },
       "verified": false,
       "featured": true,
       "priority": 6,
       "status": "published",
       "createdAt": "2026-10-01T09:20:17.734Z",
-      "updatedAt": "2026-10-01T09:20:17.734Z"
+      "updatedAt": "2026-10-02T18:16:50.272Z"
     },
     {
       "id": "seed-tour-swim-with-dolphins",
@@ -1558,8 +1979,9 @@
       "type": "group",
       "summary": "Time in the water with dolphins, run in small groups with handlers in the water alongside you throughout.",
       "description": [
-        "A structured, supervised swim session in small groups. Handlers stay in the water with you, and the session is paced around the animals rather than a fixed timetable.",
-        "Booked as a set session with a fixed start time — we'll confirm the slot when you enquire."
+        "Enjoy an unforgettable Swimming with Dolphins experience in Sharm El Sheikh and interact closely with these intelligent and friendly animals. This unique activity takes place in a safe and controlled environment under professional supervision, making it suitable for all ages.",
+        "Your tour starts with hotel pickup in Sharm El Sheikh, followed by a transfer to the dolphin center. Professional trainers provide a short briefing before guiding you through the swimming session. Learn about dolphin behavior, enjoy close interaction, and swim alongside dolphins in clear water.",
+        "This Sharm El Sheikh dolphin tour offers a once-in-a-lifetime experience and creates unforgettable memories before returning to your hotel."
       ],
       "images": [
         {
@@ -1598,34 +2020,30 @@
       "priceFrom": 80,
       "currency": "USD",
       "priceOriginal": null,
-      "childPrice": null,
+      "childPrice": 50,
       "availability": "open",
       "highlights": [
-        "Small-group swim session",
-        "Handlers in the water throughout",
-        "Suitable for confident swimmers of most ages",
-        "Photography available on site"
+        "Swim and interact closely with dolphins in Sharm El Sheikh",
+        "Safe and supervised experience with professional trainers",
+        "Suitable for families, beginners, and all ages",
+        "Unique and unforgettable Red Sea experience"
       ],
       "included": [
         "Hotel pickup and drop-off",
-        "Entry and session fee",
-        "Use of a life vest"
+        "Entry ticket to the dolphin park",
+        "Swimming session with dolphins",
+        "Professional trainers and safety briefing",
+        "Life jackets and safety equipment",
+        "Assistance from tour staff"
       ],
       "excluded": [
-        "Personal expenses and souvenirs",
-        "Gratuities (optional, always appreciated)",
-        "Travel insurance",
         "Photo and video package"
       ],
       "bring": [
         "Swimwear worn under your clothes",
-        "Towel",
-        "Reef-safe sunscreen",
-        "Dry bag or plastic pouch for phones"
+        "Towel"
       ],
-      "restrictions": [
-        "Basic swimming confidence is needed for in-water stops; vests are available."
-      ],
+      "restrictions": [],
       "itinerary": [
         {
           "title": "Pickup",
@@ -1654,7 +2072,6 @@
       "minParticipants": null,
       "maxParticipants": null,
       "importantInfo": [
-        "Bring your passport or a photo of it — some checkpoints ask for ID.",
         "Sun protection, a hat and flat shoes make every trip more comfortable.",
         "Pickup times shift slightly by hotel zone; we confirm yours the evening before.",
         "Sessions are fixed-time and capacity-limited, so book as far ahead as you can.",
@@ -1679,13 +2096,38 @@
         "glass-boat",
         "white-island"
       ],
-      "translations": {},
+      "translations": {
+        "ar": {
+          "title": "السباحة مع الدلافين",
+          "summary": "تجربة تفاعلية مميزة للسباحة واللعب مع الدلافين المدربة في شرم الشيخ."
+        },
+        "de": {
+          "title": "Schwimmen mit Delfinen",
+          "summary": "Ein unvergessliches Erlebnis: Schwimmen und Interaktion mit zahmen Delfinen im Delphinarium."
+        },
+        "it": {
+          "title": "Nuoto con i Delfini",
+          "summary": "Un'esperienza magica a contatto diretto con i delfini in piscina con istruttori qualificati."
+        },
+        "ru": {
+          "title": "Плавание с дельфинами",
+          "summary": "Незабываемый сеанс купания и общения с дружелюбными дельфинами в дельфинарии."
+        },
+        "pl": {
+          "title": "Pływanie z Delfinami",
+          "summary": "Niezapomniane spotkanie i pływanie w basenie z przyjaznymi delfinami pod okiem trenerów."
+        },
+        "fr": {
+          "title": "Nager avec les Dauphins",
+          "summary": "Vivez un moment magique en nageant au plus près des dauphins dans un bassin sécurisé."
+        }
+      },
       "verified": false,
       "featured": true,
       "priority": 7,
       "status": "published",
       "createdAt": "2026-10-01T09:20:17.734Z",
-      "updatedAt": "2026-10-01T09:20:17.734Z"
+      "updatedAt": "2026-10-02T18:36:15.507Z"
     },
     {
       "id": "seed-tour-dolphin-show",
@@ -1696,8 +2138,9 @@
       "type": "group",
       "summary": "An indoor show with seated viewing and air conditioning — the reliable evening option when you have children and a long hot day behind you.",
       "description": [
-        "A scheduled performance in a covered arena with tiered seating. It's short, it's cool inside, and it works when the rest of the day has been spent in the sun.",
-        "Transfers are timed to the performance you book."
+        "Discover the magic of Dolphin Park in Sharm El Sheikh with our exclusive Dolphin Show Tour. Perfect for families, couples, and animal lovers, enjoy convenient hotel pickup and drop-off for a fun and stress-free experience.",
+        "Enjoy an amazing one-hour dolphin show where these intelligent creatures jump, dance, and perform synchronized tricks with their trainers. Their energy and grace create an unforgettable experience filled with joy for all ages.",
+        "Take stunning photos and videos and learn more about dolphin care and training at the park. After the show, relax on your comfortable transfer back to the hotel, taking home beautiful memories of Dolphin Park Sharm El Sheikh."
       ],
       "images": [
         {
@@ -1711,6 +2154,30 @@
           "alt": "A leap during the dolphin show",
           "width": 1800,
           "height": 1200
+        },
+        {
+          "src": "/uploads/media/1466f0f3-3350-45be-83b0-864b8bdd4685.webp",
+          "alt": "Dolphin Show photo 3",
+          "width": 1600,
+          "height": 900
+        },
+        {
+          "src": "/uploads/media/c471455c-b450-419b-8f30-53eccacfa4cf.jpg",
+          "alt": "Dolphin Show photo 4",
+          "width": 1600,
+          "height": 900
+        },
+        {
+          "src": "/uploads/media/7987f856-7655-412b-9212-0e64936e6b72.webp",
+          "alt": "Dolphin Show photo 5",
+          "width": 1600,
+          "height": 900
+        },
+        {
+          "src": "/uploads/media/92761d95-3a17-48e0-a0ef-345fde53cf9e.webp",
+          "alt": "Dolphin Show photo 6",
+          "width": 1600,
+          "height": 900
         }
       ],
       "duration": "Evening",
@@ -1718,46 +2185,46 @@
       "priceFrom": 25,
       "currency": "USD",
       "priceOriginal": null,
-      "childPrice": null,
+      "childPrice": 15,
       "availability": "open",
       "highlights": [
-        "Covered, air-conditioned arena",
-        "Tiered seating with clear sightlines",
-        "Family-friendly running time",
-        "Transfers timed to the performance"
+        "Experience mesmerizing dolphin shows.",
+        "Learn from expert trainers.",
+        "Discover dolphin behavior insights.",
+        "Capture unforgettable memories",
+        "Perfect for families of all ages."
       ],
       "included": [
         "Hotel pickup and drop-off",
-        "Show ticket"
+        "Show ticket",
+        "One-hour live dolphin show featuring amazing acrobatics and tricks.",
+        "Professional trainers guiding the performance.",
+        "Time for photos and videos during the show"
       ],
       "excluded": [
         "Personal expenses and souvenirs",
-        "Gratuities (optional, always appreciated)",
-        "Travel insurance",
-        "Front-row seating upgrade",
         "Photos with the animals"
       ],
       "bring": [
-        "Swimwear worn under your clothes",
-        "Towel",
-        "Reef-safe sunscreen",
-        "Dry bag or plastic pouch for phones"
+        "Bottel water"
       ],
-      "restrictions": [
-        "Basic swimming confidence is needed for in-water stops; vests are available."
-      ],
+      "restrictions": [],
       "itinerary": [
         {
           "title": "Pickup",
-          "detail": "Collected from your hotel ahead of the performance."
+          "detail": "You will be picked up from your hotel in Sharm El Sheikh and transferred to Dolphina Park. Pickup time depends on your hotel location"
         },
         {
           "title": "Show",
-          "detail": "The performance in the covered arena."
+          "detail": "Enjoy an exciting 60-minute dolphin show featuring three smart, playful, and highly trained dolphins. Watch them perform amazing tricks, jumps, and poses alongside their professional trainers, all perfectly synchronized with music."
         },
         {
-          "title": "Return",
-          "detail": "Transfer back to your hotel."
+          "title": "Photo Opportunity:",
+          "detail": "During the show, you will have the opportunity to take photos and capture memorable moments of the dolphins in action"
+        },
+        {
+          "title": "Hotel Drop-off",
+          "detail": "At the end of the experience, you will be transferred back to your hotel in Sharm El Sheikh"
         }
       ],
       "meetingPoint": "Hotel pickup across Sharm El Sheikh.",
@@ -1770,7 +2237,6 @@
       "minParticipants": null,
       "maxParticipants": null,
       "importantInfo": [
-        "Bring your passport or a photo of it — some checkpoints ask for ID.",
         "Sun protection, a hat and flat shoes make every trip more comfortable.",
         "Pickup times shift slightly by hotel zone; we confirm yours the evening before.",
         "Performance times vary by day — we confirm yours at booking."
@@ -1794,13 +2260,38 @@
         "glass-boat",
         "soho-square"
       ],
-      "translations": {},
+      "translations": {
+        "ar": {
+          "title": "عرض الدلافين الممتع",
+          "summary": "عرض بهلواني ترفيهي رائع مع الدلافين وكلاب البحر مناسب للأطفال والعائلات."
+        },
+        "de": {
+          "title": "Delfinshow",
+          "summary": "Unterhaltsame Show mit akrobatischen Kunststücken von Delfinen und Seelöwen für die ganze Familie."
+        },
+        "it": {
+          "title": "Spettacolo dei Delfini",
+          "summary": "Divertente spettacolo acrobatico con delfini e leoni marini, ideale per famiglie e bambini."
+        },
+        "ru": {
+          "title": "Шоу дельфинов",
+          "summary": "Красочное акробатическое представление с участием дельфинов и морских котиков для всей семьи."
+        },
+        "pl": {
+          "title": "Pokaz Delfinów",
+          "summary": "Wspaniałe rodzinne widowisko z akrobacjami delfinów i fok w delfinarium."
+        },
+        "fr": {
+          "title": "Spectacle de Dauphins",
+          "summary": "Spectacle acrobatique captivant mettant en scène dauphins et otaries, parfait pour les familles."
+        }
+      },
       "verified": false,
       "featured": false,
       "priority": 15,
       "status": "published",
       "createdAt": "2026-10-01T09:20:17.734Z",
-      "updatedAt": "2026-10-01T09:20:17.734Z"
+      "updatedAt": "2026-10-02T18:29:22.539Z"
     },
     {
       "id": "seed-tour-soho-square",
@@ -1816,10 +2307,10 @@
       ],
       "images": [
         {
-          "src": "/media/soho-square/card.jpg",
-          "alt": "Illuminated fountains and promenade at Soho Square in the evening",
-          "width": 1800,
-          "height": 1200
+          "src": "/uploads/media/c9dd8e06-cdea-41a7-a1aa-ff87695c6b88.jpeg",
+          "alt": "Soho Square Evening photo 2",
+          "width": 1600,
+          "height": 900
         }
       ],
       "duration": "Evening",
@@ -1842,7 +2333,6 @@
       "excluded": [
         "Personal expenses and souvenirs",
         "Gratuities (optional, always appreciated)",
-        "Travel insurance",
         "Food, drinks and any venue entry fees"
       ],
       "bring": [
@@ -1898,13 +2388,38 @@
         "old-market",
         "farsha-cafe"
       ],
-      "translations": {},
+      "translations": {
+        "ar": {
+          "title": "سهرة سوهو سكوير",
+          "summary": "جولة مسائية في أشهر مركز ترفيهي وتسوق في شرم الشيخ مع النافورة الراقصة والمطاعم."
+        },
+        "de": {
+          "title": "Soho Square Abendausflug",
+          "summary": "Erleben Sie das pulsierende Abendleben auf dem Soho Square mit der tanzenden Fontäne."
+        },
+        "it": {
+          "title": "Serata a Soho Square",
+          "summary": "Serata animata nel famoso centro d'intrattenimento di Sharm con fontana danzante e ristoranti."
+        },
+        "ru": {
+          "title": "Вечер на площади Сохо (Soho Square)",
+          "summary": "Вечерняя прогулка по центру развлечений с поющими фонтанами, магазинами и кафе."
+        },
+        "pl": {
+          "title": "Wieczór na Soho Square",
+          "summary": "Wieczorny wypad do najsłynniejszego centrum rozrywki w Szarm z tańczącą fontanną."
+        },
+        "fr": {
+          "title": "Soirée à Soho Square",
+          "summary": "Sortie nocturne au centre de divertissement animé avec sa fontaine dansante et ses restaurants."
+        }
+      },
       "verified": false,
       "featured": false,
       "priority": 16,
       "status": "published",
       "createdAt": "2026-10-01T09:20:17.734Z",
-      "updatedAt": "2026-10-01T09:20:17.734Z"
+      "updatedAt": "2026-10-02T20:54:39.557Z"
     },
     {
       "id": "seed-tour-naama-bay",
@@ -1920,10 +2435,10 @@
       ],
       "images": [
         {
-          "src": "/media/naama-bay/card.jpg",
-          "alt": "Palm lined promenade and bay front at Naama Bay after dark",
-          "width": 1800,
-          "height": 1200
+          "src": "/uploads/media/61780396-6bf1-491c-b331-461e7197c4d3.jpeg",
+          "alt": "Naama Bay Evening photo 2",
+          "width": 1600,
+          "height": 900
         }
       ],
       "duration": "Evening",
@@ -1946,7 +2461,6 @@
       "excluded": [
         "Personal expenses and souvenirs",
         "Gratuities (optional, always appreciated)",
-        "Travel insurance",
         "Food, drinks and shopping"
       ],
       "bring": [
@@ -2002,13 +2516,38 @@
         "old-market",
         "farsha-cafe"
       ],
-      "translations": {},
+      "translations": {
+        "ar": {
+          "title": "جولة خليج نعمة",
+          "summary": "استكشاف قلب شرم الشيخ النابض بالمقاهي والمطاعم والممشى السياحي والأسواق."
+        },
+        "de": {
+          "title": "Naama Bay Entdeckungstour",
+          "summary": "Entdecken Sie das lebendige Herz von Sharm El Sheikh mit Promenaden, Cafés und Basaren."
+        },
+        "it": {
+          "title": "Tour di Naama Bay",
+          "summary": "Alla scoperta del centro storico e vivace di Sharm El Sheikh tra passeggiate e negozi."
+        },
+        "ru": {
+          "title": "Прогулка по Наама Бей (Naama Bay)",
+          "summary": "Знакомство с оживленным сердцем Шарм-эль-Шейха, набережной, кафе и восточными лавками."
+        },
+        "pl": {
+          "title": "Spacer po Naama Bay",
+          "summary": "Odkryj tętniące życiem serce Szarm el-Szejk z deptakiem, kawiarniami i sklepami."
+        },
+        "fr": {
+          "title": "Visite de Naama Bay",
+          "summary": "Découvrez le cœur vivant de Charm el-Cheikh avec ses promenades, cafés et marchés traditionnels."
+        }
+      },
       "verified": false,
       "featured": false,
       "priority": 17,
       "status": "published",
       "createdAt": "2026-10-01T09:20:17.734Z",
-      "updatedAt": "2026-10-01T09:20:17.734Z"
+      "updatedAt": "2026-10-02T20:59:24.225Z"
     },
     {
       "id": "seed-tour-farsha-cafe",
@@ -2024,10 +2563,10 @@
       ],
       "images": [
         {
-          "src": "/media/farsha-cafe/card.jpg",
-          "alt": "Cliffside terrace seating looking out over the Red Sea at dusk",
-          "width": 1800,
-          "height": 1200
+          "src": "/uploads/media/774bdb0f-9dfe-4d56-a6f4-99fffd106a37.jpeg",
+          "alt": "Farsha Cafe at Sunset photo 2",
+          "width": 1600,
+          "height": 900
         }
       ],
       "duration": "Evening",
@@ -2050,7 +2589,6 @@
       "excluded": [
         "Personal expenses and souvenirs",
         "Gratuities (optional, always appreciated)",
-        "Travel insurance",
         "Food and drinks"
       ],
       "bring": [
@@ -2107,13 +2645,38 @@
         "soho-square",
         "old-market"
       ],
-      "translations": {},
+      "translations": {
+        "ar": {
+          "title": "سهرة كافيه فرشة",
+          "summary": "تجربة أصيلة في أشهر مقهى جبلي وإطلالة بانورامية خيالية على البحر وأجواء شرقية ساحرة."
+        },
+        "de": {
+          "title": "Farsha Mountain Café",
+          "summary": "Einzigartiger Abend im berühmten Bergcafé mit atemberaubendem Meerblick und orientalischer Atmosphäre."
+        },
+        "it": {
+          "title": "Serata al Farsha Café",
+          "summary": "Esperienza suggestiva nel celebre caffè scavato nella roccia con vista panoramica sul mare."
+        },
+        "ru": {
+          "title": "Вечер в колоритном кафе Фарша (Farsha)",
+          "summary": "Посещение знаменитого атмосферного горного лаунж-кафе с завораживающим видом на море."
+        },
+        "pl": {
+          "title": "Kawiarnia Farsha na klifie",
+          "summary": "Niezapomniany wieczór w klimatycznej kawiarni na klifie z bajkowym widokiem na morze."
+        },
+        "fr": {
+          "title": "Soirée au Farsha Café",
+          "summary": "Ambiance orientale féerique dans ce café légendaire perché sur la falaise face à la mer."
+        }
+      },
       "verified": false,
       "featured": false,
       "priority": 18,
       "status": "published",
       "createdAt": "2026-10-01T09:20:17.734Z",
-      "updatedAt": "2026-10-01T09:20:17.734Z"
+      "updatedAt": "2026-10-02T20:58:26.157Z"
     },
     {
       "id": "seed-tour-old-market",
@@ -2129,10 +2692,16 @@
       ],
       "images": [
         {
-          "src": "/media/old-market/card.jpg",
-          "alt": "Lantern lit alley of spice and craft stalls in the Old Market",
-          "width": 1800,
-          "height": 1200
+          "src": "/uploads/media/28c775cb-214e-4c92-815e-5f6d91d32a2f.jpeg",
+          "alt": "Old Market Walk photo 2",
+          "width": 1600,
+          "height": 900
+        },
+        {
+          "src": "/uploads/media/21626f9d-3762-404e-b949-ee158dd92608.jpg",
+          "alt": "Old Market Walk photo 2",
+          "width": 1600,
+          "height": 900
         }
       ],
       "duration": "Evening",
@@ -2155,7 +2724,6 @@
       "excluded": [
         "Personal expenses and souvenirs",
         "Gratuities (optional, always appreciated)",
-        "Travel insurance",
         "Purchases, food and drinks"
       ],
       "bring": [
@@ -2188,7 +2756,6 @@
       "minParticipants": null,
       "maxParticipants": null,
       "importantInfo": [
-        "Bring your passport or a photo of it — some checkpoints ask for ID.",
         "Sun protection, a hat and flat shoes make every trip more comfortable.",
         "Pickup times shift slightly by hotel zone; we confirm yours the evening before.",
         "Prices at the stalls are negotiable — start well below the opening number and keep it friendly."
@@ -2212,13 +2779,38 @@
         "naama-bay",
         "farsha-cafe"
       ],
-      "translations": {},
+      "translations": {
+        "ar": {
+          "title": "السوق القديم ومسجد الصحابة",
+          "summary": "جولة في المدينة القديمة بشرم الشيخ وزيارة تحفة مسجد الصحابة المعمارية والتسوق."
+        },
+        "de": {
+          "title": "Old Market & Al Sahaba Moschee",
+          "summary": "Erkunden Sie den traditionellen Basar der Altstadt und die prachtvolle Al-Sahaba-Moschee."
+        },
+        "it": {
+          "title": "Mercato Vecchio e Moschea Al Sahaba",
+          "summary": "Passeggiata nel mercato tradizionale di Sharm e visita alla magnifica moschea Al Sahaba."
+        },
+        "ru": {
+          "title": "Старый город и мечеть Аль-Сахаба",
+          "summary": "Колоритный восточный базар Старого города и величественная архитектура мечети Аль-Сахаба."
+        },
+        "pl": {
+          "title": "Stary Rynek i Meczet Al Sahaba",
+          "summary": "Wizyta na tradycyjnym targu w Starym Mieście oraz zwiedzanie zachwycającego meczetu."
+        },
+        "fr": {
+          "title": "Vieux Marché & Mosquée Al Sahaba",
+          "summary": "Visite du souk traditionnel et de la magnifique mosquée Al Sahaba au charme architectural unique."
+        }
+      },
       "verified": false,
       "featured": false,
       "priority": 19,
       "status": "published",
       "createdAt": "2026-10-01T09:20:17.734Z",
-      "updatedAt": "2026-10-01T09:20:17.734Z"
+      "updatedAt": "2026-10-02T20:52:47.083Z"
     },
     {
       "id": "seed-tour-cairo-pyramids-gem",
@@ -2229,8 +2821,10 @@
       "type": "group",
       "summary": "Giza and the Grand Egyptian Museum in one day, run from Sharm El Sheikh by flight or from a Cairo hotel.",
       "description": [
-        "The Giza plateau and the Grand Egyptian Museum sit within sight of each other, and seeing them on the same day is the right way round: the monuments first, then the objects that came out of them. The museum, which opened fully in November 2025, holds the complete Tutankhamun collection — all of it together for the first time.",
-        "From Sharm this runs as a long day by air. If you're already in Cairo, it starts at your hotel."
+        "Embark on an unforgettable full-day Cairo tour from Sharm El Sheikh by bus and discover Egypt’s most iconic landmarks in one remarkable journey. Travel overnight in a comfortable, air-conditioned bus and arrive in Cairo ready to explore its ancient wonders.",
+        "Begin your adventure at the Grand Egyptian Museum (GEM), home to thousands of priceless artifacts, including the legendary treasures of Tutankhamun. With an expert Egyptologist guide, dive into Egypt’s rich history and fascinating civilization.",
+        "Continue to the Pyramids of Giza and the Great Sphinx, where you’ll walk among world-famous monuments, capture stunning photos, and uncover the secrets of ancient Egypt.",
+        "Enjoy a delicious lunch at a local restaurant, followed by shopping for authentic Egyptian souvenirs before relaxing on the return trip to Sharm El Sheikh."
       ],
       "images": [
         {
@@ -2271,35 +2865,41 @@
         }
       ],
       "duration": "Full day",
-      "durationHours": 12,
-      "priceFrom": null,
+      "durationHours": 23.5,
+      "priceFrom": 90,
       "currency": "USD",
       "priceOriginal": null,
-      "childPrice": 70,
+      "childPrice": 80,
       "availability": "open",
       "highlights": [
-        "The Pyramids of Giza and the Great Sphinx",
-        "The Grand Egyptian Museum",
-        "Egyptologist guide throughout",
-        "Runs from Sharm El Sheikh or from Cairo"
+        "Comfortable bus journey from Sharm El Sheikh to Cairo",
+        "Marvel at the majestic Great Pyramids of Giza",
+        "Free time for shopping in vibrant local bazaars",
+        "Explore the ancient treasures of the Egyptian Museum",
+        "Stand before the legendary Sphinx and uncover its secrets",
+        "Capture unforgettable moments at Egypt’s most iconic landmarks"
       ],
       "included": [
         "Air-conditioned transport in Cairo",
-        "Egyptologist guide",
-        "Entrance fees to the Giza plateau and the museum",
-        "Lunch"
+        "Professional Egyptologist guide",
+        "Entrance fees to all included sites",
+        "Guided tour of the Grand Museum",
+        "Visit to the Pyramids and the Sphinx",
+        "Lunch at a local restaurant",
+        "Walking tour on the Giza Plateau",
+        "Shopping time in Cairo"
       ],
       "excluded": [
         "Personal expenses and souvenirs",
-        "Gratuities (optional, always appreciated)",
-        "Travel insurance",
-        "Flights, when travelling from Sharm El Sheikh",
-        "Entry inside the pyramid chambers (ticketed separately on site)"
+        "Entry inside the pyramid chambers (ticketed separately on site)",
+        "Riding Camels",
+        "Boat trip on the Nile River (optional activity)"
       ],
       "bring": [
         "Comfortable walking shoes",
         "Shoulders and knees covered for religious sites",
-        "Small notes for bazaars and gratuities"
+        "Small notes for bazaars and gratuities",
+        "Breakfast Box: The evening before the tour, please ask your hotel reception to prepare a breakfast box. Don’t forget to collect it on the morning of the tour."
       ],
       "restrictions": [
         "Entry inside the Great Pyramid is ticketed separately on site.",
@@ -2307,25 +2907,32 @@
       ],
       "itinerary": [
         {
-          "time": "Early",
-          "title": "Departure",
-          "detail": "Flight from Sharm, or hotel pickup if you're in Cairo."
+          "title": "🚌 Hotel Pickup",
+          "detail": "Pickup from your hotel in Sharm El Sheikh around 00:00 AM (midnight), depending on your hotel location. Travel to Cairo in a comfortable air-conditioned bus with a toilet."
         },
         {
-          "title": "The Giza plateau",
-          "detail": "The pyramids, the panoramic viewpoint and the Sphinx."
+          "title": "🏛️ Grand Egyptian Museum:",
+          "detail": "Upon arrival in Cairo, meet your professional guide and explore the spectacular Grand Egyptian Museum. Discover thousands of ancient Egyptian artifacts, including the famous King Tutankhamun collection."
         },
         {
-          "title": "Lunch",
-          "detail": "Lunch stop between the plateau and the museum."
+          "title": "🍽️ Egyptian Lunch",
+          "detail": "Enjoy a traditional Egyptian lunch at a local restaurant in Cairo."
         },
         {
-          "title": "Grand Egyptian Museum",
-          "detail": "Guided visit through the galleries."
+          "title": "🔺 Giza Pyramids:",
+          "detail": "In the afternoon, visit the legendary Pyramids of Cheops, Chephren, and Mykerinus."
         },
         {
-          "title": "Return",
-          "detail": "Back to the airport, or to your Cairo hotel."
+          "title": "🦁 Great Sphinx & Valley Temple:",
+          "detail": "See the iconic Great Sphinx and visit the impressive Valley Temple of Chephren."
+        },
+        {
+          "title": "🛍️ Shopping & Optional Nile Cruise:",
+          "detail": "Enjoy some free time for shopping and an optional Nile boat ride."
+        },
+        {
+          "title": "🚌 Return to Sharm",
+          "detail": "After completing the tour, travel back to Sharm El Sheikh by comfortable bus."
         }
       ],
       "meetingPoint": "Hotel pickup in Cairo, or airport meeting point for travellers flying from Sharm El Sheikh.",
@@ -2380,25 +2987,52 @@
         "old-market",
         "airport-transfer"
       ],
-      "translations": {},
+      "translations": {
+        "ar": {
+          "title": "القاهرة والأهرامات والمتحف المصري الكبير",
+          "summary": "رحلة ليوم كامل لزيارة أهرامات الجيزة وأبو الهول والمتحف المصري الكبير الجديد."
+        },
+        "de": {
+          "title": "Kairo, Pyramiden & Grand Egyptian Museum",
+          "summary": "Ganztagesausflug zu den Pyramiden von Gizeh, der Sphinx und dem neuen Grand Egyptian Museum."
+        },
+        "it": {
+          "title": "Il Cairo: Piramidi e Grande Museo Egizio",
+          "summary": "Tour di un giorno alle Piramidi di Giza, alla Sfinge e allo straordinario Grand Egyptian Museum."
+        },
+        "ru": {
+          "title": "Каир: Пирамиды и Большой Египетский Музей",
+          "summary": "Однодневная экскурсия к пирамидам Гизы, Сфинксу и в новый Большой Египетский Музей."
+        },
+        "pl": {
+          "title": "Kair: Piramidy i Wielkie Muzeum Egipskie",
+          "summary": "Całodniowa wycieczka do piramid w Gizie, Sfinksa oraz nowego Wielkiego Muzeum Egipskiego."
+        },
+        "fr": {
+          "title": "Le Caire : Pyramides et Grand Musée Égyptien",
+          "summary": "Excursion d'une journée aux Pyramides de Gizeh, au Sphinx et au tout nouveau Grand Musée Égyptien."
+        }
+      },
       "verified": false,
       "featured": true,
       "priority": 8,
       "status": "published",
       "createdAt": "2026-10-01T09:20:17.734Z",
-      "updatedAt": "2026-10-01T09:20:17.734Z"
+      "updatedAt": "2026-10-02T21:26:50.067Z"
     },
     {
       "id": "seed-tour-old-cairo",
       "slug": "old-cairo",
-      "title": "Old Cairo & the Historic Quarters",
+      "title": "Old Cairo & Museum Tour from Sharm El Sheikh",
       "destination": "cairo",
       "category": "culture",
       "type": "private",
       "summary": "A walking day through the older layers of Cairo — the Coptic quarter, the medieval Islamic streets and the covered bazaar.",
       "description": [
-        "Cairo is a city of layers, and this day works through several of them on foot: the Coptic quarter with its early churches, the medieval city with its mosques and gates, and the bazaar that has been trading in the same streets for centuries.",
-        "Private, so the pace and the emphasis are yours."
+        "Embark on an unforgettable Cairo day trip by bus from Sharm El Sheikh and discover Egypt’s legendary capital in one enriching journey. Travel comfortably in an air-conditioned bus and enjoy a well-organized excursion filled with history and iconic sights.",
+        "Upon arrival in Cairo, your professional Egyptologist guide will take you to the Egyptian Museum, where thousands of ancient artifacts await, including the world-famous treasures of King Tutankhamun. Dive deep into Egypt’s fascinating past as you explore its priceless collections.",
+        "Continue to the Giza Plateau to witness the Great Pyramids of Giza and the majestic Sphinx. Capture unforgettable photos, learn the secrets behind these ancient wonders, and enjoy the magical atmosphere.",
+        "Savor a delicious lunch at a local restaurant, followed by time to explore traditional bazaars before relaxing on the return journey to Sharm El Sheikh"
       ],
       "images": [
         {
@@ -2416,54 +3050,69 @@
       ],
       "duration": "Full day",
       "durationHours": 8,
-      "priceFrom": null,
+      "priceFrom": 55,
       "currency": "USD",
       "priceOriginal": null,
-      "childPrice": null,
+      "childPrice": 35,
       "availability": "open",
       "highlights": [
-        "The Coptic quarter and its early churches",
-        "Medieval Islamic Cairo",
-        "The covered bazaar",
-        "Private guide at your own pace"
+        "Comfortable bus journey from Sharm El Sheikh to Cairo",
+        "Explore the ancient treasures of the Egyptian Museum",
+        "Marvel at the majestic Great Pyramids of Giza",
+        "Stand before the legendary Sphinx and uncover its secrets",
+        "Free time for shopping in vibrant local bazaars",
+        "Capture unforgettable moments at Egypt’s most iconic landmarks"
       ],
       "included": [
         "Private air-conditioned transport",
-        "Egyptologist guide",
-        "Entrance fees",
-        "Lunch"
+        "Professional Egyptologist guide",
+        "Entrance fees to all included sites",
+        "Guided tour of the Egyptian Museum",
+        "Visit to the Pyramids and the Sphinx",
+        "Lunch at a local restaurant",
+        "Walking tour on the Giza Plateau",
+        "Shopping time in Cairo"
       ],
       "excluded": [
-        "Personal expenses and souvenirs",
-        "Gratuities (optional, always appreciated)",
-        "Travel insurance"
+        " Entrance to the Great Pyramid (optional ticket)",
+        "Boat trip on the Nile River (optional activity)",
+        ""
       ],
       "bring": [
         "Comfortable walking shoes",
         "Shoulders and knees covered for religious sites",
-        "Small notes for bazaars and gratuities"
+        "Small notes for bazaars and gratuities",
+        "Breakfast Box: The evening before the tour, please ask your hotel reception to prepare a breakfast box. Don’t forget to collect it on the morning of the tour."
       ],
       "restrictions": [],
       "itinerary": [
         {
-          "title": "Hotel pickup",
-          "detail": "Collected from your Cairo hotel."
+          "title": "🚐 Hotel Pickup",
+          "detail": "Pickup from your hotel in Sharm El Sheikh between 12:00 AM and 1:00 AM, depending on your hotel location. Travel to Cairo in a comfortable air-conditioned bus with a toilet."
         },
         {
-          "title": "Coptic Cairo",
-          "detail": "Walking visit through the quarter."
+          "title": "👨‍🏫 Cairo Tour:",
+          "detail": "Upon arrival in Cairo, meet your English-speaking guide and begin your sightseeing tour."
         },
         {
-          "title": "Lunch",
-          "detail": "Lunch in the old city."
+          "title": "🏺 Old Egyptian Museum",
+          "detail": "Visit the Old Egyptian Museum at Tahrir Square and discover ancient Egyptian treasures from the Old, Middle, and New Kingdoms."
         },
         {
-          "title": "Islamic Cairo and the bazaar",
-          "detail": "The medieval streets and time in the bazaar."
+          "title": "🔺 Giza Pyramids",
+          "detail": "Explore the famous Pyramids of Cheops, Chephren, and Mykerinus."
         },
         {
-          "title": "Return",
-          "detail": "Back to your hotel."
+          "title": "🦁 Great Sphinx & Valley Temple",
+          "detail": "See the iconic Great Sphinx and visit the impressive Valley Temple of Chephren."
+        },
+        {
+          "title": "🛍️ Shopping & Optional Nile Cruise",
+          "detail": "Enjoy free time for shopping and an optional Nile boat ride."
+        },
+        {
+          "title": "🚌 Return to Sharm",
+          "detail": "After completing the tour, travel back to Sharm El Sheikh by bus"
         }
       ],
       "meetingPoint": "Hotel pickup in Cairo.",
@@ -2501,13 +3150,38 @@
         "old-market",
         "private-transfer"
       ],
-      "translations": {},
+      "translations": {
+        "ar": {
+          "title": "القاهرة التاريخية والمعالم الإسلامية والقبطية",
+          "summary": "استكشاف مجمع الأديان وخان الخليلي وشوارع القاهرة التاريخية القديمة."
+        },
+        "de": {
+          "title": "Historisches Kairo & Basar Khan el-Khalili",
+          "summary": "Führung durch das koptische und islamische Viertel sowie den berühmten Basar Khan el-Khalili."
+        },
+        "it": {
+          "title": "Il Cairo Storico e Khan el-Khalili",
+          "summary": "Visita guidata del Cairo copto e islamico e shopping nel celebre bazar Khan el-Khalili."
+        },
+        "ru": {
+          "title": "Исторический Каир и Хан аль-Халили",
+          "summary": "Прогулка по коптскому и исламскому Каиру с посещением легендарного восточного базара."
+        },
+        "pl": {
+          "title": "Historyczny Kair i Bazar Chan al-Chalili",
+          "summary": "Zwiedzanie zabytkowej części Kairu, dzielnicy koptyjskiej i słynnego bazaru."
+        },
+        "fr": {
+          "title": "Le Caire Historique & Khan el-Khalili",
+          "summary": "Exploration du Caire copte et islamique et déambulation dans le souk mythique de Khan el-Khalili."
+        }
+      },
       "verified": false,
       "featured": false,
       "priority": 20,
       "status": "published",
       "createdAt": "2026-10-01T09:20:17.734Z",
-      "updatedAt": "2026-10-01T09:20:17.734Z"
+      "updatedAt": "2026-10-02T21:33:05.193Z"
     },
     {
       "id": "seed-tour-airport-transfer",
@@ -2522,6 +3196,12 @@
         "We track the flight number you give us, so a delayed landing doesn't mean a missing car."
       ],
       "images": [
+        {
+          "src": "/uploads/media/0b3f0369-321b-4630-91d2-c1d2f2806b8f.jpeg",
+          "alt": "Airport Transfer photo 2",
+          "width": 1600,
+          "height": 900
+        },
         {
           "src": "/media/transfers/airport.jpg",
           "alt": "Arrivals meeting point at Sharm El Sheikh International Airport",
@@ -2551,7 +3231,6 @@
       "excluded": [
         "Personal expenses and souvenirs",
         "Gratuities (optional, always appreciated)",
-        "Travel insurance",
         "Extended waiting beyond the included window"
       ],
       "bring": [
@@ -2608,13 +3287,38 @@
         "soho-square",
         "naama-bay"
       ],
-      "translations": {},
+      "translations": {
+        "ar": {
+          "title": "توصيل واستقبال مطار شرم الشيخ",
+          "summary": "خدمة نقل خاصة ومريحة من وإلى مطار شرم الشيخ الدولي بسيارة حديثة ومكيفة."
+        },
+        "de": {
+          "title": "Flughafentransfer Sharm El Sheikh",
+          "summary": "Zuverlässiger privater Flughafentransfer mit modernen, klimatisierten Fahrzeugen direkt zu Ihrem Hotel."
+        },
+        "it": {
+          "title": "Transfer Aeroporto Sharm El Sheikh",
+          "summary": "Servizio di transfer privato puntuale e confortevole da e per l'aeroporto di Sharm El Sheikh."
+        },
+        "ru": {
+          "title": "Трансфер из/в аэропорт Шарм-эль-Шейх",
+          "summary": "Комфортабельный индивидуальный трансфер на кондиционированном автомобиле прямо в ваш отель."
+        },
+        "pl": {
+          "title": "Transfer z/na lotnisko Szarm el-Szejk",
+          "summary": "Wygodny prywatny transfer klimatyzowanym autem z lotniska bezpośrednio do Twojego hotelu."
+        },
+        "fr": {
+          "title": "Transfert Aéroport de Charm el-Cheikh",
+          "summary": "Service de navette privée et climatisée entre l'aéroport international et votre hôtel."
+        }
+      },
       "verified": false,
       "featured": false,
       "priority": 21,
       "status": "published",
       "createdAt": "2026-10-01T09:20:17.734Z",
-      "updatedAt": "2026-10-01T09:20:17.734Z"
+      "updatedAt": "2026-10-02T22:05:01.961Z"
     },
     {
       "id": "seed-tour-private-transfer",
@@ -2657,7 +3361,6 @@
       "excluded": [
         "Personal expenses and souvenirs",
         "Gratuities (optional, always appreciated)",
-        "Travel insurance",
         "Parking or entry fees at your destinations"
       ],
       "bring": [
@@ -2713,18 +3416,224 @@
         "farsha-cafe",
         "old-market"
       ],
-      "translations": {},
+      "translations": {
+        "ar": {
+          "title": "خدمة توصيل ونقل خاص",
+          "summary": "سيارة خاصة مع سائق محترف لرحلات مريحة بين مدن سيناء والقاهرة طوال اليوم."
+        },
+        "de": {
+          "title": "Privater Fahrservice & Überlandtransfer",
+          "summary": "Privates Fahrzeug mit Chauffeur für bequeme Fahrten im Sinai oder nach Kairo."
+        },
+        "it": {
+          "title": "Transfer Privato con Conducente",
+          "summary": "Auto privata con autista a disposizione per spostamenti nel Sinai o verso Il Cairo."
+        },
+        "ru": {
+          "title": "Индивидуальный трансфер с водителем",
+          "summary": "Личный автомобиль с опытным водителем для поездок по Синаю или в Каир."
+        },
+        "pl": {
+          "title": "Prywatny transfer z kierowcą",
+          "summary": "Prywatny samochód z kierowcą na wyjazdy po półwyspie Synaj i do Kairu."
+        },
+        "fr": {
+          "title": "Transfert Privé avec Chauffeur",
+          "summary": "Véhicule privé avec chauffeur professionnel pour tous vos déplacements dans le Sinaï et vers Le Caire."
+        }
+      },
       "verified": false,
       "featured": false,
       "priority": 22,
       "status": "published",
       "createdAt": "2026-10-01T09:20:17.734Z",
-      "updatedAt": "2026-10-01T09:20:17.734Z"
+      "updatedAt": "2026-10-02T21:33:35.709Z"
+    },
+    {
+      "id": "musous7we2tbvgvq",
+      "slug": "buggy-desert-bike-sharm-el-sheikh",
+      "title": "Buggy desert Bike Sharm El Sheikh",
+      "destination": "sharm-el-sheikh",
+      "category": "safari",
+      "type": "group",
+      "summary": "An exhilarating buggy and quad bike adventure across the Sinai desert terrain, canyons and Bedouin valleys.",
+      "description": [
+        "Head out into the Sinai desert on an off-road buggy designed for sand dunes and rocky tracks. A high-energy way to see the mountain landscape behind Sharm El Sheikh.",
+        "Led by an experienced guide with full safety briefing, helmets and goggles provided."
+      ],
+      "images": [
+        {
+          "src": "/media/super-safari/hero.jpg",
+          "alt": "Desert buggy and quad bike in Sinai desert near Sharm El Sheikh",
+          "width": 2400,
+          "height": 1350
+        }
+      ],
+      "duration": "3 hours",
+      "durationHours": 3,
+      "priceFrom": 35,
+      "childPrice": 20,
+      "currency": "USD",
+      "priceOriginal": null,
+      "priceOverrides": {},
+      "schedule": "Morning or Sunset",
+      "availability": "open",
+      "highlights": [
+        "Drive a powerful desert buggy through the Sinai trails",
+        "Spectacular mountain and desert canyon views",
+        "Stop at an authentic Bedouin tent for herbal tea",
+        "Choice of sunrise, morning or sunset departures"
+      ],
+      "included": [
+        "Hotel pickup and drop-off in an air-conditioned vehicle",
+        "Desert buggy or quad bike hire",
+        "Safety helmet and briefing",
+        "Bedouin tea stop",
+        "English-speaking safari guide"
+      ],
+      "excluded": [
+        "Bedouin scarf (available to buy on site)",
+        "Dust goggles hire",
+        "Personal expenses and tips"
+      ],
+      "bring": [
+        "Sunglasses and scarf",
+        "Comfortable closed shoes",
+        "Casual clothes you do not mind getting dusty"
+      ],
+      "restrictions": [
+        "Drivers must be 16 or older; younger passengers ride with an adult."
+      ],
+      "itinerary": [
+        {
+          "title": "Hotel pickup",
+          "detail": "Transfer from your hotel to the desert safari centre."
+        },
+        {
+          "title": "Safety briefing",
+          "detail": "Instructions on handling the buggy and helmet fitting."
+        },
+        {
+          "title": "Desert drive",
+          "detail": "Drive across the open sands and through the mountain valleys."
+        },
+        {
+          "title": "Bedouin tea",
+          "detail": "Relax with traditional Bedouin tea before the return ride."
+        },
+        {
+          "title": "Return",
+          "detail": "Transferred back to your hotel."
+        }
+      ],
+      "meetingPoint": "Hotel pickup across Sharm El Sheikh.",
+      "importantInfo": [
+        "Bring a photo of your passport.",
+        "Wear closed-toe shoes and clothes suitable for dust."
+      ],
+      "faq": [
+        {
+          "question": "Can two people share a buggy?",
+          "answer": "Yes, double buggies are available for a driver and passenger."
+        }
+      ],
+      "related": [
+        "super-safari",
+        "desert-safari"
+      ],
+      "translations": {
+        "ar": {
+          "title": "رحلة بيتش باجي وبجي في صحراء شرم الشيخ",
+          "summary": "مغامرة صحراوية مثيرة بسيارات البجي والدراجات الرباعية وسط جبال سيناء ووديانها."
+        }
+      },
+      "verified": true,
+      "featured": false,
+      "priority": 15,
+      "status": "published",
+      "createdAt": "2026-10-03T17:51:20.156Z",
+      "updatedAt": "2026-10-04T01:39:35.180Z"
     }
   ],
-  "packages": [],
-  "reviews": [],
-  "inquiries": [],
+  "packages": [
+    {
+      "tagline": "",
+      "destination": "sharm-el-sheikh",
+      "duration": "2 days",
+      "priceFrom": 65,
+      "currency": "USD",
+      "coverImage": {
+        "src": "/uploads/media/98e035f4-7857-465d-b2d8-0072c3ecbe04.jpeg",
+        "alt": "package",
+        "width": 1600,
+        "height": 900
+      },
+      "gallery": [
+        {
+          "src": "/uploads/media/f3ffedd4-dc72-4d48-8c86-1b2ac5bbc815.jpeg",
+          "alt": "package photo 1",
+          "width": 1600,
+          "height": 900
+        }
+      ],
+      "description": [],
+      "days": [],
+      "included": [],
+      "excluded": [],
+      "bring": [],
+      "status": "published",
+      "featured": false,
+      "priority": 100,
+      "slug": "sharm-2-days-package",
+      "title": "package",
+      "id": "murhwf2bvocvu6ht",
+      "createdAt": "2026-10-02T21:48:52.931Z",
+      "updatedAt": "2026-10-03T13:49:41.691Z",
+      "childPrice": 39,
+      "tourId": null,
+      "tourSlug": null,
+      "translations": {}
+    }
+  ],
+  "reviews": [
+    {
+      "id": "mupw19l6deb15j35",
+      "tourSlug": "speed-boat",
+      "name": "Катерина",
+      "email": "katerinatetora@gmail.com",
+      "country": "Україна",
+      "rating": 5,
+      "title": "Незабутні емоції!",
+      "body": "Відпочивала в Шарм Ель Шейху з 03.06.2026, каталась на швидкісному катері — це було дуже круто! 🌊😍 Стільки емоцій, швидкості й неймовірних краєвидів. Я отримала масу задоволення і точно запам’ятаю цю поїздку надовго! ❤️",
+      "photos": [],
+      "status": "approved",
+      "verified": false,
+      "submittedAt": "2026-10-01T18:49:01.386Z",
+      "reviewedAt": "2026-10-01T19:54:36.203Z",
+      "publishedAt": "2026-10-01T19:54:36.203Z"
+    }
+  ],
+  "inquiries": [
+    {
+      "id": "muriwt5jj6lvbmri",
+      "status": "new",
+      "createdAt": "2026-10-02T22:17:10.807Z",
+      "updatedAt": "2026-10-02T22:17:10.810Z",
+      "tourSlug": "white-island",
+      "tourTitle": " Ras Mohamed and White Island  SnorKeling Tour Sharm El Sheikh",
+      "guestName": "efef",
+      "guestEmail": null,
+      "guestPhone": "+31687667320",
+      "preferredDate": "2026-10-05",
+      "adults": 2,
+      "children": 0,
+      "hotel": "rixcos",
+      "roomNumber": "324",
+      "notes": "whjdw (Room: 324)",
+      "source": "booking_drawer",
+      "emailStatus": "not-configured"
+    }
+  ],
   "destinations": [
     {
       "name": "Sharm El Sheikh",
@@ -3325,7 +4234,7 @@
     },
     "social": {
       "instagram": "https://instagram.com/brothersharmtour",
-      "facebook": "https://facebook.com/brothersharmtour"
+      "facebook": "https://www.facebook.com/share/1KQ4zfHhEQ/"
     },
     "announcement": {
       "enabled": false,
@@ -3412,10 +4321,6 @@
       "notifyOnReview": true,
       "customerConfirmation": true,
       "fromName": "Brother Sharm Tour"
-    },
-    "admin": {
-      "email": "admin@brothersharmtour.com",
-      "passwordHash": "82fd9ed5e31062d50dd7a1644be691c1:91853a4a9f6697c8890ddd69d3a6a8905a567ed8d6b68195ea0d2e1c966c5882efd2cf6fc83ab7c419339e088b5b966ad1248249a39e1e7c6ddeb86502e8d7cc"
     }
   }
 }

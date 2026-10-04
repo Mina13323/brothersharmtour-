@@ -3,8 +3,7 @@ import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
 import { Reveal } from "@/components/Reveal";
 import { ContactForm } from "@/components/ContactForm";
-import { Breadcrumbs, WhatsAppIcon } from "@/components/sections";
-import { WaveDivider } from "@/components/WaveDivider";
+import { WhatsAppIcon } from "@/components/sections";
 import { getPublicSettings, serverWhatsappLink } from "@/lib/siteview";
 
 import { Hero } from "@/components/Hero";

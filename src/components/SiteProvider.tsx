@@ -44,13 +44,18 @@ export interface PublicSettings {
   languages: { code: string; label: string; dir: string; enabled: boolean }[];
 }
 
+import type { TranslationDictionary } from "@/lib/i18n/translations";
+import { getTranslation } from "@/lib/i18n/translations";
+
 interface SiteContextValue {
   settings: PublicSettings;
   catalogue: CatalogueTour[];
   currency: CurrencyContext;
+  lang: string;
   /** Formats a base-currency amount in the visitor's display currency. */
   money: (value: number | null | undefined, overrides?: Record<string, number>) => string | null;
   whatsappLink: (message?: string) => string;
+  t: (key: keyof TranslationDictionary | (string & {}), fallback?: string) => string;
 }
 
 const SiteContext = createContext<SiteContextValue | null>(null);
@@ -59,6 +64,12 @@ export function useSite() {
   const ctx = useContext(SiteContext);
   if (!ctx) throw new Error("useSite must be used inside <SiteProvider>");
   return ctx;
+}
+
+/** Translation lookup hook */
+export function useTranslation() {
+  const { lang, t } = useSite();
+  return { lang, t };
 }
 
 /** Catalogue lookup hook for the booking widget & search. */
@@ -70,11 +81,13 @@ export function SiteProvider({
   settings,
   catalogue,
   currency,
+  lang = "en",
   children,
 }: {
   settings: PublicSettings;
   catalogue: CatalogueTour[];
   currency: CurrencyContext;
+  lang?: string;
   children: ReactNode;
 }) {
   const money = useCallback(
@@ -93,9 +106,17 @@ export function SiteProvider({
     [settings.name, settings.contact.whatsapp],
   );
 
+  const t = useCallback(
+    (key: keyof TranslationDictionary | (string & {}), fallback?: string) => {
+      const val = getTranslation(lang, key as keyof TranslationDictionary);
+      return val || fallback || key;
+    },
+    [lang],
+  );
+
   return (
     <SiteContext.Provider
-      value={{ settings, catalogue, currency, money, whatsappLink }}
+      value={{ settings, catalogue, currency, lang, money, whatsappLink, t }}
     >
       {children}
     </SiteContext.Provider>

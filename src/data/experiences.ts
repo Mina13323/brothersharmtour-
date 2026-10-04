@@ -160,5 +160,6 @@ export const experiences: Experience[] = [
 export const experienceBySlug = (slug: string) =>
   experiences.find((e) => e.slug === slug);
 
-export const experienceName = (slug: string) =>
-  experiences.find((e) => e.slug === slug)?.name ?? slug;
+export const experienceName = (slug?: string | null) =>
+  slug ? (experiences.find((e) => e.slug === slug)?.name ?? slug) : "Excursion";
+

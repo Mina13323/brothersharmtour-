@@ -10,13 +10,16 @@
 import { destinations } from "@/data/destinations";
 import { experiences } from "@/data/experiences";
 
-export function destinationName(slug: string): string {
+export function destinationName(slug?: string | null): string {
+  if (!slug) return "Sharm El Sheikh";
   return destinations.find((d) => d.slug === slug)?.name ?? slug.replace(/-/g, " ");
 }
 
-export function experienceName(slug: string): string {
+export function experienceName(slug?: string | null): string {
+  if (!slug) return "Excursion";
   return experiences.find((e) => e.slug === slug)?.name ?? slug.replace(/-/g, " ");
 }
+
 
 /** Duration buckets used by the tours filter bar (mirrors data/tours). */
 export const durationBuckets = [

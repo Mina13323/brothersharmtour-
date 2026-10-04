@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useBooking } from "./BookingProvider";
 import { WhatsAppIcon } from "./sections";
-import { tourPriceUnit } from "@/lib/utils";
 import { useSite } from "./SiteProvider";
 import type { Tour } from "@/lib/types";
 
@@ -14,7 +13,7 @@ import type { Tour } from "@/lib/types";
  */
 export function StickyBookBar({ tour }: { tour: Tour }) {
   const { open } = useBooking();
-  const { money } = useSite();
+  const { money, t } = useSite();
   const [show, setShow] = useState(false);
 
   useEffect(() => {
@@ -25,6 +24,7 @@ export function StickyBookBar({ tour }: { tour: Tour }) {
   }, []);
 
   const price = tour.priceFrom;
+  const childPrice = tour.childPrice;
 
   return (
     <div
@@ -39,25 +39,35 @@ export function StickyBookBar({ tour }: { tour: Tour }) {
           <p className="truncate text-[0.8rem] sm:text-sm font-medium text-ink">
             {tour.title}
           </p>
-          <p className="text-[0.8rem] text-stone">
+          <div className="flex flex-wrap items-center gap-x-2 text-[0.8rem] text-stone">
             {price !== null ? (
               <>
-                <span className="font-display text-[1.05rem] text-ink">
+                <span className="font-display font-semibold text-[1.05rem] text-ink">
                   {money(price, tour.priceOverrides)}
                 </span>{" "}
-                {tourPriceUnit(tour)} · pay on the day
+                <span className="text-stone/90 text-xs">({t("price_adult", "Adult")})</span>
+                {typeof childPrice === "number" && childPrice >= 0 && (
+                  <span className="inline-flex items-center gap-1">
+                    <span className="text-sand/90">·</span>
+                    <span className="font-display font-semibold text-ink text-sm">
+                      {money(childPrice)}
+                    </span>
+                    <span className="text-stone/90 text-xs">({t("price_child", "Child")})</span>
+                  </span>
+                )}
+                <span className="hidden sm:inline text-stone/80">· {t("pay_on_day", "pay on the day")}</span>
               </>
             ) : (
-              "Price on request"
+              <span>{t("price_on_request", "Price on request")}</span>
             )}
-          </p>
+          </div>
         </div>
         <button
           onClick={() => open(tour.slug)}
           className="btn btn-primary btn-sm shrink-0 shadow-sm"
         >
           <WhatsAppIcon className="size-4" />
-          Book now
+          {t("nav_book_now", "Book now")}
         </button>
       </div>
     </div>

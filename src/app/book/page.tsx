@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Suspense } from "react";
 import { Reveal } from "@/components/Reveal";
 import { BookingFormWithQuery } from "@/components/BookingFormWithQuery";
-import { Breadcrumbs, WhatsAppIcon } from "@/components/sections";
+import { WhatsAppIcon } from "@/components/sections";
 import { getPublicSettings, serverWhatsappLink } from "@/lib/siteview";
 import { media } from "@/lib/media";
 

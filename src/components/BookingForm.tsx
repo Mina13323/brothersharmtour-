@@ -24,7 +24,6 @@ export function BookingForm({
   compact?: boolean;
 }) {
   const catalogue = useCatalogue();
-  const { settings } = useSite();
   const { settings: site, whatsappLink } = useSite();
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);

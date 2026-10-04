@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { isAdmin } from "@/lib/auth";
 import { allTours, saveTour, slugTaken } from "@/lib/store/repo";
+import { syncTourToSupabase } from "@/lib/store/supabaseSync";
 import { slugify } from "@/lib/utils";
 
 /** Admin tours: list (full records incl. drafts) + create. */
@@ -33,11 +34,23 @@ export async function POST(request: Request) {
       { status: 422 },
     );
 
+  if (body.priceFrom !== undefined && body.priceFrom !== null && Number(body.priceFrom) < 0) {
+    return NextResponse.json({ ok: false, message: "Adult price cannot be negative." }, { status: 422 });
+  }
+
+  if (body.childPrice !== undefined && body.childPrice !== null && Number(body.childPrice) < 0) {
+    return NextResponse.json({ ok: false, message: "Child price cannot be negative." }, { status: 422 });
+  }
+
   const tour = saveTour({
+    ...body,
     slug,
     title,
     status: body.status === "published" ? "published" : "draft",
   });
 
+  await syncTourToSupabase(tour).catch(() => {});
+
   return NextResponse.json({ ok: true, tour }, { status: 201 });
 }
+

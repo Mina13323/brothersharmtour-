@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { isAdmin } from "@/lib/auth";
 import { deleteTour, saveTour, slugTaken, tourById } from "@/lib/store/repo";
+import { syncTourToSupabase } from "@/lib/store/supabaseSync";
 
 /**
  * Admin single tour: read, update (partial merge — structured lists are only
@@ -47,11 +48,16 @@ export async function PATCH(
 
   // Guard rails on the fields that other records reference.
   if (patch.priceFrom !== undefined && patch.priceFrom !== null && Number(patch.priceFrom) < 0)
-    return NextResponse.json({ ok: false, message: "Price cannot be negative." }, { status: 422 });
+    return NextResponse.json({ ok: false, message: "Adult price cannot be negative." }, { status: 422 });
+
+  if (patch.childPrice !== undefined && patch.childPrice !== null && Number(patch.childPrice) < 0)
+    return NextResponse.json({ ok: false, message: "Child price cannot be negative." }, { status: 422 });
 
   const tour = saveTour({ ...patch, slug: String(patch.slug ?? existing.slug), id: existing.id });
+  await syncTourToSupabase(tour).catch(() => {});
   return NextResponse.json({ ok: true, tour });
 }
+
 
 export async function DELETE(
   _request: Request,

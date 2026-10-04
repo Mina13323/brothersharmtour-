@@ -217,6 +217,7 @@ export default async function RootLayout({
           settings={view.settings}
           catalogue={view.catalogue}
           currency={view.currency}
+          lang={view.lang}
         >
           <BookingProvider>
             <SmoothScroll />

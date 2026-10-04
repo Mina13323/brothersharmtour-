@@ -8,7 +8,7 @@ import { CTASection, SectionHeading, WhatsAppIcon } from "@/components/sections"
 import { BookButton } from "@/components/BookingProvider";
 import { StickyBookBar } from "@/components/StickyBookBar";
 import { Gallery } from "@/components/Gallery";
-import { packageBySlug } from "@/lib/store/repo";
+import { packageBySlug, localizePackage } from "@/lib/store/repo";
 import { getPublicSettings, getSiteView, serverWhatsappLink } from "@/lib/siteview";
 import { money } from "@/lib/utils";
 import { destinationName } from "@/lib/store/labels";
@@ -26,8 +26,10 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const pkg = packageBySlug(slug);
-  if (!pkg) return {};
+  const rawPkg = packageBySlug(slug);
+  if (!rawPkg) return {};
+  const { lang } = await getSiteView();
+  const pkg = localizePackage(rawPkg, lang);
   return {
     title: pkg.seo?.title || pkg.title,
     description: pkg.seo?.description || pkg.tagline,
@@ -59,11 +61,14 @@ export default async function PackageDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const pkg = packageBySlug(slug);
-  if (!pkg) notFound();
+  const rawPkg = packageBySlug(slug);
+  if (!rawPkg) notFound();
 
-  const [settings, { currency }] = await Promise.all([getPublicSettings(), getSiteView()]);
+  const [settings, { currency, lang }] = await Promise.all([getPublicSettings(), getSiteView()]);
+  const pkg = localizePackage(rawPkg, lang);
   const price = money(pkg.priceFrom, currency, pkg.priceOverrides);
+  const childPriceFormatted =
+    pkg.childPrice !== null && pkg.childPrice !== undefined ? money(pkg.childPrice, currency) : null;
   const whatsappLink = (m?: string) => serverWhatsappLink(settings.contact.whatsapp, m);
 
   const schema = {
@@ -143,14 +148,22 @@ export default async function PackageDetailPage({
               </div>
               <div>
                 <dt className="text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-stone">
-                  From
+                  Pricing
                 </dt>
-                <dd className="mt-1 flex flex-wrap items-baseline gap-x-2">
-                  <span className="font-display text-[1.75rem] leading-none text-ink">
-                    {price ?? "On request"}
-                  </span>
-                  {price ? (
-                    <span className="text-[0.75rem] text-stone">starting point — quoted for your group</span>
+                <dd className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                  <div>
+                    <span className="text-[10px] uppercase tracking-wider text-stone block">Adult</span>
+                    <span className="font-display text-[1.6rem] leading-none text-ink">
+                      {price ?? "On request"}
+                    </span>
+                  </div>
+                  {childPriceFormatted ? (
+                    <div className="pl-3 border-l border-sand/80">
+                      <span className="text-[10px] uppercase tracking-wider text-stone block">Child</span>
+                      <span className="font-display text-[1.25rem] font-semibold leading-none text-ink/90">
+                        {childPriceFormatted}
+                      </span>
+                    </div>
                   ) : null}
                 </dd>
               </div>
@@ -325,6 +338,7 @@ export default async function PackageDetailPage({
           description: [],
           images: pkg.coverImage ? [pkg.coverImage] : [],
           priceFrom: pkg.priceFrom,
+          childPrice: pkg.childPrice,
           currency: pkg.currency,
           priceOverrides: pkg.priceOverrides,
           duration: pkg.duration,

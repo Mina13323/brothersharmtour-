@@ -10,12 +10,10 @@ import { Reveal } from "@/components/Reveal";
 import { HighlightTile, TourCard } from "@/components/cards";
 import { Gallery } from "@/components/Gallery";
 import {
-  Breadcrumbs,
   CTASection,
   SectionHeading,
   ArrowRight,
 } from "@/components/sections";
-import { BookButton } from "@/components/BookingProvider";
 import { WaveDivider } from "@/components/WaveDivider";
 
 import {

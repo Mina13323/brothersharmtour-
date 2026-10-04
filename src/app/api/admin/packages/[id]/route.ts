@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { isAdmin } from "@/lib/auth";
 import { deletePackage, packageById, savePackage } from "@/lib/store/repo";
+import { syncPackageToSupabase } from "@/lib/store/supabaseSync";
 
 /** Admin single package: read, update, delete. */
 
@@ -33,14 +34,26 @@ export async function PATCH(
     return NextResponse.json({ ok: false, message: "Invalid body." }, { status: 400 });
   }
 
+  if (patch.priceFrom !== undefined && patch.priceFrom !== null && Number(patch.priceFrom) < 0) {
+    return NextResponse.json({ ok: false, message: "Adult price cannot be negative." }, { status: 422 });
+  }
+
+  if (patch.childPrice !== undefined && patch.childPrice !== null && Number(patch.childPrice) < 0) {
+    return NextResponse.json({ ok: false, message: "Child price cannot be negative." }, { status: 422 });
+  }
+
   const pkg = savePackage({
     ...patch,
     id: existing.id,
     slug: String(patch.slug ?? existing.slug),
     title: String(patch.title ?? existing.title),
   });
+
+  await syncPackageToSupabase(pkg).catch(() => {});
+
   return NextResponse.json({ ok: true, package: pkg });
 }
+
 
 export async function DELETE(
   _request: Request,

@@ -1,14 +1,16 @@
 import Link from "next/link";
 import { Plus, Eye, EyeOff } from "lucide-react";
 import { requireAdmin } from "@/lib/auth";
-import { allPackages } from "@/lib/store/repo";
+import { allPackages, ensureDbLoadedFromSupabase } from "@/lib/store/repo";
 import { destinationName } from "@/lib/store/labels";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminPackagesPage() {
   await requireAdmin();
+  await ensureDbLoadedFromSupabase(true);
   const packages = allPackages();
+
 
   return (
     <div className="space-y-6">

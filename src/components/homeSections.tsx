@@ -270,7 +270,7 @@ export function TrustMarquee() {
 
 export function Bestsellers() {
   const catalogue = useCatalogue();
-  const { money, whatsappLink } = useSite();
+  const { money, whatsappLink, t } = useSite();
 
   const topPicks = catalogue
     .filter((t) => t.featured)
@@ -282,6 +282,7 @@ export function Bestsellers() {
       tag: t.category.replace(/-/g, " "),
       image: t.image ?? media.whiteIsland.card,
       price: t.priceFrom,
+      childPrice: t.childPrice,
       priceOverrides: t.priceOverrides,
       duration: t.duration ?? "Flexible",
       desc: t.summary,
@@ -356,18 +357,32 @@ export function Bestsellers() {
                   </p>
                 </div>
 
-                <div className="mt-5 flex items-center justify-between pt-2">
-                  <div>
-                    <span className="text-[10px] uppercase tracking-wider text-stone block">From</span>
-                    <span className="font-display text-xl font-bold text-ink leading-none">
-                      {money(tour.price, tour.priceOverrides) ?? "On request"}
-                    </span>
+                <div className="mt-5 flex items-center justify-between pt-2 border-t border-sand/50">
+                  <div className="flex flex-wrap items-baseline gap-x-2.5">
+                    <div>
+                      <span className="text-[10px] uppercase tracking-wider text-stone block">
+                        {t("price_adult", "Adult")}
+                      </span>
+                      <span className="font-display text-xl font-bold text-ink leading-none">
+                        {money(tour.price, tour.priceOverrides) ?? t("price_on_request", "On request")}
+                      </span>
+                    </div>
+                    {typeof tour.childPrice === "number" && tour.childPrice >= 0 && (
+                      <div className="pl-2 border-l border-sand/80">
+                        <span className="text-[10px] uppercase tracking-wider text-stone block">
+                          {t("price_child", "Child")}
+                        </span>
+                        <span className="font-display text-base font-semibold text-ink/90 leading-none">
+                          {money(tour.childPrice)}
+                        </span>
+                      </div>
+                    )}
                   </div>
                   <Link
                     href={`/tours/${tour.slug}`}
-                    className="inline-flex items-center gap-1.5 text-xs font-bold text-reef hover:text-sun transition-colors"
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-reef hover:text-sun transition-colors shrink-0"
                   >
-                    <span>Details</span>
+                    <span>{t("details", "Details")}</span>
                     <span>→</span>
                   </Link>
                 </div>

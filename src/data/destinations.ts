@@ -178,5 +178,6 @@ export const destinations: Destination[] = [
 export const destinationBySlug = (slug: string) =>
   destinations.find((d) => d.slug === slug);
 
-export const destinationName = (slug: string) =>
-  destinations.find((d) => d.slug === slug)?.name ?? slug;
+export const destinationName = (slug?: string | null) =>
+  slug ? (destinations.find((d) => d.slug === slug)?.name ?? slug) : "Sharm El Sheikh";
+

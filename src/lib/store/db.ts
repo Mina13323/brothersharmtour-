@@ -70,6 +70,44 @@ export function saveDb(next: Database): Database {
 }
 
 /**
+ * Applies data fetched from Supabase into the active database and cache.
+ * Updates in-memory store immediately so serverless deployments and zip updates
+ * always serve the live database content.
+ */
+export function applySupabaseData(incoming: {
+  tours?: Database["tours"];
+  packages?: Database["packages"];
+  settings?: Database["settings"];
+}): void {
+  const current = loadDb();
+  let changed = false;
+
+  if (incoming.tours && incoming.tours.length > 0) {
+    current.tours = incoming.tours;
+    changed = true;
+  }
+  if (incoming.packages) {
+    current.packages = incoming.packages;
+    changed = true;
+  }
+  if (incoming.settings && Object.keys(incoming.settings).length > 0) {
+    current.settings = incoming.settings;
+    changed = true;
+  }
+
+  if (changed) {
+    try {
+      persist(current);
+      const mtime = statSync(DB_PATH).mtimeMs;
+      cache = { data: current, mtime };
+    } catch {
+      // In-memory cache when filesystem is read-only (e.g. serverless)
+      cache = { data: current, mtime: Date.now() };
+    }
+  }
+}
+
+/**
  * Read-modify-write helper. The mutator receives the latest on-disk state, so
  * concurrent admin actions cannot clobber each other with stale reads.
  */
@@ -86,3 +124,4 @@ export function writeSeedFile(): void {
   persist(seeded);
   cache = null;
 }
+

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Plus, AlertCircle, Eye, EyeOff } from "lucide-react";
 import { requireAdmin } from "@/lib/auth";
-import { allTours, reviewStats } from "@/lib/store/repo";
+import { allTours, ensureDbLoadedFromSupabase, reviewStats } from "@/lib/store/repo";
 import { destinationName } from "@/lib/store/labels";
 
 /**
@@ -13,7 +13,9 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminToursPage() {
   await requireAdmin();
+  await ensureDbLoadedFromSupabase(true);
   const tours = allTours();
+
 
   return (
     <div className="space-y-6">

@@ -53,10 +53,29 @@ export default function TourEditor({
 }) {
   const router = useRouter();
   const [tab, setTab] = useState<"edit" | "preview">("edit");
-  const [tour, setTour] = useState<EditorTour>(initialTour);
+  const [tour, setTour] = useState<EditorTour>(() => ({
+    ...initialTour,
+    destination: initialTour.destination || "sharm-el-sheikh",
+    category: initialTour.category || "sea-water",
+    images: Array.isArray(initialTour.images) ? initialTour.images : [],
+    description: Array.isArray(initialTour.description) ? initialTour.description : [],
+    highlights: Array.isArray(initialTour.highlights) ? initialTour.highlights : [],
+    included: Array.isArray(initialTour.included) ? initialTour.included : [],
+    excluded: Array.isArray(initialTour.excluded) ? initialTour.excluded : [],
+    bring: Array.isArray(initialTour.bring) ? initialTour.bring : [],
+    restrictions: Array.isArray(initialTour.restrictions) ? initialTour.restrictions : [],
+    itinerary: Array.isArray(initialTour.itinerary) ? initialTour.itinerary : [],
+    faq: Array.isArray(initialTour.faq) ? initialTour.faq : [],
+    related: Array.isArray(initialTour.related) ? initialTour.related : [],
+    translations: initialTour.translations || {},
+    addons: Array.isArray(initialTour.addons) ? initialTour.addons : [],
+    languages: Array.isArray(initialTour.languages) ? initialTour.languages : ["English"],
+    importantInfo: Array.isArray(initialTour.importantInfo) ? initialTour.importantInfo : [],
+  }));
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
   const [lang, setLang] = useState("en");
+
 
   const set = <K extends keyof EditorTour>(key: K, value: EditorTour[K]) =>
     setTour((t) => ({ ...t, [key]: value }));
@@ -279,22 +298,50 @@ export default function TourEditor({
             <Field label="Card summary (1–2 sentences, no marketing filler)">
               <textarea rows={3} className={input} value={tour.summary} onChange={(e) => set("summary", e.target.value)} />
             </Field>
-            <div className="grid grid-cols-2 gap-3">
-              <Field label={`From price (${tour.currency})`}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 rounded-xl bg-black/20 p-3.5 border border-white/5">
+              <Field label={`Adult Price (${tour.currency}) — Required for online quote`}>
                 <input
                   type="number"
+                  min="0"
+                  step="1"
+                  placeholder="e.g. 45"
                   className={input}
                   value={tour.priceFrom ?? ""}
-                  onChange={(e) => set("priceFrom", e.target.value === "" ? null : Number(e.target.value))}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === "") {
+                      set("priceFrom", null);
+                    } else {
+                      const num = Number(val);
+                      set("priceFrom", isNaN(num) ? null : Math.max(0, num));
+                    }
+                  }}
                 />
+                <span className="block text-[10px] text-stone-500 mt-1">
+                  Ages 12+. Independent of child price. Leave blank for &quot;Price on request&quot;.
+                </span>
               </Field>
-              <Field label="Child price (optional)">
+              <Field label={`Child Price (${tour.currency}) — Independent rate`}>
                 <input
                   type="number"
+                  min="0"
+                  step="1"
+                  placeholder="e.g. 25"
                   className={input}
                   value={tour.childPrice ?? ""}
-                  onChange={(e) => set("childPrice", e.target.value === "" ? null : Number(e.target.value))}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === "") {
+                      set("childPrice", null);
+                    } else {
+                      const num = Number(val);
+                      set("childPrice", isNaN(num) ? null : Math.max(0, num));
+                    }
+                  }}
                 />
+                <span className="block text-[10px] text-stone-500 mt-1">
+                  Ages 5–10. Editable independently. If left blank, falls back gracefully.
+                </span>
               </Field>
             </div>
             <div className="grid grid-cols-2 gap-3">

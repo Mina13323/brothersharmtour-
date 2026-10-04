@@ -6,7 +6,7 @@
 
 import { cookies } from "next/headers";
 import type { CurrencyContext } from "@/lib/currency";
-import { approvedReviews, buildCatalogue, getSettings, tourBySlug } from "@/lib/store/repo";
+import { approvedReviews, buildCatalogue, ensureDbLoadedFromSupabase, getSettings, tourBySlug } from "@/lib/store/repo";
 import type { ReviewRecord } from "@/lib/store/types";
 import type { CatalogueTour } from "@/lib/store/types";
 import type { PublicSettings } from "@/components/SiteProvider";
@@ -24,7 +24,9 @@ export function serverWhatsappLink(whatsapp: string, message?: string) {
 }
 
 export async function getPublicSettings(): Promise<PublicSettings> {
+  await ensureDbLoadedFromSupabase();
   const s = getSettings();
+
   return {
     name: s.site.name,
     tagline: s.site.tagline,
@@ -114,6 +116,7 @@ function toPublicReview(r: ReviewRecord): PublicReview {
 }
 
 export async function getSiteView(): Promise<SiteView> {
+  await ensureDbLoadedFromSupabase();
   const [settings, currency, lang] = await Promise.all([
     getPublicSettings(),
     getCurrencyContext(),
@@ -131,5 +134,5 @@ export async function getSiteView(): Promise<SiteView> {
           count,
         }
       : { average: null, count: 0 };
-  return { settings, currency, lang, catalogue: buildCatalogue(), reviews, reviewStats };
+  return { settings, currency, lang, catalogue: buildCatalogue(lang), reviews, reviewStats };
 }

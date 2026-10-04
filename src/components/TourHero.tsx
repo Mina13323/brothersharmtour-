@@ -286,21 +286,32 @@ export function TourHero({
 }: {
   tour: Tour & { priceOverrides?: Record<string, number> };
 }) {
-  const { money } = useSite();
+  const { money, t } = useSite();
   const price = money(tour.priceFrom, tour.priceOverrides);
+  const childPrice =
+    tour.childPrice !== null && tour.childPrice !== undefined
+      ? money(tour.childPrice, tour.priceOverrides)
+      : null;
+
+  const priceTag = price
+    ? ` • ${t("price_adult", "ADULT").toUpperCase()} ${price.toUpperCase()}${
+        childPrice ? ` • ${t("price_child", "CHILD").toUpperCase()} ${childPrice.toUpperCase()}` : ""
+      }`
+    : "";
+
   return (
     <CapsuleHero
       title={tour.title}
-      eyebrow={`${destinationName(tour.destination)} • ${experienceName(tour.category)}${price ? ` • FROM ${price.toUpperCase()}` : ""}`}
+      eyebrow={`${destinationName(tour.destination)} • ${experienceName(tour.category)}${priceTag}`}
       summary={tour.summary}
       images={tour.images}
       breadcrumbs={[
-        { label: "Home", href: "/" },
-        { label: "Tours", href: "/tours" },
+        { label: t("nav_home", "Home"), href: "/" },
+        { label: t("nav_tours", "Tours"), href: "/tours" },
         { label: tour.title },
       ]}
       primaryCta={{
-        label: "Book This Tour",
+        label: t("nav_book_now", "Book This Tour"),
         tourSlug: tour.slug,
       }}
     />

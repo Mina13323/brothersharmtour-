@@ -54,16 +54,20 @@ export function TourBody({
   /** In the CMS preview the fixed-position sticky bar is suppressed. */
   preview?: boolean;
 }) {
-  const { money, whatsappLink, settings } = useSite();
+  const { money, whatsappLink, settings, t } = useSite();
   const guideLang = useGuideLanguage();
 
   const price = money(tour.priceFrom, tour.priceOverrides);
+  const childPriceFormatted =
+    tour.childPrice !== null && tour.childPrice !== undefined
+      ? money(tour.childPrice, tour.priceOverrides)
+      : null;
   const original = money(tourOriginalPrice(tour), tour.priceOverrides);
   const discount = tourDiscountPct(tour);
   const rating = tourRating(tour);
   const reviewsCount = tourReviewCount(tour);
   const unit = tourPriceUnit(tour);
-  const unitShort = unit === "per person" ? "/pp" : unit.replace("per ", "/ ");
+  const unitShort = unit === "per person" ? `/${t("price_adult", "adult")}` : unit.replace("per ", "/ ");
   const galleryImages = tour.images.length > 1 ? tour.images : [];
 
   return (
@@ -74,24 +78,24 @@ export function TourBody({
           <div className="flex flex-col gap-6 py-6 lg:flex-row lg:items-center lg:justify-between lg:py-7">
             <dl className="grid grid-cols-2 gap-x-8 gap-y-4 sm:grid-cols-4 lg:gap-x-12">
               <Fact label="Location" value={destinationName(tour.destination)} />
-              <Fact label="Duration" value={tour.duration ?? "Flexible"} />
+              <Fact label="Duration" value={tour.duration ?? t("duration_flexible", "Flexible")} />
               <Fact
                 label="Tour type"
                 value={
                   tour.type === "private"
-                    ? "Private"
+                    ? t("private_tour", "Private")
                     : tour.type === "transfer"
-                      ? "Private transfer"
-                      : "Small group"
+                      ? t("private_transfer", "Private transfer")
+                      : t("small_group", "Small group")
                 }
               />
               <div>
                 <dt className="text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-stone">
-                  From
+                  {t("price_adult_label", "Adult Price")}
                 </dt>
                 <dd className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                  <span className="font-display text-[1.75rem] leading-none text-ink">
-                    {price ?? "On request"}
+                  <span className="font-display text-[1.75rem] leading-none text-ink font-bold">
+                    {price ?? t("price_on_request", "On request")}
                   </span>
                   {price ? (
                     <span className="text-[0.75rem] text-stone">{unitShort}</span>
@@ -107,12 +111,24 @@ export function TourBody({
                     </span>
                   ) : null}
                 </dd>
+                {childPriceFormatted ? (
+                  <div className="mt-2 pt-2 border-t border-sand/40">
+                    <dt className="text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-stone">
+                      {t("price_child_label", "Child Price (5–10 yrs)")}
+                    </dt>
+                    <dd className="mt-0.5 flex items-baseline gap-x-1">
+                      <span className="font-display text-[1.2rem] leading-none text-reef-deep font-bold">
+                        {childPriceFormatted}
+                      </span>
+                    </dd>
+                  </div>
+                ) : null}
               </div>
             </dl>
 
             <div className="flex flex-col gap-3 sm:flex-row lg:shrink-0">
               <BookButton tourSlug={tour.slug} className="btn btn-primary">
-                Book now
+                {t("nav_book_now", "Book now")}
               </BookButton>
               <a
                 href={whatsappLink(`Hi Brother Sharm Tour — I'm interested in ${tour.title}.`)}
@@ -396,18 +412,26 @@ export function TourBody({
                 <div className="rounded-3xl bg-paper-warm p-6 shadow-md md:p-8">
                   <div className="flex items-end justify-between gap-4 pb-5">
                     <div>
-                      <p className="eyebrow text-stone">From</p>
-                      <p className="mt-2 font-display text-[2.5rem] leading-none">
-                        {price ?? "On request"}
+                      <p className="eyebrow text-stone">{t("price_adult_label", "Adult Price")}</p>
+                      <p className="mt-1 font-display text-[2.25rem] leading-none font-bold text-ink">
+                        {price ?? t("price_on_request", "On request")}
                       </p>
                       {price ? (
-                        <p className="mt-1 text-[0.75rem] text-stone">per adult</p>
+                        <p className="mt-1 text-[0.75rem] text-stone">/{t("price_adult", "adult")}</p>
                       ) : (
                         <p className="mt-1 text-[0.75rem] text-stone">quoted for your group</p>
                       )}
+                      {childPriceFormatted ? (
+                        <div className="mt-3 pt-2 border-t border-sand/60">
+                          <p className="eyebrow text-reef-deep text-[0.65rem]">{t("price_child_label", "Child Price (5–10 yrs)")}</p>
+                          <p className="mt-0.5 font-display text-[1.4rem] font-bold text-reef-deep">
+                            {childPriceFormatted}
+                          </p>
+                        </div>
+                      ) : null}
                     </div>
                     <span className="rounded-pill border border-ink/15 px-3 py-1 text-[0.625rem] uppercase tracking-[0.14em] text-stone">
-                      {tour.duration ?? "Flexible"}
+                      {tour.duration ?? t("duration_flexible", "Flexible")}
                     </span>
                   </div>
 

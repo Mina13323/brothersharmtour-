@@ -14,8 +14,11 @@ import {
   allPackages,
   allReviews,
   allTours,
+  ensureDbLoadedFromSupabase,
   integrityCheck,
 } from "@/lib/store/repo";
+import { DatabaseSyncWidget } from "@/components/admin/DatabaseSyncWidget";
+
 
 /**
  * Admin dashboard: the state of the whole CMS at a glance — content counts,
@@ -27,6 +30,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
   await requireAdmin();
+  await ensureDbLoadedFromSupabase();
 
   const [tours, packages, reviews, inquiries, issues] = [
     allTours(),
@@ -89,7 +93,11 @@ export default async function AdminDashboardPage() {
         </p>
       </header>
 
+      {/* Persistent Database Sync */}
+      <DatabaseSyncWidget />
+
       {/* Stat cards */}
+
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((s) => {
           const Icon = s.icon;

@@ -115,8 +115,12 @@ export interface PackageRecord {
   category?: ExperienceSlug;
   duration: string;
   priceFrom: number | null;
+  childPrice?: number | null;
   currency: string;
   priceOverrides?: Record<string, number>;
+  /** Selected / linked tour reference */
+  tourId?: string | null;
+  tourSlug?: string | null;
   coverImage: MediaImage | null;
   gallery: MediaImage[];
   description: string[];
@@ -124,6 +128,7 @@ export interface PackageRecord {
   included: string[];
   excluded: string[];
   bring: string[];
+  translations?: Record<string, Partial<PackageRecord>>;
   status: PublishStatus;
   featured: boolean;
   priority: number;

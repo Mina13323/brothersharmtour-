@@ -27,9 +27,11 @@ export async function generateMetadata({
   const record = tourBySlug(slug);
   if (!record) return {};
 
+  const lang = (await getSiteView()).lang;
+  const tour = localizeTour(record, lang);
   const settings = await getPublicSettings();
-  const title = record.seo?.title || `${record.title} — ${destinationName(record.destination)}`;
-  const description = record.seo?.description || record.summary;
+  const title = tour.seo?.title || `${tour.title} — ${destinationName(tour.destination)}`;
+  const description = tour.seo?.description || tour.summary;
 
   return {
     title,

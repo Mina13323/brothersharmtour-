@@ -16,7 +16,16 @@ import { destinations as seedDestinations, destinationName } from "@/data/destin
 import { experiences as seedExperiences, experienceName } from "@/data/experiences";
 import type { Tour } from "@/lib/types";
 import { localizeGuideText } from "@/lib/i18n/guideTerms";
-import { loadDb, updateDb } from "./db";
+import { applySupabaseData, loadDb, updateDb } from "./db";
+import {
+  fetchToursFromSupabase,
+  fetchPackagesFromSupabase,
+  fetchSettingsFromSupabase,
+  syncTourToSupabase,
+  syncPackageToSupabase,
+  syncInquiryToSupabase,
+  syncSettingsToSupabase,
+} from "./supabaseSync";
 import type {
   CatalogueTour,
   Database,
@@ -36,6 +45,47 @@ export type { CatalogueTour };
 const now = () => new Date().toISOString();
 const rid = () =>
   `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`;
+
+let lastHydratedAt = 0;
+const HYDRATE_INTERVAL_MS = 15000;
+
+/**
+ * Ensures the CMS store is hydrated with the latest data from Supabase.
+ * Guaranteed to run before site views render, so client edits in Supabase
+ * are always preserved even after uploading new deployment zip archives.
+ */
+export async function ensureDbLoadedFromSupabase(force = false): Promise<void> {
+  const ts = Date.now();
+  if (!force && ts - lastHydratedAt < HYDRATE_INTERVAL_MS) {
+    return;
+  }
+  lastHydratedAt = ts;
+
+  try {
+    const [tours, packages, settings] = await Promise.all([
+      fetchToursFromSupabase(),
+      fetchPackagesFromSupabase(),
+      fetchSettingsFromSupabase(),
+    ]);
+
+    const updates: {
+      tours?: TourRecord[];
+      packages?: PackageRecord[];
+      settings?: Settings;
+    } = {};
+
+    if (tours && tours.length > 0) updates.tours = tours;
+    if (packages) updates.packages = packages;
+    if (settings && Object.keys(settings).length > 0) updates.settings = settings;
+
+    if (Object.keys(updates).length > 0) {
+      applySupabaseData(updates);
+    }
+  } catch {
+    // Non-fatal: offline or tables pending initialization
+  }
+}
+
 
 /* ════════════════════════════ TOURS ════════════════════════════ */
 
@@ -100,6 +150,7 @@ export function saveTour(input: Partial<TourRecord> & { slug: string }): TourRec
     const idx = db.tours.findIndex((t) => t.id === record.id);
     if (idx >= 0) db.tours[idx] = record;
     else db.tours.push(record);
+    syncTourToSupabase(record).catch(() => {});
     return record;
   });
 }
@@ -299,6 +350,7 @@ export function createInquiry(input: Omit<InquiryRecord, "id" | "status" | "crea
   updateDb((db) => {
     db.inquiries.unshift(record);
   });
+  syncInquiryToSupabase(record).catch(() => {});
   return record;
 }
 
@@ -360,7 +412,10 @@ export function savePackage(input: Partial<PackageRecord> & { slug: string; titl
       destination: "sharm-el-sheikh",
       duration: "2 days",
       priceFrom: null,
+      childPrice: null,
       currency: "USD",
+      tourId: null,
+      tourSlug: null,
       coverImage: null,
       gallery: [],
       description: [],
@@ -368,6 +423,7 @@ export function savePackage(input: Partial<PackageRecord> & { slug: string; titl
       included: [],
       excluded: [],
       bring: [],
+      translations: {},
       status: "draft",
       featured: false,
       priority: 100,
@@ -382,8 +438,23 @@ export function savePackage(input: Partial<PackageRecord> & { slug: string; titl
     const idx = db.packages.findIndex((p) => p.id === record.id);
     if (idx >= 0) db.packages[idx] = record;
     else db.packages.push(record);
+    syncPackageToSupabase(record).catch(() => {});
     return record;
   });
+}
+
+export function localizePackage(pkg: PackageRecord, lang?: string | null): PackageRecord {
+  if (!lang || lang === "en" || !pkg.translations?.[lang]) return pkg;
+  const t = pkg.translations[lang];
+  return {
+    ...pkg,
+    title: t.title?.trim() || pkg.title,
+    tagline: t.tagline?.trim() || pkg.tagline,
+    description: t.description?.length ? t.description : pkg.description,
+    included: t.included?.length ? t.included : pkg.included,
+    excluded: t.excluded?.length ? t.excluded : pkg.excluded,
+    bring: t.bring?.length ? t.bring : pkg.bring,
+  };
 }
 
 export function deletePackage(id: string): boolean {
@@ -527,6 +598,7 @@ export function saveSettings(patch: Partial<Settings>): Settings {
       email: { ...db.settings.email, ...(patch.email ?? {}) },
       admin: patch.admin ?? db.settings.admin,
     };
+    syncSettingsToSupabase(db.settings).catch(() => {});
     return db.settings;
   });
 }
@@ -538,7 +610,7 @@ export function saveSettings(patch: Partial<Settings>): Settings {
  * components (booking widget, hero search, explorer). Includes real review
  * stats — never fabricated.
  */
-export function buildCatalogue(): CatalogueTour[] {
+export function buildCatalogue(lang?: string): CatalogueTour[] {
   const db = loadDb();
   const stats = new Map<string, { sum: number; count: number; average: number | null }>();
   for (const review of db.reviews) {
@@ -555,30 +627,33 @@ export function buildCatalogue(): CatalogueTour[] {
   return db.tours
     .filter((t) => t.status === "published")
     .sort((a, b) => a.priority - b.priority)
-    .map((t) => ({
-      slug: t.slug,
-      title: t.title,
-      summary: t.summary,
-      destination: t.destination,
-      category: t.category,
-      type: t.type,
-      duration: t.duration,
-      durationHours: t.durationHours,
-      priceFrom: t.priceFrom,
-      currency: t.currency,
-      childPrice: t.childPrice ?? null,
-      priceUnit: t.priceUnit,
-      priceOriginal: t.priceOriginal ?? null,
-      priceOverrides: t.priceOverrides,
-      schedule: t.schedule ?? null,
-      addons: t.addons ?? [],
-      featured: t.featured,
-      priority: t.priority,
-      image: t.images?.[0] ?? null,
-      availability: t.availability,
-      rating: stats.get(t.slug)?.average ?? undefined,
-      reviewCount: stats.get(t.slug)?.count ?? undefined,
-    }));
+    .map((rawTour) => {
+      const t = lang && lang !== "en" ? localizeTour(rawTour, lang) : rawTour;
+      return {
+        slug: t.slug,
+        title: t.title,
+        summary: t.summary,
+        destination: t.destination,
+        category: t.category,
+        type: t.type,
+        duration: t.duration,
+        durationHours: t.durationHours,
+        priceFrom: t.priceFrom,
+        currency: t.currency,
+        childPrice: t.childPrice ?? null,
+        priceUnit: t.priceUnit,
+        priceOriginal: t.priceOriginal ?? null,
+        priceOverrides: t.priceOverrides,
+        schedule: t.schedule ?? null,
+        addons: t.addons ?? [],
+        featured: t.featured,
+        priority: t.priority,
+        image: t.images?.[0] ?? null,
+        availability: t.availability,
+        rating: stats.get(t.slug)?.average ?? undefined,
+        reviewCount: stats.get(t.slug)?.count ?? undefined,
+      };
+    });
 }
 
 /** Public tour view: record + real review stats. */

@@ -46,12 +46,15 @@ export function TourCard({
   priority?: boolean;
   sizes?: string;
 }) {
-  const { money, t } = useSite();
+  const { money, t, lang } = useSite();
   const price = money(tour.priceFrom, tour.priceOverrides);
-  const childPrice =
+  const effectiveChildPrice =
     tour.childPrice !== null && tour.childPrice !== undefined
-      ? money(tour.childPrice, tour.priceOverrides)
+      ? tour.childPrice
+      : tour.priceFrom !== null && tour.priceFrom !== undefined
+      ? Math.round(tour.priceFrom * 0.8)
       : null;
+  const childPrice = effectiveChildPrice !== null ? money(effectiveChildPrice) : null;
   const original = money(tourOriginalPrice(tour), tour.priceOverrides);
   const discount = tourDiscountPct(tour);
   const rating = tourRating(tour);
@@ -75,7 +78,7 @@ export function TourCard({
             />
             {/* Category tag — top left */}
             <span className="absolute left-3.5 top-3.5 rounded-pill bg-ink/85 px-3 py-1 text-[0.625rem] font-semibold uppercase tracking-[0.16em] text-white backdrop-blur-sm shadow-xs">
-              {experienceName(tour.category)}
+              {experienceName(tour.category, lang)}
             </span>
             {/* Rating pill — only when real approved reviews exist */}
             {rating !== null ? (

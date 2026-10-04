@@ -23,8 +23,9 @@ export function money(
   value: number | null | undefined,
   ctx: CurrencyContext,
   overrides?: Record<string, number>,
+  lang?: string,
 ) {
-  return moneyIn(value, ctx, { overrides });
+  return moneyIn(value, ctx, { overrides, lang });
 }
 
 /**

@@ -82,8 +82,8 @@ export function LanguageSwitcher({
     document.cookie = "googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
     document.cookie = `googtrans=; path=/; domain=${window.location.hostname}; expires=Thu, 01 Jan 1970 00:00:00 UTC;`;
 
-    // Refresh route to re-render server components with the selected language
-    router.refresh();
+    // Full reload to guarantee layout, SiteProvider, direction and all server/client components update cleanly
+    window.location.reload();
   }
 
   const active = SUPPORTED_LANGUAGES.find((l) => l.code === current) ?? SUPPORTED_LANGUAGES[0];

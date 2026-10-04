@@ -78,6 +78,18 @@ export default function PackageEditor({
       ...p,
       tourId: selected.id,
       tourSlug: selected.slug,
+      title: p.title || selected.title,
+      tagline: p.tagline || selected.summary,
+      destination: selected.destination || p.destination,
+      duration: p.duration || selected.duration || "1 day",
+      priceFrom: p.priceFrom ?? selected.priceFrom,
+      childPrice: p.childPrice ?? selected.childPrice,
+      coverImage: p.coverImage || (selected.images?.[0] ? selected.images[0] : null),
+      gallery: p.gallery?.length ? p.gallery : (selected.images?.slice(1) ?? []),
+      description: p.description?.length ? p.description : (selected.description ?? []),
+      included: p.included?.length ? p.included : (selected.included ?? []),
+      excluded: p.excluded?.length ? p.excluded : (selected.excluded ?? []),
+      bring: p.bring?.length ? p.bring : (selected.bring ?? []),
     }));
   }
 
@@ -223,11 +235,17 @@ export default function PackageEditor({
                     onChange={(e) => handleSelectTour(e.target.value)}
                   >
                     <option value="">-- No linked tour (Independent Package) --</option>
-                    {tours.map((t) => (
-                      <option key={t.id} value={t.id}>
-                        {t.title} · {destinationName(t.destination)} · {t.priceFrom !== null ? `${t.priceFrom} ${t.currency}` : "Price on request"}
-                      </option>
-                    ))}
+                    {tours.map((t) => {
+                      const localizedTitle = (lang !== "en" && t.translations?.[lang]?.title) || t.title;
+                      const adultDisplay = t.priceFrom !== null ? `Adult: ${t.priceFrom} ${t.currency}` : "Adult: On request";
+                      const childRate = t.childPrice ?? (t.priceFrom ? Math.round(t.priceFrom * 0.8) : null);
+                      const childDisplay = childRate !== null ? `Child: ${childRate} ${t.currency}` : "Child: N/A";
+                      return (
+                        <option key={t.id} value={t.id}>
+                          {localizedTitle} · {destinationName(t.destination, lang)} · {adultDisplay} · {childDisplay}
+                        </option>
+                      );
+                    })}
                   </select>
                   {selectedTour ? (
                     <button

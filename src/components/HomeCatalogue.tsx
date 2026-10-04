@@ -35,7 +35,7 @@ const GROUPS: CategoryGroup[] = [
     captionKey: "caption_sea",
     defaultName: "Sea & Diving",
     defaultCaption: "Discover the Red Sea",
-    categories: ["sea-water", "sea-diving", "sea", "diving"],
+    categories: ["sea-water", "sea-diving", "sea", "diving", "snorkeling", "snorkelling", "marine", "boat", "yacht", "island"],
   },
   {
     id: "safari",
@@ -43,7 +43,7 @@ const GROUPS: CategoryGroup[] = [
     captionKey: "caption_safari",
     defaultName: "Safari",
     defaultCaption: "Breathe in the desert",
-    categories: ["desert", "adventure", "safari"],
+    categories: ["desert", "adventure", "safari", "quad", "buggy", "camel", "canyon", "sinai"],
   },
   {
     id: "historical",
@@ -51,7 +51,7 @@ const GROUPS: CategoryGroup[] = [
     captionKey: "caption_historical",
     defaultName: "Historical",
     defaultCaption: "Where history began",
-    categories: ["culture", "historical", "history"],
+    categories: ["culture", "historical", "history", "cairo", "pyramids", "museum", "luxor", "alexandria"],
   },
   {
     id: "entertainment",
@@ -59,7 +59,7 @@ const GROUPS: CategoryGroup[] = [
     captionKey: "caption_entertainment",
     defaultName: "Entertainment",
     defaultCaption: "Dive into the adventure",
-    categories: ["wildlife", "leisure", "private-transfers", "entertainment"],
+    categories: ["wildlife", "leisure", "private-transfers", "transfer", "transfers", "entertainment", "show", "dolphin", "aqua", "night"],
   },
 ];
 
@@ -100,6 +100,11 @@ export function HomeCatalogue() {
     });
   }, [activeTab, catalogue]);
 
+  const totalVisibleTours = useMemo(() => {
+    const fromGroups = visibleGroups.reduce((acc, g) => acc + matchTours(g.categories, catalogue).length, 0);
+    return fromGroups + unassignedTours.length;
+  }, [visibleGroups, catalogue, unassignedTours]);
+
   return (
     <section id="tours" className="band scroll-mt-24">
       <div className="shell">
@@ -124,6 +129,20 @@ export function HomeCatalogue() {
 
         {/* Groups */}
         <div className="mt-12 space-y-16">
+          {totalVisibleTours === 0 && (
+            <div className="rounded-3xl border border-sand/80 bg-paper-warm/50 p-12 text-center">
+              <p className="font-display text-xl text-ink">
+                {t("no_tours_found_in_category", "No tours currently available in this category.")}
+              </p>
+              <button
+                onClick={() => setActiveTab("all")}
+                className="btn btn-outline btn-sm mt-4 cursor-pointer"
+              >
+                {t("cat_all", "All Tours")}
+              </button>
+            </div>
+          )}
+
           {visibleGroups.map((group) => {
             const list = matchTours(group.categories, catalogue);
             if (!list.length) return null;

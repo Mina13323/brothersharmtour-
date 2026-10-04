@@ -59,9 +59,13 @@ const SYMBOLS: Record<string, string> = {
   EGP: "EGP ",
 };
 
-export function formatAmount(value: number, currency: string): string {
-  const symbol = SYMBOLS[currency] ?? `${currency} `;
+export function formatAmount(value: number, currency: string, lang?: string): string {
+  const isAr = lang === "ar";
+  const symbol = isAr && currency === "EGP" ? "ج.م" : SYMBOLS[currency] ?? `${currency} `;
   const rounded = Math.round(value);
+  if (isAr) {
+    return `${rounded.toLocaleString("en-US")} ${symbol.trim()}`;
+  }
   return `${symbol}${rounded.toLocaleString("en-GB")}`;
 }
 
@@ -69,9 +73,9 @@ export function formatAmount(value: number, currency: string): string {
 export function moneyIn(
   amount: number | null | undefined,
   ctx: CurrencyContext,
-  options?: { overrides?: Record<string, number> },
+  options?: { overrides?: Record<string, number>; lang?: string },
 ): string | null {
   const { value, currency } = priceIn(amount, ctx, options);
   if (value === null) return null;
-  return formatAmount(value, currency);
+  return formatAmount(value, currency, options?.lang);
 }

@@ -21,7 +21,7 @@ export function BookingWidget({
   initialTour?: string;
   onClose?: () => void;
 }) {
-  const { settings: site, whatsappLink, money } = useSite();
+  const { settings: site, whatsappLink, money, t } = useSite();
   const tours = useCatalogue();
   const [slug, setSlug] = useState(initialTour ?? "");
   const tour = tours.find((t) => t.slug === slug);
@@ -87,7 +87,7 @@ export function BookingWidget({
       ...addons
         .filter((a) => (addonQty[a.label] ?? 0) > 0)
         .map((a) => `• Add-on: ${a.label} × ${addonQty[a.label]}`),
-      total !== null ? `• Estimated total: ${money(total, tour?.priceOverrides)} (Pay on the day)` : null,
+      total !== null ? `• Estimated total: ${money(total)} (Pay on the day)` : null,
       notes.trim() ? `• Special Notes: ${notes.trim()}` : null,
       "",
       "Please confirm availability and pickup schedule. Thank you!",
@@ -169,26 +169,30 @@ export function BookingWidget({
             <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500/70" />
             <span className="relative inline-flex size-2 rounded-full bg-emerald-600" />
           </span>
-          Team online — we reply in minutes
+          {t("team_online", "Team online — we reply in minutes")}
         </span>
         <span className="text-stone">·</span>
-        <span className="text-stone">£0 today · pay on the day</span>
+        <span className="text-stone">{t("no_prepayment", "No prepayment · pay on the day")}</span>
       </div>
 
       {/* 1 · Tour */}
-      <Field step={1} label="Choose your excursion">
+      <Field step={1} label={t("step_tour", "Choose your excursion")}>
         <select
           value={slug}
           onChange={(e) => setSlug(e.target.value)}
           className="field"
         >
-          <option value="">Select an excursion…</option>
+          <option value="">{t("select_tour_placeholder", "Select an excursion…")}</option>
           {grouped.map(([group, list]) => (
             <optgroup key={group} label={group}>
-              {list.map((t) => (
-                <option key={t.slug} value={t.slug}>
-                  {t.title}
-                  {t.priceFrom !== null && money(t.priceFrom, t.priceOverrides) ? ` — from ${money(t.priceFrom, t.priceOverrides)}` : ""}
+              {list.map((tItem) => (
+                <option key={tItem.slug} value={tItem.slug}>
+                  {tItem.title}
+                  {tItem.priceFrom !== null && money(tItem.priceFrom, tItem.priceOverrides)
+                    ? ` — ${t("price_from", "from")} ${money(tItem.priceFrom, tItem.priceOverrides)}${
+                        tItem.childPrice ? ` (${t("price_child", "Child")}: ${money(tItem.childPrice)})` : ""
+                      }`
+                    : ""}
                 </option>
               ))}
             </optgroup>
@@ -206,7 +210,7 @@ export function BookingWidget({
       {/* 2 · Date */}
       <Field
         step={2}
-        label="Pick excursion date"
+        label={t("step_date", "Pick excursion date")}
         hint={date ? prettyDate(date) : undefined}
       >
         <Calendar value={date} onChange={setDate} />
@@ -216,30 +220,30 @@ export function BookingWidget({
       </Field>
 
       {/* 3 · Guests & Party Size */}
-      <Field step={3} label="Guests & Party Size">
+      <Field step={3} label={t("step_guests", "Guests & Party Size")}>
         <div className="flex flex-col divide-y divide-sand/70 overflow-hidden rounded-2xl border border-sand/80 bg-paper-warm/30">
           <Counter
-            label="Adults"
-            sub={adultPrice !== null && !perBoat ? money(adultPrice, tour?.priceOverrides) ?? "" : "12+"}
+            label={t("guests_adults", "Adults")}
+            sub={adultPrice !== null && !perBoat ? money(adultPrice, tour?.priceOverrides) ?? "" : t("age_adults", "12+ yrs")}
             value={adults}
             min={1}
             onChange={setAdults}
           />
           {!perBoat ? (
             <Counter
-              label="Children"
+              label={t("guests_children", "Children")}
               sub={
                 childPrice !== null
-                  ? `${money(childPrice, tour?.priceOverrides)} · ages 5–10`
-                  : "ages 5–10"
+                  ? `${money(childPrice)} · ${t("age_children", "ages 5–10")}`
+                  : t("age_children", "ages 5–10")
               }
               value={children}
               onChange={setChildren}
             />
           ) : null}
           <Counter
-            label="Infants"
-            sub="ages 0–4 · free"
+            label={t("guests_infants", "Infants")}
+            sub={t("age_infants", "ages 0–4 · free")}
             value={infants}
             onChange={setInfants}
           />
@@ -253,13 +257,13 @@ export function BookingWidget({
 
       {/* Add-ons (if available) */}
       {addons.length ? (
-        <Field step={4} label="Optional Add-ons">
+        <Field step={4} label={t("step_addons", "Optional Add-ons")}>
           <div className="flex flex-col divide-y divide-sand/70 overflow-hidden rounded-2xl border border-sand/80 bg-paper-warm/30">
             {addons.map((a) => (
               <Counter
                 key={a.label}
                 label={a.label}
-                sub={`${money(a.price, tour?.priceOverrides)}${a.unit ? ` ${a.unit}` : " each"}`}
+                sub={`${money(a.price)}${a.unit ? ` ${a.unit}` : " each"}`}
                 value={addonQty[a.label] ?? 0}
                 onChange={(v) => setAddon(a.label, v - (addonQty[a.label] ?? 0))}
               />
@@ -271,14 +275,14 @@ export function BookingWidget({
       {/* 4 · Personal & Hotel Details */}
       <Field
         step={addons.length ? 5 : 4}
-        label="Personal & Hotel Pickup Details"
+        label={t("step_details", "Personal & Hotel Pickup Details")}
       >
         <div className="space-y-3.5">
           {/* Full Name */}
           <div>
             <label className="block text-[0.78rem] font-semibold text-ink mb-1 flex items-center gap-1.5">
               <User className="size-3.5 text-reef" />
-              Full Name *
+              {t("full_name", "Full Name")} *
             </label>
             <input
               type="text"
@@ -296,7 +300,7 @@ export function BookingWidget({
           <div>
             <label className="block text-[0.78rem] font-semibold text-ink mb-1 flex items-center gap-1.5">
               <Phone className="size-3.5 text-reef" />
-              WhatsApp / Mobile Number *
+              {t("phone_whatsapp", "WhatsApp / Mobile Number")} *
             </label>
             <input
               type="tel"
@@ -318,7 +322,7 @@ export function BookingWidget({
             <div className="sm:col-span-2">
               <label className="block text-[0.78rem] font-semibold text-ink mb-1 flex items-center gap-1.5">
                 <Hotel className="size-3.5 text-reef" />
-                Hotel in Egypt *
+                {t("hotel_name", "Hotel in Egypt")} *
               </label>
               <input
                 type="text"
@@ -335,7 +339,7 @@ export function BookingWidget({
             <div>
               <label className="block text-[0.78rem] font-semibold text-ink mb-1 flex items-center gap-1.5">
                 <DoorClosed className="size-3.5 text-reef" />
-                Room Number
+                {t("room_number", "Room Number")}
               </label>
               <input
                 type="text"
@@ -351,7 +355,7 @@ export function BookingWidget({
           <div>
             <label className="block text-[0.78rem] font-semibold text-ink mb-1 flex items-center gap-1.5">
               <FileText className="size-3.5 text-reef" />
-              Special Notes / Requests (Optional)
+              {t("special_requests", "Special Notes / Requests (Optional)")}
             </label>
             <textarea
               rows={2}
@@ -369,14 +373,14 @@ export function BookingWidget({
         <div className="flex items-end justify-between">
           <div>
             <p className="text-[0.72rem] uppercase tracking-[0.14em] text-stone">
-              Estimated total
+              {t("estimated_total", "Estimated total")}
             </p>
             <p className="font-display text-[2rem] leading-none text-ink">
-              {total !== null ? money(total, tour?.priceOverrides) ?? "On request" : "On request"}
+              {total !== null ? money(total) ?? t("price_on_request", "On request") : t("price_on_request", "On request")}
             </p>
             <p className="mt-1 text-[0.75rem] text-stone">
               {tour ? `${guests} guest${guests === 1 ? "" : "s"} · ` : ""}
-              paid on the day
+              {t("pay_on_day", "paid on the day")}
             </p>
           </div>
         </div>
@@ -393,7 +397,7 @@ export function BookingWidget({
             )}
           >
             <WhatsAppIcon className="size-5 shrink-0" />
-            <span>{ready ? "Book on WhatsApp" : "Complete Details to Book"}</span>
+            <span>{ready ? t("book_on_whatsapp", "Book on WhatsApp") : t("complete_details", "Complete Details to Book")}</span>
           </button>
         ) : (
           <button
@@ -401,14 +405,14 @@ export function BookingWidget({
             disabled
             className="btn btn-primary mt-4 w-full opacity-50"
           >
-            Choose a tour to start
+            {t("step_tour", "Choose a tour to start")}
           </button>
         )}
 
         <p className="mt-2.5 text-center text-[0.72rem] text-stone">
-          No prepayment · Free cancellation · Instant reply.{" "}
+          {t("no_prepayment", "No prepayment · pay on the day")}.{" "}
           <Link href="/contact" className="underline" onClick={onClose}>
-            Prefer to talk?
+            {t("nav_contact", "Contact")}
           </Link>
         </p>
       </div>

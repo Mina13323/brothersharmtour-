@@ -11,7 +11,7 @@ import { Breadcrumbs, CTASection, SectionHeading } from "@/components/sections";
 import { BookButton } from "@/components/BookingProvider";
 import { WaveDivider } from "@/components/WaveDivider";
 import { media } from "@/lib/media";
-import { getPublicSettings } from "@/lib/siteview";
+import { getSiteView } from "@/lib/siteview";
 
 export const metadata: Metadata = buildMetadata({
   fallbackTitle: "About Brother Sharm Tour \u2014 Sharm El Sheikh Tour Operator",
@@ -44,7 +44,7 @@ const localExpertise = [
 ];
 
 export default async function AboutPage() {
-  const site = await getPublicSettings();
+  const { settings: site, lang } = await getSiteView();
   const gallery = [
     media.whiteIsland.hero,
     media.superSafari.card,
@@ -60,51 +60,118 @@ export default async function AboutPage() {
         variant="card"
         image={media.about}
         size="tall"
-        eyebrow="About Brother Sharm Tour"
-        title="Our Story"
-        subtitle="A small team on the Red Sea, running the trips we'd want to be on."
+        eyebrow={lang === "ar" ? "عن Brother Sharm Tours" : "About Brother Sharm Tours"}
+        title={lang === "ar" ? "قصتنا ورسالتنا" : "Our Story & Vision"}
+        subtitle={
+          lang === "ar"
+            ? "أخوان من أبناء شرم الشيخ، نقدم تجارب استثنائية ونشارككم شغف البحر والصحراء منذ 2009."
+            : "Two brothers who call Sharm El-Sheikh home, sharing our passion for the Red Sea and desert since 2009."
+        }
         showWave
       >
-        <BookButton className="btn btn-primary">Plan your trip</BookButton>
+        <BookButton className="btn btn-primary">{lang === "ar" ? "خطط لرحلتك معنا" : "Plan your trip"}</BookButton>
         <Link href="/tours" className="btn btn-ghost-light">
-          See the tours
+          {lang === "ar" ? "استكشف الرحلات" : "See the tours"}
         </Link>
       </Hero>
 
       {/* ─────────── Who we are ─────────── */}
       <section className="band">
         <div className="shell">
-          <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "About" }]} />
+          <Breadcrumbs items={[{ label: lang === "ar" ? "الرئيسية" : "Home", href: "/" }, { label: lang === "ar" ? "من نحن" : "About" }]} />
 
           <div className="mt-12 grid gap-10 lg:grid-cols-12 lg:gap-16">
             <Reveal className="lg:col-span-4">
-              <p className="eyebrow text-reef">Who we are</p>
+              <p className="eyebrow text-reef">{lang === "ar" ? "من نحن" : "About Us"}</p>
               <h2 className="headline mt-4">
-                Egypt, shown by people who live here
+                {lang === "ar" ? "مرحباً بكم في Brother Sharm Tours" : "Welcome to Brother Sharm Tours"}
               </h2>
+              <p className="mt-4 text-stone text-base leading-relaxed">
+                {lang === "ar"
+                  ? "بوابتكم المثالية لاكتشاف الجمال الخلاب والمغامرات المثيرة في شرم الشيخ."
+                  : "Your ultimate gateway to discovering the breathtaking beauty and thrilling adventures of Sharm El-Sheikh."}
+              </p>
             </Reveal>
 
             <Reveal delay={100} className="lg:col-span-8">
-              <div className="flex flex-col gap-5 text-[1.0625rem] leading-[1.75] text-stone">
-                <p>
-                  Brother Sharm Tour is based in Sharm El Sheikh. We organise excursions,
-                  activities and private transfers across South Sinai, and day
-                  trips to Cairo for travellers who want to see the Pyramids and
-                  the Grand Egyptian Museum without moving hotels.
-                </p>
-                <p>
-                  Most visitors to Sharm see a resort, a beach and an airport
-                  road. That&apos;s a shame, because the interesting parts are all
-                  within an hour or two: a sandbank in the middle of the sea, a
-                  national park where the desert falls into a reef wall, a
-                  canyon of banded sandstone, and a market where the town does
-                  its own shopping.
-                </p>
-                <p>
-                  Our job is to close the gap between those two versions of the
-                  same place — and to handle the logistics so that closing it
-                  doesn&apos;t cost you your holiday.
-                </p>
+              <div className="flex flex-col gap-8 text-[1.0625rem] leading-[1.75] text-stone">
+                {lang === "ar" ? (
+                  <>
+                    <div>
+                      <h3 className="font-display text-xl font-bold text-ink mb-2">من نحن</h3>
+                      <p>
+                        نحن أخوان نعتبر شرم الشيخ بيتنا وموطننا. وبفضل خبرتنا العملية وشغفنا العميق بصناعة السياحة والسفر الذي يعود إلى عام 2009، تأسست رحلتنا على سنوات من الخبرة الميدانية. إن ما ألهمنا حقاً لإطلاق هذه المنصة هو التشجيع المستمر من أصدقائنا وعملائنا الذين عاشوا تجربة رحلاتنا بأنفسهم. نحن نعشق سحر الطبيعة الصحراوية ومياه البحر الأحمر الصافية وشعابها المرجانية الغنية، ورسالتنا هي مشاركة هذا السحر الحقيقي مع المسافرين من جميع أنحاء العالم.
+                      </p>
+                    </div>
+
+                    <div>
+                      <h3 className="font-display text-xl font-bold text-ink mb-2">رؤيتنا</h3>
+                      <p>
+                        نؤمن بأن كل مسافر يستحق تجربة شخصية وآمنة ولا تُنسى. ما يميزنا — وما نهتم به أكثر من أي شيء — هو الثقة والمصداقية والعلاقات الإنسانية الحقيقية، وليس مجرد إتمام عملية بيع. وبدلاً من الجولات النمطية، نصمم مغامرات مخصصة تصنع ذكريات تدوم مدى الحياة — من رحلات السفاري بالدراجات الرباعية في الصحراء إلى جولات السنوركلينج والغوص الهادئة.
+                      </p>
+                    </div>
+
+                    <div>
+                      <h3 className="font-display text-xl font-bold text-ink mb-3">لماذا تسافر معنا؟</h3>
+                      <ul className="space-y-3">
+                        <li className="flex items-start gap-2">
+                          <span className="text-reef font-bold">•</span>
+                          <span><strong>خبرة محلية أصيلة:</strong> نعرف كل كنز خفي وأفضل الطرق وأجمل المواقع في شرم الشيخ، مدعومين بخبرتنا الطويلة منذ 2009.</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-reef font-bold">•</span>
+                          <span><strong>الأمان أولاً:</strong> تلبي جميع معداتنا ومركباتنا ومرشدونا أعلى معايير السلامة لتمنحك راحة بال تامة.</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-reef font-bold">•</span>
+                          <span><strong>اهتمام شخصي ومصداقية:</strong> كعمل عائلي يديره الأخوان مباشرة، نضع الصدق أولاً ونعامل كل ضيف كفرد من العائلة، مع ضمان الاهتمام الشخصي بكل تفاصيل رحلتك.</span>
+                        </li>
+                      </ul>
+                    </div>
+
+                    <p className="font-medium text-ink pt-2 border-t border-sand/60">
+                      انضم إلينا في Brother Sharm Tours ودعنا نريك شرم الشيخ بالطريقة التي تستحق أن تعيشها!
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <div>
+                      <h3 className="font-display text-xl font-bold text-ink mb-2">Who We Are</h3>
+                      <p>
+                        We are two brothers who proudly call Sharm El-Sheikh our home. Backed by hands-on experience and a deep passion for the tourism and travel industry dating back to 2009, our journey is built on years of expertise. What truly inspired us to launch this platform was the continuous encouragement from our friends and clients who experienced our tours firsthand. We are deeply in love with the desert landscapes, crystal-clear Red Sea waters, and vibrant marine life, and our mission is to share the true magic of this paradise with travelers from all around the world.
+                      </p>
+                    </div>
+
+                    <div>
+                      <h3 className="font-display text-xl font-bold text-ink mb-2">Our Vision</h3>
+                      <p>
+                        We believe that every traveler deserves a personalized, safe, and unforgettable experience. What sets us apart—and what we care about most—is trust, credibility, and genuine relationships, rather than just making a sale. Instead of standard tours, we curate adventures tailored to create lifelong memories—from exhilarating desert quad bike safaris to serene snorkeling and diving excursions.
+                      </p>
+                    </div>
+
+                    <div>
+                      <h3 className="font-display text-xl font-bold text-ink mb-3">Why Travel With Us?</h3>
+                      <ul className="space-y-3">
+                        <li className="flex items-start gap-2">
+                          <span className="text-reef font-bold">•</span>
+                          <span><strong>Local Expertise:</strong> We know every hidden gem, best route, and top spot in Sharm, backed by our long-standing experience since 2009.</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-reef font-bold">•</span>
+                          <span><strong>Safety First:</strong> All our equipment, vehicles, and guides meet the highest safety standards to give you complete peace of mind.</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-reef font-bold">•</span>
+                          <span><strong>Personalized Care &amp; Credibility:</strong> As a family-run business led directly by the brothers, we prioritize honesty and treat every guest like family, ensuring personal attention to every detail of your journey.</span>
+                        </li>
+                      </ul>
+                    </div>
+
+                    <p className="font-medium text-ink pt-2 border-t border-sand/60">
+                      Join us at Brother Sharm Tours and let us show you Sharm El-Sheikh the way it&apos;s meant to be experienced!
+                    </p>
+                  </>
+                )}
               </div>
             </Reveal>
           </div>

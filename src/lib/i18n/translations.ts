@@ -98,6 +98,39 @@ export interface TranslationDictionary {
   plan_custom_trip: string;
   custom_trip_desc: string;
 
+  // Navigation extra
+  nav_all_tours: string;
+
+  // Tour detail sections
+  section_overview: string;
+  section_highlights: string;
+  section_included: string;
+  section_excluded: string;
+  section_itinerary: string;
+  section_meeting: string;
+  pickup_time_hint: string;
+  section_bring: string;
+  section_restrictions: string;
+  section_important: string;
+  section_faq: string;
+  section_reviews: string;
+  section_related: string;
+  label_location: string;
+  label_duration: string;
+  label_tour_type: string;
+
+  // Search & Filters
+  search_where: string;
+  search_choose_dest: string;
+  search_experience: string;
+  search_select_exp: string;
+  search_service: string;
+  search_submit: string;
+  tab_tours: string;
+  tab_experiences: string;
+  tab_transfers: string;
+  no_tours_found_in_category: string;
+
   // Footer & Misc
   footer_destinations: string;
   footer_experiences: string;
@@ -194,6 +227,34 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     footer_tagline: "Experience the best of Egypt with Brother Sharm Tour.",
     all_rights_reserved: "All rights reserved.",
     skip_to_content: "Skip to content",
+
+    nav_all_tours: "All Tours",
+    section_overview: "Overview",
+    section_highlights: "Highlights",
+    section_included: "What's included",
+    section_excluded: "Not included",
+    section_itinerary: "Itinerary",
+    section_meeting: "Meeting & pickup",
+    pickup_time_hint: "We confirm your exact pickup time once we know your hotel — usually the evening before.",
+    section_bring: "What to bring",
+    section_restrictions: "Good to know",
+    section_important: "Important information",
+    section_faq: "Frequently Asked Questions",
+    section_reviews: "Guest reviews",
+    section_related: "Related experiences",
+    label_location: "Location",
+    label_duration: "Duration",
+    label_tour_type: "Tour type",
+    search_where: "Where",
+    search_choose_dest: "Choose a destination",
+    search_experience: "Experience",
+    search_select_exp: "Select experience",
+    search_service: "Service",
+    search_submit: "Search",
+    tab_tours: "Tours",
+    tab_experiences: "Experiences",
+    tab_transfers: "Transfers",
+    no_tours_found_in_category: "No tours currently available in this category.",
   },
 
   ar: {
@@ -281,6 +342,34 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     footer_tagline: "عش أفضل التجارب في مصر مع براذر شرم تور.",
     all_rights_reserved: "جميع الحقوق محفوظة.",
     skip_to_content: "انتقل إلى المحتوى الرئيسي",
+
+    nav_all_tours: "جميع الرحلات",
+    section_overview: "نبذة عن الرحلة",
+    section_highlights: "أبرز مميزات الرحلة",
+    section_included: "البرنامج يشمل",
+    section_excluded: "البرنامج لا يشمل",
+    section_itinerary: "خط سير الرحلة والمحطات",
+    section_meeting: "نقطة التجمع وموعد التحرك",
+    pickup_time_hint: "نؤكد لك موعد التحرك المحدد من فندقك بمجرد معرفة الفندق — عادةً في المساء السابق للرحلة.",
+    section_bring: "ما يجب إحضاره معك",
+    section_restrictions: "معلومات تهمك",
+    section_important: "تعليمات هامة",
+    section_faq: "الأسئلة الشائعة",
+    section_reviews: "آراء وتقييمات العملاء",
+    section_related: "رحلات وتجارب مشابهة قد تعجبك",
+    label_location: "الموقع",
+    label_duration: "المدة",
+    label_tour_type: "نوع الرحلة",
+    search_where: "الوجهة",
+    search_choose_dest: "اختر وجهتك المفضلة",
+    search_experience: "نوع التجربة",
+    search_select_exp: "اختر نوع التجربة",
+    search_service: "الخدمة",
+    search_submit: "بحث",
+    tab_tours: "الرحلات",
+    tab_experiences: "التجارب",
+    tab_transfers: "التوصيلات",
+    no_tours_found_in_category: "لا توجد رحلات متاحة حالياً في هذا القسم.",
   },
 
   de: {
@@ -368,6 +457,34 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     footer_tagline: "Erleben Sie das Beste von Ägypten mit Brother Sharm Tour.",
     all_rights_reserved: "Alle Rechte vorbehalten.",
     skip_to_content: "Zum Inhalt springen",
+
+    nav_all_tours: "Alle Touren",
+    section_overview: "Übersicht",
+    section_highlights: "Höhepunkte",
+    section_included: "Inbegriffen",
+    section_excluded: "Nicht inbegriffen",
+    section_itinerary: "Ablauf & Stationen",
+    section_meeting: "Treffpunkt & Abholung",
+    pickup_time_hint: "Wir bestätigen Ihre genaue Abholzeit am Vorabend, sobald wir Ihr Hotel kennen.",
+    section_bring: "Mitzubringen",
+    section_restrictions: "Gut zu wissen",
+    section_important: "Wichtige Informationen",
+    section_faq: "Häufig gestellte Fragen",
+    section_reviews: "Gästebewertungen",
+    section_related: "Ähnliche Erlebnisse",
+    label_location: "Ort",
+    label_duration: "Dauer",
+    label_tour_type: "Tour-Art",
+    search_where: "Wohin",
+    search_choose_dest: "Reiseziel wählen",
+    search_experience: "Erlebnis",
+    search_select_exp: "Erlebnis wählen",
+    search_service: "Service",
+    search_submit: "Suchen",
+    tab_tours: "Touren",
+    tab_experiences: "Erlebnisse",
+    tab_transfers: "Transfers",
+    no_tours_found_in_category: "In dieser Kategorie sind derzeit keine Touren verfügbar.",
   },
 
   it: {
@@ -455,6 +572,34 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     footer_tagline: "Vivi il meglio dell'Egitto con Brother Sharm Tour.",
     all_rights_reserved: "Tutti i diritti riservati.",
     skip_to_content: "Salta al contenuto",
+
+    nav_all_tours: "Tutte le escursioni",
+    section_overview: "Panoramica",
+    section_highlights: "Punti salienti",
+    section_included: "Cosa è incluso",
+    section_excluded: "Non incluso",
+    section_itinerary: "Itinerario",
+    section_meeting: "Punto di incontro e ritiro",
+    pickup_time_hint: "Confermiamo l'orario esatto di ritiro la sera prima una volta noto il tuo hotel.",
+    section_bring: "Cosa portare",
+    section_restrictions: "Buono a sapersi",
+    section_important: "Informazioni importanti",
+    section_faq: "Domande frequenti",
+    section_reviews: "Recensioni degli ospiti",
+    section_related: "Esperienze correlate",
+    label_location: "Luogo",
+    label_duration: "Durata",
+    label_tour_type: "Tipo di tour",
+    search_where: "Dove",
+    search_choose_dest: "Scegli una destinazione",
+    search_experience: "Esperienza",
+    search_select_exp: "Scegli un'esperienza",
+    search_service: "Servizio",
+    search_submit: "Cerca",
+    tab_tours: "Escursioni",
+    tab_experiences: "Esperienze",
+    tab_transfers: "Transfer",
+    no_tours_found_in_category: "Nessun tour attualmente disponibile in questa categoria.",
   },
 
   pl: {
@@ -542,6 +687,34 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     footer_tagline: "Odkryj to, co najlepsze w Egipcie z Brother Sharm Tour.",
     all_rights_reserved: "Wszelkie prawa zastrzeżone.",
     skip_to_content: "Przejdź do treści",
+
+    nav_all_tours: "Wszystkie wycieczki",
+    section_overview: "Przegląd",
+    section_highlights: "Główne atrakcje",
+    section_included: "Co jest w cenie",
+    section_excluded: "Nie wliczone w cenę",
+    section_itinerary: "Plan wycieczki",
+    section_meeting: "Zbiórka i transfer",
+    pickup_time_hint: "Dokładną godzinę odbioru z hotelu potwierdzamy zazwyczaj wieczorem dzień wcześniej.",
+    section_bring: "Co zabrać ze sobą",
+    section_restrictions: "Warto wiedzieć",
+    section_important: "Ważne informacje",
+    section_faq: "Często zadawane pytania",
+    section_reviews: "Opinie gości",
+    section_related: "Podobne wycieczki",
+    label_location: "Lokalizacja",
+    label_duration: "Czas trwania",
+    label_tour_type: "Rodzaj wycieczki",
+    search_where: "Gdzie",
+    search_choose_dest: "Wybierz kierunek",
+    search_experience: "Atrakcja",
+    search_select_exp: "Wybierz rodzaj atrakcji",
+    search_service: "Usługa",
+    search_submit: "Szukaj",
+    tab_tours: "Wycieczki",
+    tab_experiences: "Przygody",
+    tab_transfers: "Transfery",
+    no_tours_found_in_category: "Brak dostępnych wycieczek w tej kategorii.",
   },
 
   ru: {
@@ -629,6 +802,34 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     footer_tagline: "Лучшие впечатления в Египте с Brother Sharm Tour.",
     all_rights_reserved: "Все права защищены.",
     skip_to_content: "Перейти к основному содержимому",
+
+    nav_all_tours: "Все экскурсии",
+    section_overview: "Обзор экскурсии",
+    section_highlights: "Главные впечатления",
+    section_included: "В стоимость включено",
+    section_excluded: "В стоимость не включено",
+    section_itinerary: "Программа и маршрут",
+    section_meeting: "Встреча и трансфер",
+    pickup_time_hint: "Точное время выезда из отеля мы подтверждаем накануне вечером.",
+    section_bring: "Что взять с собой",
+    section_restrictions: "Полезно знать",
+    section_important: "Важная информация",
+    section_faq: "Частые вопросы",
+    section_reviews: "Отзывы туристов",
+    section_related: "Похожие экскурсии",
+    label_location: "Локация",
+    label_duration: "Длительность",
+    label_tour_type: "Тип экскурсии",
+    search_where: "Куда",
+    search_choose_dest: "Выберите направление",
+    search_experience: "Категория",
+    search_select_exp: "Выберите категорию",
+    search_service: "Услуга",
+    search_submit: "Найти",
+    tab_tours: "Экскурсии",
+    tab_experiences: "Впечатления",
+    tab_transfers: "Трансферы",
+    no_tours_found_in_category: "В этой категории пока нет доступных экскурсий.",
   },
 
   uk: {
@@ -716,6 +917,34 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     footer_tagline: "Найкращі враження в Єгипті з Brother Sharm Tour.",
     all_rights_reserved: "Усі права захищені.",
     skip_to_content: "Перейти до основного вмісту",
+
+    nav_all_tours: "Усі екскурсії",
+    section_overview: "Огляд екскурсії",
+    section_highlights: "Головні враження",
+    section_included: "У вартість включено",
+    section_excluded: "Не входить у вартість",
+    section_itinerary: "Маршрут та зупинки",
+    section_meeting: "Зустріч та трансфер",
+    pickup_time_hint: "Точний час виїзду з готелю ми підтверджуємо напередодні ввечері.",
+    section_bring: "Що взяти з собою",
+    section_restrictions: "Корисно знати",
+    section_important: "Важлива інформація",
+    section_faq: "Часті запитання",
+    section_reviews: "Відгуки туристів",
+    section_related: "Схожі екскурсії",
+    label_location: "Локація",
+    label_duration: "Тривалість",
+    label_tour_type: "Тип екскурсії",
+    search_where: "Куди",
+    search_choose_dest: "Оберіть напрямок",
+    search_experience: "Категорія",
+    search_select_exp: "Оберіть категорію",
+    search_service: "Послуга",
+    search_submit: "Пошук",
+    tab_tours: "Екскурсії",
+    tab_experiences: "Враження",
+    tab_transfers: "Трансфери",
+    no_tours_found_in_category: "У цій категорії наразі немає доступних екскурсій.",
   },
 
   fr: {
@@ -803,6 +1032,34 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     footer_tagline: "Vivez le meilleur de l'Égypte avec Brother Sharm Tour.",
     all_rights_reserved: "Tous droits réservés.",
     skip_to_content: "Aller au contenu",
+
+    nav_all_tours: "Toutes les excursions",
+    section_overview: "Aperçu",
+    section_highlights: "Points forts",
+    section_included: "Ce qui est inclus",
+    section_excluded: "Non inclus",
+    section_itinerary: "Itinéraire",
+    section_meeting: "Point de rencontre et prise en charge",
+    pickup_time_hint: "Nous confirmons l'heure exacte de départ de votre hôtel la veille au soir.",
+    section_bring: "Ce qu'il faut apporter",
+    section_restrictions: "Bon à savoir",
+    section_important: "Informations importantes",
+    section_faq: "Foire aux questions",
+    section_reviews: "Avis des voyageurs",
+    section_related: "Expériences similaires",
+    label_location: "Lieu",
+    label_duration: "Durée",
+    label_tour_type: "Type de circuit",
+    search_where: "Où",
+    search_choose_dest: "Choisir une destination",
+    search_experience: "Expérience",
+    search_select_exp: "Choisir une expérience",
+    search_service: "Service",
+    search_submit: "Rechercher",
+    tab_tours: "Excursions",
+    tab_experiences: "Expériences",
+    tab_transfers: "Transferts",
+    no_tours_found_in_category: "Aucune excursion disponible dans cette catégorie pour le moment.",
   },
 
   ro: {
@@ -890,6 +1147,34 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     footer_tagline: "Descoperiți ce are Egiptul mai bun cu Brother Sharm Tour.",
     all_rights_reserved: "Toate drepturile rezervate.",
     skip_to_content: "Sari la conținut",
+
+    nav_all_tours: "Toate excursiile",
+    section_overview: "Prezentare generală",
+    section_highlights: "Puncte de atracție",
+    section_included: "Ce este inclus",
+    section_excluded: "Nu este inclus",
+    section_itinerary: "Itinerariu",
+    section_meeting: "Punct de întâlnire și preluare",
+    pickup_time_hint: "Confirmăm ora exactă de preluare de la hotel în seara dinaintea excursiei.",
+    section_bring: "Ce să aduceți cu dvs.",
+    section_restrictions: "Bine de știut",
+    section_important: "Informații importante",
+    section_faq: "Întrebări frecvente",
+    section_reviews: "Recenziile oaspeților",
+    section_related: "Experiențe similare",
+    label_location: "Locație",
+    label_duration: "Durată",
+    label_tour_type: "Tip excursie",
+    search_where: "Unde",
+    search_choose_dest: "Alegeți o destinație",
+    search_experience: "Experiență",
+    search_select_exp: "Selectați experiența",
+    search_service: "Serviciu",
+    search_submit: "Căutare",
+    tab_tours: "Excursii",
+    tab_experiences: "Experiențe",
+    tab_transfers: "Transferuri",
+    no_tours_found_in_category: "Nu există excursii disponibile în această categorie în prezent.",
   },
 
   nl: {
@@ -977,6 +1262,34 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     footer_tagline: "Beleef het beste van Egypte met Brother Sharm Tour.",
     all_rights_reserved: "Alle rechten voorbehouden.",
     skip_to_content: "Ga naar inhoud",
+
+    nav_all_tours: "Alle tours",
+    section_overview: "Overzicht",
+    section_highlights: "Hoogtepunten",
+    section_included: "Wat is inbegrepen",
+    section_excluded: "Niet inbegrepen",
+    section_itinerary: "Programma & route",
+    section_meeting: "Ontmoetingspunt & ophaalservice",
+    pickup_time_hint: "We bevestigen uw exacte ophaaltijd bij uw hotel de avond ervoor.",
+    section_bring: "Wat mee te nemen",
+    section_restrictions: "Goed om te weten",
+    section_important: "Belangrijke informatie",
+    section_faq: "Veelgestelde vragen",
+    section_reviews: "Beoordelingen van gasten",
+    section_related: "Gerelateerde ervaringen",
+    label_location: "Locatie",
+    label_duration: "Duur",
+    label_tour_type: "Type tour",
+    search_where: "Waar",
+    search_choose_dest: "Kies een bestemming",
+    search_experience: "Ervaring",
+    search_select_exp: "Kies een ervaring",
+    search_service: "Service",
+    search_submit: "Zoeken",
+    tab_tours: "Tours",
+    tab_experiences: "Ervaringen",
+    tab_transfers: "Transfers",
+    no_tours_found_in_category: "Momenteel geen tours beschikbaar in deze categorie.",
   },
 };
 

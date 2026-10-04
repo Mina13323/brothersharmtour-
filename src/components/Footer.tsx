@@ -11,7 +11,7 @@ import { LanguageSwitcher } from "./LanguageSwitcher";
 import { CurrencySwitcher } from "./CurrencySwitcher";
 
 export function Footer() {
-  const { settings: site, whatsappLink } = useSite();
+  const { settings: site, whatsappLink, t } = useSite();
   const pathname = usePathname();
   if (pathname?.startsWith("/admin")) return null;
 
@@ -29,8 +29,7 @@ export function Footer() {
               {site.tagline}
             </p>
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-paper/55">
-              Curated tours, excursions and private transfers across Sharm El
-              Sheikh and Cairo — run by a team that lives on the Red Sea.
+              {t("footer_tagline", "Experience the best of Egypt with Brother Sharm Tour.")}
             </p>
           </div>
 
@@ -38,13 +37,13 @@ export function Footer() {
             aria-label="Footer"
             className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:col-span-5"
           >
-            <FooterColumn title="Destinations" links={footerNav.destinations} />
-            <FooterColumn title="Experiences" links={footerNav.experiences} />
-            <FooterColumn title="Company" links={footerNav.company} />
+            <FooterColumn title={t("footer_destinations", "Destinations")} links={footerNav.destinations} />
+            <FooterColumn title={t("footer_experiences", "Experiences")} links={footerNav.experiences} />
+            <FooterColumn title={t("footer_company", "Company")} links={footerNav.company} />
           </nav>
 
           <div className="lg:col-span-3">
-            <h3 className="eyebrow text-paper/45">Contact</h3>
+            <h3 className="eyebrow text-paper/45">{t("footer_contact", "Contact")}</h3>
             <ul className="mt-5 space-y-3 text-sm">
               <li>
                 <a
@@ -111,7 +110,7 @@ export function Footer() {
         {/* ---- Legal row ---- */}
         <div className="flex flex-col gap-4 py-8 text-xs text-paper/45 sm:flex-row sm:items-center sm:justify-between">
           <p>
-            © {year} {site.name}. All rights reserved.
+            © {year} {site.name}. {t("all_rights_reserved", "All rights reserved.")}
           </p>
           <div className="flex flex-wrap items-center gap-4">
             <CurrencySwitcher tone="light" />
@@ -124,12 +123,12 @@ export function Footer() {
               </li>
               <li>
                 <Link href="/contact" className="transition-colors hover:text-paper">
-                  Contact
+                  {t("nav_contact", "Contact")}
                 </Link>
               </li>
               <li>
                 <Link href="/tours" className="transition-colors hover:text-paper">
-                  All tours
+                  {t("all_tours_button", "All tours")}
                 </Link>
               </li>
             </ul>

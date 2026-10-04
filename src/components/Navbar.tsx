@@ -10,13 +10,21 @@ import { LanguageSwitcher } from "./LanguageSwitcher";
 import { CurrencySwitcher } from "./CurrencySwitcher";
 import { Logo } from "./ui/Logo";
 
+import type { TranslationDictionary } from "@/lib/i18n/translations";
+
 /**
  * Modern floating pill navigation matching the reference design:
  * - Desktop: Floating pill header with Logo, icons+labels navigation items, language switcher, and Book button
  * - Mobile: Fixed bottom floating pill dock with Home, Search, Contact, Videos, and About
  */
-const navItems = [
+const navItems: {
+  key: keyof TranslationDictionary;
+  label: string;
+  href: string;
+  icon: React.ReactNode;
+}[] = [
   {
+    key: "nav_home",
     label: "Home",
     href: "/",
     icon: (
@@ -35,6 +43,7 @@ const navItems = [
     ),
   },
   {
+    key: "nav_search",
     label: "Search",
     href: "/tours",
     icon: (
@@ -53,6 +62,7 @@ const navItems = [
     ),
   },
   {
+    key: "nav_contact",
     label: "Contact",
     href: "/contact",
     icon: (
@@ -71,6 +81,7 @@ const navItems = [
     ),
   },
   {
+    key: "nav_videos",
     label: "Videos",
     href: "/video",
     icon: (
@@ -89,6 +100,7 @@ const navItems = [
     ),
   },
   {
+    key: "nav_about",
     label: "About",
     href: "/about",
     icon: (
@@ -110,7 +122,7 @@ const navItems = [
 ];
 
 export function Navbar() {
-  const { settings: site, whatsappLink } = useSite();
+  const { settings: site, whatsappLink, t } = useSite();
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
 
@@ -171,7 +183,7 @@ export function Navbar() {
                     {item.icon}
                   </div>
                   <span className="leading-none">
-                    {item.label}
+                    {t(item.key, item.label)}
                   </span>
                 </Link>
               );
@@ -186,12 +198,12 @@ export function Navbar() {
               href={whatsappLink()}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="Book on WhatsApp"
+              aria-label={t("nav_book_whatsapp", "Book on WhatsApp")}
               className="hidden md:inline-flex h-9 px-4 rounded-full bg-sun hover:bg-sun-bright text-white text-xs font-bold uppercase tracking-wider shadow-sm hover:shadow-md shrink-0 whitespace-nowrap items-center gap-1.5 transition-all cursor-pointer"
             >
               <WhatsAppIcon className="size-3.5 shrink-0" />
               <span>
-                Book <span className="hidden xl:inline">on WhatsApp</span>
+                {t("nav_book_whatsapp", "Book on WhatsApp")}
               </span>
             </a>
           </div>
@@ -223,7 +235,7 @@ export function Navbar() {
                 {item.icon}
               </div>
               <span className="text-[11px] tracking-tight leading-none">
-                {item.label}
+                {t(item.key, item.label)}
               </span>
             </Link>
           );

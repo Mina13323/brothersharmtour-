@@ -3,9 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { durationBuckets } from "@/lib/store/labels";
+import { durationBuckets, durationBucketLabel } from "@/lib/store/labels";
 import { cn } from "@/lib/utils";
-import { useCatalogue } from "./SiteProvider";
+import { useCatalogue, useSite } from "./SiteProvider";
 import { destinationName, experienceName } from "@/lib/store/labels";
 
 /**
@@ -21,12 +21,6 @@ import { destinationName, experienceName } from "@/lib/store/labels";
 
 type TabId = "tours" | "experiences" | "transfers";
 
-const tabs: { id: TabId; label: string }[] = [
-  { id: "tours", label: "Tours" },
-  { id: "experiences", label: "Experiences" },
-  { id: "transfers", label: "Transfers" },
-];
-
 /** Quick links under the panel — the searches people actually run. */
 const popular: { label: string; href: string }[] = [
   { label: "White Island", href: "/tours/white-island" },
@@ -37,11 +31,18 @@ const popular: { label: string; href: string }[] = [
 ];
 
 export function HeroSearch() {
+  const { t, lang } = useSite();
   const catalogue = useCatalogue();
   const destinationOptions = Array.from(new Set(catalogue.map((t) => t.destination)));
   const categoryOptions = Array.from(new Set(catalogue.map((t) => t.category)));
   const router = useRouter();
   const [tab, setTab] = useState<TabId>("tours");
+
+  const tabs: { id: TabId; label: string }[] = [
+    { id: "tours", label: t("tab_tours", "Tours") },
+    { id: "experiences", label: t("tab_experiences", "Experiences") },
+    { id: "transfers", label: t("tab_transfers", "Transfers") },
+  ];
   const [destination, setDestination] = useState("all");
   const [category, setCategory] = useState("all");
   const [duration, setDuration] = useState("all");
@@ -117,18 +118,18 @@ export function HeroSearch() {
           </div>
           <div className="flex-1 min-w-0">
             <span className="block text-[10px] font-bold uppercase tracking-[0.16em] text-stone">
-              Where
+              {t("search_where", "Where")}
             </span>
             <select
               value={destination}
               onChange={(e) => setDestination(e.target.value)}
-              aria-label="Destination"
+              aria-label={t("search_where", "Where")}
               className="w-full bg-transparent text-sm font-semibold text-ink border-0 p-0 focus:ring-0 focus:outline-none cursor-pointer truncate"
             >
-              <option value="all">Choose a destination</option>
+              <option value="all">{t("search_choose_dest", "Choose a destination")}</option>
               {destinationOptions.map((slug) => (
                 <option key={slug} value={slug}>
-                  {destinationName(slug)}
+                  {destinationName(slug, lang)}
                 </option>
               ))}
             </select>
@@ -157,18 +158,18 @@ export function HeroSearch() {
             </div>
             <div className="flex-1 min-w-0">
               <span className="block text-[10px] font-bold uppercase tracking-[0.16em] text-stone">
-                Experience
+                {t("search_experience", "Experience")}
               </span>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                aria-label="Experience type"
+                aria-label={t("search_experience", "Experience")}
                 className="w-full bg-transparent text-sm font-semibold text-ink border-0 p-0 focus:ring-0 focus:outline-none cursor-pointer truncate"
               >
-                <option value="all">Select experience</option>
+                <option value="all">{t("search_select_exp", "Select experience")}</option>
                 {categoryOptions.map((slug) => (
                   <option key={slug} value={slug}>
-                    {experienceName(slug)}
+                    {experienceName(slug, lang)}
                   </option>
                 ))}
               </select>
@@ -195,10 +196,10 @@ export function HeroSearch() {
             </div>
             <div className="flex-1 min-w-0">
               <span className="block text-[10px] font-bold uppercase tracking-[0.16em] text-stone">
-                Service
+                {t("search_service", "Service")}
               </span>
               <p className="text-sm font-semibold text-ink truncate">
-                Airport &amp; Private Transfers
+                {t("private_transfer", "Airport & Private Transfers")}
               </p>
             </div>
           </div>
@@ -225,18 +226,18 @@ export function HeroSearch() {
           </div>
           <div className="flex-1 min-w-0">
             <span className="block text-[10px] font-bold uppercase tracking-[0.16em] text-stone">
-              Duration
+              {t("label_duration", "Duration")}
             </span>
             <select
               value={duration}
               onChange={(e) => setDuration(e.target.value)}
-              aria-label="Duration"
+              aria-label={t("label_duration", "Duration")}
               className="w-full bg-transparent text-sm font-semibold text-ink border-0 p-0 focus:ring-0 focus:outline-none cursor-pointer truncate"
             >
-              <option value="all">Any length</option>
+              <option value="all">{t("duration_flexible", "Any length")}</option>
               {durationBuckets.map((b) => (
                 <option key={b.id} value={b.id}>
-                  {b.label}
+                  {durationBucketLabel(b.id, lang)}
                 </option>
               ))}
             </select>
@@ -261,7 +262,7 @@ export function HeroSearch() {
             <circle cx="11" cy="11" r="8" />
             <path d="m21 21-4.3-4.3" />
           </svg>
-          <span className="text-sm tracking-wide">Search</span>
+          <span className="text-sm tracking-wide">{t("search_submit", "Search")}</span>
         </button>
       </form>
 

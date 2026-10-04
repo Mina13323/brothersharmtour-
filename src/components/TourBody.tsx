@@ -54,14 +54,19 @@ export function TourBody({
   /** In the CMS preview the fixed-position sticky bar is suppressed. */
   preview?: boolean;
 }) {
-  const { money, whatsappLink, settings, t } = useSite();
+  const { money, whatsappLink, settings, t, lang } = useSite();
   const guideLang = useGuideLanguage();
 
-  const price = money(tour.priceFrom, tour.priceOverrides);
-  const childPriceFormatted =
+  const adultPrice = tour.priceFrom;
+  const effectiveChildPrice =
     tour.childPrice !== null && tour.childPrice !== undefined
-      ? money(tour.childPrice, tour.priceOverrides)
-      : null;
+      ? tour.childPrice
+      : adultPrice !== null && adultPrice !== undefined && adultPrice > 0
+        ? Math.round(adultPrice * 0.8)
+        : null;
+
+  const price = money(adultPrice, tour.priceOverrides);
+  const childPriceFormatted = effectiveChildPrice !== null ? money(effectiveChildPrice) : null;
   const original = money(tourOriginalPrice(tour), tour.priceOverrides);
   const discount = tourDiscountPct(tour);
   const rating = tourRating(tour);
@@ -77,10 +82,10 @@ export function TourBody({
         <div className="shell">
           <div className="flex flex-col gap-6 py-6 lg:flex-row lg:items-center lg:justify-between lg:py-7">
             <dl className="grid grid-cols-2 gap-x-8 gap-y-4 sm:grid-cols-4 lg:gap-x-12">
-              <Fact label="Location" value={destinationName(tour.destination)} />
-              <Fact label="Duration" value={tour.duration ?? t("duration_flexible", "Flexible")} />
+              <Fact label={t("label_location", "Location")} value={destinationName(tour.destination, lang)} />
+              <Fact label={t("label_duration", "Duration")} value={tour.duration ?? t("duration_flexible", "Flexible")} />
               <Fact
-                label="Tour type"
+                label={t("label_tour_type", "Tour type")}
                 value={
                   tour.type === "private"
                     ? t("private_tour", "Private")
@@ -196,7 +201,7 @@ export function TourBody({
             <div className="lg:col-span-7 xl:col-span-8">
               {/* Overview */}
               <Reveal>
-                <h2 className="eyebrow text-reef">Overview</h2>
+                <h2 className="eyebrow text-reef">{t("section_overview", "Overview")}</h2>
                 <div className="mt-5 flex flex-col gap-5 text-[1.0625rem] leading-[1.75] text-stone">
                   {tour.description.map((p) => (
                     <p key={p.slice(0, 30)}>{p}</p>
@@ -207,7 +212,7 @@ export function TourBody({
               {/* Highlights */}
               {tour.highlights.length ? (
                 <Reveal className="mt-14">
-                  <h2 className="eyebrow text-reef">Highlights</h2>
+                  <h2 className="eyebrow text-reef">{t("section_highlights", "Highlights")}</h2>
                   <ul className="mt-5 grid gap-3 sm:grid-cols-2">
                     {tour.highlights.map((h) => (
                       <li
@@ -226,18 +231,18 @@ export function TourBody({
               {tour.included.length || tour.excluded.length ? (
                 <Reveal className="mt-14 grid gap-6 sm:grid-cols-2">
                   <div className="rounded-3xl bg-paper-warm/50 p-6 shadow-xs md:p-8">
-                    <h2 className="eyebrow text-reef">What&apos;s included</h2>
+                    <h2 className="eyebrow text-reef">{t("section_included", "What's included")}</h2>
                     <ul className="mt-5 flex flex-col gap-3">
                       {tour.included.map((item) => (
                         <li key={item} className="flex gap-3 text-[0.9375rem] leading-relaxed">
                           <Check />
-                          {localizeGuideText(item, guideLang.code)}
+                          {item}
                         </li>
                       ))}
                     </ul>
                   </div>
                   <div className="rounded-3xl bg-paper-warm/50 p-6 shadow-xs md:p-8">
-                    <h2 className="eyebrow text-stone">Not included</h2>
+                    <h2 className="eyebrow text-stone">{t("section_excluded", "Not included")}</h2>
                     <ul className="mt-5 flex flex-col gap-3">
                       {tour.excluded.map((item) => (
                         <li
@@ -256,7 +261,7 @@ export function TourBody({
               {/* Itinerary */}
               {tour.itinerary.length ? (
                 <Reveal className="mt-16">
-                  <h2 className="eyebrow text-reef">Itinerary</h2>
+                  <h2 className="eyebrow text-reef">{t("section_itinerary", "Itinerary")}</h2>
                   <ol className="mt-6 border-l border-sand">
                     {tour.itinerary.map((stop, i) => (
                       <li key={stop.title} className="relative pb-8 pl-8 last:pb-0">
@@ -283,11 +288,10 @@ export function TourBody({
               {/* Meeting point */}
               {tour.meetingPoint ? (
                 <Reveal className="mt-14 rounded-3xl border border-sand/80 bg-paper-warm p-6 shadow-sm md:p-8">
-                  <h2 className="eyebrow text-reef">Meeting &amp; pickup</h2>
+                  <h2 className="eyebrow text-reef">{t("section_meeting", "Meeting & pickup")}</h2>
                   <p className="mt-4 text-[0.9375rem] leading-relaxed">{tour.meetingPoint}</p>
                   <p className="mt-3 text-[0.875rem] leading-relaxed text-stone">
-                    We confirm your exact pickup time once we know your hotel — usually the
-                    evening before.
+                    {t("pickup_time_hint", "We confirm your exact pickup time once we know your hotel — usually the evening before.")}
                   </p>
                 </Reveal>
               ) : null}
@@ -297,7 +301,7 @@ export function TourBody({
                 <Reveal className="mt-14 grid gap-6 sm:grid-cols-2">
                   {tour.bring?.length ? (
                     <div className="rounded-3xl bg-paper-warm/50 p-6 shadow-xs md:p-8">
-                      <h2 className="eyebrow text-reef">What to bring</h2>
+                      <h2 className="eyebrow text-reef">{t("section_bring", "What to bring")}</h2>
                       <ul className="mt-5 flex flex-col gap-3">
                         {tour.bring.map((item) => (
                           <li key={item} className="flex gap-3 text-[0.9375rem] leading-relaxed">
@@ -310,7 +314,7 @@ export function TourBody({
                   ) : null}
                   {tour.restrictions?.length ? (
                     <div className="rounded-3xl bg-paper-warm/50 p-6 shadow-xs md:p-8">
-                      <h2 className="eyebrow text-stone">Good to know</h2>
+                      <h2 className="eyebrow text-stone">{t("section_restrictions", "Good to know")}</h2>
                       <ul className="mt-5 flex flex-col gap-3">
                         {tour.restrictions.map((item) => (
                           <li
@@ -330,7 +334,7 @@ export function TourBody({
               {/* Important information */}
               {tour.importantInfo.length ? (
                 <Reveal className="mt-14">
-                  <h2 className="eyebrow text-reef">Important information</h2>
+                  <h2 className="eyebrow text-reef">{t("section_important", "Important information")}</h2>
                   <ul className="mt-5 flex flex-col gap-3">
                     {tour.importantInfo.map((item) => (
                       <li
@@ -350,7 +354,7 @@ export function TourBody({
                 <Reveal className="mt-14">
                   <div className="flex flex-wrap items-end justify-between gap-4">
                     <h2 className="eyebrow text-reef">
-                      Guest reviews · {reviews.length}
+                      {t("section_reviews", "Guest reviews")} · {reviews.length}
                     </h2>
                     <Link
                       href={`/review?tour=${tour.slug}`}
@@ -534,9 +538,9 @@ export function TourBody({
         <section className="band-tight bg-paper-warm">
           <div className="shell">
             <SectionHeading
-              eyebrow="You might also like"
-              title="Related experiences"
-              action={{ label: "All tours", href: "/tours" }}
+              eyebrow={t("section_related", "Related experiences")}
+              title={t("trust_bestsellers", "Bestselling Excursions")}
+              action={{ label: t("all_tours_button", "All tours"), href: "/tours" }}
             />
             <div className="mt-12 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
               {related.map((item, i) => (

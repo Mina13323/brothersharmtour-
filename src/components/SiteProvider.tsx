@@ -92,8 +92,8 @@ export function SiteProvider({
 }) {
   const money = useCallback(
     (value: number | null | undefined, overrides?: Record<string, number>) =>
-      moneyIn(value, currency, { overrides }),
-    [currency],
+      moneyIn(value, currency, { overrides, lang }),
+    [currency, lang],
   );
 
   const whatsappLink = useCallback(

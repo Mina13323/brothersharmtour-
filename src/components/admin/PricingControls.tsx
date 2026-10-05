@@ -14,6 +14,7 @@
  *                               adult price (−7.5% for pairs, −15% for groups).
  */
 
+import { useMemo } from "react";
 import { Plus, Trash2, Wand2 } from "lucide-react";
 import type { TieredPrice } from "@/lib/types";
 import { convert, formatAmount } from "@/lib/currency";
@@ -236,7 +237,7 @@ export function AgePricingFields({
 /* ───────────────────────── tiered adult pricing ───────────────────────── */
 
 const TIER_PRESETS = [
-  { minGuests: 1, maxGuests: 1, label: "Solo traveler", factor: 1 },
+  { minGuests: 1, maxGuests: 1, label: "Solo Traveller", factor: 1 },
   { minGuests: 2, maxGuests: 2, label: "Couples", factor: 0.925 },
   { minGuests: 3, maxGuests: null, label: "Group", factor: 0.85 },
 ] as const;
@@ -256,7 +257,24 @@ export function TieredPricingEditor({
   rates?: Record<string, number>;
   onChange: (tiers: TieredPrice[]) => void;
 }) {
-  const list = tiers ?? [];
+  // If the admin only inserts couples and groups prices, automatically default Solo Traveller with basePrice
+  const list: TieredPrice[] = useMemo<TieredPrice[]>(() => {
+    const raw = tiers ?? [];
+    if (!raw.length) return [];
+    const hasSolo = raw.some((t: TieredPrice) => t.minGuests === 1);
+    if (!hasSolo && basePrice !== null && basePrice !== undefined && basePrice > 0) {
+      return [
+        {
+          minGuests: 1,
+          maxGuests: 1,
+          pricePerPerson: basePrice,
+          label: "Solo Traveller",
+        },
+        ...raw,
+      ];
+    }
+    return raw;
+  }, [tiers, basePrice]);
 
   const setTier = (idx: number, patch: Partial<TieredPrice>) => {
     const next = list.map((tier, i) => (i === idx ? { ...tier, ...patch } : tier));
@@ -266,14 +284,25 @@ export function TieredPricingEditor({
   const removeTier = (idx: number) => onChange(list.filter((_, i) => i !== idx));
 
   const addTier = () => {
-    const lastMin = list.length ? Math.max(...list.map((t) => t.minGuests ?? 1)) : 0;
+    if (list.length === 0) {
+      onChange([
+        {
+          minGuests: 1,
+          maxGuests: 1,
+          pricePerPerson: basePrice ?? 0,
+          label: "Solo Traveller",
+        },
+      ]);
+      return;
+    }
+    const lastMin = Math.max(...list.map((t) => t.minGuests ?? 1));
     onChange([
       ...list,
       {
         minGuests: lastMin + 1,
         maxGuests: null,
         pricePerPerson: basePrice ?? 0,
-        label: "",
+        label: lastMin + 1 === 2 ? "Couples" : "Group",
       },
     ]);
   };

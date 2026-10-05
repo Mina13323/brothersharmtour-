@@ -40,7 +40,7 @@ export const CHILD_AGE_MAX_DEFAULT = 11;
 export const INFANT_AGE_MAX_DEFAULT = 3;
 
 export const TIER_PRESETS = [
-  { minGuests: 1, maxGuests: 1, label: "Solo traveler", factor: 1 },
+  { minGuests: 1, maxGuests: 1, label: "Solo Traveller", factor: 1 },
   { minGuests: 2, maxGuests: 2, label: "Couples", factor: 0.925 },
   { minGuests: 3, maxGuests: null, label: "Group", factor: 0.85 },
 ] as const;
@@ -48,6 +48,8 @@ export const TIER_PRESETS = [
 /**
  * Resolves tiered pricing: returns authored tiers if present and valid,
  * otherwise derives default 1 / 2 (couples) / 3+ (group) tiers from the base adult price.
+ * When the admin only inserts couples and groups prices, automatically defaults
+ * Solo Traveller for 1 guest with the base adult price.
  */
 export function effectiveTieredPricing(
   tiers: TieredPrice[] | null | undefined,
@@ -76,6 +78,18 @@ export function effectiveTieredPricing(
       });
 
     if (valid.length > 0) {
+      // If there is no tier for 1 guest (Solo Traveller), but we have a base adult price (or multi-guest tiers),
+      // automatically prepend the Solo Traveller tier so 1 person gets an explicit tier field that highlights
+      const hasSoloTier = valid.some((t) => t.minGuests === 1);
+      if (!hasSoloTier && baseAdultPrice !== null && baseAdultPrice !== undefined && baseAdultPrice > 0) {
+        valid.unshift({
+          minGuests: 1,
+          maxGuests: 1,
+          pricePerPerson: baseAdultPrice,
+          label: "Solo Traveller",
+        });
+      }
+
       // If there is a couples tier capped at 2, but no tier for 3+ guests, ensure a Group tier exists
       const hasGroupTier = valid.some(
         (t) => t.minGuests >= 3 || (t.minGuests === 2 && t.maxGuests === null),
@@ -89,7 +103,7 @@ export function effectiveTieredPricing(
           label: "Group",
         });
       }
-      return valid;
+      return valid.sort((a, b) => a.minGuests - b.minGuests);
     }
   }
   if (baseAdultPrice === null || baseAdultPrice === undefined || baseAdultPrice <= 0) {
@@ -134,6 +148,9 @@ export function resolveTier(
     if (guests >= tier.minGuests && (max === null || guests <= max)) {
       if (guests > 2 && /couple/i.test(tier.label || "")) {
         return { ...tier, label: "Group" };
+      }
+      if (guests === 1 && !tier.label) {
+        return { ...tier, label: "Solo Traveller" };
       }
       return tier;
     }

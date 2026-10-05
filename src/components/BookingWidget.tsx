@@ -477,9 +477,7 @@ export function BookingWidget({
                       ? ` · ${t("party_group", "Group")}`
                       : adults === 2
                         ? ` · ${t("party_couples", "Couples")}`
-                        : activeTier?.label && !/couple|group/i.test(activeTier.label)
-                          ? ` · ${activeTier.label}`
-                          : ""
+                        : ` · ${activeTier?.label?.trim() || t("party_solo", "Solo Traveller")}`
                   }`
                 : t("age_adults", "12+ yrs")
             }
@@ -532,32 +530,36 @@ export function BookingWidget({
                     ? Math.round((1 - tier.pricePerPerson / solo.pricePerPerson) * 100)
                     : 0;
                 return (
-                  <span
+                  <button
                     key={`${tier.minGuests}-${tier.maxGuests ?? "up"}`}
+                    type="button"
+                    onClick={() => setAdults(tier.minGuests)}
                     className={cn(
-                      "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[0.7rem] font-medium transition-colors",
+                      "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[0.7rem] font-medium transition-colors cursor-pointer",
                       isActive
                         ? "border-reef bg-reef/[0.08] text-reef-deep font-semibold"
-                        : "border-sand/80 bg-paper-warm/40 text-stone",
+                        : "border-sand/80 bg-paper-warm/40 text-stone hover:border-reef/50",
                     )}
                   >
-                    {(tier.minGuests > 2 && /couple/i.test(tier.label || ""))
-                      ? t("party_group", "Group")
-                      : (tier.label?.trim() ||
-                        (tier.minGuests > 2
-                          ? t("party_group", "Group")
-                          : tier.minGuests === 2
-                            ? t("party_couples", "Couples")
-                            : `${tier.minGuests}${tier.maxGuests == null ? "+" : tier.maxGuests === tier.minGuests ? "" : `–${tier.maxGuests}`} ${
-                                tier.minGuests === 1 ? "person" : "persons"
-                              }`))}
+                    {tier.minGuests === 1
+                      ? (tier.label?.trim() || t("party_solo", "Solo Traveller"))
+                      : (tier.minGuests > 2 && /couple/i.test(tier.label || ""))
+                        ? t("party_group", "Group")
+                        : (tier.label?.trim() ||
+                          (tier.minGuests > 2
+                            ? t("party_group", "Group")
+                            : tier.minGuests === 2
+                              ? t("party_couples", "Couples")
+                              : `${tier.minGuests}${tier.maxGuests == null ? "+" : tier.maxGuests === tier.minGuests ? "" : `–${tier.maxGuests}`} ${
+                                  tier.minGuests === 1 ? "person" : "persons"
+                                }`))}
                     {tierValue !== null ? ` · ${fmt(tierValue)}/person` : ""}
                     {savePct > 0 ? (
                       <span className="text-[0.65rem] font-bold text-emerald-700">
                         −{savePct}%
                       </span>
                     ) : null}
-                  </span>
+                  </button>
                 );
               })}
           </div>

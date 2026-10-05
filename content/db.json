@@ -53,6 +53,12 @@
       "childPrice": 15,
       "tieredPricing": [
         {
+          "label": "Solo Traveller",
+          "maxGuests": 1,
+          "minGuests": 1,
+          "pricePerPerson": 30
+        },
+        {
           "label": "Couples",
           "maxGuests": 2,
           "minGuests": 2,
@@ -210,6 +216,12 @@
         "child_age_min": null,
         "infant_age_max": null,
         "tiered_pricing": [
+          {
+            "label": "Solo Traveller",
+            "maxGuests": 1,
+            "minGuests": 1,
+            "pricePerPerson": 30
+          },
           {
             "label": "Couples",
             "maxGuests": 2,

@@ -10,10 +10,12 @@ const config = [
   {
     ignores: [
       ".next/**",
+      ".kilo/**",
       "node_modules/**",
       "public/**",
       "media-src/**",
       "next-env.d.ts",
+      "scripts/**",
     ],
   },
   ...compat.extends("next/core-web-vitals", "next/typescript"),

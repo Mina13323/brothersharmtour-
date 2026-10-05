@@ -106,7 +106,8 @@ if (hadContent) cpSync(CONTENT, BACKUP, { recursive: true });
 const server = spawn("npx", ["next", "start", "-p", String(PORT)], {
   stdio: ["ignore", "pipe", "pipe"],
   env: { ...process.env, PORT: String(PORT) },
-  detached: true, // own process group so shutdown kills next-server too
+  detached: process.platform !== "win32", // own process group on POSIX
+  shell: process.platform === "win32",
 });
 server.on("exit", (code) => {
   if (!exiting && code !== 0 && code !== null) {
@@ -121,7 +122,11 @@ server.stderr.on("data", (d) => process.env.VERBOSE && process.stderr.write(d));
 async function shutdown(code) {
   exiting = true;
   try {
-    process.kill(-server.pid, "SIGTERM");
+    if (process.platform === "win32") {
+      process.kill(server.pid, "SIGTERM");
+    } else {
+      process.kill(-server.pid, "SIGTERM");
+    }
   } catch {}
   // wait for the port to actually free, then force-kill leftovers
   for (let i = 0; i < 20; i++) {
@@ -129,7 +134,11 @@ async function shutdown(code) {
     await new Promise((r) => setTimeout(r, 250));
   }
   try {
-    process.kill(-server.pid, "SIGKILL");
+    if (process.platform === "win32") {
+      process.kill(server.pid, "SIGKILL");
+    } else {
+      process.kill(-server.pid, "SIGKILL");
+    }
   } catch {}
   // restore the original content store
   try {

@@ -103,10 +103,12 @@ export async function isAdmin(): Promise<boolean> {
 
   // Confirm against Supabase admin_users
   try {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey =
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+    const supabaseKey = (
       process.env.SUPABASE_SERVICE_ROLE_KEY ||
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+    )?.trim();
     if (supabaseUrl && supabaseKey) {
       const res = await fetch(
         `${supabaseUrl.replace(/\/+$/, "")}/rest/v1/admin_users?email=eq.${encodeURIComponent(sessionEmail)}&select=id`,
@@ -162,10 +164,12 @@ export async function checkCredentials(
 
   // 3. Secure check against Supabase admin_users table (if configured)
   try {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey =
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+    const supabaseKey = (
       process.env.SUPABASE_SERVICE_ROLE_KEY ||
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+    )?.trim();
     if (supabaseUrl && supabaseKey) {
       const res = await fetch(
         `${supabaseUrl.replace(/\/+$/, "")}/rest/v1/admin_users?email=eq.${encodeURIComponent(inputEmail)}&select=password_hash`,

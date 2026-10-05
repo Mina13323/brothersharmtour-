@@ -9,12 +9,13 @@
 
 import type { Database, TourRecord, PackageRecord, InquiryRecord, ReviewRecord, Settings } from "./types";
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://gsxohwanlajzdkrjqxgk.supabase.co";
-const SUPABASE_KEY =
+const SUPABASE_URL = (process.env.NEXT_PUBLIC_SUPABASE_URL || "").trim();
+const SUPABASE_KEY = (
   process.env.SUPABASE_SERVICE_ROLE_KEY ||
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
   process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
-  "sb_publishable_F1QhXArd-a8mtopqukwShQ_q-Z2H7n3";
+  ""
+).trim();
 
 export function isSupabaseConfigured(): boolean {
   return Boolean(SUPABASE_URL && SUPABASE_KEY);
@@ -88,8 +89,8 @@ export function rowToTour(r: Record<string, unknown>): TourRecord {
   const tripPackages = Array.isArray(r.trip_packages)
     ? (r.trip_packages as TourRecord["tripPackages"])
     : Array.isArray(seo.tripPackages)
-    ? (seo.tripPackages as TourRecord["tripPackages"])
-    : [];
+      ? (seo.tripPackages as TourRecord["tripPackages"])
+      : [];
 
   return {
     id: String(r.id),
@@ -184,8 +185,8 @@ export function rowToPackage(r: Record<string, unknown>): PackageRecord {
   const includedTours = Array.isArray(r.included_tours)
     ? (r.included_tours as string[])
     : Array.isArray(seo.includedTours)
-    ? (seo.includedTours as string[])
-    : [];
+      ? (seo.includedTours as string[])
+      : [];
 
   return {
     id: String(r.id),
@@ -343,13 +344,30 @@ export async function syncReviewToSupabase(review: ReviewRecord): Promise<void> 
     rating: review.rating ?? 5,
     title: review.title || null,
     body: review.body,
+    booking_ref: review.bookingRef || null,
     photos: review.photos || [],
     status: review.status || "pending",
     verified: Boolean(review.verified),
+    admin_notes: review.adminNotes || null,
+    submitted_at: review.submittedAt || new Date().toISOString(),
+    // NULL (not undefined) so approvals/rejections round-trip cleanly.
+    reviewed_at: review.reviewedAt || null,
+    published_at: review.publishedAt || null,
     created_at: review.submittedAt || new Date().toISOString(),
   };
 
   await postToSupabase("reviews?on_conflict=id", row, true);
+}
+
+/** Removes a review from Supabase (used when an admin deletes it in the CMS). */
+export async function deleteReviewFromSupabase(id: string): Promise<void> {
+  if (!isSupabaseConfigured()) return;
+  try {
+    const url = `${SUPABASE_URL.replace(/\/+$/, "")}/rest/v1/reviews?id=eq.${encodeURIComponent(id)}`;
+    await fetch(url, { method: "DELETE", headers: getHeaders(false) });
+  } catch (err) {
+    console.warn(`[Supabase Sync Warning] Failed to delete review:`, (err as Error).message);
+  }
 }
 
 export async function syncSettingsToSupabase(settings: Settings): Promise<void> {
@@ -453,7 +471,7 @@ export async function syncAllToSupabase(db: Database): Promise<{
             role: "admin",
             updated_at: new Date().toISOString(),
           }),
-        }).catch(() => {});
+        }).catch(() => { });
       }
     }
 

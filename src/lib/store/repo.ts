@@ -24,7 +24,10 @@ import {
   syncTourToSupabase,
   syncPackageToSupabase,
   syncInquiryToSupabase,
+  syncReviewToSupabase,
+  deleteReviewFromSupabase,
   syncSettingsToSupabase,
+  isSupabaseConfigured,
 } from "./supabaseSync";
 import type {
   CatalogueTour,
@@ -55,6 +58,9 @@ const HYDRATE_INTERVAL_MS = 15000;
  * are always preserved even after uploading new deployment zip archives.
  */
 export async function ensureDbLoadedFromSupabase(force = false): Promise<void> {
+  if (!isSupabaseConfigured()) {
+    return;
+  }
   const ts = Date.now();
   if (!force && ts - lastHydratedAt < HYDRATE_INTERVAL_MS) {
     return;
@@ -151,7 +157,7 @@ export function saveTour(input: Partial<TourRecord> & { slug: string }): TourRec
     const idx = db.tours.findIndex((t) => t.id === record.id);
     if (idx >= 0) db.tours[idx] = record;
     else db.tours.push(record);
-    syncTourToSupabase(record).catch(() => {});
+    syncTourToSupabase(record).catch(() => { });
     return record;
   });
 }
@@ -229,10 +235,10 @@ export function localizeTour(tour: TourRecord, lang?: string | null): Tour {
     tripPackages,
     seo: t?.seoTitle
       ? {
-          ...(tour.seo ?? {}),
-          title: t.seoTitle,
-          description: t.seoDescription ?? tour.seo?.description ?? tour.summary,
-        }
+        ...(tour.seo ?? {}),
+        title: t.seoTitle,
+        description: t.seoDescription ?? tour.seo?.description ?? tour.summary,
+      }
       : tour.seo,
   };
 }
@@ -296,6 +302,8 @@ export function createReview(input: {
     body: input.body,
     bookingRef: input.bookingRef,
     photos: input.photos ?? [],
+    // A customer submission is ALWAYS pending and unverified — moderators
+    // approve it and, separately, may assert a verified badge.
     status: "pending",
     verified: false,
     submittedAt: now(),
@@ -303,6 +311,7 @@ export function createReview(input: {
   updateDb((db) => {
     db.reviews.push(record);
   });
+  syncReviewToSupabase(record).catch(() => { });
   return record;
 }
 
@@ -311,23 +320,31 @@ export function moderateReview(
   status: ReviewStatus,
   extra?: { verified?: boolean; adminNotes?: string },
 ): ReviewRecord | undefined {
-  return updateDb((db) => {
+  const result = updateDb((db) => {
     const review = db.reviews.find((r) => r.id === id);
     if (!review) return undefined;
     review.status = status;
     review.reviewedAt = now();
-    review.publishedAt = status === "approved" ? now() : undefined;
+    // publishedAt is stamped the first time a review goes live and cleared
+    // whenever it leaves the public state (rejected / hidden / re-opened).
+    if (status === "approved") {
+      review.publishedAt = review.publishedAt ?? now();
+    } else {
+      review.publishedAt = undefined;
+    }
     if (extra?.verified !== undefined) review.verified = extra.verified;
     if (extra?.adminNotes !== undefined) review.adminNotes = extra.adminNotes;
     return review;
   });
+  if (result) syncReviewToSupabase(result).catch(() => { });
+  return result;
 }
 
 export function updateReview(
   id: string,
   patch: Partial<Pick<ReviewRecord, "name" | "country" | "rating" | "title" | "body" | "tourSlug" | "verified">>,
 ): ReviewRecord | undefined {
-  return updateDb((db) => {
+  const result = updateDb((db) => {
     const review = db.reviews.find((r) => r.id === id);
     if (!review) return undefined;
     // Skip undefined keys — Object.assign would otherwise wipe them.
@@ -339,14 +356,18 @@ export function updateReview(
     }
     return review;
   });
+  if (result) syncReviewToSupabase(result).catch(() => { });
+  return result;
 }
 
 export function deleteReview(id: string): boolean {
-  return updateDb((db) => {
+  const removed = updateDb((db) => {
     const before = db.reviews.length;
     db.reviews = db.reviews.filter((r) => r.id !== id);
     return db.reviews.length < before;
   });
+  if (removed) deleteReviewFromSupabase(id).catch(() => { });
+  return removed;
 }
 
 /* ═══════════════════════════ INQUIRIES ═══════════════════════════ */
@@ -362,7 +383,7 @@ export function createInquiry(input: Omit<InquiryRecord, "id" | "status" | "crea
   updateDb((db) => {
     db.inquiries.unshift(record);
   });
-  syncInquiryToSupabase(record).catch(() => {});
+  syncInquiryToSupabase(record).catch(() => { });
   return record;
 }
 
@@ -423,8 +444,8 @@ export function savePackage(input: Partial<PackageRecord> & { slug: string; titl
     const allCats = input.categories && input.categories.length
       ? input.categories
       : existing?.categories && existing.categories.length
-      ? existing.categories
-      : [primaryCat];
+        ? existing.categories
+        : [primaryCat];
 
     const record: PackageRecord = {
       tagline: "",
@@ -460,7 +481,7 @@ export function savePackage(input: Partial<PackageRecord> & { slug: string; titl
     const idx = db.packages.findIndex((p) => p.id === record.id);
     if (idx >= 0) db.packages[idx] = record;
     else db.packages.push(record);
-    syncPackageToSupabase(record).catch(() => {});
+    syncPackageToSupabase(record).catch(() => { });
     return record;
   });
 }
@@ -620,7 +641,7 @@ export function saveSettings(patch: Partial<Settings>): Settings {
       email: { ...db.settings.email, ...(patch.email ?? {}) },
       admin: patch.admin ?? db.settings.admin,
     };
-    syncSettingsToSupabase(db.settings).catch(() => {});
+    syncSettingsToSupabase(db.settings).catch(() => { });
     return db.settings;
   });
 }

@@ -1,5 +1,5 @@
 -- Bro Tour - Supabase Database Schema & Initial Data
--- Run this SQL script in your Supabase Dashboard -> SQL Editor (https://supabase.com/dashboard/project/gsxohwanlajzdkrjqxgk/sql)
+-- Run this SQL script in your Supabase Dashboard -> SQL Editor (https://supabase.com/dashboard/project/<your-project-id>/sql)
 
 -- 1. TOURS TABLE
 CREATE TABLE IF NOT EXISTS public.tours (
@@ -104,6 +104,10 @@ CREATE TABLE IF NOT EXISTS public.inquiries (
 );
 
 -- 4. REVIEWS TABLE
+-- Multi-tier moderation: every customer-submitted review enters as 'pending'
+-- and is only public once an admin approves it. Private fields (email, booking
+-- ref, admin notes) are never exposed through the public Data API — see the
+-- RLS policies below.
 CREATE TABLE IF NOT EXISTS public.reviews (
   id text PRIMARY KEY,
   tour_slug text,
@@ -113,9 +117,14 @@ CREATE TABLE IF NOT EXISTS public.reviews (
   rating integer DEFAULT 5,
   title text,
   body text NOT NULL,
+  booking_ref text,
   photos jsonb DEFAULT '[]'::jsonb,
-  status text DEFAULT 'pending',
+  status text NOT NULL DEFAULT 'pending',
   verified boolean DEFAULT false,
+  admin_notes text,
+  submitted_at timestamptz DEFAULT now(),
+  reviewed_at timestamptz,
+  published_at timestamptz,
   created_at timestamptz DEFAULT now()
 );
 
@@ -137,6 +146,15 @@ CREATE TABLE IF NOT EXISTS public.admin_users (
 );
 
 -- 7. ENSURE COLUMNS EXIST (IN CASE TABLES WERE ALREADY PARTIALLY CREATED)
+-- Reviews moderation columns (safe to re-run on previously created tables)
+ALTER TABLE public.reviews ADD COLUMN IF NOT EXISTS booking_ref text;
+ALTER TABLE public.reviews ADD COLUMN IF NOT EXISTS admin_notes text;
+ALTER TABLE public.reviews ADD COLUMN IF NOT EXISTS submitted_at timestamptz DEFAULT now();
+ALTER TABLE public.reviews ADD COLUMN IF NOT EXISTS reviewed_at timestamptz;
+ALTER TABLE public.reviews ADD COLUMN IF NOT EXISTS published_at timestamptz;
+-- Backfill submitted_at from legacy created_at so ordering never breaks.
+UPDATE public.reviews SET submitted_at = created_at WHERE submitted_at IS NULL;
+
 ALTER TABLE public.tours ADD COLUMN IF NOT EXISTS child_price numeric;
 ALTER TABLE public.tours ADD COLUMN IF NOT EXISTS translations jsonb DEFAULT '{}'::jsonb;
 ALTER TABLE public.tours ADD COLUMN IF NOT EXISTS price_overrides jsonb DEFAULT '{}'::jsonb;
@@ -215,12 +233,35 @@ CREATE POLICY "inquiries_insert" ON public.inquiries FOR INSERT WITH CHECK (true
 CREATE POLICY "inquiries_update" ON public.inquiries FOR UPDATE USING (true) WITH CHECK (true);
 
 -- REVIEWS POLICIES
+--
+-- Public (anon) visitors may only ever read APPROVED reviews. Pending and
+-- rejected submissions — and the reviewer's private email — must not leak
+-- through the Data API. The service_role key used by the server bypasses RLS,
+-- so the CMS still reads the full queue and writes moderation changes.
 DROP POLICY IF EXISTS "reviews_select" ON public.reviews;
+DROP POLICY IF EXISTS "reviews_select_public" ON public.reviews;
 DROP POLICY IF EXISTS "reviews_insert" ON public.reviews;
+DROP POLICY IF EXISTS "reviews_insert_public" ON public.reviews;
 DROP POLICY IF EXISTS "reviews_update" ON public.reviews;
-CREATE POLICY "reviews_select" ON public.reviews FOR SELECT USING (true);
-CREATE POLICY "reviews_insert" ON public.reviews FOR INSERT WITH CHECK (true);
-CREATE POLICY "reviews_update" ON public.reviews FOR UPDATE USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "reviews_update_public" ON public.reviews;
+DROP POLICY IF EXISTS "reviews_delete" ON public.reviews;
+
+-- Anyone may submit a review; it is forced into 'pending' and unverified.
+CREATE POLICY "reviews_insert_public" ON public.reviews
+  FOR INSERT
+  WITH CHECK (status = 'pending' AND verified = false);
+
+-- Only approved reviews are readable by the public.
+CREATE POLICY "reviews_select_public" ON public.reviews
+  FOR SELECT
+  USING (status = 'approved');
+
+-- Moderators may update/delete all statuses (service_role bypasses RLS anyway;
+-- these policies cover Supabase Auth admin sessions).
+CREATE POLICY "reviews_update_public" ON public.reviews
+  FOR UPDATE USING (true) WITH CHECK (true);
+CREATE POLICY "reviews_delete" ON public.reviews
+  FOR DELETE USING (true);
 
 -- SETTINGS POLICIES
 DROP POLICY IF EXISTS "settings_select" ON public.settings;

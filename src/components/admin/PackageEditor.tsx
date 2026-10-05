@@ -13,7 +13,7 @@ import { Save, Plus, Trash2, ArrowUp, ArrowDown, Sparkles } from "lucide-react";
 import type { PackageRecord, TourRecord, Settings } from "@/lib/store/types";
 import { destinationName, experienceName } from "@/lib/store/labels";
 import { MediaGalleryEditor, SingleImageUploader } from "./MediaGalleryEditor";
-import { AgePricingFields, TieredPricingEditor } from "./PricingControls";
+import { AgePricingFields, MoneyHint, TieredPricingEditor } from "./PricingControls";
 
 const DESTINATIONS = ["sharm-el-sheikh", "cairo"];
 const CATEGORIES = [
@@ -198,6 +198,12 @@ export default function PackageEditor({
       setBusy(false);
     }
   }
+
+  /* Prices are declared in the record's OWN currency (which may differ from
+   * the site base currency — e.g. a EUR-denominated package). Labelling them
+   * with the base currency is what made "80 in admin" show as "$87" live. */
+  const pkgCurrency = pkg.currency || baseCurrency;
+  const rates = settings?.currency?.rates;
 
   const enabledLanguages = settings?.languages.filter((l) => l.enabled) ?? [
     { code: "en", label: "English", dir: "ltr", enabled: true },
@@ -463,7 +469,24 @@ export default function PackageEditor({
 
         <Section title="Pricing">
           <div className="grid grid-cols-1 gap-4 rounded-xl bg-black/20 p-3.5 border border-white/5">
-            <Field label={`Adult Price (${baseCurrency}) — Primary rate`}>
+            <Field label="Price currency — the currency declared prices are declared in">
+              <select
+                className={input}
+                value={pkgCurrency}
+                onChange={(e) => set("currency", e.target.value)}
+              >
+                {Object.keys(rates ?? { [pkgCurrency]: 1 }).map((code) => (
+                  <option key={code} value={code}>
+                    {code}
+                  </option>
+                ))}
+              </select>
+              <span className="block text-[10px] text-stone-500 mt-1">
+                Every price below is declared in this currency. The storefront converts
+                them into each visitor&apos;s display currency at the site rates.
+              </span>
+            </Field>
+            <Field label={`Adult Price (${pkgCurrency}) — Primary rate`}>
               <input
                 type="number"
                 min="0"
@@ -484,21 +507,24 @@ export default function PackageEditor({
               <span className="block text-[10px] text-stone-500 mt-1">
                 Standard adult rate (ages 12+). Independent of child rate.
               </span>
+              <MoneyHint value={pkg.priceFrom} currency={pkgCurrency} rates={rates} />
             </Field>
           </div>
 
           {/* Children & infants — rates, age bands and labels */}
           <AgePricingFields
             value={pkg}
-            currency={baseCurrency}
+            currency={pkgCurrency}
+            rates={rates}
             onPatch={(patch) => setPkg((prev) => ({ ...prev, ...patch }))}
           />
 
           {/* Tiered adult pricing (1 / 2 / 3+ guests) */}
           <TieredPricingEditor
             tiers={pkg.tieredPricing}
-            currency={baseCurrency}
+            currency={pkgCurrency}
             basePrice={pkg.priceFrom ?? null}
+            rates={rates}
             onChange={(tiers) => set("tieredPricing", tiers)}
           />
           <Field label="Pinned display prices (override conversion)">

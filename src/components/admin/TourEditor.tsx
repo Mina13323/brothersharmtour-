@@ -24,7 +24,7 @@ import type { CurrencyContext } from "@/lib/currency";
 import type { Tour, TripPackage } from "@/lib/types";
 import { destinationName, experienceName } from "@/lib/store/labels";
 import { MediaGalleryEditor, MediaVideoEditor } from "./MediaGalleryEditor";
-import { AgePricingFields, TieredPricingEditor } from "./PricingControls";
+import { AgePricingFields, MoneyHint, TieredPricingEditor } from "./PricingControls";
 
 type EditorTour = TourRecord;
 
@@ -301,6 +301,23 @@ export default function TourEditor({
               <textarea rows={3} className={input} value={tour.summary} onChange={(e) => set("summary", e.target.value)} />
             </Field>
             <div className="grid grid-cols-1 gap-4 rounded-xl bg-black/20 p-3.5 border border-white/5">
+              <Field label="Price currency — the currency declared prices are declared in">
+                <select
+                  className={input}
+                  value={tour.currency}
+                  onChange={(e) => set("currency", e.target.value)}
+                >
+                  {Object.keys(currency.rates).map((code) => (
+                    <option key={code} value={code}>
+                      {code}
+                    </option>
+                  ))}
+                </select>
+                <span className="block text-[10px] text-stone-500 mt-1">
+                  Every price below is declared in this currency. The storefront converts
+                  them into each visitor&apos;s display currency at the site rates.
+                </span>
+              </Field>
               <Field label={`Adult Price (${tour.currency}) — Required for online quote`}>
                 <input
                   type="number"
@@ -322,6 +339,7 @@ export default function TourEditor({
                 <span className="block text-[10px] text-stone-500 mt-1">
                   Ages 12+. Independent of child price. Leave blank for &quot;Price on request&quot;.
                 </span>
+                <MoneyHint value={tour.priceFrom} currency={tour.currency} rates={currency.rates} />
               </Field>
             </div>
 
@@ -329,6 +347,7 @@ export default function TourEditor({
             <AgePricingFields
               value={tour}
               currency={tour.currency}
+              rates={currency.rates}
               onPatch={(patch) => setTour((prev) => ({ ...prev, ...patch }))}
             />
 
@@ -337,6 +356,7 @@ export default function TourEditor({
               tiers={tour.tieredPricing}
               currency={tour.currency}
               basePrice={tour.priceFrom ?? null}
+              rates={currency.rates}
               onChange={(tiers) => set("tieredPricing", tiers)}
             />
             <div className="grid grid-cols-2 gap-3">

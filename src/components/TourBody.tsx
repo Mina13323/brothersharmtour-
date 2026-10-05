@@ -270,6 +270,7 @@ export function TourBody({
       ? toDisplay(groupTier.pricePerPerson)
       : null;
   const groupFormatted = groupUnit !== null ? fmt(groupUnit) : null;
+  const groupTotal3Formatted = groupUnit !== null ? fmt(groupUnit * 3) : null;
   const groupSavePct =
     soloUnit !== null && groupUnit !== null && groupUnit < soloUnit
       ? Math.round((1 - groupUnit / soloUnit) * 100)
@@ -424,12 +425,12 @@ export function TourBody({
                       </div>
                       <div className="mt-1 flex items-baseline gap-1">
                         <span className="font-display text-[1.45rem] font-bold leading-none text-ink">
-                          {couplesFormatted ?? barAdultPrice ?? "—"}
+                          {couplesTotalFormatted ?? (couplesFormatted ? `${couplesFormatted} × 2` : (barAdultPrice ?? "—"))}
                         </span>
                       </div>
                     </div>
                     <span className="mt-2 block text-[0.6875rem] text-stone truncate">
-                      {couplesTotalFormatted ? `${couplesTotalFormatted} ${t("total_label", "total")}` : unitShort}
+                      {couplesFormatted ? `${couplesFormatted} ${t("per_person_short", "/person")}` : unitShort}
                     </span>
                   </div>
 
@@ -448,12 +449,12 @@ export function TourBody({
                       </div>
                       <div className="mt-1 flex items-baseline gap-1">
                         <span className="font-display text-[1.45rem] font-bold leading-none text-ink">
-                          {groupFormatted ?? barAdultPrice ?? "—"}
+                          {groupTotal3Formatted ?? (groupFormatted ? `${groupFormatted} × 3` : (barAdultPrice ?? "—"))}
                         </span>
                       </div>
                     </div>
-                    <span className="mt-2 block text-[0.6875rem] text-stone">
-                      {unitShort} ({t("small_group_discount", "group rate")})
+                    <span className="mt-2 block text-[0.6875rem] text-stone truncate">
+                      {groupFormatted ? `${groupFormatted} ${t("per_person_short", "/person")}` : unitShort}
                     </span>
                   </div>
 

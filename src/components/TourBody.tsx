@@ -209,6 +209,20 @@ export function TourBody({
   // The "was" price is never pinned by overrides — those belong to the live price.
   const original = money(tourOriginalPrice(tour), undefined, storedCurrency);
   const discount = tourDiscountPct(tour);
+
+  /* Booking-bar prices follow the SELECTED trip option (each trip carries its
+   * own adult/child/infant rates) and fall back to the tour's base rates. */
+  const barAdultPrice = selectedPkg
+    ? fmt(toDisplay(selectedPkg.adultPrice))
+    : price;
+  const barChildStored = selectedPkg
+    ? (selectedPkg.childPrice ?? effectiveChildPrice)
+    : effectiveChildPrice;
+  const barChildPrice =
+    barChildStored === null ? null : fmt(toDisplay(barChildStored));
+  const barInfantStored = selectedPkg
+    ? (selectedPkg.infantPrice ?? tour.infantPrice ?? 0)
+    : effectiveInfantPrice;
   const rating = tourRating(tour);
   const reviewsCount = tourReviewCount(tour);
   const unit = tourPriceUnit(tour);
@@ -272,38 +286,56 @@ export function TourBody({
               />
               <div>
                 <dt className="text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-stone">
-                  {t("price_adult_label", "Adult Price")}
+                  {selectedPkg
+                    ? selectedPkg.title
+                    : t("price_adult_label", "Adult Price")}
                 </dt>
                 <dd className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-1">
                   <span className="font-display text-[1.75rem] leading-none text-ink font-bold">
-                    {price ?? t("price_on_request", "On request")}
+                    {barAdultPrice ?? t("price_on_request", "On request")}
                   </span>
-                  {price ? (
+                  {barAdultPrice ? (
                     <span className="text-[0.75rem] text-stone">{unitShort}</span>
                   ) : null}
-                  {original && discount ? (
+                  {!selectedPkg && original && discount ? (
                     <span className="text-[0.9375rem] text-stone line-through decoration-sun/70">
                       {original}
                     </span>
                   ) : null}
-                  {discount ? (
+                  {!selectedPkg && discount ? (
                     <span className="rounded-pill bg-sun px-2 py-0.5 text-[0.625rem] font-bold text-white">
                       −{discount}%
                     </span>
                   ) : null}
                 </dd>
-                {childPriceFormatted ? (
+                {barChildPrice !== null ? (
                   <div className="mt-2 pt-2 border-t border-sand/40">
                     <dt className="text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-stone">
-                      {t("price_child_label", "Child Price (5–10 yrs)")}
+                      {t("price_child_label", "Child Price")} ({childAgeBand(tour)})
                     </dt>
                     <dd className="mt-0.5 flex items-baseline gap-x-1">
                       <span className="font-display text-[1.2rem] leading-none text-reef-deep font-bold">
-                        {childPriceFormatted}
+                        {barChildPrice}
                       </span>
                     </dd>
                   </div>
                 ) : null}
+                <div className="mt-2 pt-2 border-t border-sand/40">
+                  <dt className="text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-stone">
+                    {t("price_infant_label", "Infant Price")} ({infantAgeBand(tour)})
+                  </dt>
+                  <dd className="mt-0.5 flex items-baseline gap-x-1">
+                    {barInfantStored === 0 ? (
+                      <span className="rounded-pill border border-emerald-600/20 bg-emerald-600/10 px-2 py-0.5 text-[0.7rem] font-bold text-emerald-700">
+                        {t("free", "Free")}
+                      </span>
+                    ) : (
+                      <span className="font-display text-[1.2rem] leading-none text-reef-deep font-bold">
+                        {fmt(toDisplay(barInfantStored))}
+                      </span>
+                    )}
+                  </dd>
+                </div>
               </div>
             </dl>
 
@@ -424,7 +456,10 @@ export function TourBody({
                       const cardChildren = g.children;
                       const cardInfants = g.infants;
                       const cardAdultPrice = pkg.adultPrice;
-                      const cardChildPrice = pkg.childPrice !== null && pkg.childPrice !== undefined ? pkg.childPrice : 0;
+                      const cardChildPrice =
+                        pkg.childPrice !== null && pkg.childPrice !== undefined
+                          ? pkg.childPrice
+                          : (effectiveChildPrice ?? 0);
                       const cardInfantPrice =
                         pkg.infantPrice !== null && pkg.infantPrice !== undefined
                           ? pkg.infantPrice

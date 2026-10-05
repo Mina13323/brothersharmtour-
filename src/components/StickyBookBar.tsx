@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useBooking } from "./BookingProvider";
 import { WhatsAppIcon } from "./sections";
 import { useSite } from "./SiteProvider";
-import { childAgeBand } from "@/lib/utils";
+import { childAgeBand, infantAgeBand } from "@/lib/utils";
 import type { BookingOptions } from "./BookingProvider";
 import type { Tour, TripPackage } from "@/lib/types";
 
@@ -74,6 +74,22 @@ export function StickyBookBar({
                     </span>
                   </span>
                 )}
+                {(() => {
+                  const infant = selectedPackage
+                    ? (selectedPackage.infantPrice ?? tour.infantPrice ?? 0)
+                    : (tour.infantPrice ?? 0);
+                  return (
+                    <span className="inline-flex items-center gap-1">
+                      <span className="text-sand/90">·</span>
+                      <span className="font-display font-semibold text-ink text-sm">
+                        {infant === 0 ? t("free", "Free") : money(infant, undefined, tour.currency)}
+                      </span>
+                      <span className="text-stone/90 text-xs">
+                        ({t("price_infant_label", "Infant")} {infantAgeBand(tour)})
+                      </span>
+                    </span>
+                  );
+                })()}
                 <span className="hidden sm:inline text-stone/80">· {t("pay_on_day", "pay on the day")}</span>
               </>
             ) : (

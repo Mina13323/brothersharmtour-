@@ -16,6 +16,7 @@
 
 import { Plus, Trash2, Wand2 } from "lucide-react";
 import type { TieredPrice } from "@/lib/types";
+import { convert, formatAmount } from "@/lib/currency";
 import {
   CHILD_AGE_MIN_DEFAULT,
   CHILD_AGE_MAX_DEFAULT,
@@ -31,6 +32,40 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
       <span className="block text-[11px] font-semibold text-stone-400 mb-1.5">{label}</span>
       {children}
     </label>
+  );
+}
+
+/**
+ * Live "what visitors see" hint: declared prices live in the record's own
+ * currency, while the storefront converts them into each visitor's display
+ * currency. Showing the converted amounts next to every input is what keeps
+ * "I typed 80, the site shows 87" from ever being a mystery again.
+ */
+export function MoneyHint({
+  value,
+  currency,
+  rates,
+}: {
+  value: number | null | undefined;
+  currency: string;
+  rates?: Record<string, number>;
+}) {
+  if (value === null || value === undefined || !Number.isFinite(value) || !rates) return null;
+  const amount: number = value;
+  const rateMap: Record<string, number> = rates;
+  const others = Object.keys(rateMap).filter((code) => code !== currency);
+  if (!others.length) return null;
+  return (
+    <span className="block mt-1 text-[10px] leading-snug text-stone-500">
+      visitors see ≈{" "}
+      {others
+        .map((code) => {
+          const converted = convert(amount, currency, code, rateMap);
+          return converted === null ? null : formatAmount(converted, code);
+        })
+        .filter((part): part is string => part !== null)
+        .join(" · ")}
+    </span>
   );
 }
 
@@ -58,10 +93,13 @@ export interface AgePricingValue {
 export function AgePricingFields({
   value,
   currency,
+  rates,
   onPatch,
 }: {
   value: AgePricingValue;
   currency: string;
+  /** Site exchange rates (per USD) — powers the live visitor-view hint. */
+  rates?: Record<string, number>;
   onPatch: (patch: Partial<AgePricingValue>) => void;
 }) {
   const infantFree = (value.infantPrice ?? 0) === 0;
@@ -87,6 +125,7 @@ export function AgePricingFields({
               })
             }
           />
+          <MoneyHint value={value.childPrice} currency={currency} rates={rates} />
         </Field>
         <Field label="Child age min (default 4)">
           <input
@@ -146,6 +185,7 @@ export function AgePricingFields({
               </span>
             ) : null}
           </div>
+          <MoneyHint value={value.infantPrice} currency={currency} rates={rates} />
         </Field>
         <Field label="Infant age max (default 3)">
           <input
@@ -191,12 +231,15 @@ export function TieredPricingEditor({
   tiers,
   currency,
   basePrice,
+  rates,
   onChange,
 }: {
   tiers: TieredPrice[] | undefined;
   currency: string;
   /** Current adult base price — seeds sensible per-person rates. */
   basePrice: number | null;
+  /** Site exchange rates (per USD) — powers the live visitor-view hint. */
+  rates?: Record<string, number>;
   onChange: (tiers: TieredPrice[]) => void;
 }) {
   const list = tiers ?? [];
@@ -276,18 +319,21 @@ export function TieredPricingEditor({
                 })
               }
             />
-            <input
-              type="number"
-              min="0"
-              step="1"
-              className={input}
-              title="Price per person"
-              placeholder="price"
-              value={tier.pricePerPerson ?? ""}
-              onChange={(e) =>
-                setTier(idx, { pricePerPerson: Math.max(0, Number(e.target.value) || 0) })
-              }
-            />
+            <div>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                className={input}
+                title="Price per person"
+                placeholder="price"
+                value={tier.pricePerPerson ?? ""}
+                onChange={(e) =>
+                  setTier(idx, { pricePerPerson: Math.max(0, Number(e.target.value) || 0) })
+                }
+              />
+              <MoneyHint value={tier.pricePerPerson} currency={currency} rates={rates} />
+            </div>
             <input
               type="text"
               className={input}

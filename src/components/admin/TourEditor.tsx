@@ -23,6 +23,7 @@ import type { CatalogueTour, TourRecord, TourTranslation } from "@/lib/store/typ
 import type { CurrencyContext } from "@/lib/currency";
 import type { Tour, TripPackage } from "@/lib/types";
 import { destinationName, experienceName } from "@/lib/store/labels";
+import { cn } from "@/lib/utils";
 import { MediaGalleryEditor, MediaVideoEditor } from "./MediaGalleryEditor";
 import { AgePricingFields, MoneyHint, TieredPricingEditor } from "./PricingControls";
 
@@ -359,17 +360,18 @@ export default function TourEditor({
               rates={currency.rates}
               onChange={(tiers) => set("tieredPricing", tiers)}
             />
-            <div className="grid grid-cols-2 gap-3">
-              <Field label="Was-price (for struck-through display)">
+            <div className="grid grid-cols-2 gap-3 items-start">
+              <Field label="Was-price (struck-through display)">
                 <input
                   type="number"
-                  className={input}
+                  className={cn(input, "h-[40px]")}
+                  placeholder="e.g. 35"
                   value={tour.priceOriginal ?? ""}
                   onChange={(e) => set("priceOriginal", e.target.value === "" ? null : Number(e.target.value))}
                 />
               </Field>
               <Field label="Price unit">
-                <select className={input} value={tour.priceUnit ?? ""} onChange={(e) => set("priceUnit", e.target.value || undefined)}>
+                <select className={cn(input, "h-[40px]")} value={tour.priceUnit ?? ""} onChange={(e) => set("priceUnit", e.target.value || undefined)}>
                   <option value="">per person (default)</option>
                   <option value="per boat">per boat</option>
                   <option value="per car">per car</option>
@@ -1077,10 +1079,20 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  children,
+  className,
+}: {
+  label: React.ReactNode;
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
-    <label className="block">
-      <span className="block text-[11px] font-semibold text-stone-400 mb-1.5">{label}</span>
+    <label className={cn("block", className)}>
+      <span className="block text-[11px] font-semibold text-stone-400 mb-1.5 min-h-[1.125rem]">
+        {label}
+      </span>
       {children}
     </label>
   );

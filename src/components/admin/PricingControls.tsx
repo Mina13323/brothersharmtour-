@@ -21,16 +21,27 @@ import {
   CHILD_AGE_MIN_DEFAULT,
   CHILD_AGE_MAX_DEFAULT,
   INFANT_AGE_MAX_DEFAULT,
+  cn,
 } from "@/lib/utils";
 
 const input =
-  "w-full bg-black/30 border border-white/10 rounded-xl px-3 py-2 text-sm text-white placeholder:text-stone-600 focus:outline-none focus:border-teal-500/60";
+  "h-[40px] w-full bg-black/30 border border-white/10 rounded-xl px-3 text-sm text-white placeholder:text-stone-600 focus:outline-none focus:border-teal-500/60 transition-colors";
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  children,
+  className,
+}: {
+  label: React.ReactNode;
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
-    <label className="block">
-      <span className="block text-[11px] font-semibold text-stone-400 mb-1.5">{label}</span>
-      {children}
+    <label className={cn("flex flex-col justify-between", className)}>
+      <span className="block text-[11px] font-semibold text-stone-300 min-h-[1.75rem] flex items-end pb-1.5 leading-tight">
+        {label}
+      </span>
+      <div className="flex-1 flex flex-col justify-start">{children}</div>
     </label>
   );
 }
@@ -56,7 +67,7 @@ export function MoneyHint({
   const others = Object.keys(rateMap).filter((code) => code !== currency);
   if (!others.length) return null;
   return (
-    <span className="block mt-1 text-[10px] leading-snug text-stone-500">
+    <span className="block mt-1 text-[10px] leading-snug text-stone-400/90 font-mono">
       visitors see ≈{" "}
       {others
         .map((code) => {
@@ -105,12 +116,15 @@ export function AgePricingFields({
   const infantFree = (value.infantPrice ?? 0) === 0;
 
   return (
-    <div className="space-y-3 rounded-xl bg-black/20 p-3.5 border border-white/5">
-      <p className="text-[11px] font-bold uppercase tracking-wider text-stone-400">
-        Children &amp; infants — ages and rates
-      </p>
+    <div className="space-y-4 rounded-2xl bg-black/25 p-4 border border-white/10">
+      <div className="flex items-center justify-between">
+        <p className="text-[11px] font-bold uppercase tracking-wider text-teal-400">
+          Children &amp; infants — ages and rates
+        </p>
+      </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      {/* Row 1: Children */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-start">
         <Field label={`Child price (${currency})`}>
           <input
             type="number"
@@ -127,7 +141,7 @@ export function AgePricingFields({
           />
           <MoneyHint value={value.childPrice} currency={currency} rates={rates} />
         </Field>
-        <Field label="Child age min (default 4)">
+        <Field label={<>Child min age <span className="font-normal text-stone-500">(default 4)</span></>}>
           <input
             type="number"
             min="0"
@@ -139,7 +153,7 @@ export function AgePricingFields({
             onChange={(e) => onPatch({ childAgeMin: numOr(e.target.value, CHILD_AGE_MIN_DEFAULT) })}
           />
         </Field>
-        <Field label="Child age max (default 11)">
+        <Field label={<>Child max age <span className="font-normal text-stone-500">(default 11)</span></>}>
           <input
             type="number"
             min="1"
@@ -151,7 +165,7 @@ export function AgePricingFields({
             onChange={(e) => onPatch({ childAgeMax: numOr(e.target.value, CHILD_AGE_MAX_DEFAULT) })}
           />
         </Field>
-        <Field label="Child age label (custom)">
+        <Field label={<>Child label <span className="font-normal text-stone-500">(custom)</span></>}>
           <input
             type="text"
             className={input}
@@ -162,14 +176,15 @@ export function AgePricingFields({
         </Field>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      {/* Row 2: Infants */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-start pt-1 border-t border-white/5">
         <Field label={`Infant price (${currency})`}>
           <div className="relative">
             <input
               type="number"
               min="0"
               step="1"
-              className={input}
+              className={cn(input, infantFree && "pr-14")}
               placeholder="0"
               value={value.infantPrice ?? ""}
               onChange={(e) =>
@@ -180,14 +195,14 @@ export function AgePricingFields({
               }
             />
             {infantFree ? (
-              <span className="absolute -top-2 right-2 rounded-full bg-teal-500/15 border border-teal-500/30 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-teal-300">
+              <span className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md bg-teal-500/15 border border-teal-500/30 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-teal-300 pointer-events-none">
                 Free
               </span>
             ) : null}
           </div>
           <MoneyHint value={value.infantPrice} currency={currency} rates={rates} />
         </Field>
-        <Field label="Infant age max (default 3)">
+        <Field label={<>Infant max age <span className="font-normal text-stone-500">(default 3)</span></>}>
           <input
             type="number"
             min="0"
@@ -199,7 +214,7 @@ export function AgePricingFields({
             onChange={(e) => onPatch({ infantAgeMax: numOr(e.target.value, INFANT_AGE_MAX_DEFAULT) })}
           />
         </Field>
-        <Field label="Infant age label (custom)">
+        <Field label={<>Infant label <span className="font-normal text-stone-500">(custom)</span></>}>
           <input
             type="text"
             className={input}
@@ -208,12 +223,11 @@ export function AgePricingFields({
             onChange={(e) => onPatch({ infantAgeLabel: e.target.value || undefined })}
           />
         </Field>
-        <div className="flex items-end">
-          <p className="text-[10px] leading-relaxed text-stone-500 pb-2">
-            Infant price 0 shows a <span className="text-teal-300 font-semibold">Free</span> badge
-            on the site and adds nothing to booking totals.
-          </p>
-        </div>
+        <Field label={<span className="text-teal-400/80 font-normal">Pricing note</span>}>
+          <div className="h-[40px] flex items-center rounded-xl border border-white/5 bg-white/[0.02] px-3 text-[11px] leading-tight text-stone-400">
+            <span>Price 0 shows <strong className="text-teal-300 font-semibold">Free</strong> badge.</span>
+          </div>
+        </Field>
       </div>
     </div>
   );
@@ -223,8 +237,8 @@ export function AgePricingFields({
 
 const TIER_PRESETS = [
   { minGuests: 1, maxGuests: 1, label: "Solo traveler", factor: 1 },
-  { minGuests: 2, maxGuests: 2, label: "Couples / 2 Guests", factor: 0.925 },
-  { minGuests: 3, maxGuests: null, label: "Group (3+)", factor: 0.85 },
+  { minGuests: 2, maxGuests: 2, label: "Couples", factor: 0.925 },
+  { minGuests: 3, maxGuests: null, label: "Group", factor: 0.85 },
 ] as const;
 
 export function TieredPricingEditor({
@@ -283,81 +297,114 @@ export function TieredPricingEditor({
   };
 
   return (
-    <Field label={`Tiered adult pricing — per person, in ${currency} (group discounts)`}>
-      <div className="space-y-2">
+    <div className="space-y-3 rounded-2xl bg-black/25 p-4 border border-white/10">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+        <label className="text-[11px] font-bold uppercase tracking-wider text-teal-400">
+          Tiered adult pricing — per person, in {currency} (group discounts)
+        </label>
+        <span className="text-[10.5px] text-stone-500">
+          Blank max means &quot;and above&quot; (e.g. 3+)
+        </span>
+      </div>
+
+      <div className="space-y-2.5">
         {list.length === 0 ? (
-          <p className="text-[11px] text-stone-500 rounded-lg border border-dashed border-white/10 px-3 py-2.5">
+          <p className="text-[11px] text-stone-500 rounded-xl border border-dashed border-white/10 px-3 py-3">
             No tiers yet — the booking widget charges the flat adult price for
             every party size. Add tiers (or auto-fill 1 / 2 / 3+) to offer group
             discounts.
           </p>
-        ) : null}
-
-        {list.map((tier, idx) => (
-          <div key={idx} className="grid grid-cols-[4.5rem_4.5rem_6rem_1fr_auto] items-center gap-2">
-            <input
-              type="number"
-              min="1"
-              step="1"
-              className={input}
-              title="Guests from (min)"
-              placeholder="min"
-              value={tier.minGuests ?? ""}
-              onChange={(e) => setTier(idx, { minGuests: Math.max(1, Number(e.target.value) || 1) })}
-            />
-            <input
-              type="number"
-              min="1"
-              step="1"
-              className={input}
-              title="Guests up to (max — blank = open-ended, e.g. 3+"
-              placeholder="max / ∞"
-              value={tier.maxGuests ?? ""}
-              onChange={(e) =>
-                setTier(idx, {
-                  maxGuests: e.target.value === "" ? null : Math.max(1, Number(e.target.value) || 1),
-                })
-              }
-            />
-            <div>
-              <input
-                type="number"
-                min="0"
-                step="1"
-                className={input}
-                title="Price per person"
-                placeholder="price"
-                value={tier.pricePerPerson ?? ""}
-                onChange={(e) =>
-                  setTier(idx, { pricePerPerson: Math.max(0, Number(e.target.value) || 0) })
-                }
-              />
-              <MoneyHint value={tier.pricePerPerson} currency={currency} rates={rates} />
+        ) : (
+          <>
+            <div className="grid grid-cols-[5rem_5.5rem_7.5rem_1fr_2.5rem] items-center gap-2.5 px-1 text-[11px] font-semibold text-stone-400">
+              <span>Min guests</span>
+              <span>Max guests</span>
+              <span>Price / person</span>
+              <span>Tier label</span>
+              <span className="sr-only">Delete</span>
             </div>
-            <input
-              type="text"
-              className={input}
-              title="Display label"
-              placeholder='Label, e.g. "Group (3+)"'
-              value={tier.label ?? ""}
-              onChange={(e) => setTier(idx, { label: e.target.value || undefined })}
-            />
-            <button
-              type="button"
-              onClick={() => removeTier(idx)}
-              title="Delete tier"
-              className="p-2 text-stone-500 hover:text-red-400"
-            >
-              <Trash2 className="size-4" />
-            </button>
-          </div>
-        ))}
 
-        <div className="flex flex-wrap items-center gap-3 pt-0.5">
+            {list.map((tier, idx) => (
+              <div
+                key={idx}
+                className="grid grid-cols-[5rem_5.5rem_7.5rem_1fr_2.5rem] items-start gap-2.5"
+              >
+                <div>
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    className={input}
+                    title="Guests from (min)"
+                    placeholder="Min"
+                    value={tier.minGuests ?? ""}
+                    onChange={(e) =>
+                      setTier(idx, { minGuests: Math.max(1, Number(e.target.value) || 1) })
+                    }
+                  />
+                </div>
+                <div>
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    className={input}
+                    title="Guests up to (max — blank = open-ended, e.g. 3+)"
+                    placeholder="∞ (Any)"
+                    value={tier.maxGuests ?? ""}
+                    onChange={(e) =>
+                      setTier(idx, {
+                        maxGuests:
+                          e.target.value === "" ? null : Math.max(1, Number(e.target.value) || 1),
+                      })
+                    }
+                  />
+                </div>
+                <div>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    className={input}
+                    title="Price per person"
+                    placeholder="Price"
+                    value={tier.pricePerPerson ?? ""}
+                    onChange={(e) =>
+                      setTier(idx, { pricePerPerson: Math.max(0, Number(e.target.value) || 0) })
+                    }
+                  />
+                  <MoneyHint value={tier.pricePerPerson} currency={currency} rates={rates} />
+                </div>
+                <div>
+                  <input
+                    type="text"
+                    className={input}
+                    title="Display label"
+                    placeholder='Label, e.g. "Couples", "Group"'
+                    value={tier.label ?? ""}
+                    onChange={(e) => setTier(idx, { label: e.target.value || undefined })}
+                  />
+                </div>
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => removeTier(idx)}
+                    title="Delete tier"
+                    className="h-[40px] w-full flex items-center justify-center rounded-xl border border-white/10 bg-white/5 text-stone-400 hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-400 transition-colors"
+                  >
+                    <Trash2 className="size-4" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </>
+        )}
+
+        <div className="flex flex-wrap items-center gap-2.5 pt-1.5">
           <button
             type="button"
             onClick={addTier}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-teal-400 hover:text-teal-300"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-teal-500/30 bg-teal-500/10 px-3 py-2 text-xs font-semibold text-teal-300 hover:bg-teal-500/20 transition-colors"
           >
             <Plus className="size-3.5" /> Add price tier
           </button>
@@ -366,15 +413,12 @@ export function TieredPricingEditor({
             onClick={autoFill}
             disabled={basePrice === null || basePrice <= 0}
             title="Generate the standard 1 / 2 / 3+ ladder from the adult price (pair −7.5%, group −15%)"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-300 hover:text-amber-200 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs font-semibold text-amber-300 hover:bg-amber-500/20 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <Wand2 className="size-3.5" /> Auto-fill 1 / 2 / 3+
           </button>
-          <span className="text-[10px] text-stone-500">
-            min / max guests · price per person · label — blank max means “and above” (3+).
-          </span>
         </div>
       </div>
-    </Field>
+    </div>
   );
 }

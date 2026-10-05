@@ -284,6 +284,7 @@ export function Bestsellers() {
       image: t.image ?? media.whiteIsland.card,
       price: t.priceFrom,
       childPrice: t.childPrice,
+      infantPrice: t.infantPrice ?? 0,
       priceOverrides: t.priceOverrides,
       currency: t.currency,
       duration: t.duration ?? "Flexible",
@@ -360,7 +361,7 @@ export function Bestsellers() {
                 </div>
 
                 <div className="mt-5 flex items-center justify-between pt-2 border-t border-sand/50">
-                  <div className="flex flex-wrap items-baseline gap-x-2.5">
+                  <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
                     <div>
                       <span className="text-[10px] uppercase tracking-wider text-stone block">
                         {t("price_adult", "Adult")}
@@ -379,6 +380,20 @@ export function Bestsellers() {
                         </span>
                       </div>
                     )}
+                    <div className="pl-2 border-l border-sand/80">
+                      <span className="text-[10px] uppercase tracking-wider text-stone block">
+                        {t("guests_infants", "Infant")}
+                      </span>
+                      <span className="font-display text-base font-semibold text-emerald-700 leading-none">
+                        {(tour.infantPrice ?? 0) === 0 ? (
+                          <span className="rounded-full bg-emerald-600/10 px-1.5 py-0.2 text-[10px] font-bold text-emerald-700">
+                            {t("free", "Free")}
+                          </span>
+                        ) : (
+                          money(tour.infantPrice, undefined, tour.currency)
+                        )}
+                      </span>
+                    </div>
                   </div>
                   <Link
                     href={tour.href}

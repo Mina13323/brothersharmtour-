@@ -32,6 +32,7 @@ import type { Tour } from "@/lib/types";
 import {
   cn,
   resolveTier,
+  effectiveTieredPricing,
   childAgeBand,
   infantAgeBand,
   tourRating,
@@ -233,12 +234,56 @@ export function TourBody({
   /* ── "Pricing & group discounts" rows — resolved in the display currency.
    * Tier 1 mirrors the base "from" price, so pinned overrides apply to it;
    * multi-guest tiers convert honestly from the stored currency. */
+  const activeTiers = useMemo(
+    () =>
+      effectiveTieredPricing(
+        selectedPkg?.tieredPricing?.length
+          ? selectedPkg.tieredPricing
+          : tour.tieredPricing,
+        selectedPkg ? selectedPkg.adultPrice : adultPrice,
+      ),
+    [selectedPkg, tour.tieredPricing, adultPrice],
+  );
+
+  const soloUnit = selectedPkg
+    ? toDisplay(selectedPkg.adultPrice)
+    : priceIn(adultPrice ?? 0, currency, {
+        overrides: tour.priceOverrides,
+        from: storedCurrency,
+      }).value;
+
+  const couplesTier = resolveTier(activeTiers, 2);
+  const couplesUnit =
+    couplesTier && couplesTier.pricePerPerson !== null
+      ? toDisplay(couplesTier.pricePerPerson)
+      : null;
+  const couplesFormatted = couplesUnit !== null ? fmt(couplesUnit) : null;
+  const couplesTotalFormatted = couplesUnit !== null ? fmt(couplesUnit * 2) : null;
+  const couplesSavePct =
+    soloUnit !== null && couplesUnit !== null && couplesUnit < soloUnit
+      ? Math.round((1 - couplesUnit / soloUnit) * 100)
+      : 0;
+
+  const groupTier = resolveTier(activeTiers, 3);
+  const groupUnit =
+    groupTier && groupTier.pricePerPerson !== null
+      ? toDisplay(groupTier.pricePerPerson)
+      : null;
+  const groupFormatted = groupUnit !== null ? fmt(groupUnit) : null;
+  const groupSavePct =
+    soloUnit !== null && groupUnit !== null && groupUnit < soloUnit
+      ? Math.round((1 - groupUnit / soloUnit) * 100)
+      : 0;
+
   const priceTiers = useMemo(() => {
-    const tiers = (tour.tieredPricing ?? [])
-      .filter((tier) => tier && Number.isFinite(tier.minGuests) && Number.isFinite(tier.pricePerPerson))
+    const rawTiers = selectedPkg?.tieredPricing?.length
+      ? selectedPkg.tieredPricing
+      : (tour.tieredPricing ?? []);
+    const baseAdult = selectedPkg ? selectedPkg.adultPrice : adultPrice;
+    const tiers = effectiveTieredPricing(rawTiers, baseAdult)
       .sort((a, b) => a.minGuests - b.minGuests);
     if (!tiers.length) return [];
-    const soloUnit = priceIn(tiers[0].pricePerPerson, currency, {
+    const soloUnitVal = priceIn(tiers[0].pricePerPerson, currency, {
       overrides: tiers[0].minGuests <= 1 ? tour.priceOverrides : undefined,
       from: storedCurrency,
     }).value;
@@ -251,54 +296,85 @@ export function TourBody({
       const fallbackLabel =
         tier.minGuests === 1
           ? `1 ${t("price_adult_label", "Adult")}`
-          : max === null
-            ? `${tier.minGuests}+ ${t("guests_adults", "Adults")}`
-            : max === tier.minGuests
-              ? `${tier.minGuests} ${t("guests_adults", "Adults")}`
-              : `${tier.minGuests}–${max} ${t("guests_adults", "Adults")}`;
+          : tier.minGuests === 2 && max === 2
+            ? t("price_couples", "Couples (2 Guests)")
+            : max === null
+              ? `${tier.minGuests}+ ${t("guests_adults", "Adults")}`
+              : max === tier.minGuests
+                ? `${tier.minGuests} ${t("guests_adults", "Adults")}`
+                : `${tier.minGuests}–${max} ${t("guests_adults", "Adults")}`;
       const party = max === null ? tier.minGuests : max;
       const savePct =
-        soloUnit !== null && unitValue !== null && unitValue < soloUnit
-          ? Math.round((1 - unitValue / soloUnit) * 100)
+        soloUnitVal !== null && unitValue !== null && unitValue < soloUnitVal
+          ? Math.round((1 - unitValue / soloUnitVal) * 100)
           : 0;
       return { tier, unitValue, label: tier.label?.trim() || fallbackLabel, party, savePct };
     });
-  }, [tour.tieredPricing, tour.priceOverrides, currency, storedCurrency, t]);
+  }, [selectedPkg, tour.tieredPricing, adultPrice, tour.priceOverrides, currency, storedCurrency, t]);
 
   return (
     <>
       {/* ═══════════════════ BOOKING BAR ═══════════════════ */}
-      <section className="bg-paper">
+      <section className="bg-paper border-b border-sand/60">
         <div className="shell">
-          <div className="flex flex-col gap-6 py-6 lg:flex-row lg:items-center lg:justify-between lg:py-7">
-            <dl className="grid grid-cols-2 gap-x-8 gap-y-4 sm:grid-cols-4 lg:gap-x-12">
-              <Fact label={t("label_location", "Location")} value={destinationName(tour.destination, lang)} />
-              <Fact label={t("label_duration", "Duration")} value={tour.duration ?? t("duration_flexible", "Flexible")} />
-              <Fact
-                label={t("label_tour_type", "Tour type")}
-                value={
-                  tour.type === "private"
-                    ? t("private_tour", "Private")
-                    : tour.type === "transfer"
-                      ? t("private_transfer", "Private transfer")
-                      : t("small_group", "Small group")
-                }
-              />
-              <div>
-                <dt className="text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-stone">
-                  {selectedPkg
-                    ? selectedPkg.title
-                    : t("price_adult_label", "Adult Price")}
-                </dt>
-                <dd className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                  <span className="font-display text-[1.75rem] leading-none text-ink font-bold">
-                    {barAdultPrice ?? t("price_on_request", "On request")}
+          <div className="flex flex-col gap-6 py-6 lg:py-7">
+            {/* Top row: Facts & CTA buttons */}
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+              <dl className="grid grid-cols-2 gap-x-8 gap-y-4 sm:grid-cols-3 lg:gap-x-12">
+                <Fact label={t("label_location", "Location")} value={destinationName(tour.destination, lang)} />
+                <Fact label={t("label_duration", "Duration")} value={tour.duration ?? t("duration_flexible", "Flexible")} />
+                <Fact
+                  label={t("label_tour_type", "Tour type")}
+                  value={
+                    tour.type === "private"
+                      ? t("private_tour", "Private")
+                      : tour.type === "transfer"
+                        ? t("private_transfer", "Private transfer")
+                        : t("small_group", "Small group")
+                  }
+                />
+              </dl>
+
+              <div className="flex flex-col gap-3 sm:flex-row lg:shrink-0">
+                <BookButton
+                  tourSlug={tour.slug}
+                  options={
+                    selectedPkg
+                      ? {
+                          tripPackageId: selectedPkg.id,
+                          adults: effectiveSelectedAdults,
+                          children: effectiveSelectedChildren,
+                          infants: effectiveSelectedInfants,
+                        }
+                      : undefined
+                  }
+                  className="btn btn-primary"
+                >
+                  {t("nav_book_now", "Book now")}
+                </BookButton>
+                <a
+                  href={whatsappLink(`Hi Brother Sharm Tour — I'm interested in ${tour.title}.`)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-outline"
+                >
+                  <WhatsAppIcon />
+                  WhatsApp
+                </a>
+              </div>
+            </div>
+
+            {/* Prices Section — Just below photo */}
+            <div className="border-t border-sand/60 pt-5">
+              <div className="mb-3.5 flex flex-wrap items-center justify-between gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-[0.6875rem] font-bold uppercase tracking-[0.16em] text-stone">
+                    {selectedPkg
+                      ? `${selectedPkg.title} · ${t("section_prices", "Prices & Rates")}`
+                      : t("section_prices", "Prices & Rates")}
                   </span>
-                  {barAdultPrice ? (
-                    <span className="text-[0.75rem] text-stone">{unitShort}</span>
-                  ) : null}
                   {!selectedPkg && original && discount ? (
-                    <span className="text-[0.9375rem] text-stone line-through decoration-sun/70">
+                    <span className="text-[0.8125rem] text-stone line-through decoration-sun/70">
                       {original}
                     </span>
                   ) : null}
@@ -307,64 +383,130 @@ export function TourBody({
                       −{discount}%
                     </span>
                   ) : null}
-                </dd>
-                {barChildPrice !== null ? (
-                  <div className="mt-2 pt-2 border-t border-sand/40">
-                    <dt className="text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-stone">
-                      {t("price_child_label", "Child Price")} ({childAgeBand(tour)})
-                    </dt>
-                    <dd className="mt-0.5 flex items-baseline gap-x-1">
-                      <span className="font-display text-[1.2rem] leading-none text-reef-deep font-bold">
-                        {barChildPrice}
-                      </span>
-                    </dd>
-                  </div>
-                ) : null}
-                <div className="mt-2 pt-2 border-t border-sand/40">
-                  <dt className="text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-stone">
-                    {t("price_infant_label", "Infant Price")} ({infantAgeBand(tour)})
-                  </dt>
-                  <dd className="mt-0.5 flex items-baseline gap-x-1">
-                    {barInfantStored === 0 ? (
-                      <span className="rounded-pill border border-emerald-600/20 bg-emerald-600/10 px-2 py-0.5 text-[0.7rem] font-bold text-emerald-700">
-                        {t("free", "Free")}
-                      </span>
-                    ) : (
-                      <span className="font-display text-[1.2rem] leading-none text-reef-deep font-bold">
-                        {fmt(toDisplay(barInfantStored))}
-                      </span>
-                    )}
-                  </dd>
                 </div>
+                <span className="text-[0.72rem] font-medium text-stone flex items-center gap-1.5">
+                  <span className="text-[#1faa54]" aria-hidden>✓</span>
+                  {t("no_prepayment", "No prepayment · Pay on the day")}
+                </span>
               </div>
-            </dl>
 
-            <div className="flex flex-col gap-3 sm:flex-row lg:shrink-0">
-              <BookButton
-                tourSlug={tour.slug}
-                options={
-                  selectedPkg
-                    ? {
-                        tripPackageId: selectedPkg.id,
-                        adults: effectiveSelectedAdults,
-                        children: effectiveSelectedChildren,
-                        infants: effectiveSelectedInfants,
-                      }
-                    : undefined
-                }
-                className="btn btn-primary"
-              >
-                {t("nav_book_now", "Book now")}
-              </BookButton>
-              <a
-                href={whatsappLink(`Hi Brother Sharm Tour — I'm interested in ${tour.title}.`)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-outline"
-              >
-                <WhatsAppIcon />
-                WhatsApp
-              </a>
+              {!perBoat ? (
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+                  {/* 1 Adult */}
+                  <div className="flex flex-col justify-between rounded-2xl border border-sand/80 bg-paper-warm/40 p-4 transition-all hover:border-reef/30 hover:bg-paper-warm/70">
+                    <div>
+                      <span className="block text-[0.6875rem] font-bold uppercase tracking-wider text-stone truncate">
+                        {t("price_adult_label", "1 Adult")}
+                      </span>
+                      <div className="mt-1 flex items-baseline gap-1">
+                        <span className="font-display text-[1.45rem] font-bold leading-none text-ink">
+                          {barAdultPrice ?? t("price_on_request", "On request")}
+                        </span>
+                      </div>
+                    </div>
+                    <span className="mt-2 block text-[0.6875rem] text-stone">
+                      {unitShort}
+                    </span>
+                  </div>
+
+                  {/* Couples (2 Guests) */}
+                  <div className="flex flex-col justify-between rounded-2xl border border-sand/80 bg-paper-warm/40 p-4 transition-all hover:border-reef/30 hover:bg-paper-warm/70">
+                    <div>
+                      <div className="flex items-center justify-between gap-1">
+                        <span className="block text-[0.6875rem] font-bold uppercase tracking-wider text-stone truncate">
+                          {t("price_couples", "Couples (2 Guests)")}
+                        </span>
+                        {couplesSavePct > 0 ? (
+                          <span className="shrink-0 rounded-full bg-emerald-600/10 px-1.5 py-0.5 text-[0.625rem] font-bold text-emerald-700">
+                            −{couplesSavePct}%
+                          </span>
+                        ) : null}
+                      </div>
+                      <div className="mt-1 flex items-baseline gap-1">
+                        <span className="font-display text-[1.45rem] font-bold leading-none text-ink">
+                          {couplesFormatted ?? barAdultPrice ?? "—"}
+                        </span>
+                      </div>
+                    </div>
+                    <span className="mt-2 block text-[0.6875rem] text-stone truncate">
+                      {couplesTotalFormatted ? `${couplesTotalFormatted} ${t("total_label", "total")}` : unitShort}
+                    </span>
+                  </div>
+
+                  {/* 3+ Persons */}
+                  <div className="flex flex-col justify-between rounded-2xl border border-sand/80 bg-paper-warm/40 p-4 transition-all hover:border-reef/30 hover:bg-paper-warm/70">
+                    <div>
+                      <div className="flex items-center justify-between gap-1">
+                        <span className="block text-[0.6875rem] font-bold uppercase tracking-wider text-stone truncate">
+                          {t("price_group_3plus", "3+ Persons")}
+                        </span>
+                        {groupSavePct > 0 ? (
+                          <span className="shrink-0 rounded-full bg-emerald-600/10 px-1.5 py-0.5 text-[0.625rem] font-bold text-emerald-700">
+                            −{groupSavePct}%
+                          </span>
+                        ) : null}
+                      </div>
+                      <div className="mt-1 flex items-baseline gap-1">
+                        <span className="font-display text-[1.45rem] font-bold leading-none text-ink">
+                          {groupFormatted ?? barAdultPrice ?? "—"}
+                        </span>
+                      </div>
+                    </div>
+                    <span className="mt-2 block text-[0.6875rem] text-stone">
+                      {unitShort} ({t("small_group_discount", "group rate")})
+                    </span>
+                  </div>
+
+                  {/* Children */}
+                  <div className="flex flex-col justify-between rounded-2xl border border-sand/80 bg-paper-warm/40 p-4 transition-all hover:border-reef/30 hover:bg-paper-warm/70">
+                    <div>
+                      <span className="block text-[0.6875rem] font-bold uppercase tracking-wider text-stone truncate">
+                        {t("price_child_plural", "Children")} ({childAgeBand(tour)})
+                      </span>
+                      <div className="mt-1 flex items-baseline gap-1">
+                        <span className="font-display text-[1.45rem] font-bold leading-none text-reef-deep">
+                          {barChildPrice ?? "—"}
+                        </span>
+                      </div>
+                    </div>
+                    <span className="mt-2 block text-[0.6875rem] text-stone">
+                      /{t("price_child", "child")}
+                    </span>
+                  </div>
+
+                  {/* Infants */}
+                  <div className="flex flex-col justify-between rounded-2xl border border-sand/80 bg-paper-warm/40 p-4 transition-all hover:border-reef/30 hover:bg-paper-warm/70">
+                    <div>
+                      <span className="block text-[0.6875rem] font-bold uppercase tracking-wider text-stone truncate">
+                        {t("guests_infants", "Infants")} ({infantAgeBand(tour)})
+                      </span>
+                      <div className="mt-1 flex items-baseline gap-1">
+                        {barInfantStored === 0 ? (
+                          <span className="inline-flex items-center rounded-pill border border-emerald-600/20 bg-emerald-600/10 px-2.5 py-0.5 text-[0.8rem] font-bold text-emerald-700">
+                            {t("free", "Free")}
+                          </span>
+                        ) : (
+                          <span className="font-display text-[1.45rem] font-bold leading-none text-reef-deep">
+                            {fmt(toDisplay(barInfantStored))}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <span className="mt-2 block text-[0.6875rem] text-stone">
+                      {barInfantStored === 0 ? t("no_extra_cost", "No charge") : `/${t("guests_infants", "infant")}`}
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="inline-flex items-baseline gap-3 rounded-2xl border border-sand/80 bg-paper-warm/40 p-4">
+                  <span className="text-[0.75rem] font-bold uppercase tracking-wider text-stone">
+                    {unit}
+                  </span>
+                  <span className="font-display text-[1.6rem] font-bold leading-none text-ink">
+                    {barAdultPrice}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>

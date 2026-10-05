@@ -9,6 +9,7 @@ import { formatAmount, priceIn } from "@/lib/currency";
 import {
   cn,
   resolveTier,
+  effectiveTieredPricing,
   childAgeBand,
   infantAgeBand,
   tourPriceUnit,
@@ -109,10 +110,13 @@ export function BookingWidget({
   /** Tiered adult pricing — the selected option's own tiers when one is chosen. */
   const tiers = useMemo(
     () =>
-      (selectedPackage
-        ? selectedPackage.tieredPricing
-        : tour?.tieredPricing) ?? [],
-    [selectedPackage, tour?.tieredPricing],
+      effectiveTieredPricing(
+        selectedPackage
+          ? selectedPackage.tieredPricing
+          : tour?.tieredPricing,
+        adultPrice,
+      ),
+    [selectedPackage, tour?.tieredPricing, adultPrice],
   );
 
   const addons = tour?.addons ?? [];

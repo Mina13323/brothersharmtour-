@@ -29,6 +29,12 @@ export type TourCardTour = Pick<Tour, "slug" | "title" | "summary" | "category" 
   image?: MediaImage | null;
   priceFrom: number | null;
   childPrice?: number | null;
+  childAgeMin?: number;
+  childAgeMax?: number;
+  childAgeLabel?: string;
+  infantPrice?: number | null;
+  infantAgeMax?: number;
+  infantAgeLabel?: string;
   priceOriginal?: number | null;
   priceOverrides?: Record<string, number>;
   /** Currency the stored prices are denominated in — drives honest conversion. */
@@ -61,6 +67,11 @@ export function TourCard({
       ? Math.round(tour.priceFrom * 0.8)
       : null;
   const childPrice = effectiveChildPrice !== null ? money(effectiveChildPrice, undefined, tour.currency) : null;
+  const effectiveInfantPrice = tour.infantPrice ?? 0;
+  const infantPrice =
+    effectiveInfantPrice === 0
+      ? t("free", "Free")
+      : money(effectiveInfantPrice, undefined, tour.currency);
   // The "was" price is never pinned by overrides — those belong to the live price.
   const original = money(tourOriginalPrice(tour), undefined, tour.currency);
   const discount = tourDiscountPct(tour);
@@ -150,12 +161,24 @@ export function TourCard({
                         </span>
                       ) : null}
                     </span>
-                    {childPrice ? (
-                      <span className="mt-1 flex items-baseline gap-1.5 text-[0.75rem] text-reef-deep font-semibold">
-                        <span className="text-stone text-[0.6875rem] uppercase tracking-wider">{t("price_child", "Child")}:</span>
-                        <span>{childPrice}</span>
+                    <div className="mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[0.75rem]">
+                      {childPrice ? (
+                        <span className="flex items-baseline gap-1 text-reef-deep font-semibold">
+                          <span className="text-stone text-[0.65rem] uppercase tracking-wider">{t("price_child", "Child")}:</span>
+                          <span>{childPrice}</span>
+                        </span>
+                      ) : null}
+                      <span className="flex items-baseline gap-1 font-semibold text-emerald-700">
+                        <span className="text-stone text-[0.65rem] uppercase tracking-wider">{t("guests_infants", "Infant")}:</span>
+                        {effectiveInfantPrice === 0 ? (
+                          <span className="rounded-full bg-emerald-600/10 px-1.5 py-0.2 text-[0.6875rem] font-bold text-emerald-700">
+                            {t("free", "Free")}
+                          </span>
+                        ) : (
+                          <span>{infantPrice}</span>
+                        )}
                       </span>
-                    ) : null}
+                    </div>
                   </div>
                 </div>
               ) : (

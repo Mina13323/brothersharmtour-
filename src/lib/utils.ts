@@ -39,6 +39,47 @@ export const CHILD_AGE_MIN_DEFAULT = 4;
 export const CHILD_AGE_MAX_DEFAULT = 11;
 export const INFANT_AGE_MAX_DEFAULT = 3;
 
+export const TIER_PRESETS = [
+  { minGuests: 1, maxGuests: 1, label: "Solo traveler", factor: 1 },
+  { minGuests: 2, maxGuests: 2, label: "Couples / 2 Guests", factor: 0.925 },
+  { minGuests: 3, maxGuests: null, label: "Group (3+)", factor: 0.85 },
+] as const;
+
+/**
+ * Resolves tiered pricing: returns authored tiers if present and valid,
+ * otherwise derives default 1 / 2 (couples) / 3+ (group) tiers from the base adult price.
+ */
+export function effectiveTieredPricing(
+  tiers: TieredPrice[] | null | undefined,
+  baseAdultPrice: number | null | undefined,
+): TieredPrice[] {
+  if (tiers && tiers.length > 0) {
+    const valid = tiers.filter(
+      (t) =>
+        t &&
+        Number.isFinite(t.minGuests) &&
+        Number.isFinite(t.pricePerPerson) &&
+        t.pricePerPerson >= 0,
+    );
+    if (valid.length > 0) return valid;
+  }
+  if (baseAdultPrice === null || baseAdultPrice === undefined || baseAdultPrice <= 0) {
+    return [];
+  }
+  return TIER_PRESETS.map((p) => {
+    let price = Math.round(baseAdultPrice * p.factor);
+    if (p.minGuests > 1) {
+      price = Math.min(price, Math.max(1, baseAdultPrice - (p.minGuests - 1)));
+    }
+    return {
+      minGuests: p.minGuests,
+      maxGuests: p.maxGuests,
+      pricePerPerson: Math.max(1, price),
+      label: p.label,
+    };
+  });
+}
+
 /**
  * Finds the active price tier for a party of `guests` adults: the tier whose
  * inclusive [minGuests, maxGuests] range contains the count (maxGuests null

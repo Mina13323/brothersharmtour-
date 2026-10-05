@@ -51,6 +51,20 @@
       "durationHours": 5,
       "priceFrom": 30,
       "childPrice": 15,
+      "tieredPricing": [
+        {
+          "label": "Couples",
+          "maxGuests": null,
+          "minGuests": 2,
+          "pricePerPerson": 25
+        },
+        {
+          "label": "Solo Traveller",
+          "maxGuests": null,
+          "minGuests": 1,
+          "pricePerPerson": 30
+        }
+      ],
       "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
@@ -190,34 +204,30 @@
       "priority": 1,
       "status": "published",
       "seo": {
-        "tripPackages": []
+        "infant_price": null,
+        "tripPackages": [],
+        "child_age_max": null,
+        "child_age_min": null,
+        "infant_age_max": null,
+        "tiered_pricing": [
+          {
+            "label": "Couples",
+            "maxGuests": null,
+            "minGuests": 2,
+            "pricePerPerson": 25
+          },
+          {
+            "label": "Solo Traveller",
+            "maxGuests": null,
+            "minGuests": 1,
+            "pricePerPerson": 30
+          }
+        ],
+        "child_age_label": null,
+        "infant_age_label": null
       },
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-05T00:37:33.305+00:00",
-      "infantPrice": 0,
-      "childAgeMin": 4,
-      "childAgeMax": 11,
-      "infantAgeMax": 3,
-      "tieredPricing": [
-        {
-          "minGuests": 1,
-          "maxGuests": 1,
-          "pricePerPerson": 30,
-          "label": "Solo traveler"
-        },
-        {
-          "minGuests": 2,
-          "maxGuests": 2,
-          "pricePerPerson": 28,
-          "label": "Couples / 2 Guests"
-        },
-        {
-          "minGuests": 3,
-          "maxGuests": null,
-          "pricePerPerson": 26,
-          "label": "Group (3+)"
-        }
-      ]
+      "updatedAt": "2026-10-05T01:55:47.809+00:00"
     },
     {
       "id": "seed-tour-ras-mohamed",
@@ -286,6 +296,7 @@
       "durationHours": 8,
       "priceFrom": 18,
       "childPrice": 9,
+      "tieredPricing": [],
       "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
@@ -422,31 +433,7 @@
         "tripPackages": []
       },
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-05T00:37:33.305+00:00",
-      "infantPrice": 0,
-      "childAgeMin": 4,
-      "childAgeMax": 11,
-      "infantAgeMax": 3,
-      "tieredPricing": [
-        {
-          "minGuests": 1,
-          "maxGuests": 1,
-          "pricePerPerson": 18,
-          "label": "Solo traveler"
-        },
-        {
-          "minGuests": 2,
-          "maxGuests": 2,
-          "pricePerPerson": 17,
-          "label": "Couples / 2 Guests"
-        },
-        {
-          "minGuests": 3,
-          "maxGuests": null,
-          "pricePerPerson": 15,
-          "label": "Group (3+)"
-        }
-      ]
+      "updatedAt": "2026-10-05T00:37:33.305+00:00"
     },
     {
       "id": "seed-tour-tiran-island",
@@ -504,6 +491,7 @@
       "durationHours": 8,
       "priceFrom": 30,
       "childPrice": 15,
+      "tieredPricing": [],
       "tripPackages": [
         {
           "id": "tiran-pkg-without-snorkeling",
@@ -690,31 +678,7 @@
         ]
       },
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-05T00:37:33.305+00:00",
-      "infantPrice": 0,
-      "childAgeMin": 4,
-      "childAgeMax": 11,
-      "infantAgeMax": 3,
-      "tieredPricing": [
-        {
-          "minGuests": 1,
-          "maxGuests": 1,
-          "pricePerPerson": 30,
-          "label": "Solo traveler"
-        },
-        {
-          "minGuests": 2,
-          "maxGuests": 2,
-          "pricePerPerson": 28,
-          "label": "Couples / 2 Guests"
-        },
-        {
-          "minGuests": 3,
-          "maxGuests": null,
-          "pricePerPerson": 26,
-          "label": "Group (3+)"
-        }
-      ]
+      "updatedAt": "2026-10-05T00:37:33.305+00:00"
     },
     {
       "id": "seed-tour-super-safari",
@@ -765,6 +729,7 @@
       "durationHours": 6,
       "priceFrom": 35,
       "childPrice": 18,
+      "tieredPricing": [],
       "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
@@ -914,31 +879,7 @@
         "tripPackages": []
       },
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-05T00:37:33.305+00:00",
-      "infantPrice": 0,
-      "childAgeMin": 4,
-      "childAgeMax": 11,
-      "infantAgeMax": 3,
-      "tieredPricing": [
-        {
-          "minGuests": 1,
-          "maxGuests": 1,
-          "pricePerPerson": 35,
-          "label": "Solo traveler"
-        },
-        {
-          "minGuests": 2,
-          "maxGuests": 2,
-          "pricePerPerson": 32,
-          "label": "Couples / 2 Guests"
-        },
-        {
-          "minGuests": 3,
-          "maxGuests": null,
-          "pricePerPerson": 30,
-          "label": "Group (3+)"
-        }
-      ]
+      "updatedAt": "2026-10-05T00:37:33.305+00:00"
     },
     {
       "id": "seed-tour-parasailing",
@@ -981,6 +922,7 @@
       "durationHours": 2,
       "priceFrom": 17,
       "childPrice": 20,
+      "tieredPricing": [],
       "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
@@ -1095,31 +1037,7 @@
         "tripPackages": []
       },
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-05T00:37:33.305+00:00",
-      "infantPrice": 0,
-      "childAgeMin": 4,
-      "childAgeMax": 11,
-      "infantAgeMax": 3,
-      "tieredPricing": [
-        {
-          "minGuests": 1,
-          "maxGuests": 1,
-          "pricePerPerson": 17,
-          "label": "Solo traveler"
-        },
-        {
-          "minGuests": 2,
-          "maxGuests": 2,
-          "pricePerPerson": 16,
-          "label": "Couples / 2 Guests"
-        },
-        {
-          "minGuests": 3,
-          "maxGuests": null,
-          "pricePerPerson": 14,
-          "label": "Group (3+)"
-        }
-      ]
+      "updatedAt": "2026-10-05T00:37:33.305+00:00"
     },
     {
       "id": "seed-tour-speed-boat",
@@ -1158,6 +1076,7 @@
       "durationHours": 1,
       "priceFrom": 80,
       "childPrice": 50,
+      "tieredPricing": [],
       "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
@@ -1281,11 +1200,7 @@
         "tripPackages": []
       },
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-05T00:37:33.305+00:00",
-      "infantPrice": 0,
-      "childAgeMin": 4,
-      "childAgeMax": 11,
-      "infantAgeMax": 3
+      "updatedAt": "2026-10-05T00:37:33.305+00:00"
     },
     {
       "id": "seed-tour-color-canyon",
@@ -1366,6 +1281,7 @@
       "durationHours": 10,
       "priceFrom": 25,
       "childPrice": 15,
+      "tieredPricing": [],
       "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
@@ -1512,31 +1428,7 @@
         "tripPackages": []
       },
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-05T00:37:33.305+00:00",
-      "infantPrice": 0,
-      "childAgeMin": 4,
-      "childAgeMax": 11,
-      "infantAgeMax": 3,
-      "tieredPricing": [
-        {
-          "minGuests": 1,
-          "maxGuests": 1,
-          "pricePerPerson": 25,
-          "label": "Solo traveler"
-        },
-        {
-          "minGuests": 2,
-          "maxGuests": 2,
-          "pricePerPerson": 23,
-          "label": "Couples / 2 Guests"
-        },
-        {
-          "minGuests": 3,
-          "maxGuests": null,
-          "pricePerPerson": 21,
-          "label": "Group (3+)"
-        }
-      ]
+      "updatedAt": "2026-10-05T00:37:33.305+00:00"
     },
     {
       "id": "seed-tour-swim-with-dolphins",
@@ -1587,6 +1479,7 @@
       "durationHours": 4,
       "priceFrom": 80,
       "childPrice": 50,
+      "tieredPricing": [],
       "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
@@ -1701,31 +1594,7 @@
         "tripPackages": []
       },
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-05T00:37:33.305+00:00",
-      "infantPrice": 0,
-      "childAgeMin": 4,
-      "childAgeMax": 11,
-      "infantAgeMax": 3,
-      "tieredPricing": [
-        {
-          "minGuests": 1,
-          "maxGuests": 1,
-          "pricePerPerson": 80,
-          "label": "Solo traveler"
-        },
-        {
-          "minGuests": 2,
-          "maxGuests": 2,
-          "pricePerPerson": 74,
-          "label": "Couples / 2 Guests"
-        },
-        {
-          "minGuests": 3,
-          "maxGuests": null,
-          "pricePerPerson": 68,
-          "label": "Group (3+)"
-        }
-      ]
+      "updatedAt": "2026-10-05T00:37:33.305+00:00"
     },
     {
       "id": "seed-tour-cairo-pyramids-gem",
@@ -1783,6 +1652,7 @@
       "durationHours": 23.5,
       "priceFrom": 90,
       "childPrice": 80,
+      "tieredPricing": [],
       "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
@@ -1938,31 +1808,7 @@
         "tripPackages": []
       },
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-05T00:37:33.305+00:00",
-      "infantPrice": 0,
-      "childAgeMin": 4,
-      "childAgeMax": 11,
-      "infantAgeMax": 3,
-      "tieredPricing": [
-        {
-          "minGuests": 1,
-          "maxGuests": 1,
-          "pricePerPerson": 90,
-          "label": "Solo traveler"
-        },
-        {
-          "minGuests": 2,
-          "maxGuests": 2,
-          "pricePerPerson": 83,
-          "label": "Couples / 2 Guests"
-        },
-        {
-          "minGuests": 3,
-          "maxGuests": null,
-          "pricePerPerson": 77,
-          "label": "Group (3+)"
-        }
-      ]
+      "updatedAt": "2026-10-05T00:37:33.305+00:00"
     },
     {
       "id": "seed-tour-glass-boat",
@@ -2000,6 +1846,7 @@
       "durationHours": 1,
       "priceFrom": 15,
       "childPrice": 8,
+      "tieredPricing": [],
       "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
@@ -2110,31 +1957,7 @@
         "tripPackages": []
       },
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-05T00:37:33.305+00:00",
-      "infantPrice": 0,
-      "childAgeMin": 4,
-      "childAgeMax": 11,
-      "infantAgeMax": 3,
-      "tieredPricing": [
-        {
-          "minGuests": 1,
-          "maxGuests": 1,
-          "pricePerPerson": 15,
-          "label": "Solo traveler"
-        },
-        {
-          "minGuests": 2,
-          "maxGuests": 2,
-          "pricePerPerson": 14,
-          "label": "Couples / 2 Guests"
-        },
-        {
-          "minGuests": 3,
-          "maxGuests": null,
-          "pricePerPerson": 13,
-          "label": "Group (3+)"
-        }
-      ]
+      "updatedAt": "2026-10-05T00:37:33.305+00:00"
     },
     {
       "id": "seed-tour-horse-riding",
@@ -2191,6 +2014,7 @@
       "durationHours": 1,
       "priceFrom": 35,
       "childPrice": 20,
+      "tieredPricing": [],
       "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
@@ -2308,31 +2132,7 @@
         "tripPackages": []
       },
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-05T00:37:33.305+00:00",
-      "infantPrice": 0,
-      "childAgeMin": 4,
-      "childAgeMax": 11,
-      "infantAgeMax": 3,
-      "tieredPricing": [
-        {
-          "minGuests": 1,
-          "maxGuests": 1,
-          "pricePerPerson": 35,
-          "label": "Solo traveler"
-        },
-        {
-          "minGuests": 2,
-          "maxGuests": 2,
-          "pricePerPerson": 32,
-          "label": "Couples / 2 Guests"
-        },
-        {
-          "minGuests": 3,
-          "maxGuests": null,
-          "pricePerPerson": 30,
-          "label": "Group (3+)"
-        }
-      ]
+      "updatedAt": "2026-10-05T00:37:33.305+00:00"
     },
     {
       "id": "seed-tour-desert-safari",
@@ -2383,6 +2183,7 @@
       "durationHours": 4,
       "priceFrom": 15,
       "childPrice": 15,
+      "tieredPricing": [],
       "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
@@ -2504,31 +2305,7 @@
         "tripPackages": []
       },
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-05T00:37:33.305+00:00",
-      "infantPrice": 0,
-      "childAgeMin": 4,
-      "childAgeMax": 11,
-      "infantAgeMax": 3,
-      "tieredPricing": [
-        {
-          "minGuests": 1,
-          "maxGuests": 1,
-          "pricePerPerson": 15,
-          "label": "Solo traveler"
-        },
-        {
-          "minGuests": 2,
-          "maxGuests": 2,
-          "pricePerPerson": 14,
-          "label": "Couples / 2 Guests"
-        },
-        {
-          "minGuests": 3,
-          "maxGuests": null,
-          "pricePerPerson": 13,
-          "label": "Group (3+)"
-        }
-      ]
+      "updatedAt": "2026-10-05T00:37:33.305+00:00"
     },
     {
       "id": "seed-tour-dolphin-show",
@@ -2585,6 +2362,7 @@
       "durationHours": 2,
       "priceFrom": 25,
       "childPrice": 15,
+      "tieredPricing": [],
       "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
@@ -2698,31 +2476,7 @@
         "tripPackages": []
       },
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-05T00:37:33.305+00:00",
-      "infantPrice": 0,
-      "childAgeMin": 4,
-      "childAgeMax": 11,
-      "infantAgeMax": 3,
-      "tieredPricing": [
-        {
-          "minGuests": 1,
-          "maxGuests": 1,
-          "pricePerPerson": 25,
-          "label": "Solo traveler"
-        },
-        {
-          "minGuests": 2,
-          "maxGuests": 2,
-          "pricePerPerson": 23,
-          "label": "Couples / 2 Guests"
-        },
-        {
-          "minGuests": 3,
-          "maxGuests": null,
-          "pricePerPerson": 21,
-          "label": "Group (3+)"
-        }
-      ]
+      "updatedAt": "2026-10-05T00:37:33.305+00:00"
     },
     {
       "id": "musous7we2tbvgvq",
@@ -2748,6 +2502,7 @@
       "durationHours": 3,
       "priceFrom": 35,
       "childPrice": 20,
+      "tieredPricing": [],
       "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
@@ -2837,31 +2592,7 @@
         "tripPackages": []
       },
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-05T00:37:33.305+00:00",
-      "infantPrice": 0,
-      "childAgeMin": 4,
-      "childAgeMax": 11,
-      "infantAgeMax": 3,
-      "tieredPricing": [
-        {
-          "minGuests": 1,
-          "maxGuests": 1,
-          "pricePerPerson": 35,
-          "label": "Solo traveler"
-        },
-        {
-          "minGuests": 2,
-          "maxGuests": 2,
-          "pricePerPerson": 32,
-          "label": "Couples / 2 Guests"
-        },
-        {
-          "minGuests": 3,
-          "maxGuests": null,
-          "pricePerPerson": 30,
-          "label": "Group (3+)"
-        }
-      ]
+      "updatedAt": "2026-10-05T00:37:33.305+00:00"
     },
     {
       "id": "seed-tour-soho-square",
@@ -2887,6 +2618,7 @@
       "durationHours": 4,
       "priceFrom": null,
       "childPrice": null,
+      "tieredPricing": [],
       "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
@@ -2995,11 +2727,7 @@
         "tripPackages": []
       },
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-05T00:37:33.305+00:00",
-      "infantPrice": 0,
-      "childAgeMin": 4,
-      "childAgeMax": 11,
-      "infantAgeMax": 3
+      "updatedAt": "2026-10-05T00:37:33.305+00:00"
     },
     {
       "id": "seed-tour-naama-bay",
@@ -3025,6 +2753,7 @@
       "durationHours": 4,
       "priceFrom": null,
       "childPrice": null,
+      "tieredPricing": [],
       "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
@@ -3133,11 +2862,7 @@
         "tripPackages": []
       },
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-05T00:37:33.305+00:00",
-      "infantPrice": 0,
-      "childAgeMin": 4,
-      "childAgeMax": 11,
-      "infantAgeMax": 3
+      "updatedAt": "2026-10-05T00:37:33.305+00:00"
     },
     {
       "id": "seed-tour-farsha-cafe",
@@ -3163,6 +2888,7 @@
       "durationHours": 3,
       "priceFrom": null,
       "childPrice": null,
+      "tieredPricing": [],
       "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
@@ -3272,11 +2998,7 @@
         "tripPackages": []
       },
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-05T00:37:33.305+00:00",
-      "infantPrice": 0,
-      "childAgeMin": 4,
-      "childAgeMax": 11,
-      "infantAgeMax": 3
+      "updatedAt": "2026-10-05T00:37:33.305+00:00"
     },
     {
       "id": "seed-tour-old-market",
@@ -3308,6 +3030,7 @@
       "durationHours": 3,
       "priceFrom": null,
       "childPrice": null,
+      "tieredPricing": [],
       "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
@@ -3416,11 +3139,7 @@
         "tripPackages": []
       },
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-05T00:37:33.305+00:00",
-      "infantPrice": 0,
-      "childAgeMin": 4,
-      "childAgeMax": 11,
-      "infantAgeMax": 3
+      "updatedAt": "2026-10-05T00:37:33.305+00:00"
     },
     {
       "id": "seed-tour-old-cairo",
@@ -3454,6 +3173,7 @@
       "durationHours": 8,
       "priceFrom": 55,
       "childPrice": 35,
+      "tieredPricing": [],
       "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
@@ -3589,31 +3309,7 @@
         "tripPackages": []
       },
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-05T00:37:33.305+00:00",
-      "infantPrice": 0,
-      "childAgeMin": 4,
-      "childAgeMax": 11,
-      "infantAgeMax": 3,
-      "tieredPricing": [
-        {
-          "minGuests": 1,
-          "maxGuests": 1,
-          "pricePerPerson": 55,
-          "label": "Solo traveler"
-        },
-        {
-          "minGuests": 2,
-          "maxGuests": 2,
-          "pricePerPerson": 51,
-          "label": "Couples / 2 Guests"
-        },
-        {
-          "minGuests": 3,
-          "maxGuests": null,
-          "pricePerPerson": 47,
-          "label": "Group (3+)"
-        }
-      ]
+      "updatedAt": "2026-10-05T00:37:33.305+00:00"
     },
     {
       "id": "seed-tour-airport-transfer",
@@ -3645,6 +3341,7 @@
       "durationHours": 1,
       "priceFrom": null,
       "childPrice": null,
+      "tieredPricing": [],
       "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
@@ -3756,11 +3453,7 @@
         "tripPackages": []
       },
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-05T00:37:33.305+00:00",
-      "infantPrice": 0,
-      "childAgeMin": 4,
-      "childAgeMax": 11,
-      "infantAgeMax": 3
+      "updatedAt": "2026-10-05T00:37:33.305+00:00"
     },
     {
       "id": "seed-tour-private-transfer",
@@ -3786,6 +3479,7 @@
       "durationHours": null,
       "priceFrom": null,
       "childPrice": null,
+      "tieredPricing": [],
       "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
@@ -3895,11 +3589,7 @@
         "tripPackages": []
       },
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-05T00:37:33.305+00:00",
-      "infantPrice": 0,
-      "childAgeMin": 4,
-      "childAgeMax": 11,
-      "infantAgeMax": 3
+      "updatedAt": "2026-10-05T00:37:33.305+00:00"
     },
     {
       "id": "seed-tour-submarine",
@@ -3956,6 +3646,7 @@
       "durationHours": 2.5,
       "priceFrom": 30,
       "childPrice": 15,
+      "tieredPricing": [],
       "tripPackages": [],
       "currency": "USD",
       "priceOriginal": null,
@@ -4069,31 +3760,7 @@
         "tripPackages": []
       },
       "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-05T00:37:33.305+00:00",
-      "infantPrice": 0,
-      "childAgeMin": 4,
-      "childAgeMax": 11,
-      "infantAgeMax": 3,
-      "tieredPricing": [
-        {
-          "minGuests": 1,
-          "maxGuests": 1,
-          "pricePerPerson": 30,
-          "label": "Solo traveler"
-        },
-        {
-          "minGuests": 2,
-          "maxGuests": 2,
-          "pricePerPerson": 28,
-          "label": "Couples / 2 Guests"
-        },
-        {
-          "minGuests": 3,
-          "maxGuests": null,
-          "pricePerPerson": 26,
-          "label": "Group (3+)"
-        }
-      ]
+      "updatedAt": "2026-10-05T00:37:33.305+00:00"
     }
   ],
   "packages": [
@@ -4119,11 +3786,31 @@
       "duration": "1 Full Day",
       "priceFrom": 65,
       "childPrice": 40,
+      "tieredPricing": [
+        {
+          "label": "Solo traveler",
+          "maxGuests": 1,
+          "minGuests": 1,
+          "pricePerPerson": 65
+        },
+        {
+          "label": "Couples / 2 Guests",
+          "maxGuests": 2,
+          "minGuests": 2,
+          "pricePerPerson": 80
+        },
+        {
+          "label": "Group (3+)",
+          "maxGuests": null,
+          "minGuests": 3,
+          "pricePerPerson": 65
+        }
+      ],
       "currency": "EUR",
       "priceOverrides": {
         "EGP": 3400,
         "GBP": 56,
-        "USD": 70
+        "USD": 65
       },
       "coverImage": {
         "alt": "Brother Sharm - Escursione di un Giorno Flyer",
@@ -4223,7 +3910,7 @@
       "featured": true,
       "priority": 1,
       "createdAt": "2026-10-04T20:03:49.325408+00:00",
-      "updatedAt": "2026-10-05T00:37:33.966+00:00",
+      "updatedAt": "2026-10-05T02:00:44.637+00:00",
       "seo": {
         "category": "sea-water",
         "keywords": [
@@ -4238,37 +3925,39 @@
           "desert",
           "adventure"
         ],
+        "infant_price": null,
+        "child_age_max": null,
+        "child_age_min": null,
         "includedTours": [
           "white-island",
           "ras-mohamed",
           "super-safari"
         ],
-        "metaDescription": "Book the ultimate 1-day package in Sharm El Sheikh: White Island yacht cruise, Ras Mohamed snorkeling, desert quad safari, camel ride and buffet lunch included for only 65€."
-      },
-      "infantPrice": 0,
-      "childAgeMin": 4,
-      "childAgeMax": 11,
-      "infantAgeMax": 3,
-      "tieredPricing": [
-        {
-          "minGuests": 1,
-          "maxGuests": 1,
-          "pricePerPerson": 65,
-          "label": "Solo traveler"
-        },
-        {
-          "minGuests": 2,
-          "maxGuests": 2,
-          "pricePerPerson": 60,
-          "label": "Couples / 2 Guests"
-        },
-        {
-          "minGuests": 3,
-          "maxGuests": null,
-          "pricePerPerson": 55,
-          "label": "Group (3+)"
-        }
-      ]
+        "infant_age_max": null,
+        "tiered_pricing": [
+          {
+            "label": "Solo traveler",
+            "maxGuests": 1,
+            "minGuests": 1,
+            "pricePerPerson": 65
+          },
+          {
+            "label": "Couples / 2 Guests",
+            "maxGuests": 2,
+            "minGuests": 2,
+            "pricePerPerson": 80
+          },
+          {
+            "label": "Group (3+)",
+            "maxGuests": null,
+            "minGuests": 3,
+            "pricePerPerson": 65
+          }
+        ],
+        "child_age_label": null,
+        "metaDescription": "Book the ultimate 1-day package in Sharm El Sheikh: White Island yacht cruise, Ras Mohamed snorkeling, desert quad safari, camel ride and buffet lunch included for only 65€.",
+        "infant_age_label": null
+      }
     },
     {
       "id": "",
@@ -4286,6 +3975,7 @@
       "duration": "3 days",
       "priceFrom": 25,
       "childPrice": 15,
+      "tieredPricing": [],
       "currency": "USD",
       "priceOverrides": {},
       "coverImage": {
@@ -4416,31 +4106,7 @@
           "sea-water"
         ],
         "includedTours": []
-      },
-      "infantPrice": 0,
-      "childAgeMin": 4,
-      "childAgeMax": 11,
-      "infantAgeMax": 3,
-      "tieredPricing": [
-        {
-          "minGuests": 1,
-          "maxGuests": 1,
-          "pricePerPerson": 25,
-          "label": "Solo traveler"
-        },
-        {
-          "minGuests": 2,
-          "maxGuests": 2,
-          "pricePerPerson": 23,
-          "label": "Couples / 2 Guests"
-        },
-        {
-          "minGuests": 3,
-          "maxGuests": null,
-          "pricePerPerson": 21,
-          "label": "Group (3+)"
-        }
-      ]
+      }
     },
     {
       "id": "murhwf2bvocvu6ht",
@@ -4458,6 +4124,7 @@
       "duration": "2 days",
       "priceFrom": 30,
       "childPrice": 15,
+      "tieredPricing": [],
       "currency": "USD",
       "priceOverrides": {},
       "coverImage": {
@@ -4538,31 +4205,7 @@
           "sea-water"
         ],
         "includedTours": []
-      },
-      "infantPrice": 0,
-      "childAgeMin": 4,
-      "childAgeMax": 11,
-      "infantAgeMax": 3,
-      "tieredPricing": [
-        {
-          "minGuests": 1,
-          "maxGuests": 1,
-          "pricePerPerson": 30,
-          "label": "Solo traveler"
-        },
-        {
-          "minGuests": 2,
-          "maxGuests": 2,
-          "pricePerPerson": 28,
-          "label": "Couples / 2 Guests"
-        },
-        {
-          "minGuests": 3,
-          "maxGuests": null,
-          "pricePerPerson": 26,
-          "label": "Group (3+)"
-        }
-      ]
+      }
     }
   ],
   "reviews": [

@@ -472,7 +472,7 @@ export function BookingWidget({
             label={t("guests_adults", "Adults")}
             sub={
               adultUnitValue !== null && !perBoat
-                ? `${fmt(adultUnitValue)} · ${t("age_adults", "12+ yrs")}${
+                ? `${fmt(adultUnitValue)}/person · ${t("age_adults", "12+ yrs")}${
                     activeTier?.label ? ` · ${activeTier.label}` : ""
                   }`
                 : t("age_adults", "12+ yrs")
@@ -539,7 +539,7 @@ export function BookingWidget({
                       `${tier.minGuests}${tier.maxGuests == null ? "+" : tier.maxGuests === tier.minGuests ? "" : `–${tier.maxGuests}`} ${
                         tier.minGuests === 1 ? "person" : "persons"
                       }`}
-                    {tierValue !== null ? ` · ${fmt(tierValue)}` : ""}
+                    {tierValue !== null ? ` · ${fmt(tierValue)}/person` : ""}
                     {savePct > 0 ? (
                       <span className="text-[0.65rem] font-bold text-emerald-700">
                         −{savePct}%

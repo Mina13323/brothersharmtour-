@@ -126,11 +126,11 @@ export function BookingWidget({
   );
 
   /** Stored per-child price: option → tour → graceful 80%-of-adult fallback. */
+  const baseChildPrice =
+    tour?.childPrice ?? (adultPrice !== null ? Math.round(adultPrice * 0.8) : null);
   const childPrice = selectedPackage
-    ? (selectedPackage.childPrice !== undefined && selectedPackage.childPrice !== null
-        ? selectedPackage.childPrice
-        : 0)
-    : (tour?.childPrice ?? (adultPrice !== null ? Math.round(adultPrice * 0.8) : null));
+    ? (selectedPackage.childPrice ?? baseChildPrice ?? 0)
+    : baseChildPrice;
 
   /** Stored per-infant price: 0 (Free) unless the option or tour says otherwise. */
   const infantPrice = selectedPackage

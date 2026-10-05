@@ -12,9 +12,16 @@ import { StickyBookBar } from "@/components/StickyBookBar";
 import { Gallery } from "@/components/Gallery";
 import { packageBySlug, localizePackage, publishedTours, localizeTour } from "@/lib/store/repo";
 import { getPublicSettings, getSiteView, serverWhatsappLink } from "@/lib/siteview";
-import { money } from "@/lib/utils";
+import {
+  money,
+  childAgeBand,
+  infantAgeBand,
+  effectiveTieredPricing,
+  resolveTier,
+} from "@/lib/utils";
+import { formatAmount, priceIn } from "@/lib/currency";
 import { destinationName, experienceName } from "@/lib/store/labels";
-import type { FaqItem, Tour } from "@/lib/types";
+import type { FaqItem } from "@/lib/types";
 import type { TourRecord } from "@/lib/store/types";
 
 /**
@@ -69,11 +76,63 @@ export default async function PackageDetailPage({
 
   const [settings, { currency, lang }] = await Promise.all([getPublicSettings(), getSiteView()]);
   const pkg = localizePackage(rawPkg, lang);
-  const price = money(pkg.priceFrom, currency, pkg.priceOverrides, lang, pkg.currency);
-  const childPriceFormatted =
+
+  const storedCurrency = pkg.currency || "USD";
+  const fmt = (value: number | null | undefined) =>
+    value === null || value === undefined
+      ? null
+      : formatAmount(value, currency.display, lang);
+  const toDisplay = (stored: number | null | undefined) =>
+    stored === null || stored === undefined
+      ? null
+      : priceIn(stored, currency, { from: storedCurrency }).value;
+
+  const adultPrice = pkg.priceFrom;
+  const effectiveChildPrice =
     pkg.childPrice !== null && pkg.childPrice !== undefined
-      ? money(pkg.childPrice, currency, undefined, lang, pkg.currency)
+      ? pkg.childPrice
+      : adultPrice !== null && adultPrice !== undefined && adultPrice > 0
+        ? Math.round(adultPrice * 0.8)
+        : null;
+  const effectiveInfantPrice = pkg.infantPrice ?? 0;
+
+  const price = money(adultPrice, currency, pkg.priceOverrides, lang, storedCurrency);
+  const barAdultPrice = price;
+  const barChildPrice =
+    effectiveChildPrice === null ? null : fmt(toDisplay(effectiveChildPrice));
+  const barInfantStored = effectiveInfantPrice;
+
+  const activeTiers = effectiveTieredPricing(pkg.tieredPricing, adultPrice);
+
+  const soloUnit = priceIn(adultPrice ?? 0, currency, {
+    overrides: pkg.priceOverrides,
+    from: storedCurrency,
+  }).value;
+
+  const couplesTier = resolveTier(activeTiers, 2);
+  const couplesUnit =
+    couplesTier && couplesTier.pricePerPerson !== null
+      ? toDisplay(couplesTier.pricePerPerson)
       : null;
+  const couplesFormatted = couplesUnit !== null ? fmt(couplesUnit) : null;
+  const couplesTotalFormatted = couplesUnit !== null ? fmt(couplesUnit * 2) : null;
+  const couplesSavePct =
+    soloUnit !== null && couplesUnit !== null && couplesUnit < soloUnit
+      ? Math.round((1 - couplesUnit / soloUnit) * 100)
+      : 0;
+
+  const groupTier = resolveTier(activeTiers, 3);
+  const groupUnit =
+    groupTier && groupTier.pricePerPerson !== null
+      ? toDisplay(groupTier.pricePerPerson)
+      : null;
+  const groupFormatted = groupUnit !== null ? fmt(groupUnit) : null;
+  const groupTotal3Formatted = groupUnit !== null ? fmt(groupUnit * 3) : null;
+  const groupSavePct =
+    soloUnit !== null && groupUnit !== null && groupUnit < soloUnit
+      ? Math.round((1 - groupUnit / soloUnit) * 100)
+      : 0;
+
   const whatsappLink = (m?: string) => serverWhatsappLink(settings.contact.whatsapp, m);
 
   const allTours = publishedTours();
@@ -148,58 +207,168 @@ export default async function PackageDetailPage({
       />
 
       {/* Facts + booking bar */}
-      <section className="bg-paper">
+      <section className="bg-paper border-b border-sand/60">
         <div className="shell">
-          <div className="flex flex-col gap-6 py-6 lg:flex-row lg:items-center lg:justify-between lg:py-7">
-            <dl className="grid grid-cols-2 gap-x-8 gap-y-4 sm:grid-cols-3 lg:gap-x-12">
-              <div>
-                <dt className="text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-stone">
-                  Destination
-                </dt>
-                <dd className="mt-1.5 text-[0.9375rem]">{destinationName(pkg.destination)}</dd>
+          <div className="flex flex-col gap-6 py-6 lg:py-7">
+            {/* Top row: Facts & CTA buttons */}
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+              <dl className="grid grid-cols-2 gap-x-8 gap-y-4 sm:grid-cols-3 lg:gap-x-12">
+                <div>
+                  <dt className="text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-stone">
+                    Destination
+                  </dt>
+                  <dd className="mt-1.5 text-[0.9375rem] font-medium text-ink">{destinationName(pkg.destination)}</dd>
+                </div>
+                <div>
+                  <dt className="text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-stone">
+                    Duration
+                  </dt>
+                  <dd className="mt-1.5 text-[0.9375rem] font-medium text-ink">{pkg.duration}</dd>
+                </div>
+                <div>
+                  <dt className="text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-stone">
+                    Tour Type
+                  </dt>
+                  <dd className="mt-1.5 text-[0.9375rem] font-medium text-ink">Custom Package</dd>
+                </div>
+              </dl>
+
+              <div className="flex flex-col gap-3 sm:flex-row lg:shrink-0">
+                <BookButton tourSlug={pkg.slug} className="btn btn-primary">
+                  Start planning
+                </BookButton>
+                <a
+                  href={whatsappLink(`Hi Brother Sharm Tour — I'm interested in the ${pkg.title} package.`)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-outline"
+                >
+                  <WhatsAppIcon />
+                  WhatsApp
+                </a>
               </div>
-              <div>
-                <dt className="text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-stone">
-                  Duration
-                </dt>
-                <dd className="mt-1.5 text-[0.9375rem]">{pkg.duration}</dd>
+            </div>
+
+            {/* Prices Section — Just below photo */}
+            <div className="border-t border-sand/60 pt-5">
+              <div className="mb-3.5 flex flex-wrap items-center justify-between gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-[0.6875rem] font-bold uppercase tracking-[0.16em] text-stone">
+                    Prices & Rates
+                  </span>
+                </div>
+                <span className="text-[0.72rem] font-medium text-stone flex items-center gap-1.5">
+                  <span className="text-[#1faa54]" aria-hidden>✓</span>
+                  No prepayment · Pay on the day
+                </span>
               </div>
-              <div>
-                <dt className="text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-stone">
-                  Pricing
-                </dt>
-                <dd className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+                {/* 1 Adult */}
+                <div className="flex flex-col justify-between rounded-2xl border border-sand/80 bg-paper-warm/40 p-4 transition-all hover:border-reef/30 hover:bg-paper-warm/70">
                   <div>
-                    <span className="text-[10px] uppercase tracking-wider text-stone block">Adult</span>
-                    <span className="font-display text-[1.6rem] leading-none text-ink">
-                      {price ?? "On request"}
+                    <span className="block text-[0.6875rem] font-bold uppercase tracking-wider text-stone truncate">
+                      1 Adult
                     </span>
-                  </div>
-                  {childPriceFormatted ? (
-                    <div className="pl-3 border-l border-sand/80">
-                      <span className="text-[10px] uppercase tracking-wider text-stone block">Child</span>
-                      <span className="font-display text-[1.25rem] font-semibold leading-none text-ink/90">
-                        {childPriceFormatted}
+                    <div className="mt-1 flex items-baseline gap-1">
+                      <span className="font-display text-[1.45rem] font-bold leading-none text-ink">
+                        {barAdultPrice ?? "On request"}
                       </span>
                     </div>
-                  ) : null}
-                </dd>
-              </div>
-            </dl>
+                  </div>
+                  <span className="mt-2 block text-[0.6875rem] text-stone">
+                    /adult
+                  </span>
+                </div>
 
-            <div className="flex flex-col gap-3 sm:flex-row lg:shrink-0">
-              <BookButton tourSlug={pkg.slug} className="btn btn-primary">
-                Start planning
-              </BookButton>
-              <a
-                href={whatsappLink(`Hi Brother Sharm Tour — I'm interested in the ${pkg.title} package.`)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-outline"
-              >
-                <WhatsAppIcon />
-                WhatsApp
-              </a>
+                {/* Couples (2 Guests) */}
+                <div className="flex flex-col justify-between rounded-2xl border border-sand/80 bg-paper-warm/40 p-4 transition-all hover:border-reef/30 hover:bg-paper-warm/70">
+                  <div>
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="block text-[0.6875rem] font-bold uppercase tracking-wider text-stone truncate">
+                        Couples (2 Guests)
+                      </span>
+                      {couplesSavePct > 0 ? (
+                        <span className="shrink-0 rounded-full bg-emerald-600/10 px-1.5 py-0.5 text-[0.625rem] font-bold text-emerald-700">
+                          −{couplesSavePct}%
+                        </span>
+                      ) : null}
+                    </div>
+                    <div className="mt-1 flex items-baseline gap-1">
+                      <span className="font-display text-[1.45rem] font-bold leading-none text-ink">
+                        {couplesTotalFormatted ?? (couplesFormatted ? `${couplesFormatted} × 2` : (barAdultPrice ?? "—"))}
+                      </span>
+                    </div>
+                  </div>
+                  <span className="mt-2 block text-[0.6875rem] text-stone truncate">
+                    {couplesFormatted ? `${couplesFormatted}/person` : "/adult"}
+                  </span>
+                </div>
+
+                {/* Group (3+ Persons) */}
+                <div className="flex flex-col justify-between rounded-2xl border border-sand/80 bg-paper-warm/40 p-4 transition-all hover:border-reef/30 hover:bg-paper-warm/70">
+                  <div>
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="block text-[0.6875rem] font-bold uppercase tracking-wider text-stone truncate">
+                        Group (3+ Persons)
+                      </span>
+                      {groupSavePct > 0 ? (
+                        <span className="shrink-0 rounded-full bg-emerald-600/10 px-1.5 py-0.5 text-[0.625rem] font-bold text-emerald-700">
+                          −{groupSavePct}%
+                        </span>
+                      ) : null}
+                    </div>
+                    <div className="mt-1 flex items-baseline gap-1">
+                      <span className="font-display text-[1.45rem] font-bold leading-none text-ink">
+                        {groupTotal3Formatted ?? (groupFormatted ? `${groupFormatted} × 3` : (barAdultPrice ?? "—"))}
+                      </span>
+                    </div>
+                  </div>
+                  <span className="mt-2 block text-[0.6875rem] text-stone truncate">
+                    {groupFormatted ? `${groupFormatted}/person` : "/adult"}
+                  </span>
+                </div>
+
+                {/* Children */}
+                <div className="flex flex-col justify-between rounded-2xl border border-sand/80 bg-paper-warm/40 p-4 transition-all hover:border-reef/30 hover:bg-paper-warm/70">
+                  <div>
+                    <span className="block text-[0.6875rem] font-bold uppercase tracking-wider text-stone truncate">
+                      Children ({childAgeBand(pkg)})
+                    </span>
+                    <div className="mt-1 flex items-baseline gap-1">
+                      <span className="font-display text-[1.45rem] font-bold leading-none text-reef-deep">
+                        {barChildPrice ?? "—"}
+                      </span>
+                    </div>
+                  </div>
+                  <span className="mt-2 block text-[0.6875rem] text-stone">
+                    /child
+                  </span>
+                </div>
+
+                {/* Infants */}
+                <div className="flex flex-col justify-between rounded-2xl border border-sand/80 bg-paper-warm/40 p-4 transition-all hover:border-reef/30 hover:bg-paper-warm/70">
+                  <div>
+                    <span className="block text-[0.6875rem] font-bold uppercase tracking-wider text-stone truncate">
+                      Infants ({infantAgeBand(pkg)})
+                    </span>
+                    <div className="mt-1 flex items-baseline gap-1">
+                      {barInfantStored === 0 ? (
+                        <span className="inline-flex items-center rounded-pill border border-emerald-600/20 bg-emerald-600/10 px-2.5 py-0.5 text-[0.8rem] font-bold text-emerald-700">
+                          Free
+                        </span>
+                      ) : (
+                        <span className="font-display text-[1.45rem] font-bold leading-none text-reef-deep">
+                          {fmt(toDisplay(barInfantStored))}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <span className="mt-2 block text-[0.6875rem] text-stone">
+                    {barInfantStored === 0 ? "No charge" : "/infant"}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -440,6 +609,13 @@ export default async function PackageDetailPage({
           images: pkg.coverImage ? [pkg.coverImage] : [],
           priceFrom: pkg.priceFrom,
           childPrice: pkg.childPrice,
+          childAgeMin: pkg.childAgeMin,
+          childAgeMax: pkg.childAgeMax,
+          childAgeLabel: pkg.childAgeLabel,
+          infantPrice: pkg.infantPrice ?? 0,
+          infantAgeMax: pkg.infantAgeMax,
+          infantAgeLabel: pkg.infantAgeLabel,
+          tieredPricing: pkg.tieredPricing ?? [],
           currency: pkg.currency,
           priceOverrides: pkg.priceOverrides,
           duration: pkg.duration,

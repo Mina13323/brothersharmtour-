@@ -7,7 +7,7 @@ import { Hero } from "@/components/Hero";
 import { Reveal } from "@/components/Reveal";
 import { Breadcrumbs, CTASection } from "@/components/sections";
 import { BookButton } from "@/components/BookingProvider";
-import { publishedPackages } from "@/lib/store/repo";
+import { publishedPackages, localizePackage } from "@/lib/store/repo";
 import { getSiteView } from "@/lib/siteview";
 import { money } from "@/lib/utils";
 import { destinationName } from "@/lib/store/labels";
@@ -27,8 +27,8 @@ export const metadata: Metadata = buildMetadata({
 });
 
 export default async function PackagesPage() {
-  const { currency } = await getSiteView();
-  const packages = publishedPackages();
+  const { currency, lang } = await getSiteView();
+  const packages = publishedPackages().map((p) => localizePackage(p, lang));
 
   return (
     <>
@@ -63,7 +63,19 @@ export default async function PackagesPage() {
           ) : (
             <div className="mt-12 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
               {packages.map((pkg, i) => {
-                const price = money(pkg.priceFrom, currency, pkg.priceOverrides, undefined, pkg.currency);
+                const price = money(pkg.priceFrom, currency, pkg.priceOverrides, lang, pkg.currency);
+                const effectiveChildPrice =
+                  pkg.childPrice !== null && pkg.childPrice !== undefined
+                    ? pkg.childPrice
+                    : pkg.priceFrom !== null && pkg.priceFrom !== undefined
+                      ? Math.round(pkg.priceFrom * 0.8)
+                      : null;
+                const childPrice = effectiveChildPrice !== null ? money(effectiveChildPrice, currency, undefined, lang, pkg.currency) : null;
+                const effectiveInfantPrice = pkg.infantPrice ?? 0;
+                const infantPrice =
+                  effectiveInfantPrice === 0
+                    ? "Free"
+                    : money(effectiveInfantPrice, currency, undefined, lang, pkg.currency);
                 return (
                   <Reveal key={pkg.slug} delay={i * 70}>
                     <article className="group flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-sand/70 bg-paper shadow-[var(--shadow-lift)] transition-all duration-500 hover:shadow-[var(--shadow-panel)] hover:border-reef/30 hover:-translate-y-1">
@@ -95,14 +107,34 @@ export default async function PackagesPage() {
                         <div className="mt-auto flex items-end justify-between pt-5">
                           <div>
                             {price ? (
-                              <>
+                              <div>
                                 <span className="block text-[0.625rem] uppercase tracking-[0.18em] text-stone">
                                   from
                                 </span>
-                                <span className="font-display text-[1.5rem] leading-none text-ink">
-                                  {price}
-                                </span>
-                              </>
+                                <div className="flex flex-col">
+                                  <span className="font-display text-[1.45rem] leading-none text-ink font-bold">
+                                    {price}
+                                  </span>
+                                  <div className="mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[0.75rem]">
+                                    {childPrice ? (
+                                      <span className="flex items-baseline gap-1 text-reef-deep font-semibold">
+                                        <span className="text-stone text-[0.65rem] uppercase tracking-wider">Child:</span>
+                                        <span>{childPrice}</span>
+                                      </span>
+                                    ) : null}
+                                    <span className="flex items-baseline gap-1 font-semibold text-emerald-700">
+                                      <span className="text-stone text-[0.65rem] uppercase tracking-wider">Infant:</span>
+                                      {effectiveInfantPrice === 0 ? (
+                                        <span className="rounded-full bg-emerald-600/10 px-1.5 py-0.2 text-[0.6875rem] font-bold text-emerald-700">
+                                          Free
+                                        </span>
+                                      ) : (
+                                        <span>{infantPrice}</span>
+                                      )}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
                             ) : (
                               <span className="text-[0.8125rem] font-semibold uppercase tracking-[0.1em] text-reef">
                                 Price on request
@@ -111,7 +143,7 @@ export default async function PackagesPage() {
                           </div>
                           <Link
                             href={`/packages/${pkg.slug}`}
-                            className="text-xs font-bold text-reef hover:text-sun transition-colors"
+                            className="btn btn-primary btn-sm shrink-0 shadow-xs cursor-pointer"
                           >
                             Details →
                           </Link>

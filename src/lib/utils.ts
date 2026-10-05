@@ -41,8 +41,8 @@ export const INFANT_AGE_MAX_DEFAULT = 3;
 
 export const TIER_PRESETS = [
   { minGuests: 1, maxGuests: 1, label: "Solo traveler", factor: 1 },
-  { minGuests: 2, maxGuests: 2, label: "Couples / 2 Guests", factor: 0.925 },
-  { minGuests: 3, maxGuests: null, label: "Group (3+)", factor: 0.85 },
+  { minGuests: 2, maxGuests: 2, label: "Couples", factor: 0.925 },
+  { minGuests: 3, maxGuests: null, label: "Group", factor: 0.85 },
 ] as const;
 
 /**
@@ -54,14 +54,43 @@ export function effectiveTieredPricing(
   baseAdultPrice: number | null | undefined,
 ): TieredPrice[] {
   if (tiers && tiers.length > 0) {
-    const valid = tiers.filter(
-      (t) =>
-        t &&
-        Number.isFinite(t.minGuests) &&
-        Number.isFinite(t.pricePerPerson) &&
-        t.pricePerPerson >= 0,
-    );
-    if (valid.length > 0) return valid;
+    const valid = tiers
+      .filter(
+        (t) =>
+          t &&
+          Number.isFinite(t.minGuests) &&
+          Number.isFinite(t.pricePerPerson) &&
+          t.pricePerPerson >= 0,
+      )
+      .map((t) => {
+        // If a tier is labeled Couples / 2 guests but maxGuests was left open-ended, cap it at 2
+        // so more than two guests do not get labeled as Couples
+        if (
+          t.minGuests === 2 &&
+          (t.maxGuests === null || t.maxGuests === undefined) &&
+          /couple/i.test(t.label || "")
+        ) {
+          return { ...t, maxGuests: 2 };
+        }
+        return t;
+      });
+
+    if (valid.length > 0) {
+      // If there is a couples tier capped at 2, but no tier for 3+ guests, ensure a Group tier exists
+      const hasGroupTier = valid.some(
+        (t) => t.minGuests >= 3 || (t.minGuests === 2 && t.maxGuests === null),
+      );
+      if (!hasGroupTier && valid.some((t) => t.minGuests === 2 && t.maxGuests === 2)) {
+        const couplesTier = valid.find((t) => t.minGuests === 2);
+        valid.push({
+          minGuests: 3,
+          maxGuests: null,
+          pricePerPerson: couplesTier?.pricePerPerson ?? (baseAdultPrice ?? 0),
+          label: "Group",
+        });
+      }
+      return valid;
+    }
   }
   if (baseAdultPrice === null || baseAdultPrice === undefined || baseAdultPrice <= 0) {
     return [];
@@ -84,6 +113,7 @@ export function effectiveTieredPricing(
  * Finds the active price tier for a party of `guests` adults: the tier whose
  * inclusive [minGuests, maxGuests] range contains the count (maxGuests null
  * means "and above"). Tiers are evaluated in ascending minGuests order.
+ * If party size is more than two, it resolves to Group.
  */
 export function resolveTier(
   tiers: TieredPrice[] | null | undefined,
@@ -101,11 +131,22 @@ export function resolveTier(
     .sort((a, b) => a.minGuests - b.minGuests);
   for (const tier of sorted) {
     const max = tier.maxGuests ?? null;
-    if (guests >= tier.minGuests && (max === null || guests <= max)) return tier;
+    if (guests >= tier.minGuests && (max === null || guests <= max)) {
+      if (guests > 2 && /couple/i.test(tier.label || "")) {
+        return { ...tier, label: "Group" };
+      }
+      return tier;
+    }
   }
   // Party larger than every bounded tier → the last open-ended tier, else the highest.
   const last = sorted[sorted.length - 1];
-  return guests >= last.minGuests ? last : null;
+  if (guests >= last.minGuests) {
+    if (guests > 2 && /couple/i.test(last.label || "")) {
+      return { ...last, label: "Group" };
+    }
+    return last;
+  }
+  return null;
 }
 
 interface AgeBanded {

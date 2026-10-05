@@ -439,7 +439,7 @@ export function TourBody({
                     <div>
                       <div className="flex items-center justify-between gap-1">
                         <span className="block text-[0.6875rem] font-bold uppercase tracking-wider text-stone truncate">
-                          {t("price_group_3plus", "3+ Persons")}
+                          {t("price_group_3plus", "Group (3+ Persons)")}
                         </span>
                         {groupSavePct > 0 ? (
                           <span className="shrink-0 rounded-full bg-emerald-600/10 px-1.5 py-0.5 text-[0.625rem] font-bold text-emerald-700">

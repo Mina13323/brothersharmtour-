@@ -473,7 +473,13 @@ export function BookingWidget({
             sub={
               adultUnitValue !== null && !perBoat
                 ? `${fmt(adultUnitValue)}/person · ${t("age_adults", "12+ yrs")}${
-                    activeTier?.label ? ` · ${activeTier.label}` : ""
+                    adults > 2
+                      ? ` · ${t("party_group", "Group")}`
+                      : adults === 2
+                        ? ` · ${t("party_couples", "Couples")}`
+                        : activeTier?.label && !/couple|group/i.test(activeTier.label)
+                          ? ` · ${activeTier.label}`
+                          : ""
                   }`
                 : t("age_adults", "12+ yrs")
             }
@@ -535,10 +541,16 @@ export function BookingWidget({
                         : "border-sand/80 bg-paper-warm/40 text-stone",
                     )}
                   >
-                    {tier.label?.trim() ||
-                      `${tier.minGuests}${tier.maxGuests == null ? "+" : tier.maxGuests === tier.minGuests ? "" : `–${tier.maxGuests}`} ${
-                        tier.minGuests === 1 ? "person" : "persons"
-                      }`}
+                    {(tier.minGuests > 2 && /couple/i.test(tier.label || ""))
+                      ? t("party_group", "Group")
+                      : (tier.label?.trim() ||
+                        (tier.minGuests > 2
+                          ? t("party_group", "Group")
+                          : tier.minGuests === 2
+                            ? t("party_couples", "Couples")
+                            : `${tier.minGuests}${tier.maxGuests == null ? "+" : tier.maxGuests === tier.minGuests ? "" : `–${tier.maxGuests}`} ${
+                                tier.minGuests === 1 ? "person" : "persons"
+                              }`))}
                     {tierValue !== null ? ` · ${fmt(tierValue)}/person` : ""}
                     {savePct > 0 ? (
                       <span className="text-[0.65rem] font-bold text-emerald-700">

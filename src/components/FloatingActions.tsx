@@ -9,7 +9,7 @@ import { X, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function FloatingActions() {
-  const { whatsappLink } = useSite();
+  const { whatsappLink, t } = useSite();
   const pathname = usePathname();
   const { isOpen } = useBooking();
   const [showPopup, setShowPopup] = useState(false);
@@ -70,7 +70,7 @@ export function FloatingActions() {
       {showPopup && (
         <div
           role="dialog"
-          aria-label="WhatsApp live chat assistance"
+          aria-label={t("whatsapp_live_chat", "WhatsApp live chat")}
           className="mb-3 w-[300px] sm:w-[340px] max-w-[calc(100vw-28px)] overflow-hidden rounded-3xl bg-white shadow-2xl border border-sand/70 animate-in fade-in slide-in-from-bottom-5 duration-300 backdrop-blur-md"
         >
           {/* Header */}
@@ -96,7 +96,7 @@ export function FloatingActions() {
             <button
               onClick={dismissPopup}
               type="button"
-              aria-label="Close chat popup"
+              aria-label={t("close_chat", "Close chat")}
               className="size-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/80 hover:text-white transition-colors cursor-pointer"
             >
               <X className="size-4" />
@@ -128,7 +128,7 @@ export function FloatingActions() {
               className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-full bg-[#25D366] hover:bg-[#20ba59] text-white font-bold text-xs uppercase tracking-wider shadow-sm hover:shadow-md transition-all cursor-pointer"
             >
               <WhatsAppIcon className="size-4 shrink-0" />
-              <span>Chat on WhatsApp</span>
+              <span>{t("action_chat_whatsapp", "Chat on WhatsApp")}</span>
               <Send className="size-3.5 shrink-0 opacity-80" />
             </a>
           </div>
@@ -140,7 +140,7 @@ export function FloatingActions() {
         <button
           type="button"
           onClick={togglePopup}
-          aria-label="Chat with Brother Sharm Tour on WhatsApp"
+          aria-label={t("action_chat_whatsapp", "Chat on WhatsApp")}
           className="relative size-12 sm:size-14 rounded-full bg-[#25D366] hover:bg-[#20ba59] text-white shadow-xl hover:shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer ring-4 ring-white/60"
         >
           {showPopup ? (
@@ -164,7 +164,7 @@ export function FloatingActions() {
             className="absolute bottom-1 right-14 sm:right-16 mr-1 hidden sm:flex items-center gap-2 bg-white text-ink px-3 py-1.5 rounded-full shadow-lg border border-sand/60 text-xs font-semibold whitespace-nowrap cursor-pointer hover:bg-paper-warm transition-all animate-bounce"
           >
             <span className="size-2 rounded-full bg-[#25D366]" />
-            <span>Chat on WhatsApp</span>
+            <span>{t("action_chat_whatsapp", "Chat on WhatsApp")}</span>
           </div>
         )}
       </div>

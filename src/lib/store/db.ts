@@ -2,9 +2,20 @@
  * File-backed database for the Bro Tour CMS.
  *
  * `content/db.json` is the single source of truth for every piece of editable
- * content. Reads go through an in-process cache invalidated by mtime, so a
- * request costs a `stat()`, not a JSON parse. Writes are atomic (temp file +
- * rename) so a crash mid-save can never corrupt the store.
+ * content AT RUN TIME. Reads go through an in-process cache invalidated by
+ * mtime, so a request costs a `stat()`, not a JSON parse. Writes are atomic
+ * (temp file + rename) so a crash mid-save can never corrupt the store.
+ *
+ * That file is deliberately NOT tracked in git: it is mutated by every admin
+ * edit and it accumulates guest personal data (inquiries, review authors).
+ * When it is missing — a fresh clone, or a deploy onto an empty volume — the
+ * store is initialised from, in order:
+ *
+ *   1. `seed/db.seed.json` — the tracked editorial snapshot (tours, packages,
+ *      destinations, experiences, settings; never any guest data). Refresh it
+ *      with `npm run seed:snapshot`.
+ *   2. `buildSeedDatabase()` — the static content layer compiled into the app,
+ *      so the site still renders even with no snapshot at all.
  *
  * This runs on the app server (Node), which is exactly right for the deployment
  * target — a persistent Node process on the operator's Hostinger VPS. For
@@ -27,6 +38,8 @@ import type { Database } from "./types";
 
 const CONTENT_DIR = join(process.cwd(), "content");
 const DB_PATH = join(CONTENT_DIR, "db.json");
+/** Tracked editorial snapshot used to initialise a fresh install. */
+const SEED_SNAPSHOT_PATH = join(process.cwd(), "seed", "db.seed.json");
 
 let cache: { data: Database; mtime: number } | null = null;
 
@@ -44,15 +57,33 @@ export function loadDb(): Database {
     return data;
   }
 
-  // First boot on a fresh clone: seed in memory (and to disk when writable)
-  // so the site renders identically before an admin has touched anything.
-  const seeded = buildSeedDatabase();
+  // First boot on a fresh clone: initialise from the tracked editorial
+  // snapshot when one exists, otherwise from the compiled content layer — so
+  // the site renders identically before an admin has touched anything.
+  const seeded = loadSeedSnapshot() ?? buildSeedDatabase();
   try {
     persist(seeded);
   } catch {
     // Read-only filesystem (e.g. a build image) — the in-memory seed is enough.
   }
   return seeded;
+}
+
+/**
+ * Reads the tracked editorial snapshot, if present and parseable. Guest
+ * collections are forced empty: a snapshot must never reintroduce personal
+ * data, even if one were committed by mistake.
+ */
+function loadSeedSnapshot(): Database | null {
+  if (!existsSync(SEED_SNAPSHOT_PATH)) return null;
+  try {
+    const parsed = JSON.parse(
+      readFileSync(SEED_SNAPSHOT_PATH, "utf8"),
+    ) as Database;
+    return { ...parsed, reviews: [], inquiries: [] };
+  } catch {
+    return null;
+  }
 }
 
 function persist(next: Database): void {

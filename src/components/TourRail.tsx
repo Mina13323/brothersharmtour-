@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { TourCard } from "./cards";
 import type { Tour } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { useSite } from "./SiteProvider";
 
 /**
  * Horizontal snap rail for tours.
@@ -16,6 +17,7 @@ import { cn } from "@/lib/utils";
  * costs no JS on the scroll path; the observer only updates arrow state.
  */
 export function TourRail({ tours, sizes }: { tours: Tour[]; sizes?: string }) {
+  const { t } = useSite();
   const railRef = useRef<HTMLUListElement>(null);
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
@@ -73,13 +75,13 @@ export function TourRail({ tours, sizes }: { tours: Tour[]; sizes?: string }) {
 
         <div className="flex gap-2">
           <RailButton
-            label="Previous tours"
+            label={t("aria_prev_slide", "Previous")}
             disabled={atStart}
             onClick={() => scrollBy(-1)}
           >
             ←
           </RailButton>
-          <RailButton label="More tours" disabled={atEnd} onClick={() => scrollBy(1)}>
+          <RailButton label={t("aria_next_slide", "Next")} disabled={atEnd} onClick={() => scrollBy(1)}>
             →
           </RailButton>
         </div>

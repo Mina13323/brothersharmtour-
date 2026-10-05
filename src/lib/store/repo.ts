@@ -16,6 +16,7 @@ import { destinations as seedDestinations, destinationName } from "@/data/destin
 import { experiences as seedExperiences, experienceName } from "@/data/experiences";
 import type { Tour } from "@/lib/types";
 import { localizeGuideText } from "@/lib/i18n/guideTerms";
+import { slugify } from "@/lib/utils";
 import { applySupabaseData, loadDb, updateDb } from "./db";
 import {
   fetchToursFromSupabase,
@@ -233,6 +234,10 @@ export function localizeTour(tour: TourRecord, lang?: string | null): Tour {
     excluded: t?.excluded?.length ? t.excluded : tour.excluded,
     bring: t?.bring?.length ? t.bring : tour.bring,
     itinerary: t?.itinerary?.length ? t.itinerary : tour.itinerary,
+    importantInfo: t?.importantInfo?.length ? t.importantInfo : tour.importantInfo,
+    restrictions: t?.restrictions?.length ? t.restrictions : tour.restrictions,
+    meetingPoint: overlay(tour.meetingPoint, t?.meetingPoint),
+    faq: t?.faq?.length ? t.faq : tour.faq,
     tripPackages,
     childAgeLabel: overlay(tour.childAgeLabel ?? "", t?.childAgeLabel) || undefined,
     infantAgeLabel: overlay(tour.infantAgeLabel ?? "", t?.infantAgeLabel) || undefined,
@@ -437,10 +442,32 @@ export function packageById(id: string): PackageRecord | undefined {
   return loadDb().packages.find((p) => p.id === id);
 }
 
+/**
+ * Produces a package slug that collides with no other package and no tour.
+ * Falls back to an id-derived slug when the title yields nothing sluggable.
+ */
+function uniquePackageSlug(db: Database, base: string, exceptId?: string): string {
+  const taken = new Set<string>([
+    ...db.packages.filter((p) => p.id !== exceptId).map((p) => p.slug),
+    ...db.tours.map((t) => t.slug),
+  ]);
+  const root = base || `package-${rid()}`;
+  let slug = root;
+  let n = 2;
+  while (taken.has(slug)) slug = `${root}-${n++}`;
+  return slug;
+}
+
 export function savePackage(input: Partial<PackageRecord> & { slug: string; title: string }): PackageRecord {
   return updateDb((db) => {
+    // An empty-string id/slug must never be treated as a real identifier —
+    // that is exactly how a package once ended up persisted with id: "" and
+    // slug: "". Normalise to undefined before matching or assigning.
+    const inputId = String(input.id ?? "").trim() || undefined;
+    const inputSlug = String(input.slug ?? "").trim() || undefined;
     const existing = db.packages.find(
-      (p) => p.id === input.id || (input.id === undefined && p.slug === input.slug),
+      (p) => (inputId !== undefined && p.id === inputId) ||
+        (inputId === undefined && inputSlug !== undefined && p.slug === inputSlug),
     );
     const ts = now();
     const primaryCat = input.category || existing?.category || (input.categories?.[0] ?? existing?.categories?.[0] ?? "sea-water");
@@ -472,8 +499,11 @@ export function savePackage(input: Partial<PackageRecord> & { slug: string; titl
       priority: 100,
       ...(existing ?? {}),
       ...input,
-      id: existing?.id ?? input.id ?? rid(),
-      slug: input.slug,
+      id: existing?.id || inputId || rid(),
+      slug:
+        inputSlug ??
+        existing?.slug ??
+        uniquePackageSlug(db, slugify(input.title), existing?.id),
       title: input.title,
       category: primaryCat,
       categories: allCats,
@@ -500,6 +530,24 @@ export function localizePackage(pkg: PackageRecord, lang?: string | null): Packa
     included: t.included?.length ? t.included : pkg.included,
     excluded: t.excluded?.length ? t.excluded : pkg.excluded,
     bring: t.bring?.length ? t.bring : pkg.bring,
+    // Day-by-day entries are matched by position; a blank field keeps English.
+    days: t.days?.length
+      ? pkg.days.map((day, i) => ({
+          ...day,
+          title: t.days?.[i]?.title?.trim() || day.title,
+          description: t.days?.[i]?.description?.trim() || day.description,
+          inclusions: t.days?.[i]?.inclusions?.length
+            ? t.days[i].inclusions
+            : day.inclusions,
+        }))
+      : pkg.days,
+    seo: t.seo?.title || t.seo?.description
+      ? {
+          ...(pkg.seo ?? {}),
+          title: t.seo?.title || pkg.seo?.title,
+          description: t.seo?.description || pkg.seo?.description,
+        }
+      : pkg.seo,
   };
 }
 
@@ -799,6 +847,36 @@ export function integrityCheck(): IntegrityIssue[] {
   };
   dup(db.tours, "Tours");
   dup(db.packages, "Packages");
+
+  // Identifier integrity — a package with no id or no slug has no URL and
+  // cannot be edited or linked to. This must always be an error.
+  const packageIds = new Set<string>();
+  for (const pkg of db.packages) {
+    const label = `Package “${pkg.title || "(untitled)"}”`;
+    if (!String(pkg.id ?? "").trim()) {
+      issues.push({ level: "error", where: label, message: "Has no ID — run `npm run repair:packages`" });
+    } else if (packageIds.has(pkg.id)) {
+      issues.push({ level: "error", where: label, message: `Duplicate ID “${pkg.id}”` });
+    } else {
+      packageIds.add(pkg.id);
+    }
+    if (!String(pkg.slug ?? "").trim()) {
+      issues.push({ level: "error", where: label, message: "Has no slug — it has no public URL" });
+    } else if (tourSlugs.has(pkg.slug)) {
+      issues.push({ level: "warning", where: label, message: `Slug “${pkg.slug}” is also a tour slug` });
+    }
+    if (pkg.tourSlug && !tourSlugs.has(pkg.tourSlug)) {
+      issues.push({ level: "error", where: label, message: `Linked tour “${pkg.tourSlug}” does not exist` });
+    }
+    for (const included of pkg.includedTours ?? []) {
+      if (!tourSlugs.has(included)) {
+        issues.push({ level: "warning", where: label, message: `Included tour “${included}” does not exist` });
+      }
+    }
+    if (pkg.status === "draft") {
+      issues.push({ level: "warning", where: label, message: "Draft — not visible on the public site" });
+    }
+  }
 
   for (const tour of db.tours) {
     if (!destinationSlugs.has(tour.destination)) {

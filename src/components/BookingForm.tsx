@@ -24,7 +24,7 @@ export function BookingForm({
   compact?: boolean;
 }) {
   const catalogue = useCatalogue();
-  const { settings: site, whatsappLink } = useSite();
+  const { settings: site, whatsappLink, t } = useSite();
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
   const [tourSlug, setTourSlug] = useState(initialTour ?? "");
@@ -70,7 +70,7 @@ export function BookingForm({
           </svg>
         </span>
         <div>
-          <h3 className="headline text-[1.6rem]">Request received</h3>
+          <h3 className="headline text-[1.6rem]">{t("request_received", "Request received")}</h3>
           <p className="lede mt-3">
             Thanks — we have your request and we&apos;ll come back to you with
             availability, your pickup time and a final price. If you need a
@@ -110,7 +110,7 @@ export function BookingForm({
             name="name"
             required
             autoComplete="name"
-            placeholder="Your full name"
+            placeholder={t("form_full_name_ph", "Your full name")}
             className="field"
           />
         </div>
@@ -124,7 +124,7 @@ export function BookingForm({
             type="email"
             required
             autoComplete="email"
-            placeholder="you@example.com"
+            placeholder={t("form_email_ph", "you@example.com")}
             className="field"
           />
         </div>
@@ -140,7 +140,7 @@ export function BookingForm({
           required
           inputMode="tel"
           autoComplete="tel"
-          placeholder="Include your country code"
+          placeholder={t("form_phone_ph", "Include your country code")}
           className="field"
         />
       </div>
@@ -156,7 +156,7 @@ export function BookingForm({
           value={tourSlug}
           onChange={(e) => setTourSlug(e.target.value)}
         >
-          <option value="">Not sure yet — help me choose</option>
+          <option value="">{t("form_not_sure_yet", "Not sure yet — help me choose")}</option>
           {grouped.map(([destination, list]) => (
             <optgroup key={destination} label={destination}>
               {list.map((tour) => (

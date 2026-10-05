@@ -35,6 +35,7 @@ export function CapsuleHero({
   primaryCta,
   secondaryCta,
 }: CapsuleHeroProps) {
+  const { t } = useSite();
   // Ensure we have at least 3 images for the carousel capsules
   const validImages = rawImages && rawImages.length > 0 ? rawImages : [];
   const images =
@@ -176,7 +177,7 @@ export function CapsuleHero({
                 <button
                   type="button"
                   onClick={() => setChosenIdx(leftIdx)}
-                  aria-label="Choose this photo for the background"
+                  aria-label={t("aria_choose_photo", "Choose this photo for the background")}
                   className="group relative w-20 sm:w-28 md:w-36 lg:w-40 aspect-[9/18] rounded-[999px] overflow-hidden border-2 sm:border-[3.5px] border-white/80 shadow-[0_20px_50px_rgba(0,0,0,0.6)] transition-all duration-500 hover:scale-105 hover:border-white focus:outline-none cursor-pointer opacity-80 hover:opacity-100 shrink-0"
                 >
                   <Image
@@ -194,7 +195,7 @@ export function CapsuleHero({
                 <button
                   type="button"
                   onClick={() => setChosenIdx(centerIdx)}
-                  aria-label="Active photo shown in background"
+                  aria-label={t("aria_active_photo", "Active photo shown in background")}
                   className="group relative w-24 sm:w-34 md:w-40 lg:w-44 aspect-[9/19] rounded-[999px] overflow-hidden border-[3px] sm:border-[4px] border-sand ring-2 sm:ring-4 ring-sand/40 shadow-[0_25px_60px_rgba(0,0,0,0.7)] -translate-y-2 sm:-translate-y-3 z-10 transition-all duration-500 hover:scale-105 focus:outline-none cursor-pointer shrink-0"
                 >
                   <Image
@@ -216,7 +217,7 @@ export function CapsuleHero({
                 <button
                   type="button"
                   onClick={() => setChosenIdx(rightIdx)}
-                  aria-label="Choose this photo for the background"
+                  aria-label={t("aria_choose_photo", "Choose this photo for the background")}
                   className="group relative w-20 sm:w-28 md:w-36 lg:w-40 aspect-[9/18] rounded-[999px] overflow-hidden border-2 sm:border-[3.5px] border-white/80 shadow-[0_20px_50px_rgba(0,0,0,0.6)] transition-all duration-500 hover:scale-105 hover:border-white focus:outline-none cursor-pointer opacity-80 hover:opacity-100 shrink-0"
                 >
                   <Image
@@ -240,7 +241,7 @@ export function CapsuleHero({
           <button
             onClick={prevImage}
             type="button"
-            aria-label="Previous photo"
+            aria-label={t("aria_prev_photo", "Previous photo")}
             className="size-9 sm:size-11 rounded-full border border-white/80 bg-black/40 hover:bg-white text-white hover:text-ink backdrop-blur-md flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-lg cursor-pointer"
           >
             <svg
@@ -258,7 +259,7 @@ export function CapsuleHero({
           <button
             onClick={nextImage}
             type="button"
-            aria-label="Next photo"
+            aria-label={t("aria_next_photo", "Next photo")}
             className="size-9 sm:size-11 rounded-full border border-white/80 bg-black/40 hover:bg-white text-white hover:text-ink backdrop-blur-md flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-lg cursor-pointer"
           >
             <svg

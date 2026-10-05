@@ -68,7 +68,7 @@ export function HeroSearch() {
       <div className="flex justify-center mb-3">
         <div
           role="tablist"
-          aria-label="Search type"
+          aria-label={t("aria_search_type", "Search type")}
           className="inline-flex rounded-full bg-paper/95 backdrop-blur-md p-1 border border-sand/60 shadow-sm"
         >
           {tabs.map((t) => {

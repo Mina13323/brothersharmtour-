@@ -3948,8 +3948,8 @@
       }
     },
     {
-      "id": "",
-      "slug": "",
+      "id": "muvexpsfwyfl5g9i",
+      "slug": "salama-red-canyons-snorkeling-quad-biking-camels-jeep-at-dahab-51",
       "tourId": "seed-tour-color-canyon",
       "tourSlug": "color-canyon",
       "includedTours": [],
@@ -4087,106 +4087,7 @@
       "featured": false,
       "priority": 100,
       "createdAt": "2026-10-04T16:10:59.528544+00:00",
-      "updatedAt": "2026-10-05T00:37:33.966+00:00",
-      "seo": {
-        "category": "sea-water",
-        "categories": [
-          "sea-water"
-        ],
-        "includedTours": []
-      }
-    },
-    {
-      "id": "murhwf2bvocvu6ht",
-      "slug": "sharm-2-days-package",
-      "tourId": "seed-tour-white-island",
-      "tourSlug": "white-island",
-      "includedTours": [],
-      "title": "package",
-      "tagline": "A boat morning out to the sandbank that appears in the middle of the sea, with snorkelling stops on the reefs either side of it.",
-      "destination": "sharm-el-sheikh",
-      "category": "sea-water",
-      "categories": [
-        "sea-water"
-      ],
-      "duration": "2 days",
-      "priceFrom": 30,
-      "childPrice": 15,
-      "tieredPricing": [],
-      "currency": "USD",
-      "priceOverrides": {},
-      "coverImage": {
-        "alt": "package",
-        "src": "/uploads/media/98e035f4-7857-465d-b2d8-0072c3ecbe04.jpeg",
-        "width": 1600,
-        "height": 900
-      },
-      "gallery": [
-        {
-          "alt": "package photo 1",
-          "src": "/uploads/media/f3ffedd4-dc72-4d48-8c86-1b2ac5bbc815.jpeg",
-          "width": 1600,
-          "height": 900
-        }
-      ],
-      "description": [
-        "Embark on an unforgettable Ras Mohamed & White Island Boat Trip from Sharm El Sheikh and explore the crystal-clear waters of the Red Sea. Discover Ras Mohamed National Park, famous for its colorful coral reefs, rich marine life, and breathtaking underwater scenery.",
-        "Your journey starts with hotel pickup and transfer to the marina, where you’ll board a modern, fully equipped yacht. Sail along the stunning Sinai coastline while relaxing on deck and learning about the area’s unique marine ecosystem from our experienced guides",
-        "Enjoy two amazing snorkeling stops at Ras Mohamed’s top reef sites and the iconic White Island. Swim among tropical fish, admire vibrant corals, and enjoy a tasty onboard lunch with soft drinks before returning to your hotel with unforgettable memories"
-      ],
-      "days": [],
-      "included": [
-        "Hotel pickup and drop-off in an air-conditioned vehicle",
-        "Snorkeling at Ras Mohamed and White Island",
-        "Two snorkeling stops in the Red Sea",
-        "Professional instructor guidance.",
-        "Refreshments: water, coffee, tea, soda",
-        "Lunch includes chicken, rice, pasta, veggies, 3 salads",
-        "Spacious yacht with sun deck",
-        "National Park entrance fees",
-        "Life jacket"
-      ],
-      "excluded": [
-        "Optional underwater photos for purchase",
-        "snorkling equipment"
-      ],
-      "bring": [
-        "Swimwear worn under your clothes",
-        "Towel",
-        "Reef-safe sunscreen",
-        "Dry bag or plastic pouch for phones"
-      ],
-      "translations": {
-        "ar": {
-          "title": "جزيرة الرمال البيضاء",
-          "tagline": "رحلة بحرية صباحية إلى الجزيرة الرملية وسط البحر، مع وقفات للسباحة والسنوركلينج على الشعاب المرجانية."
-        },
-        "de": {
-          "title": "White Island Sandbank",
-          "tagline": "Bootsausflug am Vormittag zur Sandbank mitten im Meer mit Schnorchelstopps an den Korallenriffen."
-        },
-        "fr": {
-          "title": "Banc de Sable de White Island",
-          "tagline": "Matinée en bateau vers le banc de sable émergeant en pleine mer, avec arrêts snorkeling sur les récifs."
-        },
-        "it": {
-          "title": "Isola Bianca (White Island)",
-          "tagline": "Escursione in barca alla lingua di sabbia bianca in mezzo al mare, con soste snorkeling sulla barriera corallina."
-        },
-        "pl": {
-          "title": "Biała Wyspa (White Island)",
-          "tagline": "Rejs statkiem na piaszczystą łachę pośrodku morza z przystankami na snurkowanie przy rafie koralowej."
-        },
-        "ru": {
-          "title": "Белый Остров (White Island)",
-          "tagline": "Морская прогулка на яхте к песчаной косе посреди моря с остановками для снорклинга на рифах."
-        }
-      },
-      "status": "draft",
-      "featured": false,
-      "priority": 100,
-      "createdAt": "2026-10-04T02:05:47.616016+00:00",
-      "updatedAt": "2026-10-05T00:37:33.966+00:00",
+      "updatedAt": "2026-10-05T15:36:59.343Z",
       "seo": {
         "category": "sea-water",
         "categories": [
@@ -4196,59 +4097,8 @@
       }
     }
   ],
-  "reviews": [
-    {
-      "id": "mupw19l6deb15j35",
-      "tourSlug": "speed-boat",
-      "name": "Катерина",
-      "email": "katerinatetora@gmail.com",
-      "country": "Україна",
-      "rating": 5,
-      "title": "Незабутні емоції!",
-      "body": "Відпочивала в Шарм Ель Шейху з 03.06.2026, каталась на швидкісному катері — це було дуже круто! 🌊😍 Стільки емоцій, швидкості й неймовірних краєвидів. Я отримала масу задоволення і точно запам’ятаю цю поїздку надовго! ❤️",
-      "photos": [],
-      "status": "approved",
-      "verified": false,
-      "submittedAt": "2026-10-01T18:49:01.386Z",
-      "reviewedAt": "2026-10-01T19:54:36.203Z",
-      "publishedAt": "2026-10-01T19:54:36.203Z"
-    },
-    {
-      "id": "muuiuoj68nwx95lw",
-      "tourSlug": "old-cairo",
-      "name": "Omar",
-      "email": "omaaarmohgamedd@gmail.com",
-      "country": "Germany",
-      "rating": 5,
-      "body": "TEEEST Review................",
-      "photos": [],
-      "status": "rejected",
-      "verified": false,
-      "submittedAt": "2026-10-05T00:38:50.034Z",
-      "reviewedAt": "2026-10-05T00:38:59.759Z"
-    }
-  ],
-  "inquiries": [
-    {
-      "id": "muriwt5jj6lvbmri",
-      "status": "new",
-      "createdAt": "2026-10-02T22:17:10.807Z",
-      "updatedAt": "2026-10-02T22:17:10.810Z",
-      "tourSlug": "white-island",
-      "tourTitle": " Ras Mohamed and White Island  SnorKeling Tour Sharm El Sheikh",
-      "guestName": "efef",
-      "guestEmail": null,
-      "guestPhone": "+31687667320",
-      "preferredDate": "2026-10-05",
-      "adults": 2,
-      "children": 0,
-      "hotel": "rixcos",
-      "roomNumber": "324",
-      "notes": "whjdw (Room: 324)",
-      "source": "booking_drawer",
-      "emailStatus": "not-configured"
-    }
-  ],
+  "reviews": [],
+  "inquiries": [],
   "destinations": [
     {
       "name": "Sharm El Sheikh",

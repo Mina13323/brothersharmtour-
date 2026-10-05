@@ -4,10 +4,11 @@ import { buildMetadata } from "@/lib/seo";
 import { Reveal } from "@/components/Reveal";
 import { ContactForm } from "@/components/ContactForm";
 import { WhatsAppIcon } from "@/components/sections";
-import { getPublicSettings, serverWhatsappLink } from "@/lib/siteview";
+import { getVisitorLanguage, getPublicSettings, serverWhatsappLink } from "@/lib/siteview";
 
 import { Hero } from "@/components/Hero";
 import { media } from "@/lib/media";
+import { getTranslation, type TranslationKey } from "@/lib/i18n/translations";
 
 export const metadata: Metadata = buildMetadata({
   fallbackTitle: "Contact Brother Sharm Tour in Sharm El Sheikh",
@@ -18,6 +19,10 @@ export const metadata: Metadata = buildMetadata({
 
 export default async function ContactPage() {
   const site = await getPublicSettings();
+  const lang = await getVisitorLanguage();
+  /** Server-side counterpart of useSite().t — same dictionary, same fallback. */
+  const tr = (key: TranslationKey, fallback: string) =>
+    getTranslation(lang, key) || fallback;
   const whatsappLink = (m?: string) => serverWhatsappLink(site.contact.whatsapp, m);
   return (
     <>
@@ -37,7 +42,7 @@ export default async function ContactPage() {
             {/* ---------- Channels ---------- */}
             <Reveal className="lg:col-span-4">
               <div className="rounded-3xl bg-paper-warm/50 p-6 md:p-8 shadow-xs">
-                <h2 className="eyebrow text-stone">Direct channels</h2>
+                <h2 className="eyebrow text-stone">{tr("direct_channels", "Direct channels")}</h2>
 
                 <ul className="mt-6 flex flex-col gap-3">
                   <li className="rounded-2xl bg-paper p-4 shadow-2xs">
@@ -114,7 +119,7 @@ export default async function ContactPage() {
             {/* ---------- Form ---------- */}
             <Reveal delay={100} className="lg:col-span-8">
               <div className="rounded-3xl bg-paper-warm/50 p-6 shadow-sm md:p-10">
-                <h2 className="headline text-[1.75rem]">Send us a message</h2>
+                <h2 className="headline text-[1.75rem]">{tr("send_us_message", "Send us a message")}</h2>
                 <p className="mt-3 text-[0.9375rem] text-stone">
                   For a specific trip, use the{" "}
                   <strong className="font-semibold text-ink">Book Now</strong>{" "}
@@ -134,7 +139,7 @@ export default async function ContactPage() {
         <div className="shell">
           <div className="grid gap-8 lg:grid-cols-12 lg:gap-16">
             <div className="lg:col-span-4">
-              <p className="eyebrow text-reef">Find us</p>
+              <p className="eyebrow text-reef">{tr("find_us", "Find us")}</p>
               <h2 className="headline mt-4">Sharm El Sheikh</h2>
               <p className="lede mt-5">
                 We cover every hotel zone in Sharm — Naama Bay, Nabq, Sharks

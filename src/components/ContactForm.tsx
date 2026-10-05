@@ -8,7 +8,7 @@ type Status = "idle" | "submitting" | "success" | "error";
 
 /** General enquiry form. Shares the /api/inquiry endpoint with the booking flow. */
 export function ContactForm() {
-  const { whatsappLink } = useSite();
+  const { whatsappLink, t } = useSite();
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
 
@@ -43,7 +43,7 @@ export function ContactForm() {
           </svg>
         </span>
         <div>
-          <h3 className="headline text-[1.5rem]">Message sent</h3>
+          <h3 className="headline text-[1.5rem]">{t("form_message_sent", "Message sent")}</h3>
           <p className="lede mt-2 text-[0.9375rem]">
             Thanks for getting in touch — we&apos;ll reply shortly.
           </p>
@@ -73,7 +73,7 @@ export function ContactForm() {
             name="name"
             required
             autoComplete="name"
-            placeholder="Your full name"
+            placeholder={t("form_full_name_ph", "Your full name")}
             className="field"
           />
         </div>
@@ -87,7 +87,7 @@ export function ContactForm() {
             type="email"
             required
             autoComplete="email"
-            placeholder="you@example.com"
+            placeholder={t("form_email_ph", "you@example.com")}
             className="field"
           />
         </div>
@@ -103,7 +103,7 @@ export function ContactForm() {
           required
           inputMode="tel"
           autoComplete="tel"
-          placeholder="Include your country code"
+          placeholder={t("form_phone_ph", "Include your country code")}
           className="field"
         />
       </div>
@@ -117,7 +117,7 @@ export function ContactForm() {
           name="notes"
           rows={6}
           required
-          placeholder="What would you like to know?"
+          placeholder={t("form_message_ph", "What would you like to know?")}
           className="field"
         />
       </div>

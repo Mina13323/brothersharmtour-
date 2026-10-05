@@ -48,6 +48,9 @@ export type TourBodyTour = Tour & {
   status?: string;
 };
 
+/** A package nobody has touched yet: zero of every participant category. */
+const EMPTY_GUESTS = { adults: 0, children: 0, infants: 0 } as const;
+
 export function TourBody({
   tour,
   related,
@@ -69,21 +72,32 @@ export function TourBody({
       .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
   }, [tour.tripPackages]);
 
-  const [selectedPkgId, setSelectedPkgId] = useState<string>(() => {
-    const list = (tour.tripPackages ?? [])
-      .filter((p) => p.active !== false)
-      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-    return list[0]?.id ?? "";
-  });
+  /**
+   * Package selection is ENTIRELY user-driven. The page loads with nothing
+   * selected ("" ), no package carries the selected visual state, the booking
+   * summary shows its neutral "select your package" prompt and the total is
+   * zero. Nothing here may fabricate a default just to look populated.
+   */
+  const [selectedPkgId, setSelectedPkgId] = useState<string>("");
 
+  /** Quantities the visitor has actually entered, per package. */
   const [packageGuests, setPackageGuests] = useState<
     Record<string, { adults: number; children: number; infants: number }>
   >({});
 
-  const getPackageGuests = (pkgId: string) => {
-    if (packageGuests[pkgId]) return packageGuests[pkgId];
-    if (pkgId === selectedPkgId) return { adults: 2, children: 0, infants: 0 };
-    return { adults: 0, children: 0, infants: 0 };
+  const getPackageGuests = (pkgId: string) =>
+    packageGuests[pkgId] ?? EMPTY_GUESTS;
+
+  /**
+   * Explicit selection. Choosing an option for the first time starts it at a
+   * single adult — a consequence of the visitor's click, not a pre-filled
+   * default — and a previously adjusted option keeps the numbers they set.
+   */
+  const handleSelectPackage = (pkgId: string) => {
+    setSelectedPkgId(pkgId);
+    setPackageGuests((prev) =>
+      prev[pkgId] ? prev : { ...prev, [pkgId]: { adults: 1, children: 0, infants: 0 } },
+    );
   };
 
   const handleUpdateGuest = (
@@ -91,40 +105,32 @@ export function TourBody({
     type: "adults" | "children" | "infants",
     delta: number
   ) => {
+    // Adjusting a quantity is itself an explicit choice of that option.
     setSelectedPkgId(pkgId);
     setPackageGuests((prev) => {
-      const current =
-        prev[pkgId] ??
-        (pkgId === selectedPkgId
-          ? { adults: 2, children: 0, infants: 0 }
-          : { adults: 0, children: 0, infants: 0 });
-      const min = 0;
-      const nextVal = Math.max(min, current[type] + delta);
-      return {
-        ...prev,
-        [pkgId]: {
-          ...current,
-          [type]: nextVal,
-        },
-      };
+      const current = prev[pkgId] ?? EMPTY_GUESTS;
+      const nextVal = Math.max(0, current[type] + delta);
+      return { ...prev, [pkgId]: { ...current, [type]: nextVal } };
     });
   };
 
-  const selectedPkg = useMemo(() => {
-    if (!activeTripPackages.length) return null;
-    return (
-      activeTripPackages.find((p) => p.id === selectedPkgId) ??
-      activeTripPackages[0]
-    );
-  }, [activeTripPackages, selectedPkgId]);
+  /** Null until the visitor picks something — never falls back to the first. */
+  const selectedPkg = useMemo(
+    () => activeTripPackages.find((p) => p.id === selectedPkgId) ?? null,
+    [activeTripPackages, selectedPkgId],
+  );
 
   const curSelectedGuests = selectedPkg
     ? getPackageGuests(selectedPkg.id)
-    : { adults: 2, children: 0, infants: 0 };
-  const effectiveSelectedAdults =
-    curSelectedGuests.adults > 0 ? curSelectedGuests.adults : 1;
+    : EMPTY_GUESTS;
+  // Real counts only — no "at least one adult" floor inflating the summary.
+  const effectiveSelectedAdults = curSelectedGuests.adults;
   const effectiveSelectedChildren = curSelectedGuests.children;
   const effectiveSelectedInfants = curSelectedGuests.infants;
+  /** True once a package is chosen AND at least one participant is counted. */
+  const hasSelection =
+    !!selectedPkg &&
+    effectiveSelectedAdults + effectiveSelectedChildren + effectiveSelectedInfants > 0;
 
   const selectedPkgAdultPrice = selectedPkg?.adultPrice ?? 0;
   const selectedPkgChildPrice = selectedPkg?.childPrice ?? 0;
@@ -184,7 +190,7 @@ export function TourBody({
     infantsCount?: number
   ) => {
     const g = getPackageGuests(pkgId);
-    const a = adultsCount !== undefined ? adultsCount : g.adults > 0 ? g.adults : 2;
+    const a = adultsCount !== undefined ? adultsCount : Math.max(1, g.adults);
     const c = childrenCount !== undefined ? childrenCount : g.children;
     const inf = infantsCount !== undefined ? infantsCount : g.infants;
     open(tour.slug, {
@@ -573,6 +579,27 @@ export function TourBody({
                 </div>
               </Reveal>
 
+              {/* ─── Important information ───
+                  Deliberately placed BEFORE the package selector: visitors
+                  should read the conditions that apply to the trip before
+                  they choose an option and commit to numbers. */}
+              {tour.importantInfo.length ? (
+                <Reveal className="mt-14">
+                  <h2 className="eyebrow text-reef">{t("section_important", "Important information")}</h2>
+                  <ul className="mt-5 flex flex-col gap-3">
+                    {tour.importantInfo.map((item) => (
+                      <li
+                        key={item}
+                        className="flex gap-3 text-[0.9375rem] leading-relaxed text-stone"
+                      >
+                        <span className="mt-[0.45rem] size-1.5 shrink-0 rounded-pill bg-stone-soft" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </Reveal>
+              ) : null}
+
               {/* ─── Trip Packages / Tour Options ─── */}
               {activeTripPackages.length > 0 ? (
                 <Reveal className="mt-14">
@@ -587,11 +614,17 @@ export function TourBody({
                     </div>
                     <span className="text-xs text-stone font-medium">
                       {activeTripPackages.length}{" "}
-                      {activeTripPackages.length === 1 ? "option available" : "options available"}
+                      {activeTripPackages.length === 1
+                        ? t("option_available", "option available")
+                        : t("options_available", "options available")}
                     </span>
                   </div>
 
-                  <div className="mt-6 space-y-4">
+                  <div
+                    className="mt-6 space-y-4"
+                    role="radiogroup"
+                    aria-label={t("select_your_package", "Select your package")}
+                  >
                     {activeTripPackages.map((pkg, idx) => {
                       const isSelected = selectedPkg?.id === pkg.id;
                       const g = getPackageGuests(pkg.id);
@@ -622,7 +655,16 @@ export function TourBody({
                       return (
                         <div
                           key={pkg.id || idx}
-                          onClick={() => setSelectedPkgId(pkg.id)}
+                          role="radio"
+                          aria-checked={isSelected}
+                          tabIndex={0}
+                          onClick={() => handleSelectPackage(pkg.id)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              handleSelectPackage(pkg.id);
+                            }
+                          }}
                           className={cn(
                             "cursor-pointer rounded-2xl border p-5 md:p-6 transition-all duration-200",
                             isSelected
@@ -703,7 +745,7 @@ export function TourBody({
                                     handleUpdateGuest(pkg.id, "adults", -1);
                                   }}
                                   className="size-7 rounded-full bg-paper-warm hover:bg-sand/70 grid place-items-center text-ink text-sm font-bold transition-colors cursor-pointer"
-                                  aria-label="Decrease adults"
+                                  aria-label={`− ${t("guests_adults", "Adults")}`}
                                 >
                                   −
                                 </button>
@@ -715,7 +757,7 @@ export function TourBody({
                                     handleUpdateGuest(pkg.id, "adults", 1);
                                   }}
                                   className="size-7 rounded-full bg-paper-warm hover:bg-sand/70 grid place-items-center text-ink text-sm font-bold transition-colors cursor-pointer"
-                                  aria-label="Increase adults"
+                                  aria-label={`+ ${t("guests_adults", "Adults")}`}
                                 >
                                   +
                                 </button>
@@ -731,7 +773,7 @@ export function TourBody({
                                     handleUpdateGuest(pkg.id, "children", -1);
                                   }}
                                   className="size-7 rounded-full bg-paper-warm hover:bg-sand/70 grid place-items-center text-ink text-sm font-bold transition-colors cursor-pointer"
-                                  aria-label="Decrease children"
+                                  aria-label={`− ${t("guests_children", "Children")}`}
                                 >
                                   −
                                 </button>
@@ -743,7 +785,7 @@ export function TourBody({
                                     handleUpdateGuest(pkg.id, "children", 1);
                                   }}
                                   className="size-7 rounded-full bg-paper-warm hover:bg-sand/70 grid place-items-center text-ink text-sm font-bold transition-colors cursor-pointer"
-                                  aria-label="Increase children"
+                                  aria-label={`+ ${t("guests_children", "Children")}`}
                                 >
                                   +
                                 </button>
@@ -759,7 +801,7 @@ export function TourBody({
                                     handleUpdateGuest(pkg.id, "infants", -1);
                                   }}
                                   className="size-7 rounded-full bg-paper-warm hover:bg-sand/70 grid place-items-center text-ink text-sm font-bold transition-colors cursor-pointer"
-                                  aria-label="Decrease infants"
+                                  aria-label={`− ${t("guests_infants", "Infants")}`}
                                 >
                                   −
                                 </button>
@@ -771,7 +813,7 @@ export function TourBody({
                                     handleUpdateGuest(pkg.id, "infants", 1);
                                   }}
                                   className="size-7 rounded-full bg-paper-warm hover:bg-sand/70 grid place-items-center text-ink text-sm font-bold transition-colors cursor-pointer"
-                                  aria-label="Increase infants"
+                                  aria-label={`+ ${t("guests_infants", "Infants")}`}
                                 >
                                   +
                                 </button>
@@ -1038,24 +1080,6 @@ export function TourBody({
                 </Reveal>
               ) : null}
 
-              {/* Important information */}
-              {tour.importantInfo.length ? (
-                <Reveal className="mt-14">
-                  <h2 className="eyebrow text-reef">{t("section_important", "Important information")}</h2>
-                  <ul className="mt-5 flex flex-col gap-3">
-                    {tour.importantInfo.map((item) => (
-                      <li
-                        key={item}
-                        className="flex gap-3 text-[0.9375rem] leading-relaxed text-stone"
-                      >
-                        <span className="mt-[0.45rem] size-1.5 shrink-0 rounded-pill bg-stone-soft" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </Reveal>
-              ) : null}
-
               {/* Guest reviews — real, approved ones only */}
               {reviews.length ? (
                 <Reveal className="mt-14">
@@ -1067,7 +1091,7 @@ export function TourBody({
                       href={`/review?tour=${tour.slug}`}
                       className="text-[0.85rem] font-semibold text-reef underline-offset-4 hover:underline"
                     >
-                      Write a review →
+                      {t("action_write_review", "Write a review")} →
                     </Link>
                   </div>
                   <ul className="mt-6 flex flex-col gap-4">
@@ -1082,7 +1106,7 @@ export function TourBody({
                             <span className="text-sun" aria-hidden>
                               {"★".repeat(r.rating)}
                             </span>
-                            {r.verified ? "· verified booking" : ""}
+                            {r.verified ? `· ${t("verified_booking", "verified booking")}` : ""}
                             <time dateTime={r.date}>
                               ·{" "}
                               {new Date(r.date).toLocaleDateString("en-GB", {
@@ -1143,7 +1167,7 @@ export function TourBody({
                           {selectedPkg && selectedPkgTier?.label ? ` · ${selectedPkgTier.label}` : ""}
                         </p>
                       ) : (
-                        <p className="mt-1 text-[0.75rem] text-stone">quoted for your group</p>
+                        <p className="mt-1 text-[0.75rem] text-stone">{t("quoted_for_group", "quoted for your group")}</p>
                       )}
                       {(selectedPkg ? selectedPkg.childPrice !== null && selectedPkg.childPrice !== undefined : childPriceFormatted) ? (
                         <div className="mt-3 pt-2 border-t border-sand/60">
@@ -1169,15 +1193,40 @@ export function TourBody({
                           </p>
                         </div>
                       ) : null}
-                      {selectedPkg && (curSelectedGuests.adults > 0 || curSelectedGuests.children > 0) ? (
+                      {hasSelection ? (
                         <div className="mt-3 pt-2 border-t border-sand/60">
                           <p className="eyebrow text-stone text-[0.65rem]">{t("estimated_total", "Estimated Total")}</p>
                           <p className="mt-0.5 font-display text-[1.5rem] font-bold text-ink">
                             {fmt(selectedPkgTotal)}
                           </p>
                           <p className="text-[0.7rem] text-stone">
-                            {effectiveSelectedAdults} adult{effectiveSelectedAdults > 1 ? "s" : ""}
-                            {effectiveSelectedChildren > 0 ? `, ${effectiveSelectedChildren} child` : ""} · {t("pay_on_day", "pay on the day")}
+                            {[
+                              effectiveSelectedAdults > 0
+                                ? `${effectiveSelectedAdults} ${effectiveSelectedAdults === 1 ? t("guests_adult_one", "adult") : t("guests_adults", "adults").toLowerCase()}`
+                                : null,
+                              effectiveSelectedChildren > 0
+                                ? `${effectiveSelectedChildren} ${effectiveSelectedChildren === 1 ? t("guests_child_one", "child") : t("guests_children", "children").toLowerCase()}`
+                                : null,
+                              effectiveSelectedInfants > 0
+                                ? `${effectiveSelectedInfants} ${effectiveSelectedInfants === 1 ? t("guests_infant_one", "infant") : t("guests_infants", "infants").toLowerCase()}`
+                                : null,
+                            ]
+                              .filter(Boolean)
+                              .join(", ")} · {t("pay_on_day", "pay on the day")}
+                          </p>
+                        </div>
+                      ) : activeTripPackages.length > 0 ? (
+                        /* Neutral zero-state — nothing is selected yet, so the
+                         * summary says so instead of implying a chosen option. */
+                        <div className="mt-3 pt-2 border-t border-sand/60">
+                          <p className="eyebrow text-stone text-[0.65rem]">
+                            {t("booking_summary", "Your selection")}
+                          </p>
+                          <p className="mt-0.5 text-[0.8125rem] text-stone">
+                            {t("select_your_package", "Select your package")}
+                          </p>
+                          <p className="mt-1 font-display text-[1.5rem] font-bold text-ink">
+                            {fmt(0)}
                           </p>
                         </div>
                       ) : null}
@@ -1190,15 +1239,15 @@ export function TourBody({
                   <ul className="flex flex-col gap-3 py-5 text-[0.875rem]">
                     <li className="flex items-center gap-3">
                       <Check />
-                      Free cancellation before your date
+                      {t("perk_free_cancellation", "Free cancellation before your date")}
                     </li>
                     <li className="flex items-center gap-3">
                       <Check />
-                      No payment until we confirm
+                      {t("perk_no_payment_until_confirmed", "No payment until we confirm")}
                     </li>
                     <li className="flex items-center gap-3">
                       <Check />
-                      Hotel pickup arranged for you
+                      {t("perk_hotel_pickup", "Hotel pickup arranged for you")}
                     </li>
                   </ul>
 
@@ -1230,7 +1279,7 @@ export function TourBody({
                       className="btn btn-whatsapp w-full"
                     >
                       <WhatsAppIcon />
-                      Ask on WhatsApp
+                      {t("action_chat_whatsapp", "Chat on WhatsApp")}
                     </a>
                   </div>
 
@@ -1246,9 +1295,10 @@ export function TourBody({
 
                 {!tour.verified ? (
                   <p className="mt-4 rounded-2xl border border-sun/30 bg-sun/[0.08] p-4 text-[0.75rem] leading-relaxed text-stone">
-                    Pricing and timings shown are indicative placeholders pending
-                    confirmation from Brother Sharm Tour operations. We always confirm the
-                    final price in writing before you book.
+                    {t(
+                      "unverified_pricing_note",
+                      "Pricing and timings shown are indicative pending confirmation from our operations team. We always confirm the final price in writing before you book.",
+                    )}
                   </p>
                 ) : null}
               </div>
@@ -1262,8 +1312,8 @@ export function TourBody({
         <section id="gallery" className="band-tight scroll-mt-24 bg-paper-warm">
           <div className="shell">
             <SectionHeading
-              eyebrow={`Gallery · ${tour.images.length} photos`}
-              title="On the day"
+              eyebrow={`${t("nav_gallery", "Gallery")} · ${tour.images.length} ${t("gallery_photos", "photos")}`}
+              title={t("gallery_on_the_day", "On the day")}
             />
             <Reveal className="mt-10 grid gap-8 lg:grid-cols-[1.6fr_1fr] lg:items-start">
               <GalleryCarousel images={tour.images} />
@@ -1280,11 +1330,11 @@ export function TourBody({
             <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
               <div className="lg:col-span-4">
                 <Reveal>
-                  <p className="eyebrow text-reef">FAQ</p>
-                  <h2 className="headline mt-4">Before you book</h2>
-                  <p className="lede mt-5">Anything else, message us — we answer quickly.</p>
+                  <p className="eyebrow text-reef">{t("section_faq", "FAQ")}</p>
+                  <h2 className="headline mt-4">{t("faq_before_you_book", "Before you book")}</h2>
+                  <p className="lede mt-5">{t("faq_anything_else", "Anything else, message us — we answer quickly.")}</p>
                   <Link href="/faq" className="link-rule mt-7 inline-flex">
-                    All questions
+                    {t("faq_all_questions", "All questions")}
                   </Link>
                 </Reveal>
               </div>

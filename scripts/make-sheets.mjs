@@ -1,8 +1,13 @@
-import { readdirSync, mkdirSync } from "node:fs";
+import { readdirSync, mkdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import sharp from "sharp";
+import { resolveAssetSrc, ASSET_SRC_HINT } from "./asset-src.mjs";
 
-const ROOT = "/home/user/drive-assets";
+const ROOT = resolveAssetSrc();
+if (!existsSync(ROOT)) {
+  console.error(`make-sheets: no asset library at ${ROOT}\n${ASSET_SRC_HINT}`);
+  process.exit(1);
+}
 const OUT = "/tmp/sheets";
 mkdirSync(OUT, { recursive: true });
 

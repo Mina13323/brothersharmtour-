@@ -461,7 +461,7 @@ export function BookingWidget({
       >
         <Calendar value={date} onChange={setDate} />
         {touched && !dateValid ? (
-          <Warn>Please select a date on the calendar.</Warn>
+          <Warn>{t("validation_select_date", "Please select a date on the calendar.")}</Warn>
         ) : null}
       </Field>
 
@@ -609,7 +609,7 @@ export function BookingWidget({
               className="field"
             />
             {touched && !nameValid && (
-              <Warn>Please enter your name.</Warn>
+              <Warn>{t("validation_name", "Please enter your name.")}</Warn>
             )}
           </div>
 
@@ -630,7 +630,7 @@ export function BookingWidget({
               We send your driver pickup time to this WhatsApp number.
             </span>
             {touched && !phoneValid && (
-              <Warn>Please enter a valid phone or WhatsApp number.</Warn>
+              <Warn>{t("validation_phone", "Please enter a valid phone or WhatsApp number.")}</Warn>
             )}
           </div>
 
@@ -649,7 +649,7 @@ export function BookingWidget({
                 className="field"
               />
               {touched && !hotelValid && (
-                <Warn>Please enter your hotel name so we can arrange pickup.</Warn>
+                <Warn>{t("validation_hotel", "Please enter your hotel name so we can arrange pickup.")}</Warn>
               )}
             </div>
 
@@ -893,6 +893,7 @@ function Calendar({
   value: string | null;
   onChange: (iso: string) => void;
 }) {
+  const { t } = useSite();
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const [view, setView] = useState(
@@ -936,7 +937,7 @@ function Calendar({
             type="button"
             onClick={prev}
             disabled={!canGoBack}
-            aria-label="Previous month"
+            aria-label={t("aria_prev_month", "Previous month")}
             className="grid size-8 place-items-center rounded-full border border-sand text-stone hover:bg-paper-warm disabled:cursor-not-allowed disabled:opacity-40"
           >
             ←
@@ -945,7 +946,7 @@ function Calendar({
             type="button"
             onClick={next}
             disabled={!canGoForward}
-            aria-label="Next month"
+            aria-label={t("aria_next_month", "Next month")}
             className="grid size-8 place-items-center rounded-full border border-sand text-stone hover:bg-paper-warm disabled:cursor-not-allowed disabled:opacity-40"
           >
             →

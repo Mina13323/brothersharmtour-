@@ -12,10 +12,12 @@
 import { copyFileSync, existsSync, mkdirSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import sharp from "sharp";
+import { resolveAssetSrc, ASSET_SRC_HINT } from "./asset-src.mjs";
 
 const SRC = new URL("../media-src/", import.meta.url).pathname;
-const ASSET_SRC = "/home/user/drive-assets"; // only present in the build sandbox
 const OUT = new URL("../public/media/", import.meta.url).pathname;
+
+const ASSET_SRC = resolveAssetSrc();
 
 /** Aspect presets used across the design system. */
 const SIZES = {
@@ -215,6 +217,12 @@ const VIDEOS = [
   ["films/extra-2.mp4", "films-4", null],
 ];
 let videos = 0;
+if (!existsSync(ASSET_SRC)) {
+  console.warn(
+    `media: asset library not found at ${ASSET_SRC} — skipping video copy.\n` +
+      `       ${ASSET_SRC_HINT}`,
+  );
+}
 for (const [dest, srcName] of VIDEOS) {
   const src = join(ASSET_SRC, "videos", `${srcName}.mp4`);
   if (!existsSync(src)) {

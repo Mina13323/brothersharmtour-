@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import type { MediaImage } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { useSite } from "./SiteProvider";
 
 /**
  * Full-width photo carousel with a "1 / N" counter — the interaction pattern
@@ -12,6 +13,7 @@ import { cn } from "@/lib/utils";
  * tour only has one photo.
  */
 export function GalleryCarousel({ images }: { images: MediaImage[] }) {
+  const { t } = useSite();
   const [index, setIndex] = useState(0);
   const [zoom, setZoom] = useState(false);
   const count = images.length;
@@ -109,14 +111,14 @@ export function GalleryCarousel({ images }: { images: MediaImage[] }) {
           onClick={() => setZoom(false)}
           role="dialog"
           aria-modal
-          aria-label="Photo viewer"
+          aria-label={t("aria_photo_viewer", "Photo viewer")}
         >
           <span className="absolute left-4 top-4 rounded-pill bg-white/10 px-3 py-1 text-[0.8rem] font-medium tabular-nums text-white">
             {index + 1} / {count}
           </span>
           <button
             onClick={() => setZoom(false)}
-            aria-label="Close"
+            aria-label={t("action_close", "Close")}
             className="absolute right-4 top-4 grid size-11 place-items-center rounded-full border border-white/25 text-white transition-colors hover:bg-white/10"
           >
             <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden>

@@ -1,8 +1,13 @@
-import { readdirSync } from "node:fs";
+import { readdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import sharp from "sharp";
+import { resolveAssetSrc, ASSET_SRC_HINT } from "./asset-src.mjs";
 
-const ROOT = "/home/user/drive-assets";
+const ROOT = resolveAssetSrc();
+if (!existsSync(ROOT)) {
+  console.error(`inspect-assets: no asset library at ${ROOT}\n${ASSET_SRC_HINT}`);
+  process.exit(1);
+}
 const folders = readdirSync(ROOT, { withFileTypes: true }).filter(d => d.isDirectory()).map(d => d.name).sort();
 
 for (const folder of folders) {

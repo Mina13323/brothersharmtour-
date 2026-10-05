@@ -25,7 +25,7 @@ export function CurrencySwitcher({
   tone?: "ink" | "light";
   className?: string;
 }) {
-  const { currency } = useSite();
+  const { currency, t } = useSite();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -65,7 +65,7 @@ export function CurrencySwitcher({
         onClick={() => setOpen((o) => !o)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        aria-label="Change currency"
+        aria-label={t("aria_change_currency", "Change currency")}
         disabled={busy}
         className={cn(
           "flex items-center gap-1 sm:gap-1.5 rounded-full px-2 sm:px-3 py-1 sm:py-1.5 text-[0.75rem] sm:text-[0.8rem] font-semibold transition-colors cursor-pointer",

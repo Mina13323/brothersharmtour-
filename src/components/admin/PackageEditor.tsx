@@ -14,6 +14,7 @@ import type { PackageRecord, TourRecord, Settings } from "@/lib/store/types";
 import { destinationName, experienceName } from "@/lib/store/labels";
 import { MediaGalleryEditor, SingleImageUploader } from "./MediaGalleryEditor";
 import { AgePricingFields, MoneyHint, TieredPricingEditor } from "./PricingControls";
+import { input, Section, Field, ListEditor, AppearsOn } from "./fields";
 
 const DESTINATIONS = ["sharm-el-sheikh", "cairo"];
 const CATEGORIES = [
@@ -65,6 +66,22 @@ export default function PackageEditor({
 
   const set = <K extends keyof PackageRecord>(key: K, value: PackageRecord[K]) =>
     setPkg((p) => ({ ...p, [key]: value }));
+
+  /** Mirrors the tour editor: which translatable fields are filled per language. */
+  const translationStatus = (code: string) => {
+    const tr = pkg.translations?.[code];
+    const checks: { label: string; done: boolean }[] = [
+      { label: "Package name", done: !!tr?.title?.trim() },
+      { label: "Short description", done: !!tr?.tagline?.trim() },
+      { label: "Full description", done: !!tr?.description?.length },
+      { label: "Included", done: !pkg.included.length || !!tr?.included?.length },
+      { label: "Not included", done: !pkg.excluded.length || !!tr?.excluded?.length },
+      { label: "What to bring", done: !(pkg.bring ?? []).length || !!tr?.bring?.length },
+      { label: "Day by day", done: !pkg.days.length || !!tr?.days?.length },
+    ];
+    const done = checks.filter((c) => c.done).length;
+    return { checks, done, total: checks.length, missing: checks.filter((c) => !c.done) };
+  };
 
   const setTr = (langCode: string, patch: Partial<PackageRecord>) => {
     setPkg((p) => ({
@@ -262,7 +279,11 @@ export default function PackageEditor({
       <div className="grid gap-6 lg:grid-cols-2">
         {/* ── Included Tours in this Package ── */}
         <div className="lg:col-span-2">
-          <Section title="Included Tours & Excursions (Public Tourism Offering Composition)">
+          <Section
+            title="Tours included in this package"
+            description="Pick the existing tours this package is built from. They are listed on the package page and linked so guests can read the detail of each day."
+            appearsOn="Package page → Included tours & excursions"
+          >
             <div className="space-y-3">
               <p className="text-xs text-stone-400 leading-relaxed">
                 A Regular Package is a public product composed of multiple existing Tours. Select the tours included in this package from the database:
@@ -375,20 +396,24 @@ export default function PackageEditor({
           </Section>
         </div>
 
-        <Section title="Identity & Public Discovery">
-          <Field label="Package Title / Name">
+        <Section
+          title="Package basic information"
+          description="The package name, web address and how it is categorised across the site."
+          appearsOn="Package page → heading · Packages listing → card · Search filters"
+        >
+          <Field label="Package name" required translatable description="The public name of this package." appearsOn="Package page → heading · Packages listing → card">
             <input className={input} value={pkg.title} onChange={(e) => set("title", e.target.value)} />
           </Field>
-          <Field label="Short Description / Tagline (used on discovery cards & summary)">
+          <Field label="Short description" required translatable description="One or two sentences summarising the package." appearsOn="Packages listing → card · Google search results">
             <input className={input} value={pkg.tagline} onChange={(e) => set("tagline", e.target.value)} />
           </Field>
-          <Field label="Slug (URL identifier)">
+          <Field label="Web address (slug)" required description="The last part of the package link. Lowercase words separated by hyphens. Generated from the name if left blank." example="sharm-3-day-explorer">
             <input className={input} value={pkg.slug} onChange={(e) => set("slug", e.target.value)} />
           </Field>
 
           {/* Category selection - aligns with public filter architecture */}
           <div className="space-y-3 pt-1">
-            <Field label="Primary Category (badge and primary filter placement)">
+            <Field label="Main category" required description="The badge shown on the card and the package\u2019s primary filter placement." appearsOn="Packages listing → card badge">
               <select
                 className={input}
                 value={pkg.category || "sea-water"}
@@ -405,7 +430,7 @@ export default function PackageEditor({
               </select>
             </Field>
 
-            <Field label="Discoverable in Categories (participates in these public filters)">
+            <Field label="Also show under these categories" optional description="Additional filters this package should appear in." appearsOn="Tours & Packages listing → filters">
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 p-3 rounded-xl bg-black/20 border border-white/5">
                 {CATEGORIES.map((c) => {
                   const isChecked = (pkg.categories || [pkg.category || "sea-water"]).includes(c);
@@ -432,14 +457,14 @@ export default function PackageEditor({
           </div>
 
           <div className="grid grid-cols-2 gap-3 pt-2">
-            <Field label="Destination">
+            <Field label="Destination" required description="Which destination page this package belongs to." appearsOn="Destinations → destination page">
               <select className={input} value={pkg.destination} onChange={(e) => set("destination", e.target.value)}>
                 {DESTINATIONS.map((d) => (
                   <option key={d} value={d}>{destinationName(d)}</option>
                 ))}
               </select>
             </Field>
-            <Field label="Duration (e.g. 1 Full Day or 3 Days)">
+            <Field label="Duration" required translatable description="How long the package runs, written for guests." appearsOn="Package page → facts bar" example="3 Days / 2 Nights">
               <input className={input} value={pkg.duration} onChange={(e) => set("duration", e.target.value)} />
             </Field>
           </div>
@@ -467,7 +492,11 @@ export default function PackageEditor({
           </div>
         </Section>
 
-        <Section title="Pricing">
+        <Section
+          title="Pricing"
+          description="Prices used for every quote shown for this package."
+          appearsOn="Package page → price panel · Packages listing → \u201cfrom\u201d price"
+        >
           <div className="grid grid-cols-1 gap-4 rounded-xl bg-black/20 p-3.5 border border-white/5">
             <Field label="Price currency — the currency declared prices are declared in">
               <select
@@ -570,7 +599,11 @@ export default function PackageEditor({
           </Field>
         </Section>
 
-        <Section title="Media">
+        <Section
+          title="Photos"
+          description="The first image is the main cover used on the package page and card."
+          appearsOn="Package page → hero and gallery · Packages listing → card image"
+        >
           <SingleImageUploader
             image={pkg.coverImage}
             onChange={(img) => set("coverImage", img)}
@@ -587,7 +620,11 @@ export default function PackageEditor({
           </div>
         </Section>
 
-        <Section title="Story">
+        <Section
+          title="Package content"
+          description="The written content of the package page and what the price does and does not cover."
+          appearsOn="Package page → Overview, What\u2019s included / Not included"
+        >
           <ListEditor
             label="Description paragraphs"
             items={pkg.description}
@@ -595,11 +632,15 @@ export default function PackageEditor({
             newItem={() => ""}
             textarea
           />
-          <ListEditor label="Included" items={pkg.included} onChange={(v) => set("included", v)} newItem={() => ""} />
-          <ListEditor label="Not included" items={pkg.excluded} onChange={(v) => set("excluded", v)} newItem={() => ""} />
+          <ListEditor label="What's included in the price" itemLabel="inclusion" optional translatable description="Everything the guest does NOT pay extra for." appearsOn="Package page → What's included" items={pkg.included} onChange={(v) => set("included", v)} newItem={() => ""} />
+          <ListEditor label="What's not included" itemLabel="exclusion" optional translatable description="Costs the guest should expect on top." appearsOn="Package page → Not included" items={pkg.excluded} onChange={(v) => set("excluded", v)} newItem={() => ""} />
         </Section>
 
-        <Section title="Day by day">
+        <Section
+          title="Day by day itinerary"
+          description="What happens on each day of the package."
+          appearsOn="Package page → Day by day"
+        >
           <div className="space-y-3">
             {pkg.days.map((day, i) => (
               <div key={i} className="bg-black/20 border border-white/10 rounded-xl p-3 space-y-2">
@@ -706,45 +747,85 @@ export default function PackageEditor({
           </div>
         </Section>
 
-        <Section title="SEO">
-          <Field label="Search title">
+        <Section
+          title="Search engine listing"
+          description="How this package appears in Google. Leave blank to reuse the package name and short description."
+          appearsOn="Google search results · link previews"
+        >
+          <Field label="Search engine title" optional translatable description="Leave blank to use the package name." appearsOn="Google search results">
             <input className={input} value={pkg.seo?.title ?? ""} onChange={(e) => set("seo", { ...pkg.seo, title: e.target.value || undefined })} />
           </Field>
-          <Field label="Meta description">
+          <Field label="Search engine description" optional translatable description="Leave blank to use the short description." appearsOn="Google search results">
             <textarea rows={2} className={input} value={pkg.seo?.description ?? ""} onChange={(e) => set("seo", { ...pkg.seo, description: e.target.value || undefined })} />
           </Field>
         </Section>
 
         {/* ── Translations ── */}
         <div className="lg:col-span-2">
-          <Section title="Translations">
+          <Section
+            title="Translations"
+            description="English is the original. Anything you leave blank falls back to the English version, so the page always works."
+            appearsOn="Public website, whenever a visitor switches language"
+          >
             <p className="text-[11px] text-stone-500 leading-relaxed">
               Per-language package fields. Empty fields fall back to the base English content.
             </p>
             <div className="flex gap-2 flex-wrap">
-              {enabledLanguages.map((l) => (
-                <button
-                  key={l.code}
-                  type="button"
-                  onClick={() => setLang(l.code)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${
-                    lang === l.code ? "bg-teal-600 text-white" : "bg-white/5 text-stone-400 hover:text-white"
-                  }`}
-                >
-                  {l.label}
-                </button>
-              ))}
+              {enabledLanguages.map((l) => {
+                const st = l.code === "en" ? null : translationStatus(l.code);
+                return (
+                  <button
+                    key={l.code}
+                    onClick={() => setLang(l.code)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 ${
+                      lang === l.code ? "bg-teal-600 text-white" : "bg-white/5 text-stone-400 hover:text-white"
+                    }`}
+                  >
+                    {l.label}
+                    {st ? (
+                      <span
+                        className={`rounded px-1.5 py-0.5 text-[9.5px] font-bold ${
+                          st.done === st.total
+                            ? "bg-emerald-500/15 text-emerald-300"
+                            : st.done === 0
+                              ? "bg-red-500/15 text-red-300"
+                              : "bg-amber-500/15 text-amber-300"
+                        }`}
+                      >
+                        {st.done}/{st.total}
+                      </span>
+                    ) : null}
+                  </button>
+                );
+              })}
             </div>
+            {lang !== "en"
+              ? (() => {
+                  const st = translationStatus(lang);
+                  return st.missing.length ? (
+                    <p className="rounded-xl border border-amber-500/20 bg-amber-500/10 px-3 py-2 text-[11px] leading-relaxed text-amber-200">
+                      <strong>Still to translate:</strong>{" "}
+                      {st.missing.map((m) => m.label).join(", ")}. Visitors using this
+                      language will see the English text for those parts.
+                    </p>
+                  ) : (
+                    <p className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-[11px] text-emerald-300">
+                      This language is fully translated.
+                    </p>
+                  );
+                })()
+              : null}
+
             {lang !== "en" ? (
               <div className="space-y-3 pt-2 border-t border-white/10">
-                <Field label={`Title (${lang.toUpperCase()})`}>
+                <Field label="Package name" description="Leave blank to show the English name." appearsOn="Package page → heading · Packages listing → card">
                   <input
                     className={input}
                     value={pkg.translations?.[lang]?.title ?? ""}
                     onChange={(e) => setTr(lang, { title: e.target.value })}
                   />
                 </Field>
-                <Field label={`Tagline (${lang.toUpperCase()})`}>
+                <Field label="Short description" description="Leave blank to show the English short description." appearsOn="Packages listing → card">
                   <input
                     className={input}
                     value={pkg.translations?.[lang]?.tagline ?? ""}
@@ -752,24 +833,85 @@ export default function PackageEditor({
                   />
                 </Field>
                 <ListEditor
-                  label={`Description paragraphs (${lang.toUpperCase()})`}
+                  label="Full description"
+                  itemLabel="paragraph"
+                  description="Leave empty to show the English text."
+                  appearsOn="Package page → Overview"
                   items={pkg.translations?.[lang]?.description ?? []}
                   onChange={(v) => setTr(lang, { description: v })}
                   newItem={() => ""}
                   textarea
                 />
                 <ListEditor
-                  label={`Included (${lang.toUpperCase()})`}
+                  label="What's included in the price"
+                  itemLabel="inclusion"
+                  appearsOn="Package page → What's included"
                   items={pkg.translations?.[lang]?.included ?? []}
                   onChange={(v) => setTr(lang, { included: v })}
                   newItem={() => ""}
                 />
                 <ListEditor
-                  label={`Not included (${lang.toUpperCase()})`}
+                  label="What's not included"
+                  itemLabel="exclusion"
+                  appearsOn="Package page → Not included"
                   items={pkg.translations?.[lang]?.excluded ?? []}
                   onChange={(v) => setTr(lang, { excluded: v })}
                   newItem={() => ""}
                 />
+                <ListEditor
+                  label="What to bring"
+                  itemLabel="item"
+                  appearsOn="Package page → What to bring"
+                  items={pkg.translations?.[lang]?.bring ?? []}
+                  onChange={(v) => setTr(lang, { bring: v })}
+                  newItem={() => ""}
+                />
+
+                {pkg.days.length > 0 ? (
+                  <div className="pt-3 border-t border-white/10 space-y-3">
+                    <p className="text-xs font-semibold text-teal-400">
+                      Day by day ({lang.toUpperCase()})
+                    </p>
+                    <AppearsOn where="Package page → Day by day" />
+                    {pkg.days.map((day, i) => {
+                      const trDays = pkg.translations?.[lang]?.days ?? [];
+                      const cur = trDays[i];
+                      const writeDay = (patch: { title?: string; description?: string }) => {
+                        const next = pkg.days.map((base, j) => ({
+                          day: base.day,
+                          title: trDays[j]?.title ?? "",
+                          description: trDays[j]?.description ?? "",
+                          ...(j === i ? patch : {}),
+                        }));
+                        setTr(lang, { days: next });
+                      };
+                      return (
+                        <div key={i} className="bg-black/20 border border-white/10 rounded-xl p-3 space-y-2">
+                          <p className="text-[11px] text-stone-400">
+                            English — Day {day.day}: {day.title}
+                          </p>
+                          <Field label="Day title">
+                            <input
+                              className={input}
+                              placeholder={day.title}
+                              value={cur?.title ?? ""}
+                              onChange={(e) => writeDay({ title: e.target.value })}
+                            />
+                          </Field>
+                          <Field label="Day description">
+                            <textarea
+                              rows={2}
+                              className={input}
+                              placeholder={day.description}
+                              value={cur?.description ?? ""}
+                              onChange={(e) => writeDay({ description: e.target.value })}
+                            />
+                          </Field>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : null}
               </div>
             ) : (
               <p className="text-xs text-stone-400 italic">
@@ -783,87 +925,6 @@ export default function PackageEditor({
   );
 }
 
-const input =
-  "w-full bg-black/30 border border-white/10 rounded-xl px-3 py-2 text-sm text-white placeholder:text-stone-600 focus:outline-none focus:border-teal-500/60";
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <section className="bg-[#101c1f] border border-white/10 rounded-2xl p-5 space-y-4">
-      <h2 className="text-xs font-bold uppercase tracking-wider text-teal-400">{title}</h2>
-      {children}
-    </section>
-  );
-}
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <label className="block">
-      <span className="block text-[11px] font-semibold text-stone-400 mb-1.5">{label}</span>
-      {children}
-    </label>
-  );
-}
 
-function ListEditor({
-  label,
-  items,
-  onChange,
-  newItem,
-  textarea,
-  mono,
-}: {
-  label: string;
-  items: string[];
-  onChange: (items: string[]) => void;
-  newItem: () => string;
-  textarea?: boolean;
-  mono?: boolean;
-}) {
-  return (
-    <div>
-      <span className="block text-[11px] font-semibold text-stone-400 mb-1.5">{label}</span>
-      <div className="space-y-2">
-        {items.map((item, i) => (
-          <div key={i} className="flex items-start gap-2">
-            {textarea ? (
-              <textarea
-                rows={2}
-                className={`${input} ${mono ? "font-mono text-[11px]" : ""}`}
-                value={item}
-                onChange={(e) => {
-                  const next = [...items];
-                  next[i] = e.target.value;
-                  onChange(next);
-                }}
-              />
-            ) : (
-              <input
-                className={`${input} ${mono ? "font-mono text-[11px]" : ""}`}
-                value={item}
-                onChange={(e) => {
-                  const next = [...items];
-                  next[i] = e.target.value;
-                  onChange(next);
-                }}
-              />
-            )}
-            <button
-              type="button"
-              onClick={() => onChange(items.filter((_, j) => j !== i))}
-              className="p-2 text-stone-500 hover:text-red-400"
-            >
-              <Trash2 className="size-4" />
-            </button>
-          </div>
-        ))}
-        <button
-          type="button"
-          onClick={() => onChange([...items, newItem()])}
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-teal-400 hover:text-teal-300"
-        >
-          <Plus className="size-3.5" /> Add
-        </button>
-      </div>
-    </div>
-  );
-}

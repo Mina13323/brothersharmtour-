@@ -12,12 +12,14 @@ next-env.d.ts
 tsconfig.tsbuildinfo
 .kilo
 
-# CMS runtime data
-content/secret.key
-content/uploads
+# ─── CMS runtime data — never commit ────────────────────────────────────
+# content/ is the writable runtime store. It is mutated on every admin edit
+# and it accumulates guest personal data (inquiry names, emails, phone
+# numbers, review authors), so the whole directory stays out of git.
+#
+# A fresh clone/deploy initialises itself from the tracked editorial snapshot
+# in seed/db.seed.json (refresh it with `npm run seed:snapshot`), falling back
+# to the compiled content layer in src/data.
+content/
 google_drive
-
-# Allow committed seed db.json
-content/*
-!content/db.json
 

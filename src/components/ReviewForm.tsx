@@ -8,6 +8,7 @@
 
 import { useRef, useState } from "react";
 import { Star, ImagePlus, X } from "lucide-react";
+import { useSite } from "./SiteProvider";
 
 interface TourOption {
   slug: string;
@@ -21,6 +22,7 @@ export function ReviewForm({
   tours: TourOption[];
   preselectedTour: string;
 }) {
+  const { t } = useSite();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [country, setCountry] = useState("");
@@ -89,7 +91,7 @@ export function ReviewForm({
         <div className="mx-auto grid size-14 place-items-center rounded-full bg-reef/10 text-reef mb-4">
           <Star className="size-6" />
         </div>
-        <h2 className="font-display text-2xl text-ink">Thank you</h2>
+        <h2 className="font-display text-2xl text-ink">{t("review_thanks", "Thank you")}</h2>
         <p className="mt-3 text-stone leading-relaxed max-w-md mx-auto">{result.message}</p>
       </div>
     );
@@ -99,15 +101,15 @@ export function ReviewForm({
     <form onSubmit={submit} className="space-y-6">
       {/* Stars */}
       <div>
-        <span className="block text-[0.78rem] font-semibold text-ink mb-2">Your rating *</span>
-        <div className="flex items-center gap-1" role="radiogroup" aria-label="Star rating">
+        <span className="block text-[0.78rem] font-semibold text-ink mb-2">{t("review_your_rating", "Your rating")} *</span>
+        <div className="flex items-center gap-1" role="radiogroup" aria-label={t("aria_star_rating", "Star rating")}>
           {[1, 2, 3, 4, 5].map((value) => (
             <button
               key={value}
               type="button"
               role="radio"
               aria-checked={rating === value}
-              aria-label={`${value} star${value === 1 ? "" : "s"}`}
+              aria-label={`${value} ${value === 1 ? t("star_one", "star") : t("star_many", "stars")}`}
               onClick={() => setRating(value)}
               onMouseEnter={() => setHover(value)}
               onMouseLeave={() => setHover(0)}
@@ -125,7 +127,7 @@ export function ReviewForm({
 
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block">
-          <span className="block text-[0.78rem] font-semibold text-ink mb-1.5">Your name *</span>
+          <span className="block text-[0.78rem] font-semibold text-ink mb-1.5">{t("review_your_name", "Your name")} *</span>
           <input
             className="field"
             value={name}
@@ -137,7 +139,7 @@ export function ReviewForm({
           />
         </label>
         <label className="block">
-          <span className="block text-[0.78rem] font-semibold text-ink mb-1.5">Email * (never published)</span>
+          <span className="block text-[0.78rem] font-semibold text-ink mb-1.5">{t("review_email_private", "Email (never published)")} *</span>
           <input
             className="field"
             type="email"
@@ -148,7 +150,7 @@ export function ReviewForm({
           />
         </label>
         <label className="block">
-          <span className="block text-[0.78rem] font-semibold text-ink mb-1.5">Country</span>
+          <span className="block text-[0.78rem] font-semibold text-ink mb-1.5">{t("review_country", "Country")}</span>
           <input
             className="field"
             value={country}
@@ -158,9 +160,9 @@ export function ReviewForm({
           />
         </label>
         <label className="block">
-          <span className="block text-[0.78rem] font-semibold text-ink mb-1.5">Which trip?</span>
+          <span className="block text-[0.78rem] font-semibold text-ink mb-1.5">{t("review_which_trip", "Which trip?")}</span>
           <select className="field" value={tourSlug} onChange={(e) => setTourSlug(e.target.value)}>
-            <option value="">General review of Brother Sharm Tour</option>
+            <option value="">{t("review_general", "General review")}</option>
             {tours.map((t) => (
               <option key={t.slug} value={t.slug}>
                 {t.title}
@@ -171,18 +173,18 @@ export function ReviewForm({
       </div>
 
       <label className="block">
-        <span className="block text-[0.78rem] font-semibold text-ink mb-1.5">Headline</span>
+        <span className="block text-[0.78rem] font-semibold text-ink mb-1.5">{t("review_headline", "Headline")}</span>
         <input
           className="field"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           maxLength={120}
-          placeholder="Sum it up in a sentence (optional)"
+          placeholder={t("review_headline_placeholder", "Sum it up in a sentence (optional)")}
         />
       </label>
 
       <label className="block">
-        <span className="block text-[0.78rem] font-semibold text-ink mb-1.5">Your review *</span>
+        <span className="block text-[0.78rem] font-semibold text-ink mb-1.5">{t("review_body", "Your review")} *</span>
         <textarea
           className="field min-h-36"
           value={body}
@@ -190,28 +192,28 @@ export function ReviewForm({
           required
           minLength={20}
           maxLength={4000}
-          placeholder="How was the day? The guide, the transfer, the highlights — and anything we could do better."
+          placeholder={t("review_body_placeholder", "How was the day? The guide, the transfer, the highlights — and anything we could do better.")}
         />
         <span className="mt-1 block text-right text-[0.72rem] text-stone">{body.length}/4000</span>
       </label>
 
       <label className="block">
         <span className="block text-[0.78rem] font-semibold text-ink mb-1.5">
-          Booking reference (optional — helps us verify your trip)
+          {t("review_booking_ref", "Booking reference (optional — helps us verify your trip)")}
         </span>
         <input
           className="field"
           value={bookingRef}
           onChange={(e) => setBookingRef(e.target.value)}
           maxLength={60}
-          placeholder="Date of the trip, hotel name, or the name you booked under"
+          placeholder={t("review_proof_placeholder", "Date of the trip, hotel name, or the name you booked under")}
         />
       </label>
 
       {/* Photos */}
       <div>
         <span className="block text-[0.78rem] font-semibold text-ink mb-1.5">
-          Photos (optional, up to 3)
+          {t("review_photos_label", "Photos (optional, up to 3)")}
         </span>
         {photos.length > 0 ? (
           <ul className="mb-2 flex flex-wrap gap-2">
@@ -227,7 +229,7 @@ export function ReviewForm({
                   type="button"
                   onClick={() => setPhotos((p) => p.filter((_, j) => j !== i))}
                   className="absolute -right-1.5 -top-1.5 grid size-5 place-items-center rounded-full bg-ink text-white"
-                  aria-label={`Remove photo ${i + 1}`}
+                  aria-label={`${t("review_remove_photo", "Remove photo")} ${i + 1}`}
                 >
                   <X className="size-3" />
                 </button>
@@ -241,7 +243,7 @@ export function ReviewForm({
             onClick={() => fileRef.current?.click()}
             className="inline-flex items-center gap-2 rounded-full border border-sand bg-paper-warm/60 px-4 py-2 text-[0.78rem] font-semibold text-ink hover:bg-paper-warm transition-colors"
           >
-            <ImagePlus className="size-4" /> Add a photo
+            <ImagePlus className="size-4" /> {t("review_add_photo", "Add a photo")}
           </button>
         ) : null}
         <input
@@ -277,12 +279,11 @@ export function ReviewForm({
         disabled={busy}
         className="btn btn-primary w-full disabled:opacity-60"
       >
-        {busy ? "Sending…" : "Submit review"}
+        {busy ? t("state_sending", "Sending…") : t("review_submit", "Submit review")}
       </button>
 
       <p className="text-center text-[0.75rem] leading-relaxed text-stone">
-        Reviews are checked by our team before publication — this keeps spam
-        out, not criticism. Verified bookings are labelled as such.
+        {t("review_moderation_note", "Reviews are checked by our team before publication — this keeps spam out, not criticism. Verified bookings are labelled as such.")}
       </p>
     </form>
   );

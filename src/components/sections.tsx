@@ -88,8 +88,9 @@ export function Breadcrumbs({
   items: { label: string; href?: string }[];
   tone?: "ink" | "light";
 }) {
+  const { t } = useSite();
   return (
-    <nav aria-label="Breadcrumb">
+    <nav aria-label={t("aria_breadcrumb", "Breadcrumb")}>
       <ol
         className={cn(
           "flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.6875rem] uppercase tracking-[0.16em]",

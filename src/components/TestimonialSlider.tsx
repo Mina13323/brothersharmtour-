@@ -36,7 +36,7 @@ const FALLBACK_IMAGES = [
 ];
 
 export function ReviewSlider({ reviews }: { reviews: PublicReview[] }) {
-  const { whatsappLink } = useSite();
+  const { whatsappLink , t } = useSite();
   const [index, setIndex] = useState(0);
   const count = reviews.length;
 
@@ -96,7 +96,7 @@ export function ReviewSlider({ reviews }: { reviews: PublicReview[] }) {
             <div className="absolute bottom-5 left-5 flex items-center gap-2.5 z-20">
               <button
                 onClick={() => go(-1)}
-                aria-label="Previous review"
+                aria-label={t("aria_prev_review", "Previous review")}
                 className="size-11 rounded-full bg-white/95 hover:bg-white text-ink shadow-md flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer"
               >
                 <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -105,7 +105,7 @@ export function ReviewSlider({ reviews }: { reviews: PublicReview[] }) {
               </button>
               <button
                 onClick={() => go(1)}
-                aria-label="Next review"
+                aria-label={t("aria_next_review", "Next review")}
                 className="size-11 rounded-full bg-white/95 hover:bg-white text-ink shadow-md flex items-center justify-center transition-all hover:scale-105 active:scale-95 cursor-pointer"
               >
                 <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -116,7 +116,7 @@ export function ReviewSlider({ reviews }: { reviews: PublicReview[] }) {
 
             <div className="absolute bottom-5 right-5 z-20 bg-white/95 backdrop-blur-md rounded-2xl p-2.5 sm:p-3 flex items-center gap-3 shadow-lg border border-sand/40 max-w-[210px]">
               <div className="size-10 rounded-xl overflow-hidden relative shrink-0">
-                <Image src={tourImage.src} alt="Tour thumbnail" fill sizes="40px" className="object-cover" />
+                <Image src={tourImage.src} alt={t("tour_thumbnail", "Tour photo")} fill sizes="40px" className="object-cover" />
               </div>
               <div className="min-w-0">
                 <span className="block text-[9px] font-bold uppercase tracking-[0.14em] text-stone truncate">
@@ -170,7 +170,7 @@ export function ReviewSlider({ reviews }: { reviews: PublicReview[] }) {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-full bg-sun hover:bg-sun-bright text-white px-7 py-3 text-sm font-semibold tracking-wide shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
             >
-              <span>Book on WhatsApp</span>
+              <span>{t("nav_book_whatsapp", "Book on WhatsApp")}</span>
               <span aria-hidden="true">→</span>
             </a>
             <Link
@@ -192,6 +192,7 @@ export function ReviewSlider({ reviews }: { reviews: PublicReview[] }) {
  * fabricated social proof. Links to the public review form.
  */
 export function ReviewInvite() {
+  const { t } = useSite();
   return (
     <div className="relative isolate overflow-hidden rounded-[2.5rem] bg-paper-warm/70 border border-sand/50 p-8 sm:p-12 lg:p-16 shadow-sm text-center">
       <p className="eyebrow text-reef font-semibold tracking-[0.2em] uppercase">
@@ -210,7 +211,7 @@ export function ReviewInvite() {
           href="/review"
           className="inline-flex items-center gap-2 rounded-full bg-sun hover:bg-sun-bright text-white px-7 py-3 text-sm font-semibold tracking-wide shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
         >
-          <span>Write a review</span>
+          <span>{t("action_write_review", "Write a review")}</span>
           <span aria-hidden="true">→</span>
         </Link>
       </div>

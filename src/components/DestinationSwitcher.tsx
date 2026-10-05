@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import type { Destination } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { useSite } from "./SiteProvider";
 
 /**
  * Interactive destination discovery.
@@ -26,6 +27,7 @@ export function DestinationSwitcher({
   destinations: Destination[];
   tourCounts: Record<string, number>;
 }) {
+  const { t } = useSite();
   const [active, setActive] = useState(0);
 
   function onKeyDown(event: React.KeyboardEvent) {
@@ -110,7 +112,7 @@ export function DestinationSwitcher({
       {/* ---------------- Selector ---------------- */}
       <div
         role="tablist"
-        aria-label="Choose a destination"
+        aria-label={t("aria_choose_destination", "Choose a destination")}
         onKeyDown={onKeyDown}
         /* flex-wrap so the tabs drop to a second line on very narrow screens
            instead of overflowing the row. */

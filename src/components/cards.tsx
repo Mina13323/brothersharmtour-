@@ -98,7 +98,7 @@ export function TourCard({
             <span className="absolute left-3.5 top-3.5 rounded-pill bg-ink/85 px-3 py-1 text-[0.625rem] font-semibold uppercase tracking-[0.16em] text-white backdrop-blur-sm shadow-xs flex items-center gap-1.5">
               {tour.isPackage || tour.type === "package" ? (
                 <>
-                  <span className="text-sun font-bold">Package</span>
+                  <span className="text-sun font-bold">{t("badge_package", "Package")}</span>
                   <span className="opacity-60">•</span>
                   <span>{experienceName(tour.category, lang)}</span>
                 </>

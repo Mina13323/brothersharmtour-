@@ -1,20 +1,64 @@
 /**
  * Upload storage for CMS media and public review photos.
  *
- * Files land under `content/uploads/<folder>/` with random, extension-safe
- * names (never the client's filename). Validation happens BEFORE anything is
- * written: extension allow-list, size cap and true magic-byte sniffing, so a
- * renamed executable can never pose as an image.
+ * TWO-TIER STORAGE — both tiers share the single public `/uploads/...` URL
+ * space, so a stored URL never has to say where the bytes live:
+ *
+ *   1. RUNTIME  `content/uploads/<folder>/` — everything uploaded through the
+ *      CMS at run time. Writable, git-ignored (it can contain guest review
+ *      photos), and served by `app/uploads/[...path]/route.ts`.
+ *   2. SEED     `public/uploads/<folder>/` — media that shipped with the
+ *      repository and is referenced by the seed content. Tracked in git and
+ *      served statically by Next, so it survives a fresh clone or a redeploy
+ *      onto an empty volume. Read-only as far as the CMS is concerned.
+ *
+ * Writes always go to the runtime tier; reads fall back from runtime to seed.
+ *
+ * Files are stored with random, extension-safe names (never the client's
+ * filename). Validation happens BEFORE anything is written: extension
+ * allow-list, size cap and true magic-byte sniffing, so a renamed executable
+ * can never pose as an image.
  *
  * "server-only" keeps this module out of any client bundle.
  */
 
 import "server-only";
 import { randomUUID } from "node:crypto";
+import { existsSync } from "node:fs";
 import { mkdir, writeFile, unlink } from "node:fs/promises";
 import path from "node:path";
 
+/** Runtime (writable, git-ignored) upload tier. */
 export const UPLOAD_ROOT = path.join(process.cwd(), "content", "uploads");
+
+/** Seed (tracked, deployed, read-only) upload tier. */
+export const SEED_UPLOAD_ROOT = path.join(process.cwd(), "public", "uploads");
+
+/** Both tiers, in read-precedence order. */
+export const UPLOAD_ROOTS = [UPLOAD_ROOT, SEED_UPLOAD_ROOT] as const;
+
+/**
+ * Maps a public `/uploads/...` URL to an absolute path inside `root`,
+ * returning null when the URL is malformed or tries to escape the root.
+ */
+export function resolveUploadPath(url: string, root: string): string | null {
+  const prefix = "/uploads/";
+  if (!url.startsWith(prefix)) return null;
+  const relative = url.slice(prefix.length);
+  if (!relative || relative.includes("..") || path.isAbsolute(relative)) return null;
+  const absolute = path.join(root, relative);
+  if (!absolute.startsWith(root + path.sep)) return null;
+  return absolute;
+}
+
+/** True when the URL resolves into the tracked, read-only seed tier only. */
+export function isSeedUpload(url: string): boolean {
+  const runtime = resolveUploadPath(url, UPLOAD_ROOT);
+  const seed = resolveUploadPath(url, SEED_UPLOAD_ROOT);
+  if (!seed) return false;
+  if (runtime && existsSync(runtime)) return false;
+  return existsSync(seed);
+}
 
 const MAX_BYTES = 8 * 1024 * 1024; // 8 MB
 
@@ -88,18 +132,25 @@ export async function saveUpload(
   return { url: `/uploads/${folder}/${filename}`, absolute, bytes: buffer.length };
 }
 
-/** Deletes an uploaded file by its public URL — path traversal safe. */
-export async function deleteUpload(url: string): Promise<boolean> {
-  const prefix = "/uploads/";
-  if (!url.startsWith(prefix)) return false;
-  const relative = url.slice(prefix.length);
-  if (relative.includes("..") || path.isAbsolute(relative)) return false;
-  const absolute = path.join(UPLOAD_ROOT, relative);
-  if (!absolute.startsWith(UPLOAD_ROOT)) return false;
+/**
+ * Deletes a RUNTIME uploaded file by its public URL — path traversal safe.
+ * Seed media (tracked in git and shipped with the deployment) is never
+ * deleted here; removing it is a source change, not a CMS action.
+ */
+export async function deleteUpload(
+  url: string,
+): Promise<true | { error: string }> {
+  const absolute = resolveUploadPath(url, UPLOAD_ROOT);
+  if (!absolute) return { error: "File not found." };
+  if (isSeedUpload(url))
+    return {
+      error:
+        "This image ships with the website and cannot be deleted from the CMS.",
+    };
   try {
     await unlink(absolute);
     return true;
   } catch {
-    return false;
+    return { error: "File not found." };
   }
 }

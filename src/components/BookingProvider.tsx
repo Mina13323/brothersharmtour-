@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { BookingWidget } from "./BookingWidget";
+import { useSite } from "./SiteProvider";
 
 export interface BookingOptions {
   tripPackageId?: string;
@@ -39,6 +40,7 @@ export function useBooking() {
  * flow pre-filled with a tour, without that page needing its own form state.
  */
 export function BookingProvider({ children }: { children: ReactNode }) {
+  const { t } = useSite();
   const [isOpen, setIsOpen] = useState(false);
   const [tourSlug, setTourSlug] = useState<string | undefined>();
   const [initialOptions, setInitialOptions] = useState<BookingOptions | undefined>();
@@ -82,7 +84,7 @@ export function BookingProvider({ children }: { children: ReactNode }) {
         {/* Scrim */}
         <button
           tabIndex={isOpen ? 0 : -1}
-          aria-label="Close booking panel"
+          aria-label={t("booking_close_panel", "Close booking panel")}
           onClick={close}
           className={`absolute inset-0 bg-ink/60 backdrop-blur-[2px] transition-opacity duration-500 ${
             isOpen ? "opacity-100" : "opacity-0"
@@ -93,19 +95,19 @@ export function BookingProvider({ children }: { children: ReactNode }) {
         <div
           role="dialog"
           aria-modal={isOpen}
-          aria-label="Request a booking"
+          aria-label={t("booking_request_cta", "Request a booking")}
           className={`absolute inset-y-0 right-0 flex w-full max-w-[34rem] flex-col overflow-hidden rounded-t-[2rem] border-l border-sand/80 bg-paper shadow-2xl transition-transform duration-[600ms] [transition-timing-function:var(--ease-out-expo)] md:rounded-t-none md:rounded-l-[2.5rem] ${
             isOpen ? "translate-x-0" : "translate-x-full"
           }`}
         >
           <header className="flex items-start justify-between gap-6 border-b border-sand px-6 py-6 md:px-9">
             <div>
-              <p className="eyebrow text-reef">Book in 3 minutes</p>
-              <h2 className="headline mt-2 text-[1.75rem]">Reserve your trip</h2>
+              <p className="eyebrow text-reef">{t("booking_in_3_minutes", "Book in 3 minutes")}</p>
+              <h2 className="headline mt-2 text-[1.75rem]">{t("booking_reserve_trip", "Reserve your trip")}</h2>
             </div>
             <button
               onClick={close}
-              aria-label="Close"
+              aria-label={t("action_close", "Close")}
               className="mt-1 grid size-10 shrink-0 place-items-center rounded-pill border border-ink/15 transition-colors hover:bg-ink hover:text-paper"
             >
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>

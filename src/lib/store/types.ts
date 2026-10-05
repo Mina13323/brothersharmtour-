@@ -52,6 +52,14 @@ export interface TourTranslation {
   excluded?: string[];
   bring?: string[];
   itinerary?: ItineraryStop[];
+  /** "Important information" bullets shown on the tour page. */
+  importantInfo?: string[];
+  /** "Good to know" / restrictions bullets. */
+  restrictions?: string[];
+  /** Where guests are collected from. */
+  meetingPoint?: string;
+  /** Tour-specific FAQ — both question and answer are translated. */
+  faq?: FaqItem[];
   tripPackages?: Array<{ id: string; title?: string; description?: string }>;
   /** Localised age-band labels, e.g. "4–11 años". Prices are never translated. */
   childAgeLabel?: string;

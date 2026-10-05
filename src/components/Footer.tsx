@@ -34,7 +34,7 @@ export function Footer() {
           </div>
 
           <nav
-            aria-label="Footer"
+            aria-label={t("aria_footer", "Footer")}
             className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:col-span-5"
           >
             <FooterColumn title={t("footer_destinations", "Destinations")} links={footerNav.destinations} />

@@ -10,7 +10,11 @@
     "typecheck": "tsc --noEmit",
     "media": "node scripts/build-media.mjs",
     "lifecycle": "node scripts/lifecycle-test.mjs",
-    "test:e2e": "node scripts/lifecycle-test.mjs"
+    "test:e2e": "node scripts/lifecycle-test.mjs",
+    "seed:snapshot": "node scripts/snapshot-seed.mjs",
+    "repair:packages": "node scripts/repair-packages.mjs",
+    "i18n:scan": "node scripts/i18n-scan.mjs",
+    "i18n:inject": "node scripts/i18n-inject.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
@@ -24,8 +28,6 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "class-variance-authority": "^0.7.1",
-    "claude": "^0.1.1",
-    "cn": "^0.4.0",
     "lucide-react": "^1.49.0",
     "next": "^15.5.26",
     "nodemailer": "^10.0.13",

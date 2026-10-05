@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import type { MediaImage } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { useSite } from "./SiteProvider";
 
 /**
  * Editorial gallery with a lightbox.
@@ -19,6 +20,7 @@ export function Gallery({
   images: MediaImage[];
   columns?: 2 | 3 | 4;
 }) {
+  const { t } = useSite();
   const [index, setIndex] = useState<number | null>(null);
 
   const close = useCallback(() => setIndex(null), []);
@@ -89,7 +91,7 @@ export function Gallery({
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Image viewer"
+          aria-label={t("aria_image_viewer", "Image viewer")}
           className="fixed inset-0 z-[130] flex flex-col bg-ink/96 backdrop-blur-sm"
         >
           <div className="flex items-center justify-between px-5 py-4 text-paper md:px-8">
@@ -98,7 +100,7 @@ export function Gallery({
             </span>
             <button
               onClick={close}
-              aria-label="Close viewer"
+              aria-label={t("aria_close_viewer", "Close viewer")}
               className="grid size-10 place-items-center rounded-pill border border-paper/25 text-paper transition-colors hover:bg-paper hover:text-ink"
             >
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
@@ -123,8 +125,8 @@ export function Gallery({
               {images[index].alt}
             </p>
             <div className="flex shrink-0 gap-2">
-              <NavBtn label="Previous image" onClick={() => go(-1)} rotate />
-              <NavBtn label="Next image" onClick={() => go(1)} />
+              <NavBtn label={t("aria_prev_image", "Previous image")} onClick={() => go(-1)} rotate />
+              <NavBtn label={t("aria_next_image", "Next image")} onClick={() => go(1)} />
             </div>
           </div>
         </div>

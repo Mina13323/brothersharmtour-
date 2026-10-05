@@ -35,7 +35,7 @@ export function LanguageSwitcher({
   className?: string;
 }) {
   const router = useRouter();
-  const { settings, lang } = useSite();
+  const { settings, lang, t } = useSite();
   const [open, setOpen] = useState(false);
   const [current, setCurrent] = useState(lang || "en");
   const ref = useRef<HTMLDivElement>(null);
@@ -96,7 +96,7 @@ export function LanguageSwitcher({
         onClick={() => setOpen((o) => !o)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        aria-label="Change language"
+        aria-label={t("aria_change_language", "Change language")}
         className={cn(
           "inline-flex h-8 sm:h-9 items-center gap-1 sm:gap-1.5 rounded-full border px-2 sm:px-3 text-[0.75rem] sm:text-[0.8rem] font-semibold transition-all shadow-2xs hover:shadow-xs cursor-pointer",
           tone === "light"

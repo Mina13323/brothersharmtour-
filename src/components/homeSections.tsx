@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
  */
 
 export function HeroTrust() {
-  const { settings } = useSite();
+  const { settings, t } = useSite();
   const catalogue = useCatalogue();
 
   const reviewCount = catalogue.reduce((n, t) => n + (t.reviewCount ?? 0), 0);
@@ -51,7 +51,7 @@ export function HeroTrust() {
             <p className="font-display text-lg font-bold leading-none text-ink">
               {catalogue.length} tours
             </p>
-            <p className="mt-0.5 text-xs text-stone">across Sharm El Sheikh &amp; Cairo</p>
+            <p className="mt-0.5 text-xs text-stone">{t("home_across_sharm_cairo", "across Sharm El Sheikh & Cairo")}</p>
           </div>
 
           {settings.trust.yearsOperating ? (
@@ -59,7 +59,7 @@ export function HeroTrust() {
               <p className="font-display text-lg font-bold leading-none text-ink">
                 {settings.trust.yearsOperating}
               </p>
-              <p className="mt-0.5 text-xs text-stone">of local experience</p>
+              <p className="mt-0.5 text-xs text-stone">{t("home_of_local_experience", "of local experience")}</p>
             </div>
           ) : null}
 
@@ -68,13 +68,13 @@ export function HeroTrust() {
               <p className="font-display text-lg font-bold leading-none text-ink">
                 {settings.trust.guestsServed}
               </p>
-              <p className="mt-0.5 text-xs text-stone">guests hosted</p>
+              <p className="mt-0.5 text-xs text-stone">{t("home_guests_hosted", "guests hosted")}</p>
             </div>
           ) : null}
 
           <div className="rounded-full bg-paper-warm/60 px-5 py-2.5 shadow-2xs">
-            <p className="font-display text-lg font-bold leading-none text-ink">Pay on the Day</p>
-            <p className="mt-0.5 text-xs text-stone">no deposit needed</p>
+            <p className="font-display text-lg font-bold leading-none text-ink">{t("home_pay_on_day", "Pay on the Day")}</p>
+            <p className="mt-0.5 text-xs text-stone">{t("home_no_deposit", "no deposit needed")}</p>
           </div>
         </div>
       </div>
@@ -120,6 +120,7 @@ const valueProps: { icon: string; title: string; body: React.ReactNode }[] = [
 ];
 
 export function ValueProps() {
+  const { t } = useSite();
   const previewCards = [
     {
       title: "Red Sea & White Island",
@@ -168,7 +169,7 @@ export function ValueProps() {
               href="/about"
               className="mt-7 inline-flex items-center gap-2 rounded-full bg-sun hover:bg-sun-bright text-white px-7 py-3 text-sm font-semibold tracking-wide shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
             >
-              <span>Learn More</span>
+              <span>{t("home_learn_more", "Learn More")}</span>
               <span aria-hidden="true">→</span>
             </Link>
           </div>
@@ -436,7 +437,7 @@ export function Bestsellers() {
                 className="btn btn-whatsapp w-full rounded-full shadow-sm hover:shadow-md text-xs py-2.5"
               >
                 <WhatsAppIcon className="size-4" />
-                <span>Chat on WhatsApp</span>
+                <span>{t("action_chat_whatsapp", "Chat on WhatsApp")}</span>
               </a>
 
               <div className="mt-5 flex items-center gap-3">
@@ -468,7 +469,7 @@ export function RatingPanel({
   average: number | null;
   count: number;
 }) {
-  const { settings } = useSite();
+  const { settings, t } = useSite();
   const socials = [
     settings.social.instagram && { name: "Instagram", href: settings.social.instagram, note: "Our profile" },
     settings.social.facebook && { name: "Facebook", href: settings.social.facebook, note: "Our page" },
@@ -481,7 +482,7 @@ export function RatingPanel({
       <div className="shell py-16 md:py-24">
         <div className="grid items-center gap-10 lg:grid-cols-[1fr_1.2fr] lg:gap-16">
           <Reveal>
-            <p className="eyebrow text-reef-bright">Guest reviews · verified by our team</p>
+            <p className="eyebrow text-reef-bright">{t("home_guest_reviews_verified", "Guest reviews · verified by our team")}</p>
             {average !== null && count > 0 ? (
               <>
                 <div className="mt-6 flex items-end gap-4">
@@ -503,7 +504,7 @@ export function RatingPanel({
                 <div className="mt-6 flex items-end gap-4">
                   <span className="font-display text-[3.5rem] leading-none">★</span>
                   <div className="pb-2">
-                    <p className="text-[0.9rem] text-white/70">Reviews, published honestly</p>
+                    <p className="text-[0.9rem] text-white/70">{t("home_reviews_honest", "Reviews, published honestly")}</p>
                   </div>
                 </div>
                 <p className="mt-6 lede text-white/80">
@@ -517,7 +518,7 @@ export function RatingPanel({
               href="/review"
               className="mt-7 inline-flex items-center gap-2 rounded-full bg-sun hover:bg-sun-bright text-white px-6 py-2.5 text-xs font-semibold uppercase tracking-wider shadow-sm hover:shadow-md transition-all"
             >
-              <span>Write a review</span>
+              <span>{t("action_write_review", "Write a review")}</span>
               <span aria-hidden="true">→</span>
             </Link>
           </Reveal>
@@ -541,7 +542,7 @@ export function RatingPanel({
                     <span className="font-display text-[1.35rem] block">{s.name}</span>
                     <span className="text-xs text-white/60">{s.note}</span>
                   </div>
-                  <span className="text-reef-bright font-semibold text-sm">Follow →</span>
+                  <span className="text-reef-bright font-semibold text-sm">{t("follow", "Follow")} →</span>
                 </a>
               </Reveal>
             ))}
@@ -551,10 +552,10 @@ export function RatingPanel({
                 className="flex items-center justify-between rounded-2xl bg-white/[0.06] hover:bg-white/[0.1] px-6 py-5 shadow-xs transition-all duration-300 hover:scale-[1.02]"
               >
                 <div>
-                  <span className="font-display text-[1.35rem] block">Leave a review</span>
-                  <span className="text-xs text-white/60">Takes two minutes — published after moderation</span>
+                  <span className="font-display text-[1.35rem] block">{t("home_leave_review", "Leave a review")}</span>
+                  <span className="text-xs text-white/60">{t("review_takes_two_minutes", "Takes two minutes — published after moderation")}</span>
                 </div>
-                <span className="text-reef-bright font-semibold text-sm">Start →</span>
+                <span className="text-reef-bright font-semibold text-sm">{t("start", "Start")} →</span>
               </Link>
             </Reveal>
           </div>
@@ -655,7 +656,7 @@ export function ThreeSteps() {
 /* ───────────────────── Geography + book-a-tour card ───────────────────── */
 
 export function GeographyBook() {
-  const { whatsappLink } = useSite();
+  const { whatsappLink, t } = useSite();
   const benefits: React.ReactNode[] = [
     "No prepayment",
     "Hotel transfer included",
@@ -681,7 +682,7 @@ export function GeographyBook() {
           <Reveal delay={120}>
             {/* Frameless shadow card - no straight border */}
             <div className="rounded-[2rem] bg-paper p-7 shadow-[var(--shadow-lift)] md:p-9 hover:shadow-[var(--shadow-panel)] transition-shadow">
-              <p className="eyebrow text-reef">Book a tour</p>
+              <p className="eyebrow text-reef">{t("home_book_a_tour", "Book a tour")}</p>
               <p className="mt-2 font-display text-[1.75rem] leading-tight text-ink">
                 Talk to a real person
               </p>

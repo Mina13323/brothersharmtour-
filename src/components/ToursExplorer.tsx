@@ -6,22 +6,24 @@ import { destinationName, experienceName } from "@/lib/store/labels";
 import type { Tour } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { TourCard } from "./cards";
+import { useSite } from "./SiteProvider";
 
 type SortKey = "recommended" | "price-asc" | "price-desc" | "duration" | "popular";
 
-const sortOptions: { id: SortKey; label: string }[] = [
-  { id: "recommended", label: "Recommended" },
-  { id: "popular", label: "Most popular" },
-  { id: "price-asc", label: "Price: low to high" },
-  { id: "price-desc", label: "Price: high to low" },
-  { id: "duration", label: "Duration: shortest" },
+/** Sort options carry a translation key; the label is resolved at render. */
+const sortOptions: { id: SortKey; key: string; fallback: string }[] = [
+  { id: "recommended", key: "sort_recommended", fallback: "Recommended" },
+  { id: "popular", key: "sort_popular", fallback: "Most popular" },
+  { id: "price-asc", key: "sort_price_asc", fallback: "Price: low to high" },
+  { id: "price-desc", key: "sort_price_desc", fallback: "Price: high to low" },
+  { id: "duration", key: "sort_duration", fallback: "Duration: shortest" },
 ];
 
 const tourTypes = [
-  { id: "group", label: "Small group" },
-  { id: "private", label: "Private" },
-  { id: "transfer", label: "Transfer" },
-  { id: "package", label: "Package" },
+  { id: "group", key: "small_group", fallback: "Small group" },
+  { id: "private", key: "private_tour", fallback: "Private" },
+  { id: "transfer", key: "type_transfer", fallback: "Transfer" },
+  { id: "package", key: "badge_package", fallback: "Package" },
 ] as const;
 
 /**
@@ -52,6 +54,7 @@ export function ToursExplorer({
     type?: string;
   };
 }) {
+  const { t } = useSite();
   const [query, setQuery] = useState("");
   const [destination, setDestination] = useState(
     lockedDestination ?? initial?.destination ?? "all",
@@ -203,8 +206,8 @@ export function ToursExplorer({
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search experiences — reef, desert, dolphins, transfer…"
-              aria-label="Search tours"
+              placeholder={t("search_tours_placeholder", "Search experiences — reef, desert, dolphins, transfer…")}
+              aria-label={t("search_tours_placeholder", "Search tours")}
               className="field pl-11"
             />
           </div>
@@ -230,12 +233,12 @@ export function ToursExplorer({
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value as SortKey)}
-              aria-label="Sort tours"
+              aria-label={t("filter_sort", "Sort")}
               className="field h-[3.25rem] w-[13rem]"
             >
               {sortOptions.map((o) => (
                 <option key={o.id} value={o.id}>
-                  {o.label}
+                  {t(o.key, o.fallback)}
                 </option>
               ))}
             </select>
@@ -258,7 +261,7 @@ export function ToursExplorer({
               : "invisible opacity-0",
           )}
         >
-          <span className="sr-only">Close filters</span>
+          <span className="sr-only">{t("filter_close", "Close filters")}</span>
         </button>
 
         {/*
@@ -269,7 +272,7 @@ export function ToursExplorer({
         <aside
           role="dialog"
           aria-modal={filtersOpen ? true : undefined}
-          aria-label="Refine tours"
+          aria-label={t("filter_refine", "Refine")}
           className={cn(
             "fixed inset-y-0 right-0 z-[120] flex w-[min(22rem,88vw)] flex-col rounded-l-3xl border-l border-sand/80 bg-paper shadow-[var(--shadow-panel)] transition-transform duration-400 [transition-timing-function:var(--ease-premium)]",
             "lg:static lg:z-auto lg:w-auto lg:translate-x-0 lg:rounded-none lg:border-l-0 lg:shadow-none lg:transition-none",
@@ -277,11 +280,11 @@ export function ToursExplorer({
           )}
         >
           <div className="flex items-center justify-between px-5 py-4 lg:hidden">
-            <h2 className="eyebrow text-stone">Refine</h2>
+            <h2 className="eyebrow text-stone">{t("filter_refine", "Refine")}</h2>
             <button
               type="button"
               onClick={() => setFiltersOpen(false)}
-              aria-label="Close filters"
+              aria-label={t("filter_close", "Close filters")}
               className="grid size-9 place-items-center rounded-pill border border-sand text-ink"
             >
               <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden>
@@ -292,7 +295,7 @@ export function ToursExplorer({
 
           <div className="flex grow flex-col gap-8 overflow-y-auto overscroll-contain px-5 py-6 lg:sticky lg:top-[10.5rem] lg:overflow-visible lg:px-0 lg:py-0">
             <div className="hidden items-center justify-between lg:flex">
-              <h2 className="eyebrow text-stone">Refine</h2>
+              <h2 className="eyebrow text-stone">{t("filter_refine", "Refine")}</h2>
               {activeCount > 0 || query ? (
                 <button
                   onClick={reset}
@@ -304,7 +307,7 @@ export function ToursExplorer({
             </div>
 
             {!lockedDestination ? (
-              <FilterGroup label="Destination">
+              <FilterGroup label={t("filter_destination", "Destination")}>
                 <ChipRow
                   value={destination}
                   onChange={setDestination}
@@ -320,7 +323,7 @@ export function ToursExplorer({
             ) : null}
 
             {!lockedCategory ? (
-              <FilterGroup label="Experience type">
+              <FilterGroup label={t("filter_experience_type", "Experience type")}>
                 <ChipRow
                   value={category}
                   onChange={setCategory}
@@ -335,24 +338,24 @@ export function ToursExplorer({
               </FilterGroup>
             ) : null}
 
-            <FilterGroup label="Duration">
+            <FilterGroup label={t("filter_duration", "Duration")}>
               <ChipRow
                 value={duration}
                 onChange={setDuration}
                 options={[
-                  { id: "all", label: "Any" },
+                  { id: "all", label: t("filter_any", "Any") },
                   ...durationBuckets.map((b) => ({ id: b.id, label: b.label })),
                 ]}
               />
             </FilterGroup>
 
-            <FilterGroup label="Tour type">
+            <FilterGroup label={t("filter_tour_type", "Tour type")}>
               <ChipRow
                 value={type}
                 onChange={setType}
                 options={[
-                  { id: "all", label: "Any" },
-                  ...tourTypes.map((t) => ({ id: t.id, label: t.label })),
+                  { id: "all", label: t("filter_any", "Any") },
+                  ...tourTypes.map((tt) => ({ id: tt.id, label: t(tt.key, tt.fallback) })),
                 ]}
               />
             </FilterGroup>
@@ -370,7 +373,7 @@ export function ToursExplorer({
                   step={5}
                   value={maxPrice}
                   onChange={(e) => setMaxPrice(Number(e.target.value))}
-                  aria-label="Maximum price per adult"
+                  aria-label={t("filter_max_price", "Maximum price per adult")}
                   className="w-full accent-[var(--color-reef)]"
                 />
                 <p className="mt-2 text-[0.6875rem] text-stone">
@@ -380,7 +383,7 @@ export function ToursExplorer({
             ) : null}
 
             <label className="lg:hidden">
-              <span className="label">Sort</span>
+              <span className="label">{t("filter_sort", "Sort")}</span>
               <select
                 value={sort}
                 onChange={(e) => setSort(e.target.value as SortKey)}
@@ -388,7 +391,7 @@ export function ToursExplorer({
               >
                 {sortOptions.map((o) => (
                   <option key={o.id} value={o.id}>
-                    {o.label}
+                    {t(o.key, o.fallback)}
                   </option>
                 ))}
               </select>
@@ -436,7 +439,7 @@ export function ToursExplorer({
             </div>
           ) : (
             <div className="rounded-3xl border border-sand/80 bg-paper-warm/50 px-6 py-16 text-center shadow-sm">
-              <h3 className="headline text-[1.5rem]">Nothing matches that yet</h3>
+              <h3 className="headline text-[1.5rem]">{t("empty_no_results", "Nothing matches that yet")}</h3>
               <p className="lede mx-auto mt-3 max-w-md text-[0.9375rem]">
                 Try widening the filters — or tell us what you had in mind and
                 we&apos;ll build it for you.

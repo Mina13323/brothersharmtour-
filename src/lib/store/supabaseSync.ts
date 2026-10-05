@@ -39,24 +39,30 @@ function agePricingToColumns(rec: Partial<AgePricedRecord>): Record<string, unkn
 }
 
 function agePricingFromColumns(r: Record<string, unknown>): AgePricedRecord {
+  const seo = (r.seo && typeof r.seo === "object" ? r.seo : {}) as Record<string, unknown>;
   const num = (v: unknown): number | undefined =>
     v == null || v === "" || Number.isNaN(Number(v)) ? undefined : Number(v);
-  const tiered = Array.isArray(r.tiered_pricing)
-    ? (r.tiered_pricing as unknown[]).filter(
-        (t): t is TieredPrice =>
-          Boolean(t) &&
-          typeof t === "object" &&
-          Number.isFinite((t as TieredPrice).minGuests) &&
-          Number.isFinite((t as TieredPrice).pricePerPerson),
-      )
-    : [];
+  const tieredRaw = Array.isArray(r.tiered_pricing) && r.tiered_pricing.length
+    ? r.tiered_pricing
+    : Array.isArray(seo.tiered_pricing)
+      ? seo.tiered_pricing
+      : Array.isArray(seo.tieredPricing)
+        ? seo.tieredPricing
+        : [];
+  const tiered = (tieredRaw as unknown[]).filter(
+    (t): t is TieredPrice =>
+      Boolean(t) &&
+      typeof t === "object" &&
+      Number.isFinite((t as TieredPrice).minGuests) &&
+      Number.isFinite((t as TieredPrice).pricePerPerson),
+  );
   return {
-    infantPrice: r.infant_price != null ? Number(r.infant_price) : undefined,
-    childAgeMin: num(r.child_age_min),
-    childAgeMax: num(r.child_age_max),
-    childAgeLabel: (r.child_age_label as string) || undefined,
-    infantAgeMax: num(r.infant_age_max),
-    infantAgeLabel: (r.infant_age_label as string) || undefined,
+    infantPrice: r.infant_price != null ? Number(r.infant_price) : (num(seo.infant_price) ?? num(seo.infantPrice)),
+    childAgeMin: num(r.child_age_min) ?? (num(seo.child_age_min) ?? num(seo.childAgeMin)),
+    childAgeMax: num(r.child_age_max) ?? (num(seo.child_age_max) ?? num(seo.childAgeMax)),
+    childAgeLabel: (r.child_age_label as string) || (seo.child_age_label as string) || (seo.childAgeLabel as string) || undefined,
+    infantAgeMax: num(r.infant_age_max) ?? (num(seo.infant_age_max) ?? num(seo.infantAgeMax)),
+    infantAgeLabel: (r.infant_age_label as string) || (seo.infant_age_label as string) || (seo.infantAgeLabel as string) || undefined,
     tieredPricing: tiered,
   };
 }
@@ -132,6 +138,7 @@ export function tourToRow(tour: TourRecord): Record<string, unknown> {
     seo: {
       ...(tour.seo || {}),
       tripPackages: tour.tripPackages || [],
+      ...agePricingToColumns(tour),
     },
     updated_at: new Date().toISOString(),
   };
@@ -227,6 +234,7 @@ export function pkgToRow(pkg: PackageRecord): Record<string, unknown> {
       category: pkg.category || "sea-water",
       categories: pkg.categories || [pkg.category || "sea-water"],
       includedTours: pkg.includedTours || [],
+      ...agePricingToColumns(pkg),
     },
     updated_at: new Date().toISOString(),
   };
@@ -277,6 +285,24 @@ export function rowToPackage(r: Record<string, unknown>): PackageRecord {
   };
 }
 
+const NEW_AGE_PRICING_COLS = [
+  "infant_price",
+  "child_age_min",
+  "child_age_max",
+  "child_age_label",
+  "infant_age_max",
+  "infant_age_label",
+  "tiered_pricing",
+];
+
+function stripPendingColumns(row: Record<string, unknown>): Record<string, unknown> {
+  const clone = { ...row };
+  for (const c of NEW_AGE_PRICING_COLS) {
+    delete clone[c];
+  }
+  return clone;
+}
+
 async function postToSupabase(endpoint: string, body: unknown, preferMerge = true): Promise<void> {
   if (!isSupabaseConfigured()) return;
 
@@ -294,6 +320,17 @@ async function postToSupabase(endpoint: string, body: unknown, preferMerge = tru
       const err = await res.text().catch(() => "");
       if (res.status === 404 && err.includes("PGRST205")) {
         console.warn(`[Supabase Sync] Table not yet created in Supabase schema. Run supabase/schema.sql in Supabase SQL editor.`);
+      } else if (res.status === 400 && err.includes("PGRST204") && typeof body === "object" && body !== null && !Array.isArray(body)) {
+        // Schema cache missing column: retry with legacy columns (fields are preserved in .seo)
+        const stripped = stripPendingColumns(body as Record<string, unknown>);
+        const retryRes = await fetch(url, {
+          method: "POST",
+          headers,
+          body: JSON.stringify(stripped),
+        });
+        if (!retryRes.ok) {
+          console.warn(`[Supabase Sync Note] ${endpoint} returned status ${retryRes.status}:`, (await retryRes.text().catch(() => "")).slice(0, 150));
+        }
       } else {
         console.warn(`[Supabase Sync Note] ${endpoint} returned status ${res.status}:`, err.slice(0, 150));
       }
@@ -480,24 +517,55 @@ export async function syncAllToSupabase(db: Database): Promise<{
           error: "Table 'public.tours' not found in Supabase. Please run supabase/schema.sql in your Supabase SQL Editor first.",
         };
       }
-      return {
-        ok: false,
-        syncedTours: 0,
-        syncedPackages: 0,
-        settingsSynced: false,
-        error: `Supabase error (${tourRes.status}): ${err.slice(0, 200)}`,
-      };
+      if (tourRes.status === 400 && err.includes("PGRST204")) {
+        // Schema cache missing column: retry with legacy columns (fields are preserved in .seo)
+        const strippedRows = tourRows.map(stripPendingColumns);
+        const retry = await fetch(`${url}/tours?on_conflict=slug`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify(strippedRows),
+        });
+        if (!retry.ok) {
+          const retryErr = await retry.text().catch(() => "");
+          return {
+            ok: false,
+            syncedTours: 0,
+            syncedPackages: 0,
+            settingsSynced: false,
+            error: `Supabase error (${retry.status}): ${retryErr.slice(0, 200)}`,
+          };
+        }
+      } else {
+        return {
+          ok: false,
+          syncedTours: 0,
+          syncedPackages: 0,
+          settingsSynced: false,
+          error: `Supabase error (${tourRes.status}): ${err.slice(0, 200)}`,
+        };
+      }
     }
 
     // 2. Sync packages (if any)
     let packagesCount = 0;
     if (db.packages && db.packages.length > 0) {
       const pkgRows = db.packages.map(pkgToRow);
-      const pkgRes = await fetch(`${url}/packages?on_conflict=slug`, {
+      let pkgRes = await fetch(`${url}/packages?on_conflict=slug`, {
         method: "POST",
         headers,
         body: JSON.stringify(pkgRows),
       });
+      if (!pkgRes.ok) {
+        const pkgErr = await pkgRes.text().catch(() => "");
+        if (pkgRes.status === 400 && pkgErr.includes("PGRST204")) {
+          const stripped = pkgRows.map(stripPendingColumns);
+          pkgRes = await fetch(`${url}/packages?on_conflict=slug`, {
+            method: "POST",
+            headers,
+            body: JSON.stringify(stripped),
+          });
+        }
+      }
       if (pkgRes.ok) packagesCount = pkgRows.length;
     }
 

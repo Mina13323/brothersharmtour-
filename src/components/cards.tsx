@@ -31,6 +31,8 @@ export type TourCardTour = Pick<Tour, "slug" | "title" | "summary" | "category" 
   childPrice?: number | null;
   priceOriginal?: number | null;
   priceOverrides?: Record<string, number>;
+  /** Currency the stored prices are denominated in — drives honest conversion. */
+  currency?: string;
   priceUnit?: string;
   type?: string;
   isPackage?: boolean;
@@ -51,15 +53,16 @@ export function TourCard({
 }) {
   const { money, t, lang } = useSite();
   const cardHref = tour.href ?? (tour.isPackage || tour.type === "package" ? `/packages/${tour.slug}` : `/tours/${tour.slug}`);
-  const price = money(tour.priceFrom, tour.priceOverrides);
+  const price = money(tour.priceFrom, tour.priceOverrides, tour.currency);
   const effectiveChildPrice =
     tour.childPrice !== null && tour.childPrice !== undefined
       ? tour.childPrice
       : tour.priceFrom !== null && tour.priceFrom !== undefined
       ? Math.round(tour.priceFrom * 0.8)
       : null;
-  const childPrice = effectiveChildPrice !== null ? money(effectiveChildPrice) : null;
-  const original = money(tourOriginalPrice(tour), tour.priceOverrides);
+  const childPrice = effectiveChildPrice !== null ? money(effectiveChildPrice, undefined, tour.currency) : null;
+  // The "was" price is never pinned by overrides — those belong to the live price.
+  const original = money(tourOriginalPrice(tour), undefined, tour.currency);
   const discount = tourDiscountPct(tour);
   const rating = tourRating(tour);
   const unit = tourPriceUnit(tour);

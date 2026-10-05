@@ -13,6 +13,7 @@ import { Save, Plus, Trash2, ArrowUp, ArrowDown, Sparkles } from "lucide-react";
 import type { PackageRecord, TourRecord, Settings } from "@/lib/store/types";
 import { destinationName, experienceName } from "@/lib/store/labels";
 import { MediaGalleryEditor, SingleImageUploader } from "./MediaGalleryEditor";
+import { AgePricingFields, TieredPricingEditor } from "./PricingControls";
 
 const DESTINATIONS = ["sharm-el-sheikh", "cairo"];
 const CATEGORIES = [
@@ -100,6 +101,13 @@ export default function PackageEditor({
       duration: p.duration || selected.duration || "1 day",
       priceFrom: p.priceFrom ?? selected.priceFrom,
       childPrice: p.childPrice ?? selected.childPrice,
+      infantPrice: p.infantPrice ?? selected.infantPrice,
+      childAgeMin: p.childAgeMin ?? selected.childAgeMin,
+      childAgeMax: p.childAgeMax ?? selected.childAgeMax,
+      childAgeLabel: p.childAgeLabel ?? selected.childAgeLabel,
+      infantAgeMax: p.infantAgeMax ?? selected.infantAgeMax,
+      infantAgeLabel: p.infantAgeLabel ?? selected.infantAgeLabel,
+      tieredPricing: p.tieredPricing?.length ? p.tieredPricing : selected.tieredPricing,
       coverImage: p.coverImage || (selected.images?.[0] ? selected.images[0] : null),
       gallery: p.gallery?.length ? p.gallery : (selected.images?.slice(1) ?? []),
       description: p.description?.length ? p.description : (selected.description ?? []),
@@ -121,6 +129,13 @@ export default function PackageEditor({
       duration: p.duration || selected.duration || "1 day",
       priceFrom: selected.priceFrom,
       childPrice: selected.childPrice,
+      infantPrice: selected.infantPrice,
+      childAgeMin: selected.childAgeMin,
+      childAgeMax: selected.childAgeMax,
+      childAgeLabel: selected.childAgeLabel,
+      infantAgeMax: selected.infantAgeMax,
+      infantAgeLabel: selected.infantAgeLabel,
+      tieredPricing: selected.tieredPricing,
       coverImage: p.coverImage || (selected.images?.[0] ? selected.images[0] : null),
       gallery: p.gallery?.length ? p.gallery : (selected.images?.slice(1) ?? []),
       description: p.description?.length ? p.description : (selected.description ?? []),
@@ -447,7 +462,7 @@ export default function PackageEditor({
         </Section>
 
         <Section title="Pricing">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 rounded-xl bg-black/20 p-3.5 border border-white/5">
+          <div className="grid grid-cols-1 gap-4 rounded-xl bg-black/20 p-3.5 border border-white/5">
             <Field label={`Adult Price (${baseCurrency}) — Primary rate`}>
               <input
                 type="number"
@@ -470,29 +485,22 @@ export default function PackageEditor({
                 Standard adult rate (ages 12+). Independent of child rate.
               </span>
             </Field>
-            <Field label={`Child Price (${baseCurrency}) — Child rate`}>
-              <input
-                type="number"
-                min="0"
-                step="1"
-                placeholder="e.g. 70"
-                className={input}
-                value={pkg.childPrice ?? ""}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  if (val === "") {
-                    set("childPrice", null);
-                  } else {
-                    const num = Number(val);
-                    set("childPrice", isNaN(num) ? null : Math.max(0, num));
-                  }
-                }}
-              />
-              <span className="block text-[10px] text-stone-500 mt-1">
-                Child discount rate (ages 5–10). Independent of adult rate.
-              </span>
-            </Field>
           </div>
+
+          {/* Children & infants — rates, age bands and labels */}
+          <AgePricingFields
+            value={pkg}
+            currency={baseCurrency}
+            onPatch={(patch) => setPkg((prev) => ({ ...prev, ...patch }))}
+          />
+
+          {/* Tiered adult pricing (1 / 2 / 3+ guests) */}
+          <TieredPricingEditor
+            tiers={pkg.tieredPricing}
+            currency={baseCurrency}
+            basePrice={pkg.priceFrom ?? null}
+            onChange={(tiers) => set("tieredPricing", tiers)}
+          />
           <Field label="Pinned display prices (override conversion)">
             <div className="space-y-2">
               {Object.entries(pkg.priceOverrides ?? {}).map(([code, value]) => (

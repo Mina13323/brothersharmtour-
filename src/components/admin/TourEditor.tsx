@@ -24,6 +24,7 @@ import type { CurrencyContext } from "@/lib/currency";
 import type { Tour, TripPackage } from "@/lib/types";
 import { destinationName, experienceName } from "@/lib/store/labels";
 import { MediaGalleryEditor, MediaVideoEditor } from "./MediaGalleryEditor";
+import { AgePricingFields, TieredPricingEditor } from "./PricingControls";
 
 type EditorTour = TourRecord;
 
@@ -299,7 +300,7 @@ export default function TourEditor({
             <Field label="Card summary (1–2 sentences, no marketing filler)">
               <textarea rows={3} className={input} value={tour.summary} onChange={(e) => set("summary", e.target.value)} />
             </Field>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 rounded-xl bg-black/20 p-3.5 border border-white/5">
+            <div className="grid grid-cols-1 gap-4 rounded-xl bg-black/20 p-3.5 border border-white/5">
               <Field label={`Adult Price (${tour.currency}) — Required for online quote`}>
                 <input
                   type="number"
@@ -322,29 +323,22 @@ export default function TourEditor({
                   Ages 12+. Independent of child price. Leave blank for &quot;Price on request&quot;.
                 </span>
               </Field>
-              <Field label={`Child Price (${tour.currency}) — Independent rate`}>
-                <input
-                  type="number"
-                  min="0"
-                  step="1"
-                  placeholder="e.g. 25"
-                  className={input}
-                  value={tour.childPrice ?? ""}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    if (val === "") {
-                      set("childPrice", null);
-                    } else {
-                      const num = Number(val);
-                      set("childPrice", isNaN(num) ? null : Math.max(0, num));
-                    }
-                  }}
-                />
-                <span className="block text-[10px] text-stone-500 mt-1">
-                  Ages 5–10. Editable independently. If left blank, falls back gracefully.
-                </span>
-              </Field>
             </div>
+
+            {/* Children & infants — rates, age bands and labels */}
+            <AgePricingFields
+              value={tour}
+              currency={tour.currency}
+              onPatch={(patch) => setTour((prev) => ({ ...prev, ...patch }))}
+            />
+
+            {/* Tiered adult pricing (1 / 2 / 3+ guests) */}
+            <TieredPricingEditor
+              tiers={tour.tieredPricing}
+              currency={tour.currency}
+              basePrice={tour.priceFrom ?? null}
+              onChange={(tiers) => set("tieredPricing", tiers)}
+            />
             <div className="grid grid-cols-2 gap-3">
               <Field label="Was-price (for struck-through display)">
                 <input

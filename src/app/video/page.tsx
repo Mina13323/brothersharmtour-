@@ -98,7 +98,7 @@ export default async function VideoPage() {
                       </h3>
                       {tour.priceFrom !== null ? (
                         <span className="shrink-0 text-[0.85rem] font-semibold text-reef-deep">
-                          {money(tour.priceFrom, currency, tour.priceOverrides)}
+                          {money(tour.priceFrom, currency, tour.priceOverrides, undefined, tour.currency)}
                         </span>
                       ) : null}
                     </div>

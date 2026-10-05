@@ -5,8 +5,12 @@ import Link from "next/link";
 import { WhatsAppIcon } from "./sections";
 import { useSite, useCatalogue } from "./SiteProvider";
 import { destinationName } from "@/lib/store/labels";
+import { formatAmount, priceIn } from "@/lib/currency";
 import {
   cn,
+  resolveTier,
+  childAgeBand,
+  infantAgeBand,
   tourPriceUnit,
   tourRating,
   tourReviewCount,
@@ -24,7 +28,7 @@ export function BookingWidget({
   initialOptions?: BookingOptions;
   onClose?: () => void;
 }) {
-  const { settings: site, whatsappLink, money, t } = useSite();
+  const { settings: site, whatsappLink, money, t, currency, lang } = useSite();
   const tours = useCatalogue();
   const [slug, setSlug] = useState(initialTour ?? "");
   const tour = tours.find((t) => t.slug === slug);
@@ -87,29 +91,112 @@ export function BookingWidget({
 
   const [touched, setTouched] = useState(false);
 
+  /* ── Pricing resolution ─────────────────────────────────────────────
+   * All money maths happens in the VISITOR'S display currency: each stored
+   * unit price is resolved once (pinned override → record currency → rate
+   * conversion) and only then multiplied by quantities. That keeps the
+   * drawer total, the counter rows, the tour page and the package cards on
+   * exactly the same number — e.g. the EUR-based combo shows $70 (pinned)
+   * in USD and €65 (its own currency) in EUR, never a re-converted €60.
+   */
+  const storedCurrency = tour?.currency ?? currency.base;
+
+  /** Stored adult price: the selected trip option's rate, else the tour/package "from" price. */
   const adultPrice = selectedPackage
     ? selectedPackage.adultPrice
     : (tour?.priceFrom ?? null);
 
+  /** Tiered adult pricing — the selected option's own tiers when one is chosen. */
+  const tiers = useMemo(
+    () =>
+      (selectedPackage
+        ? selectedPackage.tieredPricing
+        : tour?.tieredPricing) ?? [],
+    [selectedPackage, tour?.tieredPricing],
+  );
+
+  const addons = tour?.addons ?? [];
+  const unit = tour ? tourPriceUnit(tour) : "per person";
+  const perBoat = /per (boat|car)/.test(unit);
+
+  /** Tier matching the current adults count (never for per-boat hires). */
+  const activeTier = useMemo(
+    () => (perBoat ? null : resolveTier(tiers, adults)),
+    [perBoat, tiers, adults],
+  );
+
+  /** Stored per-child price: option → tour → graceful 80%-of-adult fallback. */
   const childPrice = selectedPackage
     ? (selectedPackage.childPrice !== undefined && selectedPackage.childPrice !== null
         ? selectedPackage.childPrice
         : 0)
     : (tour?.childPrice ?? (adultPrice !== null ? Math.round(adultPrice * 0.8) : null));
 
-  const infantPrice = selectedPackage ? (selectedPackage.infantPrice ?? 0) : 0;
-  const addons = tour?.addons ?? [];
-  const unit = tour ? tourPriceUnit(tour) : "per person";
-  const perBoat = /per (boat|car)/.test(unit);
+  /** Stored per-infant price: 0 (Free) unless the option or tour says otherwise. */
+  const infantPrice = selectedPackage
+    ? (selectedPackage.infantPrice ?? tour?.infantPrice ?? 0)
+    : (tour?.infantPrice ?? 0);
+
+  /* Unit prices in the display currency. Pinned overrides apply ONLY to the
+   * base adult price (and to the solo tier, which mirrors it) — never to
+   * child/infant/addon rates or to multi-guest group tiers. */
+  const adultUnitValue = useMemo(() => {
+    const stored = activeTier ? activeTier.pricePerPerson : adultPrice;
+    if (stored === null || stored === undefined) return null;
+    const applyOverrides =
+      !selectedPackage && (!activeTier || activeTier.minGuests <= 1);
+    return priceIn(stored, currency, {
+      overrides: applyOverrides ? tour?.priceOverrides : undefined,
+      from: storedCurrency,
+    }).value;
+  }, [activeTier, adultPrice, selectedPackage, tour?.priceOverrides, currency, storedCurrency]);
+
+  const childUnitValue = useMemo(
+    () =>
+      childPrice === null
+        ? null
+        : priceIn(childPrice, currency, { from: storedCurrency }).value,
+    [childPrice, currency, storedCurrency],
+  );
+
+  const infantUnitValue = useMemo(
+    () => priceIn(infantPrice, currency, { from: storedCurrency }).value ?? 0,
+    [infantPrice, currency, storedCurrency],
+  );
+
+  const fmt = (value: number | null) =>
+    value === null ? null : formatAmount(value, currency.display, lang);
 
   const total = useMemo(() => {
-    if (adultPrice === null) return null;
-    let sum = perBoat ? adultPrice : adults * adultPrice;
-    if (!perBoat && childPrice !== null) sum += children * childPrice;
-    if (selectedPackage && infantPrice > 0) sum += infants * infantPrice;
-    for (const a of addons) sum += (addonQty[a.label] ?? 0) * a.price;
+    if (adultUnitValue === null) return null;
+    let sum = perBoat ? adultUnitValue : adults * adultUnitValue;
+    if (!perBoat && childUnitValue !== null) sum += children * childUnitValue;
+    if (!perBoat && infantUnitValue > 0) sum += infants * infantUnitValue;
+    for (const a of addons) {
+      const addUnit = priceIn(a.price, currency, { from: storedCurrency }).value ?? 0;
+      sum += (addonQty[a.label] ?? 0) * addUnit;
+    }
     return sum;
-  }, [adultPrice, childPrice, infantPrice, adults, children, infants, selectedPackage, addons, addonQty, perBoat]);
+  }, [adultUnitValue, childUnitValue, infantUnitValue, adults, children, infants, addons, addonQty, perBoat, currency, storedCurrency]);
+
+  const totalFormatted = total === null ? null : fmt(total);
+
+  /** Whole-number saving of the active tier vs the solo/base rate. */
+  const tierSavingPct = useMemo(() => {
+    if (!activeTier || perBoat || adultUnitValue === null) return null;
+    const soloStored =
+      resolveTier(tiers, 1)?.pricePerPerson ??
+      (selectedPackage ? null : adultPrice);
+    if (soloStored === null || soloStored === undefined || soloStored <= 0) return null;
+    const soloValue =
+      priceIn(soloStored, currency, {
+        overrides: !selectedPackage ? tour?.priceOverrides : undefined,
+        from: storedCurrency,
+      }).value ?? null;
+    if (soloValue === null || activeTier.pricePerPerson >= soloStored) return null;
+    const pct = Math.round((1 - adultUnitValue / soloValue) * 100);
+    return pct > 0 ? pct : null;
+  }, [activeTier, perBoat, adultUnitValue, tiers, selectedPackage, adultPrice, currency, tour?.priceOverrides, storedCurrency]);
 
   const guests = adults + children + infants;
   const dateValid = Boolean(date);
@@ -136,12 +223,17 @@ export function BookingWidget({
           }`
         : null,
       `• Guests: ${adults} adult${adults === 1 ? "" : "s"}` +
-        (children ? `, ${children} child (5–10)` : "") +
-        (infants ? `, ${infants} infant (0–4${infantPrice === 0 ? ", free" : ""})` : ""),
+        (children ? `, ${children} child (${childAgeBand(tour)})` : "") +
+        (infants
+          ? `, ${infants} infant (${infantAgeBand(tour)}${infantPrice === 0 ? ", free" : ""})`
+          : ""),
+      activeTier?.label || tierSavingPct
+        ? `• Group rate: ${activeTier?.label ?? `${adults} guests`}${tierSavingPct ? ` (save ~${tierSavingPct}%)` : ""}`
+        : null,
       ...addons
         .filter((a) => (addonQty[a.label] ?? 0) > 0)
         .map((a) => `• Add-on: ${a.label} × ${addonQty[a.label]}`),
-      total !== null ? `• Estimated total: ${money(total)} (Pay on the day)` : null,
+      totalFormatted ? `• Estimated total: ${totalFormatted} (Pay on the day)` : null,
       notes.trim() ? `• Special Notes: ${notes.trim()}` : null,
       "",
       "Please confirm availability and pickup schedule. Thank you!",
@@ -159,12 +251,13 @@ export function BookingWidget({
     children,
     infants,
     infantPrice,
+    activeTier,
+    tierSavingPct,
     addons,
     addonQty,
-    total,
+    totalFormatted,
     notes,
     site.name,
-    money,
   ]);
 
   const handleBook = () => {
@@ -253,9 +346,9 @@ export function BookingWidget({
               {list.map((tItem) => (
                 <option key={tItem.slug} value={tItem.slug}>
                   {tItem.title}
-                  {tItem.priceFrom !== null && money(tItem.priceFrom, tItem.priceOverrides)
-                    ? ` — ${t("price_from", "from")} ${money(tItem.priceFrom, tItem.priceOverrides)}${
-                        tItem.childPrice ? ` (${t("price_child", "Child")}: ${money(tItem.childPrice)})` : ""
+                  {tItem.priceFrom !== null && money(tItem.priceFrom, tItem.priceOverrides, tItem.currency)
+                    ? ` — ${t("price_from", "from")} ${money(tItem.priceFrom, tItem.priceOverrides, tItem.currency)}${
+                        tItem.childPrice ? ` (${t("price_child", "Child")}: ${money(tItem.childPrice, undefined, tItem.currency)})` : ""
                       }`
                     : ""}
                 </option>
@@ -312,7 +405,7 @@ export function BookingWidget({
                       </div>
                       <div className="text-right shrink-0">
                         <span className="font-display font-bold text-sm text-reef-deep">
-                          {money(pkg.adultPrice)}
+                          {money(pkg.adultPrice, undefined, storedCurrency)}
                         </span>
                         <span className="text-[0.65rem] text-stone block -mt-0.5">
                           /{t("price_adult", "adult")}
@@ -327,20 +420,25 @@ export function BookingWidget({
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.72rem] text-stone pl-6.5 mt-0.5">
                       {pkg.childPrice !== null && pkg.childPrice !== undefined ? (
                         <span>
-                          {t("price_child", "Child")}:{" "}
+                          {t("price_child", "Child")} ({childAgeBand(tour ?? {})}):{" "}
                           <strong className="text-ink font-semibold">
-                            {money(pkg.childPrice)}
+                            {money(pkg.childPrice, undefined, storedCurrency)}
                           </strong>
                         </span>
                       ) : null}
-                      {pkg.infantPrice !== null && pkg.infantPrice !== undefined ? (
-                        <span>
-                          {t("guests_infants", "Infant")}:{" "}
-                          <strong className="text-ink font-semibold">
-                            {pkg.infantPrice === 0 ? t("free", "Free") : money(pkg.infantPrice)}
-                          </strong>
-                        </span>
-                      ) : null}
+                      {(() => {
+                        const pkgInfant = pkg.infantPrice ?? tour?.infantPrice ?? 0;
+                        return (
+                          <span>
+                            {t("guests_infants", "Infant")} ({infantAgeBand(tour ?? {})}):{" "}
+                            <strong className="text-ink font-semibold">
+                              {pkgInfant === 0
+                                ? t("free", "Free")
+                                : money(pkgInfant, undefined, storedCurrency)}
+                            </strong>
+                          </span>
+                        );
+                      })()}
                       {pkg.duration ? <span>· {pkg.duration}</span> : null}
                     </div>
                   </button>
@@ -369,8 +467,10 @@ export function BookingWidget({
           <Counter
             label={t("guests_adults", "Adults")}
             sub={
-              adultPrice !== null && !perBoat
-                ? `${money(adultPrice, selectedPackage ? undefined : tour?.priceOverrides)} · ${t("age_adults", "12+ yrs")}`
+              adultUnitValue !== null && !perBoat
+                ? `${fmt(adultUnitValue)} · ${t("age_adults", "12+ yrs")}${
+                    activeTier?.label ? ` · ${activeTier.label}` : ""
+                  }`
                 : t("age_adults", "12+ yrs")
             }
             value={adults}
@@ -381,9 +481,9 @@ export function BookingWidget({
             <Counter
               label={t("guests_children", "Children")}
               sub={
-                childPrice !== null
-                  ? `${money(childPrice)} · ${t("age_children", "ages 5–10")}`
-                  : t("age_children", "ages 5–10")
+                childUnitValue !== null
+                  ? `${fmt(childUnitValue)} · (${childAgeBand(tour ?? {})})`
+                  : `(${childAgeBand(tour ?? {})})`
               }
               value={children}
               onChange={setChildren}
@@ -392,14 +492,61 @@ export function BookingWidget({
           <Counter
             label={t("guests_infants", "Infants")}
             sub={
-              infantPrice > 0
-                ? `${money(infantPrice)} · ${t("age_infants", "ages 0–4")}`
-                : t("age_infants", "ages 0–4 · free")
+              infantUnitValue > 0
+                ? `${fmt(infantUnitValue)} · (${infantAgeBand(tour ?? {})})`
+                : `${t("free", "Free")} · (${infantAgeBand(tour ?? {})})`
             }
             value={infants}
             onChange={setInfants}
           />
         </div>
+
+        {/* Tiered adult pricing — the active tier follows the adults counter */}
+        {!perBoat && tiers.length > 1 ? (
+          <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+            {[...tiers]
+              .sort((a, b) => a.minGuests - b.minGuests)
+              .map((tier) => {
+                const isActive =
+                  activeTier !== null && activeTier.minGuests === tier.minGuests;
+                const tierValue = priceIn(tier.pricePerPerson, currency, {
+                  overrides:
+                    !selectedPackage && tier.minGuests <= 1
+                      ? tour?.priceOverrides
+                      : undefined,
+                  from: storedCurrency,
+                }).value;
+                const solo = resolveTier(tiers, 1);
+                const savePct =
+                  solo && tier.pricePerPerson < solo.pricePerPerson
+                    ? Math.round((1 - tier.pricePerPerson / solo.pricePerPerson) * 100)
+                    : 0;
+                return (
+                  <span
+                    key={`${tier.minGuests}-${tier.maxGuests ?? "up"}`}
+                    className={cn(
+                      "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[0.7rem] font-medium transition-colors",
+                      isActive
+                        ? "border-reef bg-reef/[0.08] text-reef-deep font-semibold"
+                        : "border-sand/80 bg-paper-warm/40 text-stone",
+                    )}
+                  >
+                    {tier.label?.trim() ||
+                      `${tier.minGuests}${tier.maxGuests == null ? "+" : tier.maxGuests === tier.minGuests ? "" : `–${tier.maxGuests}`} ${
+                        tier.minGuests === 1 ? "person" : "persons"
+                      }`}
+                    {tierValue !== null ? ` · ${fmt(tierValue)}` : ""}
+                    {savePct > 0 ? (
+                      <span className="text-[0.65rem] font-bold text-emerald-700">
+                        −{savePct}%
+                      </span>
+                    ) : null}
+                  </span>
+                );
+              })}
+          </div>
+        ) : null}
+
         {perBoat ? (
           <p className="mt-2 text-[0.78rem] text-stone">
             Private hire — one price for the whole {unit.replace("per ", "")}.
@@ -415,7 +562,7 @@ export function BookingWidget({
               <Counter
                 key={a.label}
                 label={a.label}
-                sub={`${money(a.price)}${a.unit ? ` ${a.unit}` : " each"}`}
+                sub={`${money(a.price, undefined, storedCurrency)}${a.unit ? ` ${a.unit}` : " each"}`}
                 value={addonQty[a.label] ?? 0}
                 onChange={(v) => setAddon(a.label, v - (addonQty[a.label] ?? 0))}
               />
@@ -528,11 +675,16 @@ export function BookingWidget({
               {t("estimated_total", "Estimated total")}
             </p>
             <p className="font-display text-[2rem] leading-none text-ink">
-              {total !== null ? money(total) ?? t("price_on_request", "On request") : t("price_on_request", "On request")}
+              {totalFormatted ?? t("price_on_request", "On request")}
             </p>
             <p className="mt-1 text-[0.75rem] text-stone">
               {tour ? `${guests} guest${guests === 1 ? "" : "s"} · ` : ""}
               {t("pay_on_day", "paid on the day")}
+              {tierSavingPct ? (
+                <span className="ml-1.5 inline-flex items-center rounded-full bg-emerald-600/10 px-2 py-0.5 text-[0.68rem] font-bold text-emerald-700">
+                  {t("group_rate_saved", "Group rate applied")} −{tierSavingPct}%
+                </span>
+              ) : null}
             </p>
           </div>
         </div>

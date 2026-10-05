@@ -63,7 +63,7 @@ export default async function PackagesPage() {
           ) : (
             <div className="mt-12 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
               {packages.map((pkg, i) => {
-                const price = money(pkg.priceFrom, currency, pkg.priceOverrides);
+                const price = money(pkg.priceFrom, currency, pkg.priceOverrides, undefined, pkg.currency);
                 return (
                   <Reveal key={pkg.slug} delay={i * 70}>
                     <article className="group flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-sand/70 bg-paper shadow-[var(--shadow-lift)] transition-all duration-500 hover:shadow-[var(--shadow-panel)] hover:border-reef/30 hover:-translate-y-1">

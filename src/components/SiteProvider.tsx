@@ -52,8 +52,16 @@ interface SiteContextValue {
   catalogue: CatalogueTour[];
   currency: CurrencyContext;
   lang: string;
-  /** Formats a base-currency amount in the visitor's display currency. */
-  money: (value: number | null | undefined, overrides?: Record<string, number>) => string | null;
+  /**
+   * Formats a stored amount in the visitor's display currency.
+   * `overrides` pins exact per-currency prices (adult base price only);
+   * `from` is the currency the amount is stored in (tour/pkg `currency`).
+   */
+  money: (
+    value: number | null | undefined,
+    overrides?: Record<string, number>,
+    from?: string,
+  ) => string | null;
   whatsappLink: (message?: string) => string;
   t: (key: keyof TranslationDictionary | (string & {}), fallback?: string) => string;
 }
@@ -91,8 +99,8 @@ export function SiteProvider({
   children: ReactNode;
 }) {
   const money = useCallback(
-    (value: number | null | undefined, overrides?: Record<string, number>) =>
-      moneyIn(value, currency, { overrides, lang }),
+    (value: number | null | undefined, overrides?: Record<string, number>, from?: string) =>
+      moneyIn(value, currency, { overrides, from, lang }),
     [currency, lang],
   );
 

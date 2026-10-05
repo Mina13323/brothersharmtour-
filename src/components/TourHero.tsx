@@ -287,10 +287,11 @@ export function TourHero({
   tour: Tour & { priceOverrides?: Record<string, number> };
 }) {
   const { money, t } = useSite();
-  const price = money(tour.priceFrom, tour.priceOverrides);
+  const price = money(tour.priceFrom, tour.priceOverrides, tour.currency);
+  // Pinned overrides belong to the adult base price only — never the child rate.
   const childPrice =
     tour.childPrice !== null && tour.childPrice !== undefined
-      ? money(tour.childPrice, tour.priceOverrides)
+      ? money(tour.childPrice, undefined, tour.currency)
       : null;
 
   const priceTag = price

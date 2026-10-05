@@ -69,9 +69,11 @@ export default async function PackageDetailPage({
 
   const [settings, { currency, lang }] = await Promise.all([getPublicSettings(), getSiteView()]);
   const pkg = localizePackage(rawPkg, lang);
-  const price = money(pkg.priceFrom, currency, pkg.priceOverrides);
+  const price = money(pkg.priceFrom, currency, pkg.priceOverrides, lang, pkg.currency);
   const childPriceFormatted =
-    pkg.childPrice !== null && pkg.childPrice !== undefined ? money(pkg.childPrice, currency) : null;
+    pkg.childPrice !== null && pkg.childPrice !== undefined
+      ? money(pkg.childPrice, currency, undefined, lang, pkg.currency)
+      : null;
   const whatsappLink = (m?: string) => serverWhatsappLink(settings.contact.whatsapp, m);
 
   const allTours = publishedTours();

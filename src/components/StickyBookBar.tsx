@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useBooking } from "./BookingProvider";
 import { WhatsAppIcon } from "./sections";
 import { useSite } from "./SiteProvider";
+import { childAgeBand } from "@/lib/utils";
 import type { BookingOptions } from "./BookingProvider";
 import type { Tour, TripPackage } from "@/lib/types";
 
@@ -57,16 +58,20 @@ export function StickyBookBar({
             {price !== null ? (
               <>
                 <span className="font-display font-semibold text-[1.05rem] text-ink">
-                  {money(price, selectedPackage ? undefined : tour.priceOverrides)}
+                  {/* Pinned overrides apply to the tour's base adult price only —
+                      resolved from the record's own stored currency. */}
+                  {money(price, selectedPackage ? undefined : tour.priceOverrides, tour.currency)}
                 </span>{" "}
                 <span className="text-stone/90 text-xs">({t("price_adult", "Adult")})</span>
                 {typeof childPrice === "number" && childPrice >= 0 && (
                   <span className="inline-flex items-center gap-1">
                     <span className="text-sand/90">·</span>
                     <span className="font-display font-semibold text-ink text-sm">
-                      {money(childPrice)}
+                      {money(childPrice, undefined, tour.currency)}
                     </span>
-                    <span className="text-stone/90 text-xs">({t("price_child", "Child")})</span>
+                    <span className="text-stone/90 text-xs">
+                      ({t("price_child", "Child")} {childAgeBand(tour)})
+                    </span>
                   </span>
                 )}
                 <span className="hidden sm:inline text-stone/80">· {t("pay_on_day", "pay on the day")}</span>

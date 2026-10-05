@@ -170,6 +170,23 @@ ALTER TABLE public.tours ADD COLUMN IF NOT EXISTS trip_packages jsonb DEFAULT '[
 ALTER TABLE public.tours ADD COLUMN IF NOT EXISTS verified boolean DEFAULT false;
 ALTER TABLE public.tours ADD COLUMN IF NOT EXISTS seo jsonb DEFAULT '{}'::jsonb;
 
+-- Child/infant pricing, age bands and tiered adult pricing (tours + packages)
+ALTER TABLE public.tours ADD COLUMN IF NOT EXISTS infant_price numeric;
+ALTER TABLE public.tours ADD COLUMN IF NOT EXISTS child_age_min integer;
+ALTER TABLE public.tours ADD COLUMN IF NOT EXISTS child_age_max integer;
+ALTER TABLE public.tours ADD COLUMN IF NOT EXISTS child_age_label text;
+ALTER TABLE public.tours ADD COLUMN IF NOT EXISTS infant_age_max integer;
+ALTER TABLE public.tours ADD COLUMN IF NOT EXISTS infant_age_label text;
+ALTER TABLE public.tours ADD COLUMN IF NOT EXISTS tiered_pricing jsonb DEFAULT '[]'::jsonb;
+
+ALTER TABLE public.packages ADD COLUMN IF NOT EXISTS infant_price numeric;
+ALTER TABLE public.packages ADD COLUMN IF NOT EXISTS child_age_min integer;
+ALTER TABLE public.packages ADD COLUMN IF NOT EXISTS child_age_max integer;
+ALTER TABLE public.packages ADD COLUMN IF NOT EXISTS child_age_label text;
+ALTER TABLE public.packages ADD COLUMN IF NOT EXISTS infant_age_max integer;
+ALTER TABLE public.packages ADD COLUMN IF NOT EXISTS infant_age_label text;
+ALTER TABLE public.packages ADD COLUMN IF NOT EXISTS tiered_pricing jsonb DEFAULT '[]'::jsonb;
+
 ALTER TABLE public.packages ADD COLUMN IF NOT EXISTS tour_id text;
 ALTER TABLE public.packages ADD COLUMN IF NOT EXISTS tour_slug text;
 ALTER TABLE public.packages ADD COLUMN IF NOT EXISTS included_tours jsonb DEFAULT '[]'::jsonb;

@@ -113,6 +113,27 @@ export interface FaqItem {
   answer: string;
 }
 
+/**
+ * A group-size price tier for adult pricing. The booking widget picks the
+ * tier whose [minGuests, maxGuests] range contains the current adults count
+ * and charges `pricePerPerson × adults`.
+ *
+ * Example set:
+ *   { minGuests: 1, maxGuests: 1,    pricePerPerson: 50, label: "Solo traveler" }
+ *   { minGuests: 2, maxGuests: 2,    pricePerPerson: 45, label: "Couples / 2 Guests" }
+ *   { minGuests: 3, maxGuests: null, pricePerPerson: 40, label: "Group (3+)" }
+ */
+export interface TieredPrice {
+  /** Inclusive lower bound of the party size, e.g. 1, 2, 3. */
+  minGuests: number;
+  /** Inclusive upper bound — null (or omitted) means "and above", e.g. 3+. */
+  maxGuests?: number | null;
+  /** Price charged per adult inside this tier, in the record's currency. */
+  pricePerPerson: number;
+  /** Admin-authored display label, e.g. "Solo traveler", "Group (3+)". */
+  label?: string;
+}
+
 /** A purchasable option/tier inside an individual tour (e.g. without equipment vs with equipment). */
 export interface TripPackage {
   id: string;
@@ -120,7 +141,10 @@ export interface TripPackage {
   description?: string;
   adultPrice: number;
   childPrice?: number | null;
+  /** Price per infant. 0 (the default) renders as "Free". */
   infantPrice?: number | null;
+  /** Optional group-size tiers for this option's adult price. */
+  tieredPricing?: TieredPrice[];
   duration?: string;
   included?: string[];
   excluded?: string[];
@@ -165,8 +189,22 @@ export interface Tour {
   schedule?: string;
   /** Pricing unit label, e.g. "per person", "per boat". */
   priceUnit?: string;
-  /** Price per child (5–10). Falls back to ~80% of the adult price. */
+  /** Price per child. Falls back to ~80% of the adult price when unset. */
   childPrice?: number | null;
+  /** Inclusive lower bound of the child age band. Default 4. */
+  childAgeMin?: number;
+  /** Inclusive upper bound of the child age band. Default 11. */
+  childAgeMax?: number;
+  /** Custom display label for the child age band, e.g. "4–11 years". */
+  childAgeLabel?: string;
+  /** Price per infant. 0 (the default) renders as "Free". */
+  infantPrice?: number | null;
+  /** Inclusive upper bound of the infant age band. Default 3. */
+  infantAgeMax?: number;
+  /** Custom display label for the infant age band, e.g. "Under 4 years". */
+  infantAgeLabel?: string;
+  /** Group-size adult pricing tiers (1 / 2 / 3+ guests). Optional. */
+  tieredPricing?: TieredPrice[];
   /** Trip Packages / Tour Options belonging to this individual tour. */
   tripPackages?: TripPackage[];
   /** Optional paid extras shown as counters in the booking widget. */

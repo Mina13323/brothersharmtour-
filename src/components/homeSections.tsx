@@ -285,6 +285,7 @@ export function Bestsellers() {
       price: t.priceFrom,
       childPrice: t.childPrice,
       priceOverrides: t.priceOverrides,
+      currency: t.currency,
       duration: t.duration ?? "Flexible",
       desc: t.summary,
     }));
@@ -365,7 +366,7 @@ export function Bestsellers() {
                         {t("price_adult", "Adult")}
                       </span>
                       <span className="font-display text-xl font-bold text-ink leading-none">
-                        {money(tour.price, tour.priceOverrides) ?? t("price_on_request", "On request")}
+                        {money(tour.price, tour.priceOverrides, tour.currency) ?? t("price_on_request", "On request")}
                       </span>
                     </div>
                     {typeof tour.childPrice === "number" && tour.childPrice >= 0 && (
@@ -374,7 +375,7 @@ export function Bestsellers() {
                           {t("price_child", "Child")}
                         </span>
                         <span className="font-display text-base font-semibold text-ink/90 leading-none">
-                          {money(tour.childPrice)}
+                          {money(tour.childPrice, undefined, tour.currency)}
                         </span>
                       </div>
                     )}

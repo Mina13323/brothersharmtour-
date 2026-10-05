@@ -38,17 +38,27 @@ export function convert(
 
 /**
  * Formats a stored price in the display currency.
- * `override` (per-tour pinned price) always wins over conversion.
+ *
+ * Resolution order:
+ *  1. `overrides[display]` — an admin-pinned price for the visitor's currency
+ *     always wins (e.g. USD 70 for the EUR-based combo).
+ *  2. `from` — the currency the amount is actually stored in (tour.currency /
+ *     pkg.currency). When it equals the display currency the amount is used
+ *     AS-IS (€65 stays €65 — never re-converted through the base rate).
+ *  3. Rate conversion from `from` (falling back to `ctx.base` for legacy
+ *     callers) into the display currency.
  */
 export function priceIn(
   amount: number | null | undefined,
   ctx: CurrencyContext,
-  options?: { overrides?: Record<string, number> },
+  options?: { overrides?: Record<string, number>; from?: string },
 ): { value: number | null; currency: string } {
   if (amount === null || amount === undefined) return { value: null, currency: ctx.display };
   const pinned = options?.overrides?.[ctx.display];
   if (typeof pinned === "number") return { value: pinned, currency: ctx.display };
-  const converted = convert(amount, ctx.base, ctx.display, ctx.rates);
+  const from = options?.from || ctx.base;
+  if (from === ctx.display) return { value: amount, currency: ctx.display };
+  const converted = convert(amount, from, ctx.display, ctx.rates);
   return { value: converted, currency: ctx.display };
 }
 
@@ -73,7 +83,7 @@ export function formatAmount(value: number, currency: string, lang?: string): st
 export function moneyIn(
   amount: number | null | undefined,
   ctx: CurrencyContext,
-  options?: { overrides?: Record<string, number>; lang?: string },
+  options?: { overrides?: Record<string, number>; from?: string; lang?: string },
 ): string | null {
   const { value, currency } = priceIn(amount, ctx, options);
   if (value === null) return null;

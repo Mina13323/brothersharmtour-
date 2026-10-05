@@ -149,6 +149,7 @@ export function saveTour(input: Partial<TourRecord> & { slug: string }): TourRec
       "description",
       "languages",
       "tripPackages",
+      "tieredPricing",
     ] as const) {
       if (record[key] === undefined && existing?.[key]) {
         (record as unknown as Record<string, unknown>)[key] = existing[key];
@@ -233,6 +234,8 @@ export function localizeTour(tour: TourRecord, lang?: string | null): Tour {
     bring: t?.bring?.length ? t.bring : tour.bring,
     itinerary: t?.itinerary?.length ? t.itinerary : tour.itinerary,
     tripPackages,
+    childAgeLabel: overlay(tour.childAgeLabel ?? "", t?.childAgeLabel) || undefined,
+    infantAgeLabel: overlay(tour.infantAgeLabel ?? "", t?.infantAgeLabel) || undefined,
     seo: t?.seoTitle
       ? {
         ...(tour.seo ?? {}),
@@ -686,6 +689,13 @@ export function buildCatalogue(lang?: string): CatalogueTour[] {
         priceFrom: t.priceFrom,
         currency: t.currency,
         childPrice: t.childPrice ?? null,
+        childAgeMin: t.childAgeMin,
+        childAgeMax: t.childAgeMax,
+        childAgeLabel: t.childAgeLabel,
+        infantPrice: t.infantPrice ?? null,
+        infantAgeMax: t.infantAgeMax,
+        infantAgeLabel: t.infantAgeLabel,
+        tieredPricing: t.tieredPricing ?? [],
         tripPackages: t.tripPackages ?? [],
         priceUnit: t.priceUnit,
         priceOriginal: t.priceOriginal ?? null,
@@ -723,6 +733,13 @@ export function buildCatalogue(lang?: string): CatalogueTour[] {
         priceFrom: p.priceFrom,
         currency: p.currency,
         childPrice: p.childPrice ?? null,
+        childAgeMin: p.childAgeMin,
+        childAgeMax: p.childAgeMax,
+        childAgeLabel: p.childAgeLabel,
+        infantPrice: p.infantPrice ?? null,
+        infantAgeMax: p.infantAgeMax,
+        infantAgeLabel: p.infantAgeLabel,
+        tieredPricing: p.tieredPricing ?? [],
         priceUnit: undefined,
         priceOriginal: null,
         priceOverrides: p.priceOverrides,

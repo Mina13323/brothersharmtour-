@@ -7,7 +7,59 @@
  * never overwrite client edits stored in the database.
  */
 
-import type { Database, TourRecord, PackageRecord, InquiryRecord, ReviewRecord, Settings } from "./types";
+import type { Database, TourRecord, PackageRecord, InquiryRecord, ReviewRecord, Settings, TieredPrice } from "./types";
+
+/**
+ * Child/infant pricing + tiered adult pricing columns shared by tours and
+ * packages: `infant_price`, the child age range (`child_age_min/max/label`),
+ * `infant_age_max/label` and `tiered_pricing` (jsonb). Serialised when set,
+ * read back defensively so older rows without the columns still hydrate.
+ */
+type AgePricedRecord = Pick<
+  TourRecord,
+  | "infantPrice"
+  | "childAgeMin"
+  | "childAgeMax"
+  | "childAgeLabel"
+  | "infantAgeMax"
+  | "infantAgeLabel"
+  | "tieredPricing"
+>;
+
+function agePricingToColumns(rec: Partial<AgePricedRecord>): Record<string, unknown> {
+  return {
+    infant_price: rec.infantPrice ?? null,
+    child_age_min: rec.childAgeMin ?? null,
+    child_age_max: rec.childAgeMax ?? null,
+    child_age_label: rec.childAgeLabel || null,
+    infant_age_max: rec.infantAgeMax ?? null,
+    infant_age_label: rec.infantAgeLabel || null,
+    tiered_pricing: rec.tieredPricing ?? [],
+  };
+}
+
+function agePricingFromColumns(r: Record<string, unknown>): AgePricedRecord {
+  const num = (v: unknown): number | undefined =>
+    v == null || v === "" || Number.isNaN(Number(v)) ? undefined : Number(v);
+  const tiered = Array.isArray(r.tiered_pricing)
+    ? (r.tiered_pricing as unknown[]).filter(
+        (t): t is TieredPrice =>
+          Boolean(t) &&
+          typeof t === "object" &&
+          Number.isFinite((t as TieredPrice).minGuests) &&
+          Number.isFinite((t as TieredPrice).pricePerPerson),
+      )
+    : [];
+  return {
+    infantPrice: r.infant_price != null ? Number(r.infant_price) : undefined,
+    childAgeMin: num(r.child_age_min),
+    childAgeMax: num(r.child_age_max),
+    childAgeLabel: (r.child_age_label as string) || undefined,
+    infantAgeMax: num(r.infant_age_max),
+    infantAgeLabel: (r.infant_age_label as string) || undefined,
+    tieredPricing: tiered,
+  };
+}
 
 const SUPABASE_URL = (process.env.NEXT_PUBLIC_SUPABASE_URL || "").trim();
 const SUPABASE_KEY = (
@@ -49,6 +101,7 @@ export function tourToRow(tour: TourRecord): Record<string, unknown> {
     duration_hours: tour.durationHours ?? null,
     price_from: tour.priceFrom ?? null,
     child_price: tour.childPrice ?? null,
+    ...agePricingToColumns(tour),
     currency: tour.currency || "USD",
     price_original: tour.priceOriginal ?? null,
     price_unit: tour.priceUnit || null,
@@ -107,6 +160,7 @@ export function rowToTour(r: Record<string, unknown>): TourRecord {
     durationHours: r.duration_hours != null ? Number(r.duration_hours) : null,
     priceFrom: r.price_from != null ? Number(r.price_from) : null,
     childPrice: r.child_price != null ? Number(r.child_price) : null,
+    ...agePricingFromColumns(r),
     tripPackages,
     currency: (r.currency as string) || "USD",
     priceOriginal: r.price_original != null ? Number(r.price_original) : null,
@@ -154,6 +208,7 @@ export function pkgToRow(pkg: PackageRecord): Record<string, unknown> {
     duration: pkg.duration || "",
     price_from: pkg.priceFrom ?? null,
     child_price: pkg.childPrice ?? null,
+    ...agePricingToColumns(pkg),
     currency: pkg.currency || "USD",
     price_overrides: pkg.priceOverrides || {},
     cover_image: pkg.coverImage || null,
@@ -202,6 +257,7 @@ export function rowToPackage(r: Record<string, unknown>): PackageRecord {
     duration: (r.duration as string) || "",
     priceFrom: r.price_from != null ? Number(r.price_from) : null,
     childPrice: r.child_price != null ? Number(r.child_price) : null,
+    ...agePricingFromColumns(r),
     currency: (r.currency as string) || "USD",
     priceOverrides: r.price_overrides && typeof r.price_overrides === "object" ? (r.price_overrides as Record<string, number>) : {},
     coverImage: (r.cover_image as PackageRecord["coverImage"]) || null,

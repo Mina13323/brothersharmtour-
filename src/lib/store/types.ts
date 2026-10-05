@@ -19,9 +19,12 @@ import type {
   MediaImage,
   MediaVideo,
   SeoMeta,
+  TieredPrice,
   TourType,
   TripPackage,
 } from "@/lib/types";
+
+export type { TieredPrice };
 
 export type DestinationSlug = string;
 export type ExperienceSlug = string;
@@ -50,6 +53,9 @@ export interface TourTranslation {
   bring?: string[];
   itinerary?: ItineraryStop[];
   tripPackages?: Array<{ id: string; title?: string; description?: string }>;
+  /** Localised age-band labels, e.g. "4–11 años". Prices are never translated. */
+  childAgeLabel?: string;
+  infantAgeLabel?: string;
   seoTitle?: string;
   seoDescription?: string;
 }
@@ -77,6 +83,19 @@ export interface TourRecord {
   /** Explicit per-currency prices that override rate conversion, e.g. { GBP: 35 }. */
   priceOverrides?: Record<string, number>;
   childPrice?: number | null;
+  /** Inclusive child age band. Defaults: 4–11. */
+  childAgeMin?: number;
+  childAgeMax?: number;
+  /** Custom child age label, e.g. "4–11 years". Derived from min/max when unset. */
+  childAgeLabel?: string;
+  /** Price per infant — 0 (default) renders as "Free". */
+  infantPrice?: number | null;
+  /** Inclusive infant age ceiling. Default: 3 (i.e. "under 4"). */
+  infantAgeMax?: number;
+  /** Custom infant age label, e.g. "Under 4 years". Derived when unset. */
+  infantAgeLabel?: string;
+  /** Group-size adult pricing tiers (1 / 2 / 3+ guests). */
+  tieredPricing?: TieredPrice[];
   tripPackages?: TripPackage[];
   priceUnit?: string;
   schedule?: string;
@@ -129,6 +148,17 @@ export interface PackageRecord {
   durationHours?: number | null;
   priceFrom: number | null;
   childPrice?: number | null;
+  /** Inclusive child age band. Defaults: 4–11. */
+  childAgeMin?: number;
+  childAgeMax?: number;
+  childAgeLabel?: string;
+  /** Price per infant — 0 (default) renders as "Free". */
+  infantPrice?: number | null;
+  /** Inclusive infant age ceiling. Default: 3 (i.e. "under 4"). */
+  infantAgeMax?: number;
+  infantAgeLabel?: string;
+  /** Group-size adult pricing tiers (1 / 2 / 3+ guests). */
+  tieredPricing?: TieredPrice[];
   currency: string;
   priceOverrides?: Record<string, number>;
   /** Selected / linked tour reference */
@@ -324,6 +354,15 @@ export interface CatalogueTour {
   priceOriginal?: number | null;
   /** Explicit per-currency prices that win over rate conversion. */
   priceOverrides?: Record<string, number>;
+  /** Child/infant pricing + age bands, passed through for the booking widget. */
+  childAgeMin?: number;
+  childAgeMax?: number;
+  childAgeLabel?: string;
+  infantPrice?: number | null;
+  infantAgeMax?: number;
+  infantAgeLabel?: string;
+  /** Group-size adult pricing tiers (1 / 2 / 3+ guests). */
+  tieredPricing?: TieredPrice[];
   /** Authored departure schedule, e.g. "Daily". */
   schedule?: string | null;
   /** Optional bookable extras shown in the booking drawer. */

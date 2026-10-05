@@ -1,5 +1,6 @@
 import type { CurrencyContext } from "@/lib/currency";
 import { moneyIn } from "@/lib/currency";
+import type { TieredPrice } from "@/lib/types";
 
 export function cn(...classes: (string | false | null | undefined)[]) {
   return classes.filter(Boolean).join(" ");
@@ -16,16 +17,77 @@ export function formatPrice(value: number | null, currency = "USD") {
 }
 
 /**
- * Renders a stored (base-currency) price in the display currency.
+ * Renders a stored price in the display currency.
  * `ctx` comes from the CMS settings — see src/lib/currency.ts.
+ * `from` is the currency the value is stored in (tour.currency / pkg.currency);
+ * without it conversion falls back to ctx.base.
  */
 export function money(
   value: number | null | undefined,
   ctx: CurrencyContext,
   overrides?: Record<string, number>,
   lang?: string,
+  from?: string,
 ) {
-  return moneyIn(value, ctx, { overrides, lang });
+  return moneyIn(value, ctx, { overrides, from, lang });
+}
+
+/* ─────────────────── tiered pricing & age bands ─────────────────── */
+
+/** Age-band defaults shared by the widget, tour pages and the CMS editors. */
+export const CHILD_AGE_MIN_DEFAULT = 4;
+export const CHILD_AGE_MAX_DEFAULT = 11;
+export const INFANT_AGE_MAX_DEFAULT = 3;
+
+/**
+ * Finds the active price tier for a party of `guests` adults: the tier whose
+ * inclusive [minGuests, maxGuests] range contains the count (maxGuests null
+ * means "and above"). Tiers are evaluated in ascending minGuests order.
+ */
+export function resolveTier(
+  tiers: TieredPrice[] | null | undefined,
+  guests: number,
+): TieredPrice | null {
+  if (!tiers?.length || guests < 1) return null;
+  const sorted = [...tiers]
+    .filter(
+      (t) =>
+        t &&
+        Number.isFinite(t.minGuests) &&
+        Number.isFinite(t.pricePerPerson) &&
+        t.pricePerPerson >= 0,
+    )
+    .sort((a, b) => a.minGuests - b.minGuests);
+  for (const tier of sorted) {
+    const max = tier.maxGuests ?? null;
+    if (guests >= tier.minGuests && (max === null || guests <= max)) return tier;
+  }
+  // Party larger than every bounded tier → the last open-ended tier, else the highest.
+  const last = sorted[sorted.length - 1];
+  return guests >= last.minGuests ? last : null;
+}
+
+interface AgeBanded {
+  childAgeMin?: number;
+  childAgeMax?: number;
+  childAgeLabel?: string;
+  infantAgeMax?: number;
+  infantAgeLabel?: string;
+}
+
+/** Child age-band label: custom label wins, else derived, e.g. "4–11 yrs". */
+export function childAgeBand(t: AgeBanded): string {
+  if (t.childAgeLabel?.trim()) return t.childAgeLabel.trim();
+  const min = t.childAgeMin ?? CHILD_AGE_MIN_DEFAULT;
+  const max = t.childAgeMax ?? CHILD_AGE_MAX_DEFAULT;
+  return `${min}–${max} yrs`;
+}
+
+/** Infant age-band label: custom label wins, else derived, e.g. "under 4 yrs". */
+export function infantAgeBand(t: AgeBanded): string {
+  if (t.infantAgeLabel?.trim()) return t.infantAgeLabel.trim();
+  const max = t.infantAgeMax ?? INFANT_AGE_MAX_DEFAULT;
+  return `under ${max + 1} yrs`;
 }
 
 /**

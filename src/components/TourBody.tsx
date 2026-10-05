@@ -27,9 +27,13 @@ import { GuideLanguageBadge } from "./DynamicGuideLanguage";
 import { useSite } from "./SiteProvider";
 import type { PublicReview } from "@/lib/siteview";
 import { destinationName, experienceName } from "@/lib/store/labels";
+import { formatAmount, priceIn } from "@/lib/currency";
 import type { Tour } from "@/lib/types";
 import {
   cn,
+  resolveTier,
+  childAgeBand,
+  infantAgeBand,
   tourRating,
   tourReviewCount,
   tourOriginalPrice,
@@ -55,7 +59,7 @@ export function TourBody({
   /** In the CMS preview the fixed-position sticky bar is suppressed. */
   preview?: boolean;
 }) {
-  const { money, whatsappLink, settings, t, lang } = useSite();
+  const { money, whatsappLink, settings, t, lang, currency } = useSite();
   const { open } = useBooking();
 
   const activeTripPackages = useMemo(() => {
@@ -123,23 +127,53 @@ export function TourBody({
 
   const selectedPkgAdultPrice = selectedPkg?.adultPrice ?? 0;
   const selectedPkgChildPrice = selectedPkg?.childPrice ?? 0;
-  const selectedPkgInfantPrice = selectedPkg?.infantPrice ?? 0;
+  const selectedPkgInfantPrice =
+    selectedPkg?.infantPrice ?? tour.infantPrice ?? 0;
+
+  /** Currency the tour/package prices are stored in — all maths below first
+   * resolves unit prices into the visitor's display currency, so totals here,
+   * in the booking drawer and on the package cards can never disagree. */
+  const storedCurrency = tour.currency;
+  const fmt = (value: number | null | undefined) =>
+    value === null || value === undefined
+      ? null
+      : formatAmount(value, currency.display, lang);
+  const toDisplay = (stored: number | null | undefined) =>
+    stored === null || stored === undefined
+      ? null
+      : priceIn(stored, currency, { from: storedCurrency }).value;
+
+  /** Tier matching the selected option's adult count (option-level tiers only). */
+  const selectedPkgTier = resolveTier(
+    selectedPkg?.tieredPricing,
+    effectiveSelectedAdults,
+  );
 
   const selectedPkgTotal = useMemo(() => {
     if (!selectedPkg) return 0;
+    const adultUnit =
+      toDisplay(
+        selectedPkgTier ? selectedPkgTier.pricePerPerson : selectedPkgAdultPrice,
+      ) ?? 0;
+    const childUnit = toDisplay(selectedPkgChildPrice) ?? 0;
+    const infantUnit = toDisplay(selectedPkgInfantPrice) ?? 0;
     return (
-      effectiveSelectedAdults * selectedPkgAdultPrice +
-      effectiveSelectedChildren * selectedPkgChildPrice +
-      effectiveSelectedInfants * selectedPkgInfantPrice
+      effectiveSelectedAdults * adultUnit +
+      effectiveSelectedChildren * childUnit +
+      effectiveSelectedInfants * infantUnit
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     selectedPkg,
+    selectedPkgTier,
     effectiveSelectedAdults,
     selectedPkgAdultPrice,
     effectiveSelectedChildren,
     selectedPkgChildPrice,
     effectiveSelectedInfants,
     selectedPkgInfantPrice,
+    currency,
+    storedCurrency,
   ]);
 
   const handleBookPackage = (
@@ -167,16 +201,55 @@ export function TourBody({
       : adultPrice !== null && adultPrice !== undefined && adultPrice > 0
         ? Math.round(adultPrice * 0.8)
         : null;
+  const effectiveInfantPrice = tour.infantPrice ?? 0;
 
-  const price = money(adultPrice, tour.priceOverrides);
-  const childPriceFormatted = effectiveChildPrice !== null ? money(effectiveChildPrice) : null;
-  const original = money(tourOriginalPrice(tour), tour.priceOverrides);
+  const price = money(adultPrice, tour.priceOverrides, storedCurrency);
+  const childPriceFormatted =
+    effectiveChildPrice !== null ? fmt(toDisplay(effectiveChildPrice)) : null;
+  // The "was" price is never pinned by overrides — those belong to the live price.
+  const original = money(tourOriginalPrice(tour), undefined, storedCurrency);
   const discount = tourDiscountPct(tour);
   const rating = tourRating(tour);
   const reviewsCount = tourReviewCount(tour);
   const unit = tourPriceUnit(tour);
   const unitShort = unit === "per person" ? `/${t("price_adult", "adult")}` : unit.replace("per ", "/ ");
   const galleryImages = tour.images.length > 1 ? tour.images : [];
+  const perBoat = /per (boat|car)/.test(unit);
+
+  /* ── "Pricing & group discounts" rows — resolved in the display currency.
+   * Tier 1 mirrors the base "from" price, so pinned overrides apply to it;
+   * multi-guest tiers convert honestly from the stored currency. */
+  const priceTiers = useMemo(() => {
+    const tiers = (tour.tieredPricing ?? [])
+      .filter((tier) => tier && Number.isFinite(tier.minGuests) && Number.isFinite(tier.pricePerPerson))
+      .sort((a, b) => a.minGuests - b.minGuests);
+    if (!tiers.length) return [];
+    const soloUnit = priceIn(tiers[0].pricePerPerson, currency, {
+      overrides: tiers[0].minGuests <= 1 ? tour.priceOverrides : undefined,
+      from: storedCurrency,
+    }).value;
+    return tiers.map((tier) => {
+      const unitValue = priceIn(tier.pricePerPerson, currency, {
+        overrides: tier.minGuests <= 1 ? tour.priceOverrides : undefined,
+        from: storedCurrency,
+      }).value;
+      const max = tier.maxGuests ?? null;
+      const fallbackLabel =
+        tier.minGuests === 1
+          ? `1 ${t("price_adult_label", "Adult")}`
+          : max === null
+            ? `${tier.minGuests}+ ${t("guests_adults", "Adults")}`
+            : max === tier.minGuests
+              ? `${tier.minGuests} ${t("guests_adults", "Adults")}`
+              : `${tier.minGuests}–${max} ${t("guests_adults", "Adults")}`;
+      const party = max === null ? tier.minGuests : max;
+      const savePct =
+        soloUnit !== null && unitValue !== null && unitValue < soloUnit
+          ? Math.round((1 - unitValue / soloUnit) * 100)
+          : 0;
+      return { tier, unitValue, label: tier.label?.trim() || fallbackLabel, party, savePct };
+    });
+  }, [tour.tieredPricing, tour.priceOverrides, currency, storedCurrency, t]);
 
   return (
     <>
@@ -352,11 +425,21 @@ export function TourBody({
                       const cardInfants = g.infants;
                       const cardAdultPrice = pkg.adultPrice;
                       const cardChildPrice = pkg.childPrice !== null && pkg.childPrice !== undefined ? pkg.childPrice : 0;
-                      const cardInfantPrice = pkg.infantPrice !== null && pkg.infantPrice !== undefined ? pkg.infantPrice : 0;
+                      const cardInfantPrice =
+                        pkg.infantPrice !== null && pkg.infantPrice !== undefined
+                          ? pkg.infantPrice
+                          : (tour.infantPrice ?? 0);
+                      // Unit prices resolved into the display currency BEFORE
+                      // multiplying — same pipeline as the booking drawer.
+                      const cardTier = resolveTier(pkg.tieredPricing, cardAdults);
+                      const cardAdultUnit =
+                        toDisplay(cardTier ? cardTier.pricePerPerson : cardAdultPrice) ?? 0;
+                      const cardChildUnit = toDisplay(cardChildPrice) ?? 0;
+                      const cardInfantUnit = toDisplay(cardInfantPrice) ?? 0;
                       const cardTotal =
-                        cardAdults * cardAdultPrice +
-                        cardChildren * cardChildPrice +
-                        cardInfants * cardInfantPrice;
+                        cardAdults * cardAdultUnit +
+                        cardChildren * cardChildUnit +
+                        cardInfants * cardInfantUnit;
 
                       return (
                         <div
@@ -402,24 +485,29 @@ export function TourBody({
                             ) : null}
                           </div>
 
-                          {/* Pricing Row: $30 / adult     Child: $15     Infant: $0 */}
+                          {/* Pricing Row: $30 / adult · Child (4–11 yrs): $15 · Infant (under 4 yrs): Free */}
                           <div className="mt-4 flex flex-wrap items-baseline gap-x-6 gap-y-1.5 py-2.5 border-y border-sand/70 text-sm pl-6.5">
                             <div>
                               <span className="font-display font-bold text-[1.25rem] text-ink">
-                                {money(cardAdultPrice)}
+                                {fmt(cardAdultUnit)}
                               </span>
                               <span className="text-xs text-stone ml-1">/ {t("price_adult", "adult")}</span>
+                              {cardTier?.label && cardAdults >= cardTier.minGuests ? (
+                                <span className="ml-2 rounded-full bg-emerald-600/10 px-2 py-0.5 text-[0.65rem] font-bold text-emerald-700 align-middle">
+                                  {cardTier.label}
+                                </span>
+                              ) : null}
                             </div>
                             <div className="text-stone">
-                              {t("price_child", "Child")}:{" "}
+                              {t("price_child", "Child")} ({childAgeBand(tour)}):{" "}
                               <strong className="text-ink font-semibold">
-                                {pkg.childPrice !== null && pkg.childPrice !== undefined ? money(pkg.childPrice) : "$0"}
+                                {fmt(cardChildUnit)}
                               </strong>
                             </div>
                             <div className="text-stone">
-                              {t("guests_infants", "Infant")}:{" "}
+                              {t("guests_infants", "Infant")} ({infantAgeBand(tour)}):{" "}
                               <strong className="text-ink font-semibold">
-                                {pkg.infantPrice ? money(pkg.infantPrice) : "$0"}
+                                {cardInfantPrice === 0 ? t("free", "Free") : fmt(cardInfantUnit)}
                               </strong>
                             </div>
                           </div>
@@ -522,12 +610,12 @@ export function TourBody({
                                 </span>
                                 <div className="flex items-baseline gap-2">
                                   <span className="font-display text-2xl font-bold text-ink">
-                                    {money(cardTotal)}
+                                    {fmt(cardTotal)}
                                   </span>
                                   <span className="text-xs text-stone">
-                                    ({cardAdults} × {money(cardAdultPrice)}
-                                    {cardChildren > 0 ? ` + ${cardChildren} × ${money(cardChildPrice)}` : ""}
-                                    {cardInfants > 0 && cardInfantPrice > 0 ? ` + ${cardInfants} × ${money(cardInfantPrice)}` : ""})
+                                    ({cardAdults} × {fmt(cardAdultUnit)}
+                                    {cardChildren > 0 ? ` + ${cardChildren} × ${fmt(cardChildUnit)}` : ""}
+                                    {cardInfants > 0 && cardInfantPrice > 0 ? ` + ${cardInfants} × ${fmt(cardInfantUnit)}` : ""})
                                   </span>
                                 </div>
                               </div>
@@ -545,7 +633,7 @@ export function TourBody({
                                 </button>
                                 <a
                                   href={whatsappLink(
-                                    `Hi Brother Sharm Tour — I want to book ${tour.title} (${pkg.title}) for ${cardAdults} adult(s)${cardChildren ? `, ${cardChildren} child` : ""}. Total: ${money(cardTotal)}.`
+                                    `Hi Brother Sharm Tour — I want to book ${tour.title} (${pkg.title}) for ${cardAdults} adult(s)${cardChildren ? `, ${cardChildren} child` : ""}. Total: ${fmt(cardTotal)}.`
                                   )}
                                   target="_blank"
                                   rel="noopener noreferrer"
@@ -561,6 +649,91 @@ export function TourBody({
                         </div>
                       );
                     })}
+                  </div>
+                </Reveal>
+              ) : null}
+
+              {/* ─── Pricing & group discounts ─── */}
+              {!perBoat && (price !== null || priceTiers.length > 0) ? (
+                <Reveal className="mt-14">
+                  <h2 className="eyebrow text-reef">
+                    {t("section_pricing", "Pricing & group discounts")}
+                  </h2>
+                  <div className="mt-5 overflow-hidden rounded-3xl border border-sand/80 bg-paper-warm/50 shadow-xs">
+                    <ul className="divide-y divide-sand/70">
+                      {priceTiers.length > 0 ? (
+                        priceTiers.map(({ tier, unitValue, label, party, savePct }) => (
+                          <li
+                            key={`${tier.minGuests}-${tier.maxGuests ?? "up"}`}
+                            className="flex flex-wrap items-center justify-between gap-2 px-5 py-3.5 md:px-7"
+                          >
+                            <span className="text-[0.9375rem] font-medium text-ink">
+                              {label}
+                            </span>
+                            <span className="flex flex-wrap items-baseline justify-end gap-2">
+                              {savePct > 0 ? (
+                                <span className="rounded-full bg-emerald-600/10 px-2 py-0.5 text-[0.65rem] font-bold text-emerald-700">
+                                  {t("save", "Save")} {savePct}%
+                                </span>
+                              ) : null}
+                              {party > 1 && unitValue !== null ? (
+                                <span className="text-[0.8rem] text-stone">
+                                  {party} × {fmt(unitValue)} =
+                                </span>
+                              ) : null}
+                              <span className="font-display text-[1.15rem] font-bold text-reef-deep">
+                                {fmt(unitValue !== null && party > 1 ? unitValue * party : unitValue)}
+                              </span>
+                              <span className="text-[0.72rem] text-stone">
+                                {party > 1 ? t("total_label", "total") : `/${t("price_adult", "adult")}`}
+                              </span>
+                            </span>
+                          </li>
+                        ))
+                      ) : (
+                        <li className="flex items-center justify-between gap-2 px-5 py-3.5 md:px-7">
+                          <span className="text-[0.9375rem] font-medium text-ink">
+                            {t("price_adult_label", "Adult")}{" "}
+                            <span className="font-normal text-stone">
+                              ({t("age_adults", "12+ yrs")})
+                            </span>
+                          </span>
+                          <span className="font-display text-[1.15rem] font-bold text-reef-deep">
+                            {price}
+                          </span>
+                        </li>
+                      )}
+                      <li className="flex items-center justify-between gap-2 px-5 py-3.5 md:px-7">
+                        <span className="text-[0.9375rem] font-medium text-ink">
+                          {t("price_child_plural", "Children")}{" "}
+                          <span className="font-normal text-stone">({childAgeBand(tour)})</span>
+                        </span>
+                        <span className="font-display text-[1.05rem] font-bold text-ink">
+                          {childPriceFormatted ?? "—"}
+                        </span>
+                      </li>
+                      <li className="flex items-center justify-between gap-2 px-5 py-3.5 md:px-7">
+                        <span className="text-[0.9375rem] font-medium text-ink">
+                          {t("guests_infants", "Infants")}{" "}
+                          <span className="font-normal text-stone">({infantAgeBand(tour)})</span>
+                        </span>
+                        {effectiveInfantPrice === 0 ? (
+                          <span className="rounded-full bg-emerald-600/10 px-3 py-1 text-[0.75rem] font-bold text-emerald-700">
+                            {t("free", "Free")}
+                          </span>
+                        ) : (
+                          <span className="font-display text-[1.05rem] font-bold text-ink">
+                            {fmt(toDisplay(effectiveInfantPrice))}
+                          </span>
+                        )}
+                      </li>
+                    </ul>
+                    <p className="border-t border-sand/70 bg-paper/60 px-5 py-3 text-[0.75rem] leading-relaxed text-stone md:px-7">
+                      {t(
+                        "pricing_note",
+                        "Prices are per person and shown in your display currency. Bigger parties pay less per adult where a group rate applies. No prepayment — you pay on the day.",
+                      )}
+                    </p>
                   </div>
                 </Reveal>
               ) : null}
@@ -777,21 +950,44 @@ export function TourBody({
                       </p>
                       <p className="mt-1 font-display text-[2.25rem] leading-none font-bold text-ink">
                         {selectedPkg
-                          ? money(selectedPkg.adultPrice)
+                          ? fmt(
+                              toDisplay(
+                                selectedPkgTier
+                                  ? selectedPkgTier.pricePerPerson
+                                  : selectedPkg.adultPrice,
+                              ),
+                            )
                           : (price ?? t("price_on_request", "On request"))}
                       </p>
                       {price || selectedPkg ? (
-                        <p className="mt-1 text-[0.75rem] text-stone">/{t("price_adult", "adult")}</p>
+                        <p className="mt-1 text-[0.75rem] text-stone">
+                          /{t("price_adult", "adult")}
+                          {selectedPkg && selectedPkgTier?.label ? ` · ${selectedPkgTier.label}` : ""}
+                        </p>
                       ) : (
                         <p className="mt-1 text-[0.75rem] text-stone">quoted for your group</p>
                       )}
                       {(selectedPkg ? selectedPkg.childPrice !== null && selectedPkg.childPrice !== undefined : childPriceFormatted) ? (
                         <div className="mt-3 pt-2 border-t border-sand/60">
-                          <p className="eyebrow text-reef-deep text-[0.65rem]">{t("price_child_label", "Child Price (5–10 yrs)")}</p>
+                          <p className="eyebrow text-reef-deep text-[0.65rem]">
+                            {t("price_child_label", "Child Price")} ({childAgeBand(tour)})
+                          </p>
                           <p className="mt-0.5 font-display text-[1.4rem] font-bold text-reef-deep">
                             {selectedPkg
-                              ? (selectedPkg.childPrice ? money(selectedPkg.childPrice) : "$0")
+                              ? fmt(toDisplay(selectedPkg.childPrice ?? 0))
                               : childPriceFormatted}
+                          </p>
+                        </div>
+                      ) : null}
+                      {!selectedPkg ? (
+                        <div className="mt-3 pt-2 border-t border-sand/60">
+                          <p className="eyebrow text-stone text-[0.65rem]">
+                            {t("guests_infants", "Infants")} ({infantAgeBand(tour)})
+                          </p>
+                          <p className="mt-0.5 font-display text-[1.4rem] font-bold text-ink">
+                            {effectiveInfantPrice === 0
+                              ? t("free", "Free")
+                              : fmt(toDisplay(effectiveInfantPrice))}
                           </p>
                         </div>
                       ) : null}
@@ -799,7 +995,7 @@ export function TourBody({
                         <div className="mt-3 pt-2 border-t border-sand/60">
                           <p className="eyebrow text-stone text-[0.65rem]">{t("estimated_total", "Estimated Total")}</p>
                           <p className="mt-0.5 font-display text-[1.5rem] font-bold text-ink">
-                            {money(selectedPkgTotal)}
+                            {fmt(selectedPkgTotal)}
                           </p>
                           <p className="text-[0.7rem] text-stone">
                             {effectiveSelectedAdults} adult{effectiveSelectedAdults > 1 ? "s" : ""}
@@ -848,7 +1044,7 @@ export function TourBody({
                     <a
                       href={whatsappLink(
                         selectedPkg
-                          ? `Hi Brother Sharm Tour — I want to book ${tour.title} (${selectedPkg.title}) for ${effectiveSelectedAdults} adult(s)${effectiveSelectedChildren ? `, ${effectiveSelectedChildren} child` : ""}. Total: ${money(selectedPkgTotal)}.`
+                          ? `Hi Brother Sharm Tour — I want to book ${tour.title} (${selectedPkg.title}) for ${effectiveSelectedAdults} adult(s)${effectiveSelectedChildren ? `, ${effectiveSelectedChildren} child` : ""}. Total: ${fmt(selectedPkgTotal)}.`
                           : `Hi Brother Sharm Tour — I'd like to ask about ${tour.title}.`
                       )}
                       target="_blank"

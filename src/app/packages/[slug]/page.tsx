@@ -21,6 +21,7 @@ import {
 } from "@/lib/utils";
 import { formatAmount, priceIn } from "@/lib/currency";
 import { destinationName, experienceName } from "@/lib/store/labels";
+import { getTranslation, type TranslationKey } from "@/lib/i18n/translations";
 import type { FaqItem } from "@/lib/types";
 import type { TourRecord } from "@/lib/store/types";
 
@@ -76,6 +77,7 @@ export default async function PackageDetailPage({
 
   const [settings, { currency, lang }] = await Promise.all([getPublicSettings(), getSiteView()]);
   const pkg = localizePackage(rawPkg, lang);
+  const t = (key: TranslationKey, fb?: string) => getTranslation(lang, key) || fb || key;
 
   const storedCurrency = pkg.currency || "USD";
   const fmt = (value: number | null | undefined) =>
@@ -215,27 +217,27 @@ export default async function PackageDetailPage({
               <dl className="grid grid-cols-2 gap-x-8 gap-y-4 sm:grid-cols-3 lg:gap-x-12">
                 <div>
                   <dt className="text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-stone">
-                    Destination
+                    {t("search_where", "Destination")}
                   </dt>
-                  <dd className="mt-1.5 text-[0.9375rem] font-medium text-ink">{destinationName(pkg.destination)}</dd>
+                  <dd className="mt-1.5 text-[0.9375rem] font-medium text-ink">{destinationName(pkg.destination, lang)}</dd>
                 </div>
                 <div>
                   <dt className="text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-stone">
-                    Duration
+                    {t("label_duration", "Duration")}
                   </dt>
                   <dd className="mt-1.5 text-[0.9375rem] font-medium text-ink">{pkg.duration}</dd>
                 </div>
                 <div>
                   <dt className="text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-stone">
-                    Tour Type
+                    {t("label_tour_type", "Tour Type")}
                   </dt>
-                  <dd className="mt-1.5 text-[0.9375rem] font-medium text-ink">Custom Package</dd>
+                  <dd className="mt-1.5 text-[0.9375rem] font-medium text-ink">{t("nav_packages", "Custom Package")}</dd>
                 </div>
               </dl>
 
               <div className="flex flex-col gap-3 sm:flex-row lg:shrink-0">
                 <BookButton tourSlug={pkg.slug} className="btn btn-primary">
-                  Start planning
+                  {t("start_planning", "Start planning")}
                 </BookButton>
                 <a
                   href={whatsappLink(`Hi Brother Sharm Tour — I'm interested in the ${pkg.title} package.`)}
@@ -254,12 +256,12 @@ export default async function PackageDetailPage({
               <div className="mb-3.5 flex flex-wrap items-center justify-between gap-2">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-[0.6875rem] font-bold uppercase tracking-[0.16em] text-stone">
-                    Prices & Rates
+                    {t("section_prices", "Prices & Rates")}
                   </span>
                 </div>
                 <span className="text-[0.72rem] font-medium text-stone flex items-center gap-1.5">
                   <span className="text-[#1faa54]" aria-hidden>✓</span>
-                  No prepayment · Pay on the day
+                  {t("no_prepayment", "No prepayment · Pay on the day")}
                 </span>
               </div>
 
@@ -268,16 +270,16 @@ export default async function PackageDetailPage({
                 <div className="flex flex-col justify-between rounded-2xl border border-sand/80 bg-paper-warm/40 p-4 transition-all hover:border-reef/30 hover:bg-paper-warm/70">
                   <div>
                     <span className="block text-[0.6875rem] font-bold uppercase tracking-wider text-stone truncate">
-                      1 Adult
+                      1 {t("price_adult", "Adult")}
                     </span>
                     <div className="mt-1 flex items-baseline gap-1">
                       <span className="font-display text-[1.45rem] font-bold leading-none text-ink">
-                        {barAdultPrice ?? "On request"}
+                        {barAdultPrice ?? t("price_on_request", "On request")}
                       </span>
                     </div>
                   </div>
                   <span className="mt-2 block text-[0.6875rem] text-stone">
-                    /adult
+                    /{t("price_adult", "adult")}
                   </span>
                 </div>
 
@@ -286,7 +288,7 @@ export default async function PackageDetailPage({
                   <div>
                     <div className="flex items-center justify-between gap-1">
                       <span className="block text-[0.6875rem] font-bold uppercase tracking-wider text-stone truncate">
-                        Couples (2 Guests)
+                        {t("price_couples", "Couples (2 Guests)")}
                       </span>
                       {couplesSavePct > 0 ? (
                         <span className="shrink-0 rounded-full bg-emerald-600/10 px-1.5 py-0.5 text-[0.625rem] font-bold text-emerald-700">
@@ -301,7 +303,7 @@ export default async function PackageDetailPage({
                     </div>
                   </div>
                   <span className="mt-2 block text-[0.6875rem] text-stone truncate">
-                    {couplesFormatted ? `${couplesFormatted}/person` : "/adult"}
+                    {couplesFormatted ? `${couplesFormatted}${t("per_person_short", "/person")}` : `/${t("price_adult", "adult")}`}
                   </span>
                 </div>
 
@@ -310,7 +312,7 @@ export default async function PackageDetailPage({
                   <div>
                     <div className="flex items-center justify-between gap-1">
                       <span className="block text-[0.6875rem] font-bold uppercase tracking-wider text-stone truncate">
-                        Group (3+ Persons)
+                        {t("price_group_3plus", "Group (3+ Persons)")}
                       </span>
                       {groupSavePct > 0 ? (
                         <span className="shrink-0 rounded-full bg-emerald-600/10 px-1.5 py-0.5 text-[0.625rem] font-bold text-emerald-700">
@@ -325,7 +327,7 @@ export default async function PackageDetailPage({
                     </div>
                   </div>
                   <span className="mt-2 block text-[0.6875rem] text-stone truncate">
-                    {groupFormatted ? `${groupFormatted}/person` : "/adult"}
+                    {groupFormatted ? `${groupFormatted}${t("per_person_short", "/person")}` : `/${t("price_adult", "adult")}`}
                   </span>
                 </div>
 
@@ -333,7 +335,7 @@ export default async function PackageDetailPage({
                 <div className="flex flex-col justify-between rounded-2xl border border-sand/80 bg-paper-warm/40 p-4 transition-all hover:border-reef/30 hover:bg-paper-warm/70">
                   <div>
                     <span className="block text-[0.6875rem] font-bold uppercase tracking-wider text-stone truncate">
-                      Children ({childAgeBand(pkg)})
+                      {t("price_child_plural", "Children")} ({childAgeBand(pkg)})
                     </span>
                     <div className="mt-1 flex items-baseline gap-1">
                       <span className="font-display text-[1.45rem] font-bold leading-none text-reef-deep">
@@ -342,7 +344,7 @@ export default async function PackageDetailPage({
                     </div>
                   </div>
                   <span className="mt-2 block text-[0.6875rem] text-stone">
-                    /child
+                    /{t("price_child", "child")}
                   </span>
                 </div>
 
@@ -350,12 +352,12 @@ export default async function PackageDetailPage({
                 <div className="flex flex-col justify-between rounded-2xl border border-sand/80 bg-paper-warm/40 p-4 transition-all hover:border-reef/30 hover:bg-paper-warm/70">
                   <div>
                     <span className="block text-[0.6875rem] font-bold uppercase tracking-wider text-stone truncate">
-                      Infants ({infantAgeBand(pkg)})
+                      {t("guests_infants", "Infants")} ({infantAgeBand(pkg)})
                     </span>
                     <div className="mt-1 flex items-baseline gap-1">
                       {barInfantStored === 0 ? (
                         <span className="inline-flex items-center rounded-pill border border-emerald-600/20 bg-emerald-600/10 px-2.5 py-0.5 text-[0.8rem] font-bold text-emerald-700">
-                          Free
+                          {t("free", "Free")}
                         </span>
                       ) : (
                         <span className="font-display text-[1.45rem] font-bold leading-none text-reef-deep">
@@ -365,7 +367,7 @@ export default async function PackageDetailPage({
                     </div>
                   </div>
                   <span className="mt-2 block text-[0.6875rem] text-stone">
-                    {barInfantStored === 0 ? "No charge" : "/infant"}
+                    {barInfantStored === 0 ? t("no_extra_cost", "No charge") : `/${t("guests_infants", "infant")}`}
                   </span>
                 </div>
               </div>
@@ -379,7 +381,7 @@ export default async function PackageDetailPage({
           <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
             <div className="lg:col-span-7 xl:col-span-8">
               <Reveal>
-                <h2 className="eyebrow text-reef">Overview</h2>
+                <h2 className="eyebrow text-reef">{t("section_overview", "Overview")}</h2>
                 <div className="mt-5 flex flex-col gap-5 text-[1.0625rem] leading-[1.75] text-stone">
                   {pkg.description.map((p) => (
                     <p key={p.slice(0, 30)}>{p}</p>
@@ -389,7 +391,7 @@ export default async function PackageDetailPage({
 
               {pkg.days.length ? (
                 <Reveal className="mt-16">
-                  <h2 className="eyebrow text-reef">Day by day</h2>
+                  <h2 className="eyebrow text-reef">{t("section_itinerary", "Day by day")}</h2>
                   <ol className="mt-6 border-l border-sand">
                     {pkg.days.map((day) => (
                       <li key={day.day} className="relative pb-8 pl-8 last:pb-0">
@@ -454,16 +456,16 @@ export default async function PackageDetailPage({
                   </div>
 
                   <div className="mt-6 grid gap-5 sm:grid-cols-2">
-                    {includedTours.map((t) => (
+                    {includedTours.map((tourItem) => (
                       <div
-                        key={t.slug}
+                        key={tourItem.slug}
                         className="group flex flex-col sm:flex-row gap-4 p-4 rounded-2xl bg-paper-warm/60 border border-sand/70 hover:border-reef/30 hover:shadow-md transition-all duration-300"
                       >
-                        {t.images?.[0] ? (
+                        {tourItem.images?.[0] ? (
                           <div className="relative aspect-[4/3] sm:aspect-square w-full sm:w-28 shrink-0 rounded-xl overflow-hidden">
                             <Image
-                              src={t.images[0].src}
-                              alt={t.images[0].alt}
+                              src={tourItem.images[0].src}
+                              alt={tourItem.images[0].alt}
                               fill
                               sizes="(max-width: 640px) 100vw, 120px"
                               className="object-cover group-hover:scale-105 transition-transform duration-500"
@@ -473,25 +475,25 @@ export default async function PackageDetailPage({
                         <div className="flex flex-col justify-between flex-1 min-w-0">
                           <div>
                             <span className="text-[10px] font-bold uppercase tracking-wider text-reef">
-                              {experienceName(t.category, lang)}
+                              {experienceName(tourItem.category, lang)}
                             </span>
                             <h4 className="font-display text-base font-semibold text-ink line-clamp-1 group-hover:text-reef transition-colors">
-                              {t.title}
+                              {tourItem.title}
                             </h4>
                             <p className="mt-1 text-xs text-stone line-clamp-2 leading-relaxed">
-                              {t.summary}
+                              {tourItem.summary}
                             </p>
                           </div>
                           <div className="mt-3 flex items-center justify-between pt-2 border-t border-sand/40">
                             <span className="text-[11px] text-stone font-medium">
-                              {t.duration ?? "Flexible"}
+                              {tourItem.duration ?? "Flexible"}
                             </span>
                             <Link
-                              href={`/tours/${t.slug}`}
+                              href={`/tours/${tourItem.slug}`}
                               target="_blank"
                               className="text-xs font-bold text-reef hover:text-sun inline-flex items-center gap-1 transition-colors"
                             >
-                              <span>View excursion</span>
+                              <span>{t("view_details", "View details")}</span>
                               <span>→</span>
                             </Link>
                           </div>
@@ -505,7 +507,7 @@ export default async function PackageDetailPage({
               {pkg.included.length || pkg.excluded.length ? (
                 <Reveal className="mt-14 grid gap-6 sm:grid-cols-2">
                   <div className="rounded-3xl bg-paper-warm/50 p-6 shadow-xs md:p-8">
-                    <h2 className="eyebrow text-reef">What&apos;s included</h2>
+                    <h2 className="eyebrow text-reef">{t("section_included", "What's included")}</h2>
                     <ul className="mt-5 flex flex-col gap-3">
                       {pkg.included.map((item) => (
                         <li key={item} className="flex gap-3 text-[0.9375rem] leading-relaxed">
@@ -516,7 +518,7 @@ export default async function PackageDetailPage({
                     </ul>
                   </div>
                   <div className="rounded-3xl bg-paper-warm/50 p-6 shadow-xs md:p-8">
-                    <h2 className="eyebrow text-stone">Not included</h2>
+                    <h2 className="eyebrow text-stone">{t("section_excluded", "Not included")}</h2>
                     <ul className="mt-5 flex flex-col gap-3">
                       {pkg.excluded.map((item) => (
                         <li
@@ -533,7 +535,7 @@ export default async function PackageDetailPage({
               ) : null}
 
               <Reveal className="mt-14">
-                <h2 className="eyebrow text-reef">Common questions</h2>
+                <h2 className="eyebrow text-reef">{t("section_faq", "Frequently Asked Questions")}</h2>
                 <div className="mt-6">
                   <Accordion items={PACKAGE_FAQ} />
                 </div>
@@ -543,7 +545,7 @@ export default async function PackageDetailPage({
             <aside className="lg:col-span-5 xl:col-span-4">
               <div className="lg:sticky lg:top-28">
                 <div className="rounded-3xl bg-paper-warm p-6 shadow-md md:p-8">
-                  <p className="eyebrow text-stone">Custom itinerary</p>
+                  <p className="eyebrow text-stone">{t("custom_itinerary", "Custom itinerary")}</p>
                   <p className="mt-2 font-display text-[2rem] leading-none">
                     {price ?? "Quoted for you"}
                   </p>

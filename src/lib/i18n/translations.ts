@@ -15,6 +15,8 @@ export type SupportedLanguage =
   | "ro"
   | "nl";
 
+export type TranslationKey = keyof TranslationDictionary;
+
 export interface TranslationDictionary {
   // Navigation
   nav_home: string;
@@ -140,6 +142,32 @@ export interface TranslationDictionary {
   footer_tagline: string;
   all_rights_reserved: string;
   skip_to_content: string;
+
+  // Tiered Pricing, Guests & Packages additions
+  select_package_option: string;
+  free: string;
+  party_group: string;
+  party_couples: string;
+  party_solo: string;
+  group_rate_saved: string;
+  price_couples: string;
+  section_prices: string;
+  per_person_short: string;
+  price_group_3plus: string;
+  price_child_plural: string;
+  no_extra_cost: string;
+  section_packages: string;
+  select_your_package: string;
+  total_price: string;
+  book_this_package: string;
+  section_pricing: string;
+  save: string;
+  total_label: string;
+  pricing_note: string;
+  book_now: string;
+  home_base: string;
+  explore: string;
+  start_planning: string;
 }
 
 export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
@@ -257,6 +285,31 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     tab_experiences: "Experiences",
     tab_transfers: "Transfers",
     no_tours_found_in_category: "No tours currently available in this category.",
+
+    select_package_option: "Select Package Option",
+    free: "Free",
+    party_group: "Group",
+    party_couples: "Couples",
+    party_solo: "Solo Traveller",
+    group_rate_saved: "Group rate applied",
+    price_couples: "Couples (2 Guests)",
+    section_prices: "Prices & Rates",
+    per_person_short: "/person",
+    price_group_3plus: "Group (3+ Persons)",
+    price_child_plural: "Children",
+    no_extra_cost: "No charge",
+    section_packages: "Tour Options & Packages",
+    select_your_package: "Select your package",
+    total_price: "Estimated Total",
+    book_this_package: "Book selected option",
+    section_pricing: "Pricing & group discounts",
+    save: "Save",
+    total_label: "total",
+    pricing_note: "Prices are per person and shown in your display currency. Bigger parties pay less per adult where a group rate applies. No prepayment — you pay on the day.",
+    book_now: "Book now",
+    home_base: "Our home base",
+    explore: "Explore",
+    start_planning: "Start planning",
   },
 
   ar: {
@@ -373,6 +426,31 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     tab_experiences: "التجارب",
     tab_transfers: "التوصيلات",
     no_tours_found_in_category: "لا توجد رحلات متاحة حالياً في هذا القسم.",
+
+    select_package_option: "اختر باقة الرحلة",
+    free: "مجاناً",
+    party_group: "مجموعة",
+    party_couples: "شخصين (كابلز)",
+    party_solo: "مسافر منفرد",
+    group_rate_saved: "تم تطبيق خصم المجموعة",
+    price_couples: "شخصين (كابلز)",
+    section_prices: "الأسعار والخيارات",
+    per_person_short: "/للشخص",
+    price_group_3plus: "مجموعة (٣ أشخاص فأكثر)",
+    price_child_plural: "أطفال",
+    no_extra_cost: "بدون رسوم إضافية",
+    section_packages: "خيارات وباقات الرحلة",
+    select_your_package: "اختر باقتك المفضلة",
+    total_price: "الإجمالي التقريبي",
+    book_this_package: "احجز هذه الباقة",
+    section_pricing: "الأسعار وخصومات المجموعات",
+    save: "وفر",
+    total_label: "إجمالي",
+    pricing_note: "الأسعار موضحة للشخص الواحد وبعملتك المختارة. المجموعات الأكبر تدفع أقل للشخص عند تطبيق سعر المجموعة. بدون أي دفع مسبق — الدفع بالكامل يوم الرحلة.",
+    book_now: "احجز الآن",
+    home_base: "مركزنا الرئيسي",
+    explore: "استكشف",
+    start_planning: "ابدأ التخطيط",
   },
 
   de: {
@@ -489,6 +567,31 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     tab_experiences: "Erlebnisse",
     tab_transfers: "Transfers",
     no_tours_found_in_category: "In dieser Kategorie sind derzeit keine Touren verfügbar.",
+
+    select_package_option: "Paket-Option wählen",
+    free: "Kostenlos",
+    party_group: "Gruppe",
+    party_couples: "Paare",
+    party_solo: "Alleinreisende(r)",
+    group_rate_saved: "Gruppenrabatt angewendet",
+    price_couples: "Paare (2 Personen)",
+    section_prices: "Preise & Tarife",
+    per_person_short: "/Person",
+    price_group_3plus: "Gruppe (ab 3 Personen)",
+    price_child_plural: "Kinder",
+    no_extra_cost: "Kostenfrei",
+    section_packages: "Tour-Optionen & Pakete",
+    select_your_package: "Wählen Sie Ihr Paket",
+    total_price: "Geschätzter Gesamtpreis",
+    book_this_package: "Dieses Paket buchen",
+    section_pricing: "Preise & Gruppenrabatte",
+    save: "Sparen Sie",
+    total_label: "gesamt",
+    pricing_note: "Preise verstehen sich pro Person in der ausgewählten Währung. Größere Gruppen zahlen pro Erwachsenem weniger, wenn ein Gruppentarif gilt. Keine Vorauszahlung — Sie zahlen am Tag der Tour.",
+    book_now: "Jetzt buchen",
+    home_base: "Unsere Heimatbasis",
+    explore: "Entdecken",
+    start_planning: "Planung starten",
   },
 
   it: {
@@ -605,6 +708,31 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     tab_experiences: "Esperienze",
     tab_transfers: "Transfer",
     no_tours_found_in_category: "Nessun tour attualmente disponibile in questa categoria.",
+
+    select_package_option: "Seleziona opzione pacchetto",
+    free: "Gratis",
+    party_group: "Gruppo",
+    party_couples: "Coppie",
+    party_solo: "Viaggiatore singolo",
+    group_rate_saved: "Tariffa di gruppo applicata",
+    price_couples: "Coppie (2 persone)",
+    section_prices: "Prezzi e tariffe",
+    per_person_short: "/persona",
+    price_group_3plus: "Gruppo (3+ persone)",
+    price_child_plural: "Bambini",
+    no_extra_cost: "Nessun costo aggiuntivo",
+    section_packages: "Opzioni e pacchetti tour",
+    select_your_package: "Seleziona il tuo pacchetto",
+    total_price: "Totale stimato",
+    book_this_package: "Prenota questa opzione",
+    section_pricing: "Prezzi e sconti per gruppi",
+    save: "Risparmia",
+    total_label: "totale",
+    pricing_note: "I prezzi si intendono per persona nella valuta selezionata. I gruppi più numerosi pagano meno per adulto quando si applica la tariffa di gruppo. Nessun pagamento anticipato: si paga il giorno del tour.",
+    book_now: "Prenota ora",
+    home_base: "La nostra sede",
+    explore: "Esplora",
+    start_planning: "Inizia a pianificare",
   },
 
   pl: {
@@ -721,6 +849,31 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     tab_experiences: "Przygody",
     tab_transfers: "Transfery",
     no_tours_found_in_category: "Brak dostępnych wycieczek w tej kategorii.",
+
+    select_package_option: "Wybierz opcję pakietu",
+    free: "Bezpłatnie",
+    party_group: "Grupa",
+    party_couples: "Pary",
+    party_solo: "Podróżujący solo",
+    group_rate_saved: "Naliczono stawkę grupową",
+    price_couples: "Pary (2 osoby)",
+    section_prices: "Ceny i stawki",
+    per_person_short: "/osoba",
+    price_group_3plus: "Grupa (3+ osoby)",
+    price_child_plural: "Dzieci",
+    no_extra_cost: "Bez dopłat",
+    section_packages: "Opcje wycieczki i pakiety",
+    select_your_package: "Wybierz swój pakiet",
+    total_price: "Szacunkowa suma",
+    book_this_package: "Zarezerwuj tę opcję",
+    section_pricing: "Ceny i zniżki grupowe",
+    save: "Oszczędzasz",
+    total_label: "łącznie",
+    pricing_note: "Ceny podane są za osobę w wybranej walucie. Większe grupy płacą mniej za osobę dorosłą po naliczeniu stawki grupowej. Brak przedpłaty — płacisz w dniu wycieczki.",
+    book_now: "Rezerwuj teraz",
+    home_base: "Nasza baza główna",
+    explore: "Odkrywaj",
+    start_planning: "Zacznij planować",
   },
 
   ru: {
@@ -837,6 +990,31 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     tab_experiences: "Впечатления",
     tab_transfers: "Трансферы",
     no_tours_found_in_category: "В этой категории пока нет доступных экскурсий.",
+
+    select_package_option: "Выберите вариант пакета",
+    free: "Бесплатно",
+    party_group: "Группа",
+    party_couples: "Пара (2 чел.)",
+    party_solo: "1 взрослый (соло)",
+    group_rate_saved: "Применен групповой тариф",
+    price_couples: "Пара (2 гостя)",
+    section_prices: "Цены и тарифы",
+    per_person_short: "/чел.",
+    price_group_3plus: "Группа (от 3 человек)",
+    price_child_plural: "Дети",
+    no_extra_cost: "Без доплат",
+    section_packages: "Варианты экскурсии и пакеты",
+    select_your_package: "Выберите пакет",
+    total_price: "Примерная стоимость",
+    book_this_package: "Забронировать этот вариант",
+    section_pricing: "Цены и групповые скидки",
+    save: "Скидка",
+    total_label: "итого",
+    pricing_note: "Цены указаны за человека в выбранной валюте. Для групп от 3 человек действует сниженный тариф. Никакой предоплаты — оплата в день экскурсии.",
+    book_now: "Забронировать",
+    home_base: "Наша главная база",
+    explore: "Исследовать",
+    start_planning: "Начать планирование",
   },
 
   uk: {
@@ -953,6 +1131,31 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     tab_experiences: "Враження",
     tab_transfers: "Трансфери",
     no_tours_found_in_category: "У цій категорії наразі немає доступних екскурсій.",
+
+    select_package_option: "Оберіть варіант пакета",
+    free: "Безкоштовно",
+    party_group: "Група",
+    party_couples: "Пара (2 особи)",
+    party_solo: "1 дорослий (соло)",
+    group_rate_saved: "Застосовано груповий тариф",
+    price_couples: "Пара (2 гостя)",
+    section_prices: "Ціни та тарифи",
+    per_person_short: "/особа",
+    price_group_3plus: "Група (від 3 осіб)",
+    price_child_plural: "Діти",
+    no_extra_cost: "Без доплат",
+    section_packages: "Варіанти екскурсії та пакети",
+    select_your_package: "Оберіть пакет",
+    total_price: "Орієнтовна вартість",
+    book_this_package: "Забронювати цей варіант",
+    section_pricing: "Ціни та групові знижки",
+    save: "Знижка",
+    total_label: "разом",
+    pricing_note: "Ціни вказані за особу у вибраній валюті. Для груп від 3 осіб діє знижений тариф. Без передоплати — оплата в день екскурсії.",
+    book_now: "Забронювати",
+    home_base: "Наша головна база",
+    explore: "Дослідити",
+    start_planning: "Почати планування",
   },
 
   fr: {
@@ -1069,6 +1272,31 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     tab_experiences: "Expériences",
     tab_transfers: "Transferts",
     no_tours_found_in_category: "Aucune excursion disponible dans cette catégorie pour le moment.",
+
+    select_package_option: "Choisir une formule",
+    free: "Gratuit",
+    party_group: "Groupe",
+    party_couples: "Couples",
+    party_solo: "Voyageur solo",
+    group_rate_saved: "Tarif de groupe appliqué",
+    price_couples: "Couples (2 personnes)",
+    section_prices: "Tarifs et forfaits",
+    per_person_short: "/personne",
+    price_group_3plus: "Groupe (3+ personnes)",
+    price_child_plural: "Enfants",
+    no_extra_cost: "Sans supplément",
+    section_packages: "Options et formules",
+    select_your_package: "Sélectionnez votre formule",
+    total_price: "Total estimé",
+    book_this_package: "Réserver cette option",
+    section_pricing: "Tarifs et réductions de groupe",
+    save: "Économisez",
+    total_label: "total",
+    pricing_note: "Les prix s'entendent par personne dans votre devise. Les groupes bénéficient d'un tarif dégressif par adulte. Aucun prépaiement — vous réglez le jour de l'excursion.",
+    book_now: "Réserver",
+    home_base: "Notre base principale",
+    explore: "Explorer",
+    start_planning: "Commencer à planifier",
   },
 
   ro: {
@@ -1185,6 +1413,31 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     tab_experiences: "Experiențe",
     tab_transfers: "Transferuri",
     no_tours_found_in_category: "Nu există excursii disponibile în această categorie în prezent.",
+
+    select_package_option: "Selectați opțiunea de pachet",
+    free: "Gratuit",
+    party_group: "Grup",
+    party_couples: "Cupluri",
+    party_solo: "Călător solo",
+    group_rate_saved: "Tarif de grup aplicat",
+    price_couples: "Cupluri (2 persoane)",
+    section_prices: "Prețuri și tarife",
+    per_person_short: "/persoană",
+    price_group_3plus: "Grup (3+ persoane)",
+    price_child_plural: "Copii",
+    no_extra_cost: "Fără cost suplimentar",
+    section_packages: "Opțiuni de tur și pachete",
+    select_your_package: "Selectați pachetul dorit",
+    total_price: "Total estimat",
+    book_this_package: "Rezervați această opțiune",
+    section_pricing: "Prețuri și reduceri de grup",
+    save: "Economisiți",
+    total_label: "total",
+    pricing_note: "Prețurile sunt per persoană și afișate în moneda selectată. Grupurile mai mari plătesc mai puțin per adult când se aplică tariful de grup. Fără avans — plata se face în ziua excursiei.",
+    book_now: "Rezervă acum",
+    home_base: "Baza noastră principală",
+    explore: "Explorează",
+    start_planning: "Începeți planificarea",
   },
 
   nl: {
@@ -1301,6 +1554,31 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     tab_experiences: "Ervaringen",
     tab_transfers: "Transfers",
     no_tours_found_in_category: "Momenteel geen tours beschikbaar in deze categorie.",
+
+    select_package_option: "Kies pakketoptie",
+    free: "Gratis",
+    party_group: "Groep",
+    party_couples: "Koppels",
+    party_solo: "Soloreiziger",
+    group_rate_saved: "Groepstarief toegepast",
+    price_couples: "Koppels (2 gasten)",
+    section_prices: "Prijzen & tarieven",
+    per_person_short: "/persoon",
+    price_group_3plus: "Groep (3+ personen)",
+    price_child_plural: "Kinderen",
+    no_extra_cost: "Geen extra kosten",
+    section_packages: "Touropties & pakketten",
+    select_your_package: "Selecteer uw pakket",
+    total_price: "Geschat totaal",
+    book_this_package: "Deze optie boeken",
+    section_pricing: "Prijzen & groepskortingen",
+    save: "Bespaar",
+    total_label: "totaal",
+    pricing_note: "Prijzen zijn per persoon en weergegeven in uw valuta. Grotere groepen betalen minder per volwassene wanneer het groepstarief geldt. Geen vooruitbetaling — u betaalt op de dag zelf.",
+    book_now: "Nu boeken",
+    home_base: "Onze thuisbasis",
+    explore: "Ontdekken",
+    start_planning: "Begin met plannen",
   },
 };
 

@@ -11,7 +11,7 @@ import {
   tourOriginalPrice,
   tourDiscountPct,
 } from "@/lib/utils";
-import { experienceName } from "@/lib/store/labels";
+import { destinationName, experienceName } from "@/lib/store/labels";
 import { useSite } from "./SiteProvider";
 
 /* ═══════════════════════════ Tour card ═══════════════════════════ */
@@ -218,6 +218,9 @@ export function DestinationCard({
   primary?: boolean;
   priority?: boolean;
 }) {
+  const { t, lang } = useSite();
+  const dName = destinationName(destination.slug, lang) || destination.name;
+
   return (
     <Link
       href={`/destinations/${destination.slug}`}
@@ -238,7 +241,7 @@ export function DestinationCard({
       <div className="absolute inset-x-0 bottom-0 z-10 p-6 text-white md:p-9">
         {primary ? (
           <span className="mb-4 inline-block rounded-pill bg-sun px-3 py-1 text-[0.625rem] font-semibold uppercase tracking-[0.18em] text-ink shadow-xs">
-            Our home base
+            {t("home_base", "Our home base")}
           </span>
         ) : null}
 
@@ -250,7 +253,7 @@ export function DestinationCard({
               : "text-[clamp(2rem,1.4rem+2vw,3rem)]",
           )}
         >
-          {destination.name}
+          {dName}
         </h3>
 
         <p className="mt-2 max-w-md text-[0.9375rem] text-white/80">
@@ -258,7 +261,7 @@ export function DestinationCard({
         </p>
 
         <span className="link-rule mt-6 inline-flex text-white">
-          Explore
+          {t("explore", "Explore")}
           <svg width="16" height="8" viewBox="0 0 16 8" fill="none" aria-hidden>
             <path d="M0 4h14M11 1l3 3-3 3" stroke="currentColor" strokeWidth="1.2" />
           </svg>
@@ -279,6 +282,9 @@ export function ExperienceCard({
   tourCount?: number;
   sizes?: string;
 }) {
+  const { t, lang } = useSite();
+  const eName = experienceName(experience.slug, lang) || experience.name;
+
   return (
     <Link
       href={`/experiences/${experience.slug}`}
@@ -293,7 +299,7 @@ export function ExperienceCard({
       />
 
       <div className="absolute inset-x-0 bottom-0 z-10 p-5 text-white md:p-6">
-        <h3 className="font-display text-[1.75rem] leading-none">{experience.name}</h3>
+        <h3 className="font-display text-[1.75rem] leading-none">{eName}</h3>
 
         {/* Description reveals on hover on pointer devices, always visible on touch */}
         <div className="grid grid-rows-[1fr] transition-[grid-template-rows] duration-600 [transition-timing-function:var(--ease-editorial)] md:grid-rows-[0fr] md:group-hover:grid-rows-[1fr] md:group-focus-visible:grid-rows-[1fr]">
@@ -305,8 +311,8 @@ export function ExperienceCard({
         <div className="mt-4 flex items-center justify-between">
           <span className="text-[0.6875rem] uppercase tracking-[0.18em] text-white/65">
             {tourCount !== undefined
-              ? `${tourCount} ${tourCount === 1 ? "experience" : "experiences"}`
-              : "Explore"}
+              ? `${tourCount} ${t("tours_count", "experiences")}`
+              : t("explore", "Explore")}
           </span>
           <span className="grid size-9 place-items-center rounded-pill border border-white/40 transition-colors duration-400 group-hover:border-white group-hover:bg-white group-hover:text-ink">
             <svg width="14" height="8" viewBox="0 0 16 8" fill="none" aria-hidden>

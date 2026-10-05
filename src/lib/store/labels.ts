@@ -199,8 +199,11 @@ export function durationBucketLabel(id: string, lang?: string | null): string {
   const isDe = lang === "de";
   const isIt = lang === "it";
   const isRu = lang === "ru";
+  const isUk = lang === "uk";
   const isFr = lang === "fr";
   const isPl = lang === "pl";
+  const isRo = lang === "ro";
+  const isNl = lang === "nl";
 
   switch (id) {
     case "short":
@@ -208,24 +211,33 @@ export function durationBucketLabel(id: string, lang?: string | null): string {
       if (isDe) return "Bis zu 2 Stunden";
       if (isIt) return "Fino a 2 ore";
       if (isRu) return "До 2 часов";
+      if (isUk) return "До 2 годин";
       if (isFr) return "Jusqu'à 2 heures";
       if (isPl) return "Do 2 godzin";
+      if (isRo) return "Până la 2 ore";
+      if (isNl) return "Tot 2 uur";
       return "Up to 2 hours";
     case "half":
       if (isAr) return "نصف يوم";
       if (isDe) return "Halbtags";
       if (isIt) return "Mezza giornata";
       if (isRu) return "Полдня";
+      if (isUk) return "Півдня";
       if (isFr) return "Demi-journée";
       if (isPl) return "Pół dnia";
+      if (isRo) return "Jumătate de zi";
+      if (isNl) return "Halve dag";
       return "Half day";
     case "full":
       if (isAr) return "يوم كامل";
       if (isDe) return "Ganztags";
       if (isIt) return "Giornata intera";
       if (isRu) return "Полный день";
+      if (isUk) return "Цілий день";
       if (isFr) return "Journée entière";
       if (isPl) return "Cały dzień";
+      if (isRo) return "O zi întreagă";
+      if (isNl) return "Hele dag";
       return "Full day";
     default:
       return id;

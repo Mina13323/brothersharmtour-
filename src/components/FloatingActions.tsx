@@ -40,8 +40,11 @@ export function FloatingActions() {
 
   const defaultMsg =
     pathname.startsWith("/tours/") && pathname !== "/tours"
-      ? "Hi Brother Sharm Tour! I would like to enquire about this tour."
-      : "Hi Brother Sharm Tour! I'd like to ask a question about your tours in Egypt.";
+      ? t("wa_msg_tour", "Hi Brother Sharm Tour! I would like to enquire about this tour.")
+      : t(
+          "wa_msg_general",
+          "Hi Brother Sharm Tour! I'd like to ask a question about your tours in Egypt.",
+        );
 
   function dismissPopup(e: React.MouseEvent) {
     e.stopPropagation();
@@ -88,7 +91,7 @@ export function FloatingActions() {
                 </h4>
                 <p className="text-[10px] text-white/80 flex items-center gap-1.5 mt-0.5">
                   <span className="size-1.5 rounded-full bg-[#25D366] inline-block animate-pulse" />
-                  Online now · Replies in 2 mins
+                  {t("wa_online_now", "Online now · Replies in 2 mins")}
                 </p>
               </div>
             </div>
@@ -107,13 +110,13 @@ export function FloatingActions() {
           <div className="p-4 bg-[#ECE5DD]/40 text-xs">
             <div className="bg-white rounded-2xl rounded-tl-sm p-3.5 shadow-xs text-stone-800 leading-relaxed border border-stone-200/50">
               <p className="font-medium text-ink mb-1">
-                Hello there! 👋 Welcome to Egypt.
+                {t("wa_greeting", "Hello there! 👋 Welcome to Egypt.")}
               </p>
               <p className="text-stone">
-                Need help picking the best tour, booking with no prepayment, or checking hotel transfer times? Ask us on WhatsApp!
+                {t("wa_help_text", "Need help picking the best tour, booking with no prepayment, or checking hotel transfer times? Ask us on WhatsApp!")}
               </p>
               <span className="block text-[10px] text-stone text-right mt-1.5 font-mono">
-                Just now ✓✓
+                {t("wa_just_now", "Just now ✓✓")}
               </span>
             </div>
           </div>

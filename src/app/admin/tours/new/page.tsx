@@ -1,6 +1,7 @@
 import TourEditor from "@/components/admin/TourEditor";
 import { requireAdmin } from "@/lib/auth";
 import { getSiteView } from "@/lib/siteview";
+import { categoryOptions } from "@/lib/store/categories";
 import type { TourRecord } from "@/lib/store/types";
 
 export const dynamic = "force-dynamic";
@@ -52,6 +53,7 @@ export default async function AdminNewTourPage() {
       catalogue={view.catalogue}
       currency={view.currency}
       isNew
+      categories={categoryOptions()}
     />
   );
 }

@@ -20,6 +20,7 @@ import {
 import { media, videoAvailable } from "@/lib/media";
 import type { FaqItem } from "@/lib/types";
 import { getSiteView } from "@/lib/siteview";
+import { translatorFor } from "@/lib/i18n/server";
 
 export const metadata: Metadata = buildMetadata({
   fallbackTitle: "Sharm El Sheikh Excursions & Egypt Day Trips",
@@ -70,6 +71,7 @@ const homeFaq: FaqItem[] = [
 
 export default async function HomePage() {
   const view = await getSiteView();
+  const tr = translatorFor(view.lang);
   const publicReviews = view.reviews;
   const { count, average } = view.reviewStats;
 
@@ -82,8 +84,8 @@ export default async function HomePage() {
         video={videoAvailable ? media.heroFilm : undefined}
         eyebrow="Brother Sharm Tour"
         title={<SplitHeadline lines={["Sharm El Sheikh", "Excursions"]} />}
-        subtitle="Experience the best of Egypt with us — Red Sea trips, Sinai desert safari and Cairo day trips."
-        cta={{ label: "Explore Excursions", href: "#search-bar" }}
+        subtitle={tr("home_hero_subtitle", "Experience the best of Egypt with us — Red Sea trips, Sinai desert safari and Cairo day trips.")}
+        cta={{ label: tr("hero_explore_excursions", "Explore Excursions"), href: "#search-bar" }}
       >
         <HeroSearch />
       </Hero>
@@ -109,7 +111,7 @@ export default async function HomePage() {
         <div className="shell">
           <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
             <div className="lg:col-span-4">
-              <SectionHeading eyebrow="FAQ" title="Frequently asked questions" />
+              <SectionHeading eyebrow="FAQ" title={tr("home_faq_title", "Frequently asked questions")} />
             </div>
             <div className="lg:col-span-8">
               <Accordion items={homeFaq} />
@@ -129,7 +131,7 @@ export default async function HomePage() {
 
       {/* Quick link out to the full tours page for crawlers / no-JS */}
       <div className="sr-only">
-        <Link href="/tours">Browse all Brother Sharm Tour excursions</Link>
+        <Link href="/tours">{tr("home_browse_all_excursions", "Browse all Brother Sharm Tour excursions")}</Link>
       </div>
     </>
   );

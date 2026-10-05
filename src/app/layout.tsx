@@ -12,6 +12,7 @@ import { SmoothScroll } from "@/components/SmoothScroll";
 import { SiteProvider } from "@/components/SiteProvider";
 import { OG_IMAGE } from "@/lib/media";
 import { getSiteView } from "@/lib/siteview";
+import { translatorFor } from "@/lib/i18n/server";
 
 /*
  * Every route renders per request because every route derives from the CMS
@@ -143,6 +144,7 @@ export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const view = await getSiteView();
+  const tr = translatorFor(view.lang);
   const url = process.env.NEXT_PUBLIC_SITE_URL ?? "https://brothersharmtour.com";
 
   /** Organisation + site-level structured data, from CMS values. */
@@ -210,7 +212,7 @@ export default async function RootLayout({
           href="#main"
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:rounded-pill focus:bg-ink focus:px-5 focus:py-3 focus:text-sm focus:text-paper"
         >
-          Skip to content
+          {tr("skip_to_content", "Skip to content")}
         </a>
 
         <SiteProvider

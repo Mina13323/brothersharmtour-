@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { MediaImage, MediaVideo } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { WaveDivider } from "./WaveDivider";
+import { useSite } from "./SiteProvider";
 
 /**
  * Cinematic hero.
@@ -310,13 +311,14 @@ export function Hero({
 }
 
 function ScrollCue() {
+  const { t } = useSite();
   return (
     <div
       aria-hidden
       className="pointer-events-none absolute bottom-12 md:bottom-16 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-3 z-30 md:flex"
     >
       <span className="text-[0.5625rem] uppercase tracking-[0.3em] text-white/70 font-medium">
-        Scroll
+        {t("hero_scroll", "Scroll")}
       </span>
       <span className="relative block h-10 w-px overflow-hidden bg-white/30 rounded-full">
         <span className="absolute inset-x-0 top-0 h-3.5 animate-[cue_2.4s_var(--ease-editorial)_infinite] bg-white rounded-full" />

@@ -122,9 +122,11 @@ export function Breadcrumbs({
 /* ═════════════════════════ CTA section ══════════════════════════ */
 
 export function CTASection({
-  eyebrow = "Start planning",
-  title = "Ready to discover Egypt?",
-  text = "Tell us where you want to go. We'll take care of the rest.",
+  // Defaults are resolved from the dictionary inside the component so an
+  // un-overridden CTA is localized like everything else.
+  eyebrow,
+  title,
+  text,
   image = media.sharmHero,
   tourSlug,
   topWave = true,
@@ -140,7 +142,11 @@ export function CTASection({
   bottomWave?: boolean;
   waveColor?: string;
 }) {
-  const { whatsappLink } = useSite();
+  const { whatsappLink, t } = useSite();
+  const ctaEyebrow = eyebrow ?? t("cta_default_eyebrow", "Start planning");
+  const ctaTitle = title ?? t("cta_default_title", "Ready to discover Egypt?");
+  const ctaText =
+    text ?? t("cta_default_text", "Tell us where you want to go. We'll take care of the rest.");
   return (
     <section className="on-ink relative isolate overflow-hidden bg-ink text-paper">
       {topWave && (
@@ -157,15 +163,15 @@ export function CTASection({
 
       <div className="shell relative z-10 band py-20 md:py-28">
         <Reveal className="mx-auto flex max-w-3xl flex-col items-center text-center">
-          <p className="eyebrow text-sun">{eyebrow}</p>
+          <p className="eyebrow text-sun">{ctaEyebrow}</p>
           <h2 className="display mt-6 text-[clamp(2.5rem,1.4rem+4.4vw,5rem)]">
-            {title}
+            {ctaTitle}
           </h2>
-          <p className="lede mt-6 max-w-xl">{text}</p>
+          <p className="lede mt-6 max-w-xl">{ctaText}</p>
 
           <div className="mt-10 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
             <BookButton tourSlug={tourSlug} className="btn btn-primary shadow-sm hover:shadow-md">
-              Plan my trip
+              {t("cta_plan_my_trip", "Plan my trip")}
               <span className="arrow" aria-hidden>
                 →
               </span>

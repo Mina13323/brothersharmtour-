@@ -4,6 +4,7 @@ import { buildMetadata } from "@/lib/seo";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getServerT, type ServerTranslate } from "@/lib/i18n/server";
 
 import { CapsuleHero } from "@/components/TourHero";
 import { Reveal } from "@/components/Reveal";
@@ -48,6 +49,7 @@ export default async function DestinationPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  const tr = await getServerT();
   const destination = destinationBySlug(slug);
   if (!destination) notFound();
 
@@ -87,11 +89,11 @@ export default async function DestinationPage({
       {
         "@type": "BreadcrumbList",
         itemListElement: [
-          { "@type": "ListItem", position: 1, name: "Home", item: url },
+          { "@type": "ListItem", position: 1, name: tr("nav_home", "Home"), item: url },
           {
             "@type": "ListItem",
             position: 2,
-            name: "Destinations",
+            name: tr("nav_destinations", "Destinations"),
             item: `${url}/destinations`,
           },
           {
@@ -119,16 +121,16 @@ export default async function DestinationPage({
         summary={destination.intro}
         images={[destination.heroImage, ...(destination.gallery || [])]}
         breadcrumbs={[
-          { label: "Home", href: "/" },
-          { label: "Destinations", href: "/destinations" },
+          { label: tr("nav_home", "Home"), href: "/" },
+          { label: tr("nav_destinations", "Destinations"), href: "/destinations" },
           { label: destination.name },
         ]}
         primaryCta={{
-          label: "See The Tours",
+          label: tr("cta_see_the_tours", "See The Tours"),
           href: "#tours",
         }}
         secondaryCta={{
-          label: "Plan Your Trip",
+          label: tr("cta_plan_your_trip", "Plan Your Trip"),
         }}
       />
 
@@ -138,11 +140,11 @@ export default async function DestinationPage({
 
           <div className="mt-12 grid gap-10 lg:grid-cols-12 lg:gap-16">
             <Reveal className="lg:col-span-4">
-              <p className="eyebrow text-reef">Overview</p>
+              <p className="eyebrow text-reef">{tr("section_overview", "Overview")}</p>
               <h2 className="headline mt-4">
                 {destination.slug === "sharm-el-sheikh"
-                  ? "Where the reef starts at the shoreline"
-                  : "A city built in layers"}
+                  ? tr("dest_sharm_overview_title", "Where the reef starts at the shoreline")
+                  : tr("dest_cairo_overview_title", "A city built in layers")}
               </h2>
             </Reveal>
 
@@ -161,9 +163,9 @@ export default async function DestinationPage({
       <section className="band-tight bg-paper-warm">
         <div className="shell">
           <SectionHeading
-            eyebrow="Things to do"
-            title={`The ${destination.name} list`}
-            intro="The places worth your time, and what each one actually is."
+            eyebrow={tr("dest_things_eyebrow", "Things to do")}
+            title={tr("dest_the_list", "The {name} list").replace("{name}", destination.name)}
+            intro={tr("dest_things_intro", "The places worth your time, and what each one actually is.")}
           />
 
           <div className="mt-12 grid grid-cols-2 gap-x-4 gap-y-9 md:grid-cols-3 lg:grid-cols-5">
@@ -184,11 +186,11 @@ export default async function DestinationPage({
       <section id="tours" className="band scroll-mt-24">
         <div className="shell">
           <SectionHeading
-            eyebrow="Experiences"
-            title={`What we run in ${destination.name}`}
-            intro="Grouped by the kind of day it is."
+            eyebrow={tr("exp_eyebrow", "Experiences")}
+            title={tr("dest_what_we_run", "What we run in {name}").replace("{name}", destination.name)}
+            intro={tr("dest_experiences_intro", "Grouped by the kind of day it is.")}
             action={{
-              label: "All tours",
+              label: tr("all_tours_link", "All tours"),
               href: `/tours?destination=${destination.slug}`,
             }}
           />
@@ -249,8 +251,8 @@ export default async function DestinationPage({
       <section className="band-tight bg-paper-warm">
         <div className="shell">
           <SectionHeading
-            eyebrow="Most booked"
-            title={`Popular in ${destination.name}`}
+            eyebrow={tr("dest_most_booked", "Most booked")}
+            title={tr("dest_popular_in", "Popular in {name}").replace("{name}", destination.name)}
           />
           <div className="mt-12 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
             {showcase.map((tour, i) => (
@@ -265,7 +267,7 @@ export default async function DestinationPage({
       {/* ───────────────── Gallery ───────────────── */}
       <section className="band">
         <div className="shell">
-          <SectionHeading eyebrow="Gallery" title={`${destination.name} in pictures`} />
+          <SectionHeading eyebrow={tr("gallery_label", "Gallery")} title={tr("dest_in_pictures", "{name} in pictures").replace("{name}", destination.name)} />
           <Reveal className="mt-12">
             <Gallery images={destination.gallery} columns={3} />
           </Reveal>
@@ -279,10 +281,10 @@ export default async function DestinationPage({
         <div className="shell band-tight py-16 md:py-24">
           <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
             <Reveal className="lg:col-span-4">
-              <p className="eyebrow text-sun">Travel information</p>
-              <h2 className="headline mt-4">Good to know</h2>
+              <p className="eyebrow text-sun">{tr("dest_travel_info", "Travel information")}</p>
+              <h2 className="headline mt-4">{tr("dest_good_to_know", "Good to know")}</h2>
               <p className="lede mt-5">
-                The practical detail for planning a trip to {destination.name}.
+                {tr("dest_practical_detail", "The practical detail for planning a trip to {name}.").replace("{name}", destination.name)}
               </p>
             </Reveal>
 
@@ -305,18 +307,18 @@ export default async function DestinationPage({
       </section>
 
       {/* ───────────────── Cross-sell to the other destination ───────────────── */}
-      <OtherDestination current={destination.slug} />
+      <OtherDestination current={destination.slug} tr={tr} />
 
       <CTASection
         image={destination.heroImage}
-        title={`Ready for ${destination.name}?`}
-        text="Tell us your dates and what you're hoping to see. We'll put the days together."
+        title={tr("dest_ready_for", "Ready for {name}?").replace("{name}", destination.name)}
+        text={tr("dest_cta_text", "Tell us your dates and what you\u2019re hoping to see. We\u2019ll put the days together.")}
       />
     </>
   );
 }
 
-function OtherDestination({ current }: { current: string }) {
+function OtherDestination({ current, tr }: { current: string; tr: ServerTranslate }) {
   const other = activeDestinations().find((d) => d.slug !== current);
   if (!other) return null;
 
@@ -338,7 +340,7 @@ function OtherDestination({ current }: { current: string }) {
           />
           <div className="relative z-10 flex w-full flex-wrap items-end justify-between gap-6 p-6 text-white md:p-10">
             <div>
-              <p className="eyebrow text-white/70">Also with Brother Sharm Tour</p>
+              <p className="eyebrow text-white/70">{tr("dest_also_with", "Also with Brother Sharm Tour")}</p>
               <h2 className="mt-3 font-display text-[clamp(2rem,1.4rem+2.4vw,3.25rem)] leading-none">
                 {other.name}
               </h2>
@@ -347,7 +349,7 @@ function OtherDestination({ current }: { current: string }) {
               </p>
             </div>
             <span className="link-rule text-white">
-              Explore
+              {tr("explore", "Explore")}
               <ArrowRight />
             </span>
           </div>

@@ -31,15 +31,9 @@ import { input, Section, Field, Toggle, ListEditor, AppearsOn } from "./fields";
 type EditorTour = TourRecord;
 
 const DESTINATIONS = ["sharm-el-sheikh", "cairo"];
-const CATEGORIES = [
-  "sea-water",
-  "desert",
-  "adventure",
-  "culture",
-  "wildlife",
-  "leisure",
-  "private-transfers",
-];
+
+/** A category as managed by the admin in Admin → Experience Categories. */
+export type CategoryOption = { slug: string; name: string; status: string };
 
 export default function TourEditor({
   initialTour,
@@ -47,19 +41,22 @@ export default function TourEditor({
   catalogue,
   currency,
   isNew,
+  categories,
 }: {
   initialTour: EditorTour;
   settings: PublicSettings;
   catalogue: CatalogueTour[];
   currency: CurrencyContext;
   isNew: boolean;
+  /** Live list from Admin → Experience Categories (the source of truth). */
+  categories: CategoryOption[];
 }) {
   const router = useRouter();
   const [tab, setTab] = useState<"edit" | "preview">("edit");
   const [tour, setTour] = useState<EditorTour>(() => ({
     ...initialTour,
     destination: initialTour.destination || "sharm-el-sheikh",
-    category: initialTour.category || "sea-water",
+    category: initialTour.category || categories[0]?.slug || "sea-water",
     images: Array.isArray(initialTour.images) ? initialTour.images : [],
     description: Array.isArray(initialTour.description) ? initialTour.description : [],
     highlights: Array.isArray(initialTour.highlights) ? initialTour.highlights : [],
@@ -83,6 +80,18 @@ export default function TourEditor({
 
   const set = <K extends keyof EditorTour>(key: K, value: EditorTour[K]) =>
     setTour((t) => ({ ...t, [key]: value }));
+
+  /**
+   * The category dropdown is driven by the admin-managed experiences, never by
+   * a hard-coded list. A category the tour already uses but that is not
+   * registered is still offered — so opening an editor can never silently
+   * rewrite existing data — and is clearly flagged.
+   */
+  const unregisteredCategory =
+    Boolean(tour.category) && !categories.some((c) => c.slug === tour.category);
+  const categoryOptions: CategoryOption[] = unregisteredCategory
+    ? [...categories, { slug: tour.category, name: experienceName(tour.category), status: "missing" }]
+    : categories;
 
   /**
    * Which translatable fields are filled in for a language. Drives the
@@ -318,12 +327,28 @@ export default function TourEditor({
                   ))}
                 </select>
               </Field>
-              <Field label="Experience type" required description="The kind of day this is. Controls the Experiences pages and the experience filter." appearsOn="Experiences → category page · Tours listing → Experience filter">
+              <Field
+                label="Experience type"
+                required
+                description="The kind of day this is. The list comes from Admin → Experience Categories, so adding a category there makes it selectable here."
+                appearsOn="Experiences → category page · Tours listing → Experience filter"
+              >
                 <select className={input} value={tour.category} onChange={(e) => set("category", e.target.value)}>
-                  {CATEGORIES.map((c) => (
-                    <option key={c} value={c}>{experienceName(c)}</option>
+                  {categoryOptions.map((c) => (
+                    <option key={c.slug} value={c.slug}>
+                      {c.name}
+                      {c.status === "draft" ? " (draft — hidden from the public pages)" : ""}
+                      {c.status === "missing" ? " (not registered — create it in Experience Categories)" : ""}
+                    </option>
                   ))}
                 </select>
+                {unregisteredCategory ? (
+                  <span className="mt-1 block text-[10.5px] leading-relaxed text-amber-300">
+                    This tour is filed under “{tour.category}”, which is not in
+                    Experience Categories. Create it there, or pick a registered
+                    category — otherwise the tour never appears on an Experiences page.
+                  </span>
+                ) : null}
               </Field>
             </div>
             <div className="grid grid-cols-2 gap-3">

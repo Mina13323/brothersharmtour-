@@ -32,9 +32,13 @@ export function HeroSearch() {
   const popular = [
     { label: "White Island", href: "/tours/white-island" },
     { label: "Ras Mohamed", href: "/tours/ras-mohamed" },
-    { label: "Desert safari", href: "/experiences/desert" },
-    { label: "Pyramids day trip", href: "/destinations/cairo" },
-    { label: "Airport transfer", href: "/experiences/private-transfers" },
+    // Place names stay as they are; the descriptive labels are localized.
+    { label: experienceName("desert", lang), href: "/experiences/desert" },
+    { label: t("popular_pyramids_day_trip", "Pyramids day trip"), href: "/destinations/cairo" },
+    {
+      label: t("popular_airport_transfer", "Airport transfer"),
+      href: "/experiences/private-transfers",
+    },
     { label: t("nav_packages", "Packages"), href: "/packages" },
   ];
 
@@ -269,7 +273,7 @@ export function HeroSearch() {
       {/* ---------- Popular ---------- */}
       <div className="mt-4 flex flex-wrap items-center justify-center gap-2 sm:gap-2.5">
         <span className="text-[0.6875rem] uppercase tracking-[0.16em] text-stone font-semibold mr-1">
-          Popular:
+          {t("hero_popular", "Popular:")}
         </span>
         {popular.map((p) => (
           <a

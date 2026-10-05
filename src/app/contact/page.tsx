@@ -30,9 +30,9 @@ export default async function ContactPage() {
         variant="card"
         image={media.sharmHero}
         size="short"
-        eyebrow="Contact Brother Sharm Tour"
-        title="Let's plan it together"
-        subtitle="Tell us your dates and what you're curious about. WhatsApp is the fastest way to reach us — usually a reply within the hour."
+        eyebrow={tr("contact_eyebrow", "Contact Brother Sharm Tour")}
+        title={tr("contact_title", "Let’s plan it together")}
+        subtitle={tr("contact_subtitle", "Tell us your dates and what you’re curious about. WhatsApp is the fastest way to reach us — usually a reply within the hour.")}
         showWave
       />
 
@@ -56,13 +56,13 @@ export default async function ContactPage() {
                       className="mt-1 inline-flex items-center gap-2 font-display text-[1.4rem] leading-none transition-colors hover:text-reef"
                     >
                       <WhatsAppIcon className="size-5 text-[#1faa54]" />
-                      Message us
+                      {tr("contact_message_us", "Message us")}
                     </a>
                   </li>
 
                   <li className="rounded-2xl bg-paper p-4 shadow-2xs">
                     <p className="text-[0.6875rem] uppercase tracking-[0.16em] text-stone">
-                      Phone
+                      {tr("contact_phone", "Phone")}
                     </p>
                     <a
                       href={`tel:${site.contact.phone}`}
@@ -86,7 +86,7 @@ export default async function ContactPage() {
 
                   <li className="rounded-2xl bg-paper p-4 shadow-2xs">
                     <p className="text-[0.6875rem] uppercase tracking-[0.16em] text-stone">
-                      Based in
+                      {tr("contact_based_in", "Based in")}
                     </p>
                     <p className="mt-1 font-display text-[1.2rem] text-ink">{site.contact.address}</p>
                     <p className="mt-0.5 text-[0.8rem] text-stone">
@@ -121,9 +121,9 @@ export default async function ContactPage() {
               <div className="rounded-3xl bg-paper-warm/50 p-6 shadow-sm md:p-10">
                 <h2 className="headline text-[1.75rem]">{tr("send_us_message", "Send us a message")}</h2>
                 <p className="mt-3 text-[0.9375rem] text-stone">
-                  For a specific trip, use the{" "}
-                  <strong className="font-semibold text-ink">Book Now</strong>{" "}
-                  button instead — it captures dates and group size too.
+                  {tr("contact_for_specific_trip", "For a specific trip, use the")}{" "}
+                  <strong className="font-semibold text-ink">{tr("contact_book_now_strong", "Book Now")}</strong>{" "}
+                  {tr("contact_book_now_hint", "button instead — it captures dates and group size too.")}
                 </p>
                 <div className="mt-8">
                   <ContactForm />
@@ -142,8 +142,7 @@ export default async function ContactPage() {
               <p className="eyebrow text-reef">{tr("find_us", "Find us")}</p>
               <h2 className="headline mt-4">Sharm El Sheikh</h2>
               <p className="lede mt-5">
-                We cover every hotel zone in Sharm — Naama Bay, Nabq, Sharks
-                Bay, Hadaba, Old Market and the coast in between.
+                {tr("contact_zones_note", "We cover every hotel zone in Sharm — Naama Bay, Nabq, Sharks Bay, Hadaba, Old Market and the coast in between.")}
               </p>
             </div>
 
@@ -155,17 +154,16 @@ export default async function ContactPage() {
               */}
               <div
                 role="img"
-                aria-label="Map placeholder for Brother Sharm Tour's location in Sharm El Sheikh, South Sinai"
+                aria-label={tr("contact_map_aria", "Map placeholder for Brother Sharm Tour’s location in Sharm El Sheikh, South Sinai")}
                 className="relative flex aspect-[16/10] w-full items-center justify-center overflow-hidden rounded-3xl bg-[repeating-linear-gradient(45deg,var(--color-sand)_0_1px,transparent_1px_14px)] shadow-md"
               >
                 <div className="rounded-2xl bg-paper/95 px-6 py-5 text-center shadow-sm">
-                  <p className="eyebrow text-stone">Map</p>
+                  <p className="eyebrow text-stone">{tr("contact_map", "Map")}</p>
                   <p className="mt-2 font-display text-[1.375rem] leading-tight">
                     {site.contact.address}
                   </p>
                   <p className="mt-2 max-w-xs text-[0.75rem] leading-relaxed text-stone">
-                    Embed slot reserved — add the Maps iframe once the office
-                    coordinates are confirmed.
+                    {tr("contact_map_note", "Embed slot reserved — add the Maps iframe once the office coordinates are confirmed.")}
                   </p>
                 </div>
               </div>

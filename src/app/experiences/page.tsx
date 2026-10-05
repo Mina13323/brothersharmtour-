@@ -8,8 +8,10 @@ import { Hero } from "@/components/Hero";
 import { Reveal } from "@/components/Reveal";
 import { Breadcrumbs, CTASection, ArrowRight } from "@/components/sections";
 import { activeExperiences, localizeTour, toursByCategory } from "@/lib/store/repo";
-import { destinationName } from "@/lib/store/labels";
+import { destinationName, experienceName } from "@/lib/store/labels";
 import { media } from "@/lib/media";
+import { translatorFor } from "@/lib/i18n/server";
+import { getVisitorLanguage } from "@/lib/siteview";
 
 export const metadata: Metadata = buildMetadata({
   fallbackTitle: "Egypt Tour Experiences & Activity Types",
@@ -19,7 +21,9 @@ export const metadata: Metadata = buildMetadata({
   image: media.sharmHero,
 });
 
-export default function ExperiencesPage() {
+export default async function ExperiencesPage() {
+  const lang = await getVisitorLanguage();
+  const tr = translatorFor(lang);
   const experiences = activeExperiences();
   return (
     <>
@@ -27,16 +31,19 @@ export default function ExperiencesPage() {
         variant="card"
         image={media.tiranIsland.hero}
         size="short"
-        eyebrow="Experiences"
-        title="What kind of day is it?"
-        subtitle="Start with the mood rather than the map. Every category leads to the trips we actually run."
+        eyebrow={tr("exp_eyebrow", "Experiences")}
+        title={tr("exp_title", "What kind of day is it?")}
+        subtitle={tr("exp_subtitle", "Start with the mood rather than the map. Every category leads to the trips we actually run.")}
         showWave
       />
 
       <section className="band bg-paper-warm/30">
         <div className="shell">
           <Breadcrumbs
-            items={[{ label: "Home", href: "/" }, { label: "Experiences" }]}
+            items={[
+              { label: tr("nav_home", "Home"), href: "/" },
+              { label: tr("nav_experiences", "Experiences") },
+            ]}
           />
 
           {/* Editorial index — elevated rounded cards rather than bordered rows */}
@@ -78,7 +85,7 @@ export default function ExperiencesPage() {
                           {String(index + 1).padStart(2, "0")}
                         </span>
                         <h2 className="font-display text-[clamp(1.75rem,1.2rem+2vw,2.75rem)] leading-none transition-colors duration-500 group-hover:text-reef">
-                          {experience.name}
+                          {experienceName(experience.slug, lang) || experience.name}
                         </h2>
                       </div>
 
@@ -89,13 +96,15 @@ export default function ExperiencesPage() {
                       <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2 text-[0.6875rem] uppercase tracking-[0.16em] text-stone">
                         <span>
                           {list.length}{" "}
-                          {list.length === 1 ? "experience" : "experiences"}
+                          {list.length === 1
+                            ? tr("count_experience_one", "experience")
+                            : tr("count_experience_many", "experiences")}
                         </span>
                         <span aria-hidden className="opacity-40">
                           ·
                         </span>
                         <span>
-                          {experience.destinations.map((d) => destinationName(d)).join(" & ")}
+                          {experience.destinations.map((d) => destinationName(d, lang)).join(" & ")}
                         </span>
                       </div>
                     </Reveal>
@@ -115,8 +124,8 @@ export default function ExperiencesPage() {
 
       <CTASection
         image={media.superSafari.hero}
-        title="Not sure which one?"
-        text="Tell us who's travelling and how long you have. We'll put a shortlist together."
+        title={tr("exp_cta_title", "Not sure which one?")}
+        text={tr("exp_cta_text", "Tell us who's travelling and how long you have. We'll put a shortlist together.")}
       />
     </>
   );

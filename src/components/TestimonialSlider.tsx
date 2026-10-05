@@ -120,7 +120,9 @@ export function ReviewSlider({ reviews }: { reviews: PublicReview[] }) {
               </div>
               <div className="min-w-0">
                 <span className="block text-[9px] font-bold uppercase tracking-[0.14em] text-stone truncate">
-                  {active.verified ? "Verified trip" : "Customer review"}
+                  {active.verified
+                    ? t("review_verified_trip", "Verified trip")
+                    : t("review_customer_review", "Customer review")}
                 </span>
                 <p className="text-xs font-bold text-ink truncate">
                   {active.tourTitle ?? "Our excursions"}
@@ -133,11 +135,11 @@ export function ReviewSlider({ reviews }: { reviews: PublicReview[] }) {
         {/* Right Column: Headline, quote, author, actions */}
         <div className="lg:col-span-6 flex flex-col justify-center">
           <p className="eyebrow text-reef font-semibold tracking-[0.2em] uppercase">
-            Reviews · What They Say
+            {t("testimonials_eyebrow", "Reviews · What They Say")}
           </p>
 
           <h2 className="font-display text-3xl sm:text-4xl lg:text-[2.75rem] font-medium tracking-tight text-ink mt-3 leading-tight">
-            What our travellers say
+            {t("testimonials_title", "What our travellers say")}
           </h2>
 
           <blockquote className="mt-5 text-base sm:text-lg text-stone-700 leading-relaxed font-normal">
@@ -177,7 +179,7 @@ export function ReviewSlider({ reviews }: { reviews: PublicReview[] }) {
               href="/review"
               className="link-rule text-ink"
             >
-              Leave a review
+              {t("home_leave_review", "Leave a review")}
               <span aria-hidden="true">→</span>
             </Link>
           </div>
@@ -196,15 +198,13 @@ export function ReviewInvite() {
   return (
     <div className="relative isolate overflow-hidden rounded-[2.5rem] bg-paper-warm/70 border border-sand/50 p-8 sm:p-12 lg:p-16 shadow-sm text-center">
       <p className="eyebrow text-reef font-semibold tracking-[0.2em] uppercase">
-        Reviews
+        {t("review_page_eyebrow", "Reviews")}
       </p>
       <h2 className="font-display text-3xl sm:text-4xl font-medium tracking-tight text-ink mt-3 leading-tight">
-        Been out with us?
+        {t("review_invite_title", "Been out with us?")}
       </h2>
       <p className="mt-4 max-w-xl mx-auto text-stone leading-relaxed">
-        We publish every verified customer review exactly as it was written —
-        good or bad. If you have finished a trip with Brother Sharm Tour, tell
-        other travellers how it went.
+        {t("review_invite_text", "We publish every verified customer review exactly as it was written — good or bad. If you have finished a trip with Brother Sharm Tour, tell other travellers how it went.")}
       </p>
       <div className="mt-7 flex flex-wrap items-center justify-center gap-3.5">
         <Link

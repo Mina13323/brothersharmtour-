@@ -8,6 +8,9 @@ import { DestinationCard } from "@/components/cards";
 import { Breadcrumbs, CTASection, ArrowRight } from "@/components/sections";
 import { activeDestinations, toursByDestination } from "@/lib/store/repo";
 import { media } from "@/lib/media";
+import { translatorFor } from "@/lib/i18n/server";
+import { getVisitorLanguage } from "@/lib/siteview";
+import { experienceName } from "@/lib/store/labels";
 
 export const metadata: Metadata = buildMetadata({
   fallbackTitle: "Egypt Destinations: Sharm El Sheikh & Cairo",
@@ -17,7 +20,9 @@ export const metadata: Metadata = buildMetadata({
   image: media.sharmHero,
 });
 
-export default function DestinationsPage() {
+export default async function DestinationsPage() {
+  const lang = await getVisitorLanguage();
+  const tr = translatorFor(lang);
   const destinations = activeDestinations();
   return (
     <>
@@ -25,16 +30,19 @@ export default function DestinationsPage() {
         variant="card"
         image={media.sharmHero}
         size="short"
-        eyebrow="Destinations"
-        title="Two sides of Egypt"
-        subtitle="The Red Sea and the Sinai desert on one side, four thousand years of history on the other."
+        eyebrow={tr("dest_eyebrow", "Destinations")}
+        title={tr("dest_title", "Two sides of Egypt")}
+        subtitle={tr("dest_subtitle", "The Red Sea and the Sinai desert on one side, four thousand years of history on the other.")}
         showWave
       />
 
       <section className="band">
         <div className="shell">
           <Breadcrumbs
-            items={[{ label: "Home", href: "/" }, { label: "Destinations" }]}
+            items={[
+              { label: tr("nav_home", "Home"), href: "/" },
+              { label: tr("nav_destinations", "Destinations") },
+            ]}
           />
 
           <div className="mt-12 flex flex-col gap-20 md:gap-28">
@@ -63,7 +71,9 @@ export default function DestinationsPage() {
                     className={`lg:col-span-5 ${reverse ? "lg:order-1" : ""}`}
                   >
                     <p className="eyebrow text-reef">
-                      {destination.priority === 1 ? "Primary destination" : "Also with us"}
+                      {destination.priority === 1
+                        ? tr("dest_primary", "Primary destination")
+                        : tr("dest_also_with_us", "Also with us")}
                     </p>
                     <h2 className="headline mt-4">{destination.name}</h2>
                     <p className="lede mt-5">{destination.intro}</p>
@@ -72,10 +82,7 @@ export default function DestinationsPage() {
                       {destination.experiences.slice(0, 6).map((slug) => (
                         <li key={slug}>
                           <Link href={`/experiences/${slug}`} className="chip">
-                            {slug
-                              .split("-")
-                              .map((w) => w[0].toUpperCase() + w.slice(1))
-                              .join(" ")}
+                            {experienceName(slug, lang)}
                           </Link>
                         </li>
                       ))}

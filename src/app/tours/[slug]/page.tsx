@@ -11,6 +11,7 @@ import {
   tourBySlug,
 } from "@/lib/store/repo";
 import { getPublicSettings, getSiteView } from "@/lib/siteview";
+import { translatorFor } from "@/lib/i18n/server";
 import { destinationName } from "@/lib/store/labels";
 
 /**
@@ -30,7 +31,7 @@ export async function generateMetadata({
   const lang = (await getSiteView()).lang;
   const tour = localizeTour(record, lang);
   const settings = await getPublicSettings();
-  const title = tour.seo?.title || `${tour.title} — ${destinationName(tour.destination)}`;
+  const title = tour.seo?.title || `${tour.title} — ${destinationName(tour.destination, lang)}`;
   const description = tour.seo?.description || tour.summary;
 
   return {
@@ -61,6 +62,7 @@ export default async function TourDetailPage({
   const url = process.env.NEXT_PUBLIC_SITE_URL ?? "https://brothersharmtour.com";
 
   const lang = (await getSiteView()).lang;
+  const tr = translatorFor(lang);
   const tour = localizeTour(record, lang);
   const stats = reviewStats(record.slug);
   const view = { ...tour, rating: stats.average ?? undefined, reviewCount: stats.count };
@@ -167,8 +169,8 @@ export default async function TourDetailPage({
       {
         "@type": "BreadcrumbList",
         itemListElement: [
-          { "@type": "ListItem", position: 1, name: "Home", item: url },
-          { "@type": "ListItem", position: 2, name: "Tours", item: `${url}/tours` },
+          { "@type": "ListItem", position: 1, name: tr("nav_home", "Home"), item: url },
+          { "@type": "ListItem", position: 2, name: tr("nav_tours", "Tours"), item: `${url}/tours` },
           { "@type": "ListItem", position: 3, name: tour.title, item: `${url}/tours/${tour.slug}` },
         ],
       },

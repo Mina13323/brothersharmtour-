@@ -15,6 +15,11 @@
  *  6. Settings: an admin edit is live on the public site immediately
  *  7. Uploads: invalid files rejected, valid image accepted and served
  *
+ * Credentials are NEVER hard-coded here. The suite reads them from the
+ * environment and passes them through to the server it boots:
+ *
+ *   ADMIN_PASSWORD=… [ADMIN_EMAIL=…] npm run lifecycle
+ *
  * Usage:  node scripts/lifecycle-test.mjs   (run `npm run build` first)
  */
 
@@ -25,6 +30,22 @@ import { tmpdir } from "node:os";
 
 const PORT = 3123;
 const BASE = `http://127.0.0.1:${PORT}`;
+
+/* ── admin credentials come from the environment, never from source ── */
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@brothersharmtour.com";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+
+if (!ADMIN_PASSWORD) {
+  console.error(
+    "lifecycle: ADMIN_PASSWORD is not set.\n\n" +
+      "The admin-auth checks need the password the server will accept. Set it in\n" +
+      "the environment (it is also read by the server this suite boots) and re-run:\n\n" +
+      "  ADMIN_PASSWORD='<the admin password>' npm run lifecycle\n\n" +
+      "Optionally set ADMIN_EMAIL too (defaults to admin@brothersharmtour.com).\n" +
+      "Never commit the value — pass it from your shell or CI secret store.",
+  );
+  process.exit(1);
+}
 
 let passed = 0;
 let failed = 0;
@@ -105,7 +126,13 @@ if (hadContent) cpSync(CONTENT, BACKUP, { recursive: true });
 
 const server = spawn("npx", ["next", "start", "-p", String(PORT)], {
   stdio: ["ignore", "pipe", "pipe"],
-  env: { ...process.env, PORT: String(PORT) },
+  env: {
+    ...process.env,
+    PORT: String(PORT),
+    // Same credentials for the server under test — passed through, not logged.
+    ADMIN_EMAIL,
+    ADMIN_PASSWORD,
+  },
   detached: process.platform !== "win32", // own process group on POSIX
   shell: process.platform === "win32",
 });
@@ -211,13 +238,13 @@ try {
   const noAuth = await fetch(BASE + "/api/admin/tours");
   ok("tours API rejects anonymous", noAuth.status === 401);
   const wrong = await post("/api/admin/auth", {
-    email: "admin@brothersharmtour.com",
+    email: ADMIN_EMAIL,
     password: "wrong-password",
   });
   ok("wrong password rejected", wrong.status === 401);
   const login = await post("/api/admin/auth", {
-    email: "admin@brothersharmtour.com",
-    password: "Brotour-Admin-2026",
+    email: ADMIN_EMAIL,
+    password: ADMIN_PASSWORD,
   });
   ok("correct password accepted", login.status === 200);
   const setCookie = login.headers.get("set-cookie") ?? "";
@@ -232,7 +259,7 @@ try {
   let got429 = false;
   for (let i = 0; i < 8; i++) {
     const r = await post("/api/admin/auth", {
-      email: "admin@brothersharmtour.com",
+      email: ADMIN_EMAIL,
       password: `guess-${i}`,
     });
     if (r.status === 429) {

@@ -24,14 +24,14 @@ export function BookingForm({
   compact?: boolean;
 }) {
   const catalogue = useCatalogue();
-  const { settings: site, whatsappLink, t } = useSite();
+  const { settings: site, whatsappLink, t, lang } = useSite();
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
   const [tourSlug, setTourSlug] = useState(initialTour ?? "");
 
   const grouped = Object.entries(
     catalogue.reduce<Record<string, typeof catalogue>>((acc, tour) => {
-      const key = destinationName(tour.destination);
+      const key = destinationName(tour.destination, lang);
       (acc[key] ??= []).push(tour);
       return acc;
     }, {}),
@@ -72,7 +72,7 @@ export function BookingForm({
         <div>
           <h3 className="headline text-[1.6rem]">{t("request_received", "Request received")}</h3>
           <p className="lede mt-3">
-            Thanks — we have your request and we&apos;ll come back to you with
+            {t("booking_thanks_body", "Thanks — we have your request and we\u2019ll come back to you with availability, your pickup time and a final price. If you need a faster answer, WhatsApp is the quickest way to reach us.")}
             availability, your pickup time and a final price. If you need a
             faster answer, WhatsApp is the quickest way to reach us.
           </p>
@@ -88,10 +88,10 @@ export function BookingForm({
             rel="noopener noreferrer"
             className="btn btn-whatsapp btn-sm"
           >
-            Chat on WhatsApp
+            {t("action_chat_whatsapp", "Chat on WhatsApp")}
           </a>
           <Link href="/tours" className="btn btn-outline btn-sm">
-            Browse more tours
+            {t("form_browse_more_tours", "Browse more tours")}
           </Link>
         </div>
       </div>
@@ -103,7 +103,7 @@ export function BookingForm({
       <div className={cn("grid gap-5", compact ? "grid-cols-1" : "sm:grid-cols-2")}>
         <div>
           <label className="label" htmlFor="bf-name">
-            Name
+            {t("form_name", "Name")}
           </label>
           <input
             id="bf-name"
@@ -116,7 +116,7 @@ export function BookingForm({
         </div>
         <div>
           <label className="label" htmlFor="bf-email">
-            Email
+            {t("form_email", "Email")}
           </label>
           <input
             id="bf-email"
@@ -132,7 +132,7 @@ export function BookingForm({
 
       <div>
         <label className="label" htmlFor="bf-phone">
-          WhatsApp / Phone
+          {t("form_phone_whatsapp", "Phone / WhatsApp")}
         </label>
         <input
           id="bf-phone"
@@ -147,7 +147,7 @@ export function BookingForm({
 
       <div>
         <label className="label" htmlFor="bf-tour">
-          Selected experience
+          {t("form_selected_experience", "Selected experience")}
         </label>
         <select
           id="bf-tour"
@@ -172,7 +172,7 @@ export function BookingForm({
       <div className="grid grid-cols-2 gap-5">
         <div className="col-span-2 sm:col-span-1">
           <label className="label" htmlFor="bf-date">
-            Preferred date
+            {t("form_preferred_date", "Preferred date")}
           </label>
           <input
             id="bf-date"
@@ -184,7 +184,7 @@ export function BookingForm({
         </div>
         <div>
           <label className="label" htmlFor="bf-adults">
-            Adults
+            {t("guests_adults", "Adults")}
           </label>
           <input
             id="bf-adults"
@@ -198,7 +198,7 @@ export function BookingForm({
         </div>
         <div>
           <label className="label" htmlFor="bf-children">
-            Children
+            {t("guests_children", "Children")}
           </label>
           <input
             id="bf-children"
@@ -214,13 +214,13 @@ export function BookingForm({
 
       <div>
         <label className="label" htmlFor="bf-notes">
-          Special requests
+          {t("form_special_requests", "Special requests")}
         </label>
         <textarea
           id="bf-notes"
           name="notes"
           rows={4}
-          placeholder="Hotel name, children's ages, dietary needs, anything else we should know."
+          placeholder={t("form_notes_full_ph", "Hotel name, children\u2019s ages, dietary needs, anything else we should know.")}
           className="field"
         />
       </div>
@@ -237,7 +237,7 @@ export function BookingForm({
           disabled={status === "submitting"}
           className="btn btn-primary grow disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {status === "submitting" ? "Sending…" : "Submit request"}
+          {status === "submitting" ? t("state_sending", "Sending…") : t("form_submit_request", "Submit request")}
         </button>
         <a
           href={whatsappLink(
@@ -247,13 +247,12 @@ export function BookingForm({
           rel="noopener noreferrer"
           className="btn btn-whatsapp"
         >
-          Chat on WhatsApp
+          {t("action_chat_whatsapp", "Chat on WhatsApp")}
         </a>
       </div>
 
       <p className="text-xs leading-relaxed text-stone">
-        No payment is taken now. We reply with availability, your hotel pickup
-        time and a final price before anything is confirmed. Or call us on{" "}
+        {t("form_no_payment_note", "No payment is taken now. We reply with availability, your hotel pickup time and a final price before anything is confirmed. Or call us on")}{" "}
         <a href={`tel:${site.contact.phone}`} className="underline">
           {site.contact.phone}
         </a>

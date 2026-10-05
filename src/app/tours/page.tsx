@@ -9,6 +9,7 @@ import { BookButton } from "@/components/BookingProvider";
 import { localizeTour, publishedTours, publishedPackages, localizePackage } from "@/lib/store/repo";
 import { getSiteView } from "@/lib/siteview";
 import { media } from "@/lib/media";
+import { translatorFor } from "@/lib/i18n/server";
 import type { Tour } from "@/lib/types";
 
 export const metadata: Metadata = buildMetadata({
@@ -22,6 +23,7 @@ export const metadata: Metadata = buildMetadata({
 export default async function ToursPage() {
   const url = process.env.NEXT_PUBLIC_SITE_URL ?? "https://brothersharmtour.com";
   const lang = (await getSiteView()).lang;
+  const tr = translatorFor(lang);
   const toursList = publishedTours().map((t) => localizeTour(t, lang));
   const packagesList = publishedPackages().map((p) => {
     const loc = localizePackage(p, lang);
@@ -71,16 +73,21 @@ export default async function ToursPage() {
         image={media.whiteIsland.hero}
         size="short"
         eyebrow={`${tours.length} experiences · Sharm El Sheikh & Cairo`}
-        title="Find your Egypt experience"
-        subtitle="Filter by destination, the kind of day you want, how long you have and what you'd like to spend."
+        title={tr("tours_title", "Find your Egypt experience")}
+        subtitle={tr("tours_subtitle", "Filter by destination, the kind of day you want, how long you have and what you'd like to spend.")}
         showWave
       >
-        <BookButton className="btn btn-primary">Ask us to plan it</BookButton>
+        <BookButton className="btn btn-primary">{tr("ask_us_to_plan", "Ask us to plan it")}</BookButton>
       </Hero>
 
       <section className="pb-24 pt-10 md:pt-14">
         <div className="shell">
-          <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Tours" }]} />
+          <Breadcrumbs
+            items={[
+              { label: tr("nav_home", "Home"), href: "/" },
+              { label: tr("nav_tours", "Tours") },
+            ]}
+          />
           <div className="mt-8">
             {/* Suspense boundary: the explorer reads the hero search hand-off
                 from the query string, which opts its subtree into CSR. */}
@@ -93,8 +100,8 @@ export default async function ToursPage() {
 
       <CTASection
         image={media.superSafari.hero}
-        title="Can't find the right day?"
-        text="We build private itineraries too. Tell us what you had in mind."
+        title={tr("tours_cta_title", "Can't find the right day?")}
+        text={tr("tours_cta_text", "We build private itineraries too. Tell us what you had in mind.")}
       />
     </>
   );

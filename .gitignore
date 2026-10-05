@@ -23,3 +23,6 @@ tsconfig.tsbuildinfo
 content/
 google_drive
 
+
+# One-off translation authoring batches (merged into scripts/i18n-additions.json)
+scripts/i18n-batches/

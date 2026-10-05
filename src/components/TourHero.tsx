@@ -209,7 +209,7 @@ export function CapsuleHero({
                   <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-40" />
                   {/* Active indicator badge */}
                   <span className="absolute bottom-3 sm:bottom-4 inset-x-0 mx-auto w-fit rounded-full bg-sand text-ink text-[9px] sm:text-[10px] font-extrabold uppercase px-2 sm:px-2.5 py-0.5 shadow-md">
-                    Active
+                    {t("photo_active", "Active")}
                   </span>
                 </button>
 
@@ -287,7 +287,7 @@ export function TourHero({
 }: {
   tour: Tour & { priceOverrides?: Record<string, number> };
 }) {
-  const { money, t } = useSite();
+  const { money, t, lang } = useSite();
   const price = money(tour.priceFrom, tour.priceOverrides, tour.currency);
   // Pinned overrides belong to the adult base price only — never the child rate.
   const childPrice =
@@ -304,7 +304,7 @@ export function TourHero({
   return (
     <CapsuleHero
       title={tour.title}
-      eyebrow={`${destinationName(tour.destination)} • ${experienceName(tour.category)}${priceTag}`}
+      eyebrow={`${destinationName(tour.destination, lang)} • ${experienceName(tour.category, lang)}${priceTag}`}
       summary={tour.summary}
       images={tour.images}
       breadcrumbs={[

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { durationBuckets } from "@/lib/store/labels";
+import { durationBuckets, durationBucketLabel } from "@/lib/store/labels";
 import { destinationName, experienceName } from "@/lib/store/labels";
 import type { Tour } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -54,7 +54,7 @@ export function ToursExplorer({
     type?: string;
   };
 }) {
-  const { t } = useSite();
+  const { t, lang } = useSite();
   const [query, setQuery] = useState("");
   const [destination, setDestination] = useState(
     lockedDestination ?? initial?.destination ?? "all",
@@ -228,7 +228,7 @@ export function ToursExplorer({
 
           <label className="hidden shrink-0 items-center gap-2 lg:flex">
             <span className="text-[0.6875rem] uppercase tracking-[0.16em] text-stone">
-              Sort
+              {t("filter_sort", "Sort")}
             </span>
             <select
               value={sort}
@@ -301,7 +301,7 @@ export function ToursExplorer({
                   onClick={reset}
                   className="text-[0.6875rem] uppercase tracking-[0.14em] text-reef underline underline-offset-4"
                 >
-                  Clear all
+                  {t("filter_clear_all", "Clear all")}
                 </button>
               ) : null}
             </div>
@@ -312,10 +312,10 @@ export function ToursExplorer({
                   value={destination}
                   onChange={setDestination}
                   options={[
-                    { id: "all", label: "All" },
+                    { id: "all", label: t("filter_all", "All") },
                     ...Array.from(new Set(tours.map((t) => t.destination))).map((slug) => ({
                       id: slug,
-                      label: destinationName(slug),
+                      label: destinationName(slug, lang),
                     })),
                   ]}
                 />
@@ -328,10 +328,10 @@ export function ToursExplorer({
                   value={category}
                   onChange={setCategory}
                   options={[
-                    { id: "all", label: "All" },
+                    { id: "all", label: t("filter_all", "All") },
                     ...Array.from(new Set(tours.map((t) => t.category))).map((slug) => ({
                       id: slug,
-                      label: experienceName(slug),
+                      label: experienceName(slug, lang),
                     })),
                   ]}
                 />
@@ -344,7 +344,7 @@ export function ToursExplorer({
                 onChange={setDuration}
                 options={[
                   { id: "all", label: t("filter_any", "Any") },
-                  ...durationBuckets.map((b) => ({ id: b.id, label: b.label })),
+                  ...durationBuckets.map((b) => ({ id: b.id, label: durationBucketLabel(b.id, lang) })),
                 ]}
               />
             </FilterGroup>
@@ -377,7 +377,7 @@ export function ToursExplorer({
                   className="w-full accent-[var(--color-reef)]"
                 />
                 <p className="mt-2 text-[0.6875rem] text-stone">
-                  Tours quoted on request are always shown.
+                  {t("filter_on_request_note", "Tours quoted on request are always shown.")}
                 </p>
               </FilterGroup>
             ) : null}
@@ -406,7 +406,7 @@ export function ToursExplorer({
               onClick={reset}
               className="btn btn-outline flex-1"
             >
-              Reset
+              {t("filter_reset", "Reset")}
             </button>
             <button
               type="button"
@@ -441,11 +441,10 @@ export function ToursExplorer({
             <div className="rounded-3xl border border-sand/80 bg-paper-warm/50 px-6 py-16 text-center shadow-sm">
               <h3 className="headline text-[1.5rem]">{t("empty_no_results", "Nothing matches that yet")}</h3>
               <p className="lede mx-auto mt-3 max-w-md text-[0.9375rem]">
-                Try widening the filters — or tell us what you had in mind and
-                we&apos;ll build it for you.
+                {t("empty_widen_filters", "Try widening the filters — or tell us what you had in mind and we\u2019ll build it for you.")}
               </p>
               <button onClick={reset} className="btn btn-outline btn-sm mt-7">
-                Clear filters
+                {t("filter_clear_filters", "Clear filters")}
               </button>
             </div>
           )}

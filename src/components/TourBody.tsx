@@ -1370,8 +1370,8 @@ export function TourBody({
         <CTASection
           image={tour.images[0]}
           tourSlug={tour.slug}
-          title={`Ready for ${tour.title}?`}
-          text="Send us your dates and we'll confirm availability and your pickup time."
+          title={t("tour_cta_ready", "Ready for {title}?").replace("{title}", tour.title)}
+          text={t("tour_cta_text", "Send us your dates and we\u2019ll confirm availability and your pickup time.")}
         />
       ) : null}
 

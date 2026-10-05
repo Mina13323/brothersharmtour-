@@ -6,9 +6,11 @@ import { Reveal } from "./Reveal";
 import { SectionHeading, WhatsAppIcon } from "./sections";
 import { WaveDivider } from "./WaveDivider";
 import { useSite, useCatalogue } from "./SiteProvider";
+import { experienceName } from "@/lib/store/labels";
 import { media } from "@/lib/media";
 import { GuideLanguageBadge } from "./DynamicGuideLanguage";
 import { cn } from "@/lib/utils";
+import type { TranslationKey } from "@/lib/i18n/translations";
 
 /* ───────────────────────── Hero trust row ───────────────────────── */
 /*
@@ -110,33 +112,38 @@ export function Avatars({ dark = false }: { dark?: boolean }) {
 
 /* ───────────────────────── Value props (6) ───────────────────────── */
 
-const valueProps: { icon: string; title: string; body: React.ReactNode }[] = [
-  { icon: "🤝", title: "No Prepayment", body: "Reserve today and pay on the day of your tour — cash, in your currency." },
-  { icon: "⚡", title: "Instant Booking", body: "Message us on WhatsApp with your date and hotel — we confirm from there." },
-  { icon: "🚌", title: "Hotel Transfer", body: "Pickup and drop-off from your hotel is included with every excursion." },
-  { icon: "🗣️", title: "Expert Guides", body: <>Every tour is led by an experienced <GuideLanguageBadge format="speaking-guide" />.</> },
-  { icon: "🧭", title: "Local Operator", body: "We live and work in Sharm El Sheikh — not a call centre in another country." },
-  { icon: "🛟", title: "Clear Cancellation", body: "If weather or the coastguard stops a trip, we move you to another date or refund in full." },
+type Translate = (key: TranslationKey, fallback: string) => string;
+
+const buildValueProps = (
+  t: Translate,
+): { icon: string; title: string; body: React.ReactNode }[] => [
+  { icon: "🤝", title: t("vp_no_prepayment_title", "No Prepayment"), body: t("vp_no_prepayment_body", "Reserve today and pay on the day of your tour — cash, in your currency.") },
+  { icon: "⚡", title: t("vp_instant_title", "Instant Booking"), body: t("vp_instant_body", "Message us on WhatsApp with your date and hotel — we confirm from there.") },
+  { icon: "🚌", title: t("vp_transfer_title", "Hotel Transfer"), body: t("vp_transfer_body", "Pickup and drop-off from your hotel is included with every excursion.") },
+  { icon: "🗣️", title: t("vp_guides_title", "Expert Guides"), body: <>{t("vp_guides_body_prefix", "Every tour is led by an experienced")} <GuideLanguageBadge format="speaking-guide" />.</> },
+  { icon: "🧭", title: t("vp_local_title", "Local Operator"), body: t("vp_local_body", "We live and work in Sharm El Sheikh — not a call centre in another country.") },
+  { icon: "🛟", title: t("vp_cancel_title", "Clear Cancellation"), body: t("vp_cancel_body", "If weather or the coastguard stops a trip, we move you to another date or refund in full.") },
 ];
 
 export function ValueProps() {
   const { t } = useSite();
+  const valueProps = buildValueProps(t);
   const previewCards = [
     {
-      title: "Red Sea & White Island",
-      tag: "Boat Trips & Snorkelling",
+      title: t("card_red_sea_title", "Red Sea & White Island"),
+      tag: t("card_red_sea_tag", "Boat Trips & Snorkelling"),
       image: media.whiteIsland.card,
       href: "/tours/white-island",
     },
     {
-      title: "Sinai Desert Safari",
-      tag: "Quads, Camels & Dinner",
+      title: t("card_desert_title", "Sinai Desert Safari"),
+      tag: t("card_desert_tag", "Quads, Camels & Dinner"),
       image: media.superSafari.card,
       href: "/experiences/desert",
     },
     {
-      title: "Cairo & Pyramids",
-      tag: "Guided Day Trips",
+      title: t("card_cairo_title", "Cairo & Pyramids"),
+      tag: t("card_cairo_tag", "Guided Day Trips"),
       image: media.pyramids.card,
       href: "/destinations/cairo",
     },
@@ -148,10 +155,10 @@ export function ValueProps() {
         {/* Top Centered Headline (matching "Comfort Meets Escape") */}
         <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
           <p className="eyebrow text-reef font-semibold tracking-[0.2em] uppercase mb-3">
-            Why Brother Sharm Tour
+            {t("home_why_bst_eyebrow", "Why Brother Sharm Tour")}
           </p>
           <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight text-ink leading-tight">
-            Comfort Meets Adventure
+            {t("home_comfort_title", "Comfort Meets Adventure")}
           </h2>
         </div>
 
@@ -160,10 +167,10 @@ export function ValueProps() {
           {/* Left Column */}
           <div className="lg:col-span-4 flex flex-col items-start">
             <h3 className="font-display text-2xl sm:text-3xl text-ink leading-snug">
-              Thoughtful excursions made for slower, memorable days
+              {t("home_thoughtful_title", "Thoughtful excursions made for slower, memorable days")}
             </h3>
             <p className="mt-4 text-stone text-sm sm:text-base leading-relaxed">
-              Every tour is operated by our local crew in Sharm El Sheikh. We provide hotel transfers, clear pricing in your currency, and confirmation on WhatsApp.
+              {t("home_thoughtful_body", "Every tour is operated by our local crew in Sharm El Sheikh. We provide hotel transfers, clear pricing in your currency, and confirmation on WhatsApp.")}
             </p>
             <Link
               href="/about"
@@ -238,15 +245,16 @@ export function ValueProps() {
 /* Structural service facts — never borrowed ratings or traveller counts. */
 
 export function TrustMarquee() {
+  const { t } = useSite();
   const item = (
     <span className="flex shrink-0 items-center gap-4 whitespace-nowrap px-6 text-[0.95rem] font-medium tracking-[0.02em] text-white/85">
-      Operated by our local team in Sharm El Sheikh
+      {t("trust_operated_local", "Operated by our local team in Sharm El Sheikh")}
       <span className="text-reef-bright">•</span>
-      No prepayment — pay on the day
+      {t("trust_no_prepayment", "No prepayment — pay on the day")}
       <span className="text-reef-bright">•</span>
-      Hotel pickup across Sharm El Sheikh
+      {t("trust_hotel_pickup", "Hotel pickup across Sharm El Sheikh")}
       <span className="text-reef-bright">•</span>
-      Full price confirmed before you book
+      {t("trust_price_confirmed", "Full price confirmed before you book")}
       <span className="text-reef-bright">•</span>
     </span>
   );
@@ -271,7 +279,9 @@ export function TrustMarquee() {
 
 export function Bestsellers() {
   const catalogue = useCatalogue();
-  const { money, whatsappLink, t } = useSite();
+  const { money, whatsappLink, t, lang } = useSite();
+  // `t` is shadowed by the tour parameter inside the map below.
+  const translate = t;
 
   const topPicks = catalogue
     .filter((t) => t.featured)
@@ -281,7 +291,10 @@ export function Bestsellers() {
       title: t.title,
       slug: t.slug,
       href: t.href ?? (t.isPackage || t.type === "package" ? `/packages/${t.slug}` : `/tours/${t.slug}`),
-      tag: t.isPackage || t.type === "package" ? `Package • ${t.category.replace(/-/g, " ")}` : t.category.replace(/-/g, " "),
+      tag:
+        t.isPackage || t.type === "package"
+          ? `${translate("badge_package", "Package")} • ${experienceName(t.category, lang)}`
+          : experienceName(t.category, lang),
       image: t.image ?? media.whiteIsland.card,
       price: t.priceFrom,
       childPrice: t.childPrice,
@@ -301,13 +314,13 @@ export function Bestsellers() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div className="max-w-2xl">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-reef/10 px-3.5 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-reef mb-3">
-              ✦ Bestselling Excursions
+              ✦ {t("trust_bestsellers", "Bestselling Excursions")}
             </span>
             <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight text-ink leading-tight">
-              Real Adventures. Real Memories. The Best of Egypt.
+              {t("home_best_title", "Real Adventures. Real Memories. The Best of Egypt.")}
             </h2>
             <p className="mt-3 text-stone text-sm sm:text-base leading-relaxed">
-              Handpicked excursions operated directly by our team, with hotel transfers included and no prepayment.
+              {t("home_best_body", "Handpicked excursions operated directly by our team, with hotel transfers included and no prepayment.")}
             </p>
           </div>
 
@@ -316,7 +329,7 @@ export function Bestsellers() {
               href="/tours"
               className="inline-flex items-center gap-2 rounded-full bg-sun hover:bg-sun-bright text-white px-6 py-2.5 text-xs font-semibold uppercase tracking-wider shadow-sm hover:shadow-md transition-all"
             >
-              <span>All {catalogue.length} Tours</span>
+              <span>{t("home_all_tours_count", "All {count} Tours").replace("{count}", String(catalogue.length))}</span>
               <span aria-hidden="true">→</span>
             </Link>
           </div>
@@ -417,13 +430,13 @@ export function Bestsellers() {
           >
             <div>
               <span className="inline-block text-[10px] font-bold uppercase tracking-[0.16em] text-reef-deep mb-2">
-                Custom Itineraries
+                {t("custom_itinerary", "Custom Itineraries")}
               </span>
               <h3 className="font-display text-2xl font-bold text-ink leading-tight">
-                Plan a Custom Trip. Zero Hassle.
+                {t("plan_custom_trip", "Plan a Custom Trip. Zero Hassle.")}
               </h3>
               <p className="mt-3 text-xs text-stone leading-relaxed">
-                Want a private yacht charter, VIP desert safari, or custom Cairo trip? Tell us your dates and group size.
+                {t("custom_trip_desc", "Want a private yacht charter, VIP desert safari, or custom Cairo trip? Tell us your dates and group size.")}
               </p>
             </div>
 
@@ -443,7 +456,7 @@ export function Bestsellers() {
               <div className="mt-5 flex items-center gap-3">
                 <Avatars dark />
                 <span className="text-[11px] font-semibold text-ink">
-                  A real team, on the ground in Sharm
+                  {t("home_real_team", "A real team, on the ground in Sharm")}
                 </span>
               </div>
             </div>
@@ -471,9 +484,9 @@ export function RatingPanel({
 }) {
   const { settings, t } = useSite();
   const socials = [
-    settings.social.instagram && { name: "Instagram", href: settings.social.instagram, note: "Our profile" },
-    settings.social.facebook && { name: "Facebook", href: settings.social.facebook, note: "Our page" },
-    settings.social.tripadvisor && { name: "Tripadvisor", href: settings.social.tripadvisor, note: "Our listing" },
+    settings.social.instagram && { name: "Instagram", href: settings.social.instagram, note: t("social_our_profile", "Our profile") },
+    settings.social.facebook && { name: "Facebook", href: settings.social.facebook, note: t("social_our_page", "Our page") },
+    settings.social.tripadvisor && { name: "Tripadvisor", href: settings.social.tripadvisor, note: t("social_our_listing", "Our listing") },
   ].filter(Boolean) as { name: string; href: string; note: string }[];
 
   return (
@@ -490,13 +503,15 @@ export function RatingPanel({
                   <div className="pb-2">
                     <p className="text-reef-bright">★★★★★</p>
                     <p className="text-[0.9rem] text-white/70">
-                      from {count} guest {count === 1 ? "review" : "reviews"}
+                      {(count === 1
+                        ? t("reviews_from_guest_one", "from {count} guest review")
+                        : t("reviews_from_guests", "from {count} guest reviews")
+                      ).replace("{count}", String(count))}
                     </p>
                   </div>
                 </div>
                 <p className="mt-6 lede text-white/80">
-                  Every review below was submitted by a real customer after their trip and
-                  published by our team — unedited.
+                  {t("reviews_unedited_note", "Every review below was submitted by a real customer after their trip and published by our team — unedited.")}
                 </p>
               </>
             ) : (
@@ -508,9 +523,7 @@ export function RatingPanel({
                   </div>
                 </div>
                 <p className="mt-6 lede text-white/80">
-                  We publish customer reviews exactly as they are written — no invented
-                  ratings, no stock testimonials. Been out with us? Be the first to tell
-                  other travellers how it went.
+                  {t("reviews_invite_body", "We publish customer reviews exactly as they are written — no invented ratings, no stock testimonials. Been out with us? Be the first to tell other travellers how it went.")}
                 </p>
               </>
             )}
@@ -568,21 +581,25 @@ export function RatingPanel({
 
 /* ───────────────────────── No compromises (7) ───────────────────────── */
 
-const guarantees: { title: React.ReactNode; body: React.ReactNode }[] = [
-  { title: "No prepayment", body: "Pay on the day of your tour — in cash, in your currency." },
-  { title: "No hidden fees", body: "The final price is confirmed with you before you commit." },
-  { title: "Hotel transfer", body: "Pickup and drop-off from your hotel in Sharm El Sheikh." },
-  { title: "24/7 WhatsApp", body: <>A real person on WhatsApp, <GuideLanguageBadge format="in-language" />.</> },
-  { title: <><GuideLanguageBadge format="adjective" />-speaking guides</>, body: "Professionals who know every route they lead." },
-  { title: "Local team", body: "We live and work here — in Sharm El Sheikh, not behind a call centre." },
-  { title: "Weather guarantee", body: "If the coastguard closes the sea, we move your trip or refund in full." },
+const buildGuarantees = (
+  t: Translate,
+): { title: React.ReactNode; body: React.ReactNode }[] => [
+  { title: t("g_no_prepayment_title", "No prepayment"), body: t("g_no_prepayment_body", "Pay on the day of your tour — in cash, in your currency.") },
+  { title: t("g_no_fees_title", "No hidden fees"), body: t("g_no_fees_body", "The final price is confirmed with you before you commit.") },
+  { title: t("g_transfer_title", "Hotel transfer"), body: t("g_transfer_body", "Pickup and drop-off from your hotel in Sharm El Sheikh.") },
+  { title: t("g_whatsapp_title", "24/7 WhatsApp"), body: <>{t("g_whatsapp_body_prefix", "A real person on WhatsApp,")} <GuideLanguageBadge format="in-language" />.</> },
+  { title: <><GuideLanguageBadge format="adjective" />{t("g_guides_suffix", "-speaking guides")}</>, body: t("g_guides_body", "Professionals who know every route they lead.") },
+  { title: t("g_local_title", "Local team"), body: t("g_local_body", "We live and work here — in Sharm El Sheikh, not behind a call centre.") },
+  { title: t("g_weather_title", "Weather guarantee"), body: t("g_weather_body", "If the coastguard closes the sea, we move your trip or refund in full.") },
 ];
 
 export function NoCompromises() {
+  const { t } = useSite();
+  const guarantees = buildGuarantees(t);
   return (
     <section className="band bg-paper-warm/40">
       <div className="shell">
-        <SectionHeading eyebrow="Our promise" title="No compromises" />
+        <SectionHeading eyebrow={t("promise_eyebrow", "Our promise")} title={t("promise_title", "No compromises")} />
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {guarantees.map((g, i) => (
             <Reveal
@@ -609,16 +626,17 @@ export function NoCompromises() {
 
 export function ThreeSteps() {
   const catalogue = useCatalogue();
+  const { t } = useSite();
   const steps = [
-    { title: "Choose a tour", body: `${catalogue.length} experiences — sea, desert and history.` },
-    { title: "Message us on WhatsApp", body: "Send your date, hotel and group size. We confirm and answer questions." },
-    { title: "We pick you up from your hotel", body: "Guide, transfer and the day itself — pay when it's over." },
+    { title: t("step_choose_tour", "Choose a tour"), body: t("step_choose_tour_body", "{count} experiences — sea, desert and history.").replace("{count}", String(catalogue.length)) },
+    { title: t("step_message_whatsapp", "Message us on WhatsApp"), body: t("step_message_whatsapp_body", "Send your date, hotel and group size. We confirm and answer questions.") },
+    { title: t("step_pickup", "We pick you up from your hotel"), body: t("step_pickup_body", "Guide, transfer and the day itself — pay when it's over.") },
   ];
 
   return (
     <section className="band-tight">
       <div className="shell">
-        <SectionHeading eyebrow="How to book" title="Three steps" intro="Fast and easy." />
+        <SectionHeading eyebrow={t("howto_eyebrow", "How to book")} title={t("howto_title", "Three steps")} intro={t("howto_intro", "Fast and easy.")} />
         <ol className="mt-12 grid gap-6 md:grid-cols-3">
           {steps.map((step, i) => (
             <Reveal as="li" key={step.title} variant="card" delay={i * 80}>
@@ -658,24 +676,23 @@ export function ThreeSteps() {
 export function GeographyBook() {
   const { whatsappLink, t } = useSite();
   const benefits: React.ReactNode[] = [
-    "No prepayment",
-    "Hotel transfer included",
-    "Full price confirmed before you book",
+    t("g_no_prepayment_title", "No prepayment"),
+    t("benefit_transfer_included", "Hotel transfer included"),
+    t("benefit_price_confirmed", "Full price confirmed before you book"),
     <GuideLanguageBadge key="guides" format="speaking-guides" />,
-    "Free date changes if your plans move",
+    t("benefit_free_date_change", "Free date changes if your plans move"),
   ];
   return (
     <section className="band bg-paper-warm/40">
       <div className="shell">
         <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
           <Reveal>
-            <p className="eyebrow text-reef">Geography</p>
+            <p className="eyebrow text-reef">{t("geography_eyebrow", "Geography")}</p>
             <h2 className="headline mt-4 text-[clamp(2rem,1.4rem+2vw,3.25rem)]">
-              One team, two Egypts
+              {t("geography_title", "One team, two Egypts")}
             </h2>
             <p className="mt-4 max-w-md text-stone">
-              The reefs and deserts of Sinai from our base in Sharm El Sheikh, and the
-              pyramids and museums of Cairo — booked with the same local team.
+              {t("geography_body", "The reefs and deserts of Sinai from our base in Sharm El Sheikh, and the pyramids and museums of Cairo — booked with the same local team.")}
             </p>
           </Reveal>
 
@@ -684,10 +701,10 @@ export function GeographyBook() {
             <div className="rounded-[2rem] bg-paper p-7 shadow-[var(--shadow-lift)] md:p-9 hover:shadow-[var(--shadow-panel)] transition-shadow">
               <p className="eyebrow text-reef">{t("home_book_a_tour", "Book a tour")}</p>
               <p className="mt-2 font-display text-[1.75rem] leading-tight text-ink">
-                Talk to a real person
+                {t("talk_real_person", "Talk to a real person")}
               </p>
               <p className="mt-1 text-[0.9rem] text-stone">
-                Message us on WhatsApp — we usually reply within minutes.
+                {t("talk_real_person_body", "Message us on WhatsApp — we usually reply within minutes.")}
               </p>
               <ul className="mt-6 space-y-2.5">
                 {benefits.map((b, i) => (
@@ -703,10 +720,10 @@ export function GeographyBook() {
                 className="btn btn-whatsapp mt-7 w-full shadow-sm hover:shadow-md"
               >
                 <WhatsAppIcon className="size-5" />
-                Message us on WhatsApp
+                {t("step_message_whatsapp", "Message us on WhatsApp")}
               </a>
               <p className="mt-3 text-center text-[0.78rem] text-stone">
-                No prepayment. No booking fees.
+                {t("no_prepayment_no_fees", "No prepayment. No booking fees.")}
               </p>
             </div>
           </Reveal>
@@ -730,18 +747,18 @@ function Check() {
 /* Social channels come from CMS settings — one source of truth. */
 
 export function ContactChannels() {
-  const { whatsappLink, settings } = useSite();
+  const { whatsappLink, settings, t } = useSite();
   const channels = [
-    { name: "WhatsApp", caption: "Message us now", href: whatsappLink(), icon: <WhatsAppIcon className="size-6" /> },
+    { name: "WhatsApp", caption: t("channel_message_now", "Message us now"), href: whatsappLink(), icon: <WhatsAppIcon className="size-6" /> },
     settings.social.instagram && {
       name: "Instagram",
-      caption: "Follow & DM us",
+      caption: t("channel_follow_dm", "Follow & DM us"),
       href: settings.social.instagram,
       icon: <InstagramGlyph />,
     },
     settings.social.telegram && {
       name: "Telegram",
-      caption: "Message us on Telegram",
+      caption: t("channel_telegram", "Message us on Telegram"),
       href: settings.social.telegram,
       icon: <TelegramGlyph />,
     },
@@ -749,7 +766,7 @@ export function ContactChannels() {
   return (
     <section className="band-tight">
       <div className="shell">
-        <SectionHeading eyebrow="Get in touch" title="Reach us on your favourite messenger" />
+        <SectionHeading eyebrow={t("contact_channels_eyebrow", "Get in touch")} title={t("contact_channels_title", "Reach us on your favourite messenger")} />
         <div className={cn("mt-10 grid gap-4", channels.length === 1 ? "sm:grid-cols-1" : "sm:grid-cols-3")}>
           {channels.map((c, i) => (
             <Reveal as="div" key={c.name} variant="card" delay={i * 70}>

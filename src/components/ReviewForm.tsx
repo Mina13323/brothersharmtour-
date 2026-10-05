@@ -263,7 +263,7 @@ export function ReviewForm({
       {/* Honeypot — visually hidden, bots fill it */}
       <div className="sr-only" aria-hidden="true">
         <label>
-          Company
+          {t("honeypot_company", "Company")}
           <input tabIndex={-1} autoComplete="off" value={company} onChange={(e) => setCompany(e.target.value)} />
         </label>
       </div>

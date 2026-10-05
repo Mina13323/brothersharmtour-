@@ -185,8 +185,8 @@ export default async function PackageDetailPage({
       {
         "@type": "BreadcrumbList",
         itemListElement: [
-          { "@type": "ListItem", position: 1, name: "Home", item: "/" },
-          { "@type": "ListItem", position: 2, name: "Packages", item: "/packages" },
+          { "@type": "ListItem", position: 1, name: t("nav_home", "Home"), item: "/" },
+          { "@type": "ListItem", position: 2, name: t("nav_packages", "Packages"), item: "/packages" },
           { "@type": "ListItem", position: 3, name: pkg.title, item: `/packages/${pkg.slug}` },
         ],
       },
@@ -406,7 +406,7 @@ export default async function PackageDetailPage({
                         {day.tourSlugs?.length ? (
                           <div className="mt-3 flex flex-wrap items-center gap-2">
                             <span className="text-[11px] font-semibold text-stone uppercase tracking-wider">
-                              Day Tours:
+                              {t("pkg_day_tours_label", "Day Tours:")}
                             </span>
                             {day.tourSlugs.map((tSlug) => {
                               const match = allTours.find((t) => t.slug === tSlug || t.id === tSlug);
@@ -446,12 +446,12 @@ export default async function PackageDetailPage({
               {includedTours.length > 0 ? (
                 <Reveal className="mt-16">
                   <div className="pb-2">
-                    <h2 className="eyebrow text-reef">Included Tours &amp; Excursions</h2>
+                    <h2 className="eyebrow text-reef">{t("pkg_included_eyebrow", "Included Tours & Excursions")}</h2>
                     <h3 className="mt-1 font-display text-2xl sm:text-3xl text-ink">
-                      Tours included in this package
+                      {t("pkg_included_title", "Tours included in this package")}
                     </h3>
                     <p className="mt-1 text-sm text-stone leading-relaxed">
-                      This package bundles the following authentic experiences operated directly by our team:
+                      {t("pkg_included_body", "This package bundles the following authentic experiences operated directly by our team:")}
                     </p>
                   </div>
 
@@ -547,23 +547,23 @@ export default async function PackageDetailPage({
                 <div className="rounded-3xl bg-paper-warm p-6 shadow-md md:p-8">
                   <p className="eyebrow text-stone">{t("custom_itinerary", "Custom itinerary")}</p>
                   <p className="mt-2 font-display text-[2rem] leading-none">
-                    {price ?? "Quoted for you"}
+                    {price ?? t("pkg_quoted_for_you", "Quoted for you")}
                   </p>
                   <p className="mt-1 text-[0.75rem] text-stone">
-                    {price ? "starting point · final quote depends on dates & group" : "tell us your dates and group size"}
+                    {price ? t("pkg_price_starting_note", "starting point · final quote depends on dates & group") : t("pkg_tell_us_dates", "tell us your dates and group size")}
                   </p>
                   <ul className="mt-6 flex flex-col gap-3 py-5 text-[0.875rem]">
                     <li className="flex items-center gap-3">
                       <span className="mt-[0.45rem] size-2 shrink-0 rounded-full bg-reef" />
-                      Planned with you, changed whenever you like
+                      {t("pkg_planned_with_you", "Planned with you, changed whenever you like")}
                     </li>
                     <li className="flex items-center gap-3">
                       <span className="mt-[0.45rem] size-2 shrink-0 rounded-full bg-reef" />
-                      Day tours stay pay-on-the-day
+                      {t("pkg_pay_on_day", "Day tours stay pay-on-the-day")}
                     </li>
                     <li className="flex items-center gap-3">
                       <span className="mt-[0.45rem] size-2 shrink-0 rounded-full bg-reef" />
-                      Hotel transfers included as standard
+                      {t("pkg_transfers_standard", "Hotel transfers included as standard")}
                     </li>
                   </ul>
                   <a
@@ -573,7 +573,7 @@ export default async function PackageDetailPage({
                     className="btn btn-whatsapp w-full"
                   >
                     <WhatsAppIcon />
-                    Plan it on WhatsApp
+                    {t("pkg_plan_whatsapp", "Plan it on WhatsApp")}
                   </a>
                 </div>
               </div>
@@ -585,7 +585,7 @@ export default async function PackageDetailPage({
       {pkg.gallery.length ? (
         <section id="gallery" className="band-tight scroll-mt-24 bg-paper-warm">
           <div className="shell">
-            <SectionHeading eyebrow={`Gallery · ${pkg.gallery.length} photos`} title="The places" />
+            <SectionHeading eyebrow={`Gallery · ${pkg.gallery.length} photos`} title={t("pkg_gallery_title", "The places")} />
             <Reveal className="mt-10">
               <Gallery images={pkg.gallery} columns={3} />
             </Reveal>
@@ -595,8 +595,8 @@ export default async function PackageDetailPage({
 
       <CTASection
         image={pkg.coverImage ?? { src: "/media/super-safari/hero.jpg", alt: pkg.title, width: 1600, height: 900 }}
-        title={`Ready to plan ${pkg.title}?`}
-        text="Send us your dates and we'll come back with a full itinerary and price."
+        title={t("pkg_ready_to_plan", "Ready to plan {title}?").replace("{title}", pkg.title)}
+        text={t("pkg_cta_text", "Send us your dates and we\u2019ll come back with a full itinerary and price.")}
       />
 
       <StickyBookBar

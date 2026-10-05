@@ -158,6 +158,7 @@ function Arrow({
   onClick: () => void;
   light?: boolean;
 }) {
+  const { t } = useSite();
   return (
     <button
       type="button"
@@ -165,7 +166,11 @@ function Arrow({
         e.stopPropagation();
         onClick();
       }}
-      aria-label={side === "left" ? "Previous photo" : "Next photo"}
+      aria-label={
+        side === "left"
+          ? t("aria_prev_photo", "Previous photo")
+          : t("aria_next_photo", "Next photo")
+      }
       className={cn(
         "absolute top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-full backdrop-blur-sm transition-colors md:size-11",
         side === "left" ? "left-3" : "right-3",

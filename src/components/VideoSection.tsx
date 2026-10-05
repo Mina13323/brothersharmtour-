@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import type { MediaVideo } from "@/lib/types";
 import { videoAvailable } from "@/lib/media";
 import { Reveal } from "./Reveal";
+import { useSite } from "./SiteProvider";
 import { WaveDivider } from "./WaveDivider";
 
 /**
@@ -29,6 +30,7 @@ export function VideoSection({
   title: string;
   text?: string;
 }) {
+  const { t } = useSite();
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -147,7 +149,7 @@ export function VideoSection({
             <div className="absolute inset-0 flex items-center justify-center">
               <button
                 onClick={togglePlay}
-                aria-label={playing ? "Pause film" : "Play film"}
+                aria-label={playing ? t("video_pause", "Pause film") : t("video_play", "Play film")}
                 className="group grid size-[4.5rem] place-items-center rounded-pill border border-white/45 bg-ink/25 text-white backdrop-blur-sm transition-all duration-500 hover:scale-105 hover:border-white hover:bg-white hover:text-ink md:size-24"
               >
                 {playing ? (
@@ -172,7 +174,7 @@ export function VideoSection({
                   el.muted = !el.muted;
                   setMuted(el.muted);
                 }}
-                aria-label={muted ? "Unmute film" : "Mute film"}
+                aria-label={muted ? t("video_unmute", "Unmute film") : t("video_mute", "Mute film")}
                 className="absolute bottom-4 right-4 grid size-10 place-items-center rounded-pill border border-white/40 bg-ink/35 text-white backdrop-blur-sm transition-colors hover:bg-white hover:text-ink md:bottom-6 md:right-6"
               >
                 {muted ? (

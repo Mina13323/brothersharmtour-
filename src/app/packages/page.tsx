@@ -9,6 +9,7 @@ import { Breadcrumbs, CTASection } from "@/components/sections";
 import { BookButton } from "@/components/BookingProvider";
 import { publishedPackages, localizePackage } from "@/lib/store/repo";
 import { getSiteView } from "@/lib/siteview";
+import { translatorFor } from "@/lib/i18n/server";
 import { money } from "@/lib/utils";
 import { destinationName } from "@/lib/store/labels";
 import { media } from "@/lib/media";
@@ -28,6 +29,7 @@ export const metadata: Metadata = buildMetadata({
 
 export default async function PackagesPage() {
   const { currency, lang } = await getSiteView();
+  const tr = translatorFor(lang);
   const packages = publishedPackages().map((p) => localizePackage(p, lang));
 
   return (
@@ -36,28 +38,29 @@ export default async function PackagesPage() {
         variant="card"
         image={media.cairoGallery?.[0] ?? media.sharmHero}
         size="short"
-        eyebrow="Custom packages"
-        title="Egypt, one trip at a time"
-        subtitle="Multi-day itineraries that combine the Red Sea, the Sinai and Cairo — planned with the same team that runs our day tours."
+        eyebrow={tr("pk_eyebrow", "Custom packages")}
+        title={tr("pk_title", "Egypt, one trip at a time")}
+        subtitle={tr("pk_subtitle", "Multi-day itineraries that combine the Red Sea, the Sinai and Cairo — planned with the same team that runs our day tours.")}
         showWave
       >
-        <BookButton className="btn btn-primary">Ask us to plan it</BookButton>
+        <BookButton className="btn btn-primary">{tr("ask_us_to_plan", "Ask us to plan it")}</BookButton>
       </Hero>
 
       <section className="band">
         <div className="shell">
-          <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Packages" }]} />
+          <Breadcrumbs items={[
+              { label: tr("nav_home", "Home"), href: "/" },
+              { label: tr("nav_packages", "Packages") },
+            ]} />
 
           {packages.length === 0 ? (
             <div className="mt-14 rounded-[2rem] border border-sand/80 bg-paper-warm/60 p-10 text-center">
-              <h2 className="font-display text-2xl text-ink">Packages are being written</h2>
+              <h2 className="font-display text-2xl text-ink">{tr("packages_empty", "Packages are being written")}</h2>
               <p className="mx-auto mt-3 max-w-md text-stone leading-relaxed">
-                We&apos;re preparing multi-day itineraries and will publish them
-                here. In the meantime, any day tour can be combined — message us
-                and we&apos;ll build a plan around your dates.
+                {tr("packages_empty_body", "We\u2019re preparing multi-day itineraries and will publish them here. In the meantime, any day tour can be combined — message us and we\u2019ll build a plan around your dates.")}
               </p>
               <Link href="/tours" className="btn btn-primary mt-6">
-                Browse day tours
+                {tr("browse_day_tours", "Browse day tours")}
               </Link>
             </div>
           ) : (
@@ -94,7 +97,7 @@ export default async function PackagesPage() {
                           {pkg.duration}
                         </span>
                         <span className="absolute bottom-3.5 right-3.5 rounded-pill bg-paper/95 px-2.5 py-1 text-[0.6875rem] font-semibold text-ink">
-                          {destinationName(pkg.destination)}
+                          {destinationName(pkg.destination, lang)}
                         </span>
                       </Link>
                       <div className="flex grow flex-col p-5">
@@ -118,15 +121,15 @@ export default async function PackagesPage() {
                                   <div className="mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[0.75rem]">
                                     {childPrice ? (
                                       <span className="flex items-baseline gap-1 text-reef-deep font-semibold">
-                                        <span className="text-stone text-[0.65rem] uppercase tracking-wider">Child:</span>
+                                        <span className="text-stone text-[0.65rem] uppercase tracking-wider">{tr("price_child_short", "Child")}:</span>
                                         <span>{childPrice}</span>
                                       </span>
                                     ) : null}
                                     <span className="flex items-baseline gap-1 font-semibold text-emerald-700">
-                                      <span className="text-stone text-[0.65rem] uppercase tracking-wider">Infant:</span>
+                                      <span className="text-stone text-[0.65rem] uppercase tracking-wider">{tr("price_infant_short", "Infant")}:</span>
                                       {effectiveInfantPrice === 0 ? (
                                         <span className="rounded-full bg-emerald-600/10 px-1.5 py-0.2 text-[0.6875rem] font-bold text-emerald-700">
-                                          Free
+                                          {tr("free", "Free")}
                                         </span>
                                       ) : (
                                         <span>{infantPrice}</span>
@@ -137,7 +140,7 @@ export default async function PackagesPage() {
                               </div>
                             ) : (
                               <span className="text-[0.8125rem] font-semibold uppercase tracking-[0.1em] text-reef">
-                                Price on request
+                                {tr("price_on_request", "Price on request")}
                               </span>
                             )}
                           </div>
@@ -145,7 +148,7 @@ export default async function PackagesPage() {
                             href={`/packages/${pkg.slug}`}
                             className="btn btn-primary btn-sm shrink-0 shadow-xs cursor-pointer"
                           >
-                            Details →
+                            {tr("details", "Details")} →
                           </Link>
                         </div>
                       </div>
@@ -160,8 +163,8 @@ export default async function PackagesPage() {
 
       <CTASection
         image={media.superSafari.hero}
-        title="Want something bespoke?"
-        text="Tell us your dates and what you want to see — we build private itineraries in the same style."
+        title={tr("pk_cta_title", "Want something bespoke?")}
+        text={tr("pk_cta_text", "Tell us your dates and what you want to see — we build private itineraries in the same style.")}
       />
     </>
   );

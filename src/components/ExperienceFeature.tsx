@@ -1,8 +1,11 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { Reveal } from "./Reveal";
 import type { Experience } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { useSite } from "./SiteProvider";
 
 /**
  * Experience discovery: one large feature category beside a stack of smaller
@@ -19,6 +22,7 @@ export function ExperienceDiscovery({
   experiences: Experience[];
   counts: Record<string, number>;
 }) {
+  const { t } = useSite();
   const [feature, ...rest] = experiences;
   if (!feature) return null;
 
@@ -40,7 +44,7 @@ export function ExperienceDiscovery({
           <div className="absolute inset-x-0 bottom-0 p-6 text-white md:p-10">
             <div className="card-shift">
               <p className="eyebrow text-sun">
-                {counts[feature.slug] ?? 0} experiences
+                {t("count_experiences", "{count} experiences").replace("{count}", String(counts[feature.slug] ?? 0))}
               </p>
               <h3 className="mt-3 font-display text-[clamp(2rem,1.4rem+2.2vw,3.25rem)] leading-[0.98]">
                 {feature.name}
@@ -49,7 +53,7 @@ export function ExperienceDiscovery({
                 {feature.tagline}
               </p>
               <span className="link-rule mt-6 inline-flex text-white">
-                Explore
+                {t("explore", "Explore")}
                 <span className="arrow" aria-hidden>
                   →
                 </span>

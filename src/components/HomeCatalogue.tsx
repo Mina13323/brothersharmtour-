@@ -170,7 +170,7 @@ export function HomeCatalogue() {
                     {t("nav_packages", "Packages")}
                   </h3>
                   <p className="mt-1 text-[0.9rem] text-stone">
-                    Curated regular packages & bundled day excursions
+                    {t("catalogue_packages_caption", "Curated regular packages & bundled day excursions")}
                   </p>
                 </div>
                 <span className="shrink-0 rounded-pill bg-reef-deep/10 px-3 py-1 text-[0.8rem] font-semibold text-reef-deep">

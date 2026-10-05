@@ -45,7 +45,7 @@ export function ContactForm() {
         <div>
           <h3 className="headline text-[1.5rem]">{t("form_message_sent", "Message sent")}</h3>
           <p className="lede mt-2 text-[0.9375rem]">
-            Thanks for getting in touch — we&apos;ll reply shortly.
+            {t("contact_thanks_body", "Thanks for getting in touch — we\u2019ll reply shortly.")}
           </p>
         </div>
         <a
@@ -55,7 +55,7 @@ export function ContactForm() {
           className="btn btn-whatsapp btn-sm"
         >
           <WhatsAppIcon />
-          Chat on WhatsApp
+          {t("action_chat_whatsapp", "Chat on WhatsApp")}
         </a>
       </div>
     );
@@ -66,7 +66,7 @@ export function ContactForm() {
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
           <label className="label" htmlFor="cf-name">
-            Name
+            {t("form_name", "Name")}
           </label>
           <input
             id="cf-name"
@@ -79,7 +79,7 @@ export function ContactForm() {
         </div>
         <div>
           <label className="label" htmlFor="cf-email">
-            Email
+            {t("form_email", "Email")}
           </label>
           <input
             id="cf-email"
@@ -95,7 +95,7 @@ export function ContactForm() {
 
       <div>
         <label className="label" htmlFor="cf-phone">
-          Phone / WhatsApp
+          {t("form_phone_whatsapp", "Phone / WhatsApp")}
         </label>
         <input
           id="cf-phone"
@@ -110,7 +110,7 @@ export function ContactForm() {
 
       <div>
         <label className="label" htmlFor="cf-message">
-          Message
+          {t("form_message", "Message")}
         </label>
         <textarea
           id="cf-message"
@@ -134,7 +134,7 @@ export function ContactForm() {
           disabled={status === "submitting"}
           className="btn btn-primary grow disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {status === "submitting" ? "Sending…" : "Send message"}
+          {status === "submitting" ? t("state_sending", "Sending…") : t("form_send_message", "Send message")}
         </button>
         <a
           href={whatsappLink()}
@@ -143,7 +143,7 @@ export function ContactForm() {
           className="btn btn-outline"
         >
           <WhatsAppIcon />
-          WhatsApp instead
+          {t("form_whatsapp_instead", "WhatsApp instead")}
         </a>
       </div>
     </form>

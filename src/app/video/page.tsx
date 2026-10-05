@@ -11,6 +11,7 @@ import { destinationName } from "@/lib/store/labels";
 import { media } from "@/lib/media";
 import { money } from "@/lib/utils";
 import { getSiteView } from "@/lib/siteview";
+import { translatorFor } from "@/lib/i18n/server";
 
 import { Hero } from "@/components/Hero";
 
@@ -23,10 +24,11 @@ export const metadata: Metadata = buildMetadata({
 });
 
 export default async function VideoPage() {
-  const [{ currency }, records] = await Promise.all([
+  const [{ currency, lang }, records] = await Promise.all([
     getSiteView(),
     Promise.resolve(publishedTours()),
   ]);
+  const tr = translatorFor(lang);
   const reels = records
     .filter((t) => t.featured)
     .slice(0, 6)
@@ -39,27 +41,27 @@ export default async function VideoPage() {
         variant="card"
         image={media.heroFilm.poster}
         size="tall"
-        eyebrow="Watch · Brother Sharm Tour"
+        eyebrow={tr("video_eyebrow", "Watch · Brother Sharm Tour")}
         title={<SplitHeadline lines={["Egypt, through", "our own lens"]} />}
-        subtitle="No stock footage and no drone reels bought online. Every frame below was shot on our own trips across the Red Sea and the Sinai desert."
+        subtitle={tr("video_subtitle", "No stock footage and no drone reels bought online. Every frame below was shot on our own trips across the Red Sea and the Sinai desert.")}
         showWave
       />
 
       {/* Featured film */}
       <VideoSection
         video={media.film}
-        eyebrow="Our film"
-        title="A morning on the Red Sea"
-        text="Snorkelling stops, the crossing to White Island and the sandbank that only exists at low tide."
+        eyebrow={tr("video_our_film", "Our film")}
+        title={tr("video_film_title", "A morning on the Red Sea")}
+        text={tr("video_film_text", "Snorkelling stops, the crossing to White Island and the sandbank that only exists at low tide.")}
       />
 
       {/* Trip clips grid */}
       <section className="band bg-paper-warm">
         <div className="shell">
           <SectionHeading
-            eyebrow="Trip stories"
-            title="See the trips before you book"
-            intro="A look at the experiences travellers book most. Tap any one to see the full itinerary, photos and price."
+            eyebrow={tr("video_stories_eyebrow", "Trip stories")}
+            title={tr("video_stories_title", "See the trips before you book")}
+            intro={tr("video_stories_intro", "A look at the experiences travellers book most. Tap any one to see the full itinerary, photos and price.")}
           />
           <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {reels.map((tour, i) => {
@@ -89,7 +91,7 @@ export default async function VideoPage() {
                         </span>
                       </span>
                       <span className="absolute bottom-3 left-3 rounded-pill bg-ink/70 px-3 py-1 text-[0.72rem] font-medium text-white backdrop-blur-sm">
-                        {destinationName(tour.destination)}
+                        {destinationName(tour.destination, lang)}
                       </span>
                     </div>
                     <div className="flex items-center justify-between gap-3 p-4">
@@ -112,9 +114,9 @@ export default async function VideoPage() {
 
       <CTASection
         image={media.tiranIsland.hero}
-        eyebrow="Ready when you are"
-        title="Come see it for yourself"
-        text="Send us your dates and we'll come back with a plan, a price and your pickup time."
+        eyebrow={tr("cta_ready_eyebrow", "Ready when you are")}
+        title={tr("cta_come_see", "Come see it for yourself")}
+        text={tr("cta_send_dates_plan", "Send us your dates and we'll come back with a plan, a price and your pickup time.")}
       />
     </>
   );

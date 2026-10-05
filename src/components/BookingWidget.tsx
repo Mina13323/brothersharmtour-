@@ -307,7 +307,7 @@ export function BookingWidget({
 
   const grouped = Object.entries(
     tours.reduce<Record<string, CatalogueTour[]>>((acc, t) => {
-      const key = destinationName(t.destination);
+      const key = destinationName(t.destination, lang);
       (acc[key] ??= []).push(t);
       return acc;
     }, {}),
@@ -605,7 +605,7 @@ export function BookingWidget({
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Sarah Jenkins"
+              placeholder={t("ph_full_name_example", "e.g. Sarah Jenkins")}
               className="field"
             />
             {touched && !nameValid && (
@@ -627,7 +627,7 @@ export function BookingWidget({
               className="field"
             />
             <span className="text-[0.72rem] text-stone mt-1 block">
-              We send your driver pickup time to this WhatsApp number.
+              {t("booking_pickup_sms_note", "We send your driver pickup time to this WhatsApp number.")}
             </span>
             {touched && !phoneValid && (
               <Warn>{t("validation_phone", "Please enter a valid phone or WhatsApp number.")}</Warn>
@@ -645,7 +645,7 @@ export function BookingWidget({
                 type="text"
                 value={hotel}
                 onChange={(e) => setHotel(e.target.value)}
-                placeholder="e.g. Rixos Premium Seagate, Sharm"
+                placeholder={t("ph_hotel_example", "e.g. Rixos Premium Seagate, Sharm")}
                 className="field"
               />
               {touched && !hotelValid && (
@@ -678,7 +678,7 @@ export function BookingWidget({
               rows={2}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="e.g. Vegetarian lunch, stroller assistance, or flight arrival time..."
+              placeholder={t("ph_requests_example", "e.g. Vegetarian lunch, stroller assistance, or flight arrival time...")}
               className="field"
             />
           </div>

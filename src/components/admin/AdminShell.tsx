@@ -17,6 +17,7 @@ import {
   Sparkles,
   Star,
   Images,
+  Tags,
 } from "lucide-react";
 
 /**
@@ -29,6 +30,7 @@ const navigation = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { name: "Tours & Pricing", href: "/admin/tours", icon: Compass },
   { name: "Custom Packages", href: "/admin/packages", icon: Package },
+  { name: "Experience Categories", href: "/admin/experiences", icon: Tags },
   { name: "Inquiries & Bookings", href: "/admin/inquiries", icon: Inbox },
   { name: "Reviews", href: "/admin/reviews", icon: Star },
   { name: "Media Library", href: "/admin/media", icon: Images },

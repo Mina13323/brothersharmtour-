@@ -8,6 +8,7 @@ import { BookingFormWithQuery } from "@/components/BookingFormWithQuery";
 import { WhatsAppIcon } from "@/components/sections";
 import { getPublicSettings, serverWhatsappLink } from "@/lib/siteview";
 import { media } from "@/lib/media";
+import { getServerT } from "@/lib/i18n/server";
 
 import { Hero } from "@/components/Hero";
 
@@ -37,6 +38,7 @@ const reassurance = [
 
 export default async function BookPage() {
   const site = await getPublicSettings();
+  const tr = await getServerT();
   const whatsappLink = (m?: string) => serverWhatsappLink(site.contact.whatsapp, m);
   return (
     <>
@@ -44,9 +46,9 @@ export default async function BookPage() {
         variant="card"
         image={media.whiteIsland.hero}
         size="short"
-        eyebrow="Booking request"
-        title="Tell us your plan"
-        subtitle="One short form. We'll come back with availability, your hotel pickup time and a final price — then you decide."
+        eyebrow={tr("book_eyebrow", "Booking request")}
+        title={tr("book_title", "Tell us your plan")}
+        subtitle={tr("book_subtitle", "One short form. We'll come back with availability, your hotel pickup time and a final price — then you decide.")}
         showWave
       />
 
@@ -92,7 +94,7 @@ export default async function BookPage() {
 
                 <div className="mt-6 pt-2">
                   <p className="text-[0.875rem] text-stone">
-                    Prefer to talk it through?
+                    {tr("book_prefer_talk", "Prefer to talk it through?")}
                   </p>
                   <div className="mt-4 flex flex-col gap-3 sm:flex-row">
                     <a

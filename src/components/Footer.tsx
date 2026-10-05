@@ -8,10 +8,11 @@ import { Logo } from "./ui/Logo";
 import { WhatsAppIcon } from "./sections";
 import { WaveDivider } from "./WaveDivider";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import { destinationName, experienceName } from "@/lib/store/labels";
 import { CurrencySwitcher } from "./CurrencySwitcher";
 
 export function Footer() {
-  const { settings: site, whatsappLink, t } = useSite();
+  const { settings: site, whatsappLink, t, lang } = useSite();
   const pathname = usePathname();
   if (pathname?.startsWith("/admin")) return null;
 
@@ -37,9 +38,36 @@ export function Footer() {
             aria-label={t("aria_footer", "Footer")}
             className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:col-span-5"
           >
-            <FooterColumn title={t("footer_destinations", "Destinations")} links={footerNav.destinations} />
-            <FooterColumn title={t("footer_experiences", "Experiences")} links={footerNav.experiences} />
-            <FooterColumn title={t("footer_company", "Company")} links={footerNav.company} />
+            {/*
+              Link labels are localized, not just the column headings:
+              destination/experience names come from the shared label tables
+              (the same ones the cards and filters use) and the company links
+              from the nav keys, so nothing in the footer stays English.
+            */}
+            <FooterColumn
+              title={t("footer_destinations", "Destinations")}
+              links={footerNav.destinations.map((l) => ({
+                ...l,
+                label: destinationName(l.href.split("/").pop(), lang) || l.label,
+              }))}
+            />
+            <FooterColumn
+              title={t("footer_experiences", "Experiences")}
+              links={footerNav.experiences.map((l) => ({
+                ...l,
+                label: experienceName(l.href.split("/").pop(), lang) || l.label,
+              }))}
+            />
+            <FooterColumn
+              title={t("footer_company", "Company")}
+              links={[
+                { label: t("nav_about_us", "About Us"), href: "/about" },
+                { label: t("nav_contact", "Contact"), href: "/contact" },
+                { label: t("nav_faq", "FAQ"), href: "/faq" },
+                { label: t("nav_all_tours", "All Tours"), href: "/tours" },
+                { label: t("nav_videos", "Video"), href: "/video" },
+              ]}
+            />
           </nav>
 
           <div className="lg:col-span-3">
@@ -82,7 +110,7 @@ export function Footer() {
                   href={site.social.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Brother Sharm Tour on Instagram"
+                  aria-label={t("footer_on_instagram", "Brother Sharm Tour on Instagram")}
                   className="grid size-10 place-items-center rounded-pill border border-ink-line transition-colors hover:border-sun hover:text-sun"
                 >
                   <svg viewBox="0 0 24 24" fill="currentColor" className="size-4" aria-hidden>
@@ -95,7 +123,7 @@ export function Footer() {
                   href={site.social.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Brother Sharm Tour on Facebook"
+                  aria-label={t("footer_on_facebook", "Brother Sharm Tour on Facebook")}
                   className="grid size-10 place-items-center rounded-pill border border-ink-line transition-colors hover:border-sun hover:text-sun"
                 >
                   <svg viewBox="0 0 24 24" fill="currentColor" className="size-4" aria-hidden>

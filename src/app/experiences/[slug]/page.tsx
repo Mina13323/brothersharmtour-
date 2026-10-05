@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getServerT } from "@/lib/i18n/server";
 
 import { CapsuleHero } from "@/components/TourHero";
 import { Reveal } from "@/components/Reveal";
@@ -43,6 +44,7 @@ export default async function ExperienceCategoryPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  const tr = await getServerT();
   const experience = experienceBySlug(slug);
   if (!experience) notFound();
 
@@ -71,11 +73,11 @@ export default async function ExperienceCategoryPage({
       {
         "@type": "BreadcrumbList",
         itemListElement: [
-          { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+          { "@type": "ListItem", position: 1, name: tr("nav_home", "Home"), item: SITE_URL },
           {
             "@type": "ListItem",
             position: 2,
-            name: "Experiences",
+            name: tr("nav_experiences", "Experiences"),
             item: `${SITE_URL}/experiences`,
           },
           {
@@ -103,16 +105,16 @@ export default async function ExperienceCategoryPage({
         summary={experience.description || experience.tagline}
         images={[experience.image, ...list.flatMap((t) => t.images)]}
         breadcrumbs={[
-          { label: "Home", href: "/" },
-          { label: "Experiences", href: "/experiences" },
+          { label: tr("nav_home", "Home"), href: "/" },
+          { label: tr("nav_experiences", "Experiences"), href: "/experiences" },
           { label: experience.name },
         ]}
         primaryCta={{
-          label: "See The Tours",
+          label: tr("cta_see_the_tours", "See The Tours"),
           href: "#tours",
         }}
         secondaryCta={{
-          label: "Plan Your Trip",
+          label: tr("cta_plan_your_trip", "Plan Your Trip"),
         }}
       />
 
@@ -133,7 +135,7 @@ export default async function ExperienceCategoryPage({
       {/* Sibling categories — keeps discovery moving sideways, not just back */}
       <section className="band-tight bg-paper-warm">
         <div className="shell">
-          <h2 className="eyebrow text-stone">Other experiences</h2>
+          <h2 className="eyebrow text-stone">{tr("exp_other", "Other experiences")}</h2>
           <ul className="mt-6 flex flex-wrap gap-2">
             {others.map((other) => (
               <li key={other.slug}>
@@ -149,8 +151,8 @@ export default async function ExperienceCategoryPage({
 
       <CTASection
         image={experience.image}
-        title={`Looking for something ${experience.name.toLowerCase()}?`}
-        text="Tell us your dates and group size and we'll come back with options."
+        title={tr("exp_looking_for", "Looking for something {name}?").replace("{name}", experience.name.toLowerCase())}
+        text={tr("exp_cta_dates", "Tell us your dates and group size and we\u2019ll come back with options.")}
       />
     </>
   );

@@ -8,6 +8,7 @@ import { CTASection, WhatsAppIcon } from "@/components/sections";
 import { generalFaq } from "@/data/testimonials";
 import { getPublicSettings, serverWhatsappLink } from "@/lib/siteview";
 import { media } from "@/lib/media";
+import { getServerT } from "@/lib/i18n/server";
 
 import { Hero } from "@/components/Hero";
 
@@ -21,6 +22,7 @@ export const metadata: Metadata = buildMetadata({
 
 export default async function FaqPage() {
   const site = await getPublicSettings();
+  const tr = await getServerT();
   const whatsappLink = (m?: string) => serverWhatsappLink(site.contact.whatsapp, m);
   const schema = {
     "@context": "https://schema.org",
@@ -44,9 +46,9 @@ export default async function FaqPage() {
         variant="card"
         image={media.sharmHero}
         size="short"
-        eyebrow="Questions & Answers"
-        title="Good to know"
-        subtitle="The things travellers ask us most. Anything we haven't covered, just message — we answer quickly."
+        eyebrow={tr("faq_eyebrow", "Questions & Answers")}
+        title={tr("faq_title", "Good to know")}
+        subtitle={tr("faq_subtitle", "The things travellers ask us most. Anything we haven't covered, just message — we answer quickly.")}
         showWave
       />
 
@@ -55,9 +57,9 @@ export default async function FaqPage() {
           <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
             <Reveal className="lg:col-span-4">
               <div className="lg:sticky lg:top-28">
-                <h2 className="eyebrow text-stone">Still unsure?</h2>
+                <h2 className="eyebrow text-stone">{tr("faq_still_unsure", "Still unsure?")}</h2>
                 <p className="mt-5 font-display text-[1.75rem] leading-tight">
-                  Ask us directly.
+                  {tr("faq_ask_directly", "Ask us directly.")}
                 </p>
                 <p className="mt-3 text-[0.9375rem] leading-relaxed text-stone">
                   {site.contact.hours}
@@ -70,10 +72,10 @@ export default async function FaqPage() {
                     className="btn btn-whatsapp"
                   >
                     <WhatsAppIcon />
-                    Chat on WhatsApp
+                    {tr("action_chat_whatsapp", "Chat on WhatsApp")}
                   </a>
                   <Link href="/contact" className="btn btn-outline">
-                    Contact page
+                    {tr("contact_page_link", "Contact page")}
                   </Link>
                 </div>
               </div>

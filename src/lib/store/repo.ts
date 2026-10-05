@@ -672,6 +672,22 @@ export function saveExperience(input: Partial<ExperienceRecord> & { slug: string
   });
 }
 
+export function experienceById(id: string): ExperienceRecord | undefined {
+  return loadDb().experiences.find((e) => e.id === id);
+}
+
+/**
+ * Removes a category. Callers must check first that no tour still references
+ * its slug — a tour pointing at a deleted category becomes an integrity error.
+ */
+export function deleteExperience(id: string): boolean {
+  return updateDb((db) => {
+    const before = db.experiences.length;
+    db.experiences = db.experiences.filter((e) => e.id !== id);
+    return db.experiences.length < before;
+  });
+}
+
 /* ═══════════════════════════ SETTINGS ═══════════════════════════ */
 
 export function getSettings(): Settings {
@@ -835,6 +851,11 @@ export function integrityCheck(): IntegrityIssue[] {
   const tourSlugs = new Set(db.tours.map((t) => t.slug));
   const destinationSlugs = new Set(db.destinations.map((d) => d.slug));
   const experienceSlugs = new Set(db.experiences.map((e) => e.slug));
+  // Categories are admin-managed data, never a hard-coded list: a tour's
+  // category is valid exactly when a matching experience record exists.
+  const draftExperienceSlugs = new Set(
+    db.experiences.filter((e) => e.status !== "published").map((e) => e.slug),
+  );
 
   const dup = <T extends { slug: string }>(items: T[], label: string) => {
     const seen = new Set<string>();
@@ -890,7 +911,13 @@ export function integrityCheck(): IntegrityIssue[] {
       issues.push({
         level: "error",
         where: `Tour “${tour.title}”`,
-        message: `References missing category “${tour.category}”`,
+        message: `References missing category “${tour.category}” — create it in Experience Categories, or move the tour to an existing one`,
+      });
+    } else if (draftExperienceSlugs.has(tour.category)) {
+      issues.push({
+        level: "warning",
+        where: `Tour “${tour.title}”`,
+        message: `Category “${tour.category}” is a draft — the tour will not appear on the Experiences pages until it is published`,
       });
     }
     if (!tour.images?.length) {

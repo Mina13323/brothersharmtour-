@@ -14,7 +14,8 @@
     "seed:snapshot": "node scripts/snapshot-seed.mjs",
     "repair:packages": "node scripts/repair-packages.mjs",
     "i18n:scan": "node scripts/i18n-scan.mjs",
-    "i18n:inject": "node scripts/i18n-inject.mjs"
+    "i18n:inject": "node scripts/i18n-inject.mjs",
+    "repair:categories": "node scripts/repair-categories.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",

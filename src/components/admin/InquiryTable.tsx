@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Select } from "@/components/Select";
 import { useRouter } from "next/navigation";
 import { Trash2, ChevronDown } from "lucide-react";
 
@@ -148,7 +149,7 @@ export function InquiryTable({ initialInquiries }: { initialInquiries: AdminInqu
                     </div>
                   </button>
 
-                  <select
+                  <Select dark
                     value={inquiry.status}
                     disabled={busyId === inquiry.id}
                     onChange={(e) => patch(inquiry.id, { status: e.target.value })}
@@ -159,7 +160,7 @@ export function InquiryTable({ initialInquiries }: { initialInquiries: AdminInqu
                         {s}
                       </option>
                     ))}
-                  </select>
+                  </Select>
 
                   <a
                     href={`https://wa.me/${inquiry.guestPhone.replace(/[^\d]/g, "")}`}

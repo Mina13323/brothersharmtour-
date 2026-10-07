@@ -103,7 +103,38 @@ currency** — they are separate cookies and separate settings.
 Enabled languages are admin-controlled. Tour editors carry per-language fields
 (title, summary, description, lists, SEO) — the public site overlays them via
 `localizeTour` when the visitor picks that language (`bt_lang` cookie).
-Untranslated fields fall back to English. There is **no machine translation**.
+Untranslated fields fall back to English.
+
+#### Auto-translation and provider failover
+
+Tours are written in English; saving queues a translation of blank fields (and
+stale machine-translated ones) into every other language. Human edits are never
+overwritten; re-translating a field is an explicit admin action.
+
+Two OpenAI-compatible providers are tried in order, each a fallback for the other
+(`src/lib/translate/providers.mjs`, shared by the server and
+`scripts/backfill-translations.mjs`):
+
+| Provider | Base URL | Env |
+|---|---|---|
+| OpenRouter | `https://openrouter.ai/api/v1` | `OPENROUTER_API_KEY`, `OPENROUTER_MODEL` |
+| SovereignEG | `https://backend.sovereigneg.com/v1` | `SOVEREIGNEG_API_KEY`, `SOVEREIGNEG_BASE_URL`, `SOVEREIGNEG_MODEL` |
+
+`TRANSLATE_PROVIDER_ORDER=openrouter,sovereigneg` sets the priority. A provider
+with no key is skipped, so a single key works alone. Keys are server-only.
+
+A call switches provider on 402 (no credit), 401/403 (bad key), 429 (after one
+retry), 5xx, timeout or network error, and on invalid JSON after one retry on the
+same provider. Our own bad requests (400/422) are reported, not retried elsewhere.
+A provider that fails with 402/401/403 is parked for 30 minutes, with 429/5xx for
+2 minutes (state in `content/.translate-providers.json`, so it survives restarts).
+If every provider fails, the English save still succeeds, the language is marked
+"failed" with each provider's error, and the site shows English. The tour editor's
+Translations tab shows the active provider and any cooldown ("OpenRouter: out of
+credit"). `translationMeta[lang]` records the provider and model used.
+
+Offline tests: `node scripts/translate-selftest.mjs`. Manual failover test: put a
+wrong `OPENROUTER_API_KEY` (401) and save a tour — it is translated by SovereignEG.
 
 ### Reviews
 

@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import { isAdmin } from "@/lib/auth";
-import { allExperiences, allTours, deleteExperience, saveExperience } from "@/lib/store/repo";
+import {
+  allExperiences,
+  allTours,
+  deleteExperience,
+  ensureDbLoadedFromSupabase,
+  saveExperience,
+} from "@/lib/store/repo";
 
 /** Admin single experience (tour category): read, update, delete. */
 
@@ -27,6 +33,7 @@ export async function PATCH(
 ) {
   if (!(await isAdmin())) return NextResponse.json({ ok: false }, { status: 401 });
   const { id } = await params;
+  await ensureDbLoadedFromSupabase(true);
   const existing = byId(id);
   if (!existing) return NextResponse.json({ ok: false }, { status: 404 });
 
@@ -55,6 +62,7 @@ export async function DELETE(
 ) {
   if (!(await isAdmin())) return NextResponse.json({ ok: false }, { status: 401 });
   const { id } = await params;
+  await ensureDbLoadedFromSupabase(true);
   const existing = byId(id);
   if (!existing) return NextResponse.json({ ok: false }, { status: 404 });
 

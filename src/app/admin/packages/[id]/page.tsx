@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import PackageEditor from "@/components/admin/PackageEditor";
+import { categoryOptions } from "@/lib/store/categories";
 import { requireAdmin } from "@/lib/auth";
 import { allTours, getSettings, packageById } from "@/lib/store/repo";
 
@@ -24,6 +25,7 @@ export default async function AdminPackageEditPage({
       baseCurrency={settings.currency.base}
       settings={settings}
       tours={tours}
+      categories={categoryOptions()}
       isNew={false}
     />
   );

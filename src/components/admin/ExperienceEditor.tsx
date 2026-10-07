@@ -17,6 +17,7 @@ import { Loader2, Save, Trash2 } from "lucide-react";
 import type { ExperienceRecord } from "@/lib/store/types";
 import { slugify } from "@/lib/utils";
 import { input, Section, Field, Toggle } from "./fields";
+import { SingleImageUploader } from "./MediaGalleryEditor";
 
 export default function ExperienceEditor({
   initialExperience,
@@ -185,6 +186,21 @@ export default function ExperienceEditor({
             onChange={(e) => set("description", e.target.value)}
           />
         </Field>
+      </Section>
+
+      <Section
+        title="Cover photo"
+        description="The picture shown on the category card and at the top of the category page."
+        appearsOn="Experiences listing → card image · Category page → hero"
+      >
+        <SingleImageUploader
+          image={experience.image?.src ? experience.image : null}
+          onChange={(img) =>
+            set("image", img ?? { src: "", alt: "", width: 1600, height: 900 })
+          }
+          label="Category cover photo"
+          defaultAlt={experience.name}
+        />
       </Section>
 
       <Section

@@ -208,6 +208,16 @@ export function tourSchedule(t: { schedule?: string | null }) {
   return t.schedule?.trim() || null;
 }
 
+/**
+ * True when the unit is a flat per-item hire (boat, car, buggy… — anything the
+ * admin typed) rather than per person / per group, so the adult/child/infant
+ * rate grid doesn't apply.
+ */
+export function isFlatPriceUnit(unit: string) {
+  const u = unit.trim().toLowerCase();
+  return u !== "" && u !== "per person" && u !== "per group";
+}
+
 /** Pricing unit label used after the price, e.g. "per person". */
 export function tourPriceUnit(t: { priceUnit?: string; type?: string; title?: string }) {
   if (t.priceUnit) return t.priceUnit;

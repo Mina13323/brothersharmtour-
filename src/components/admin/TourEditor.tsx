@@ -11,9 +11,10 @@
  * conversion and the honest no-rating state.
  */
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Select } from "@/components/Select";
 import { useRouter } from "next/navigation";
-import { Save, Eye, PencilLine, Plus, Trash2, ArrowUp, ArrowDown } from "lucide-react";
+import { Save, Eye, PencilLine, Plus, Trash2, ArrowUp, ArrowDown, RefreshCw } from "lucide-react";
 
 import { SiteProvider, type PublicSettings } from "@/components/SiteProvider";
 import { BookingProvider } from "@/components/BookingProvider";
@@ -26,7 +27,9 @@ import { destinationName, experienceName } from "@/lib/store/labels";
 import { cn } from "@/lib/utils";
 import { MediaGalleryEditor, MediaVideoEditor } from "./MediaGalleryEditor";
 import { AgePricingFields, MoneyHint, TieredPricingEditor } from "./PricingControls";
-import { input, Section, Field, Toggle, ListEditor, AppearsOn } from "./fields";
+import { input, Section, Field, Toggle, ListEditor } from "./fields";
+import { TranslationReview } from "./TranslationReview";
+import { TranslationProviderStatus } from "./TranslationProviderStatus";
 
 type EditorTour = TourRecord;
 
@@ -76,6 +79,18 @@ export default function TourEditor({
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
   const [lang, setLang] = useState("en");
+  /** Fields a human edited this session, per language — sent on Save so the server marks them manual. */
+  const [trEdits, setTrEdits] = useState<Record<string, Record<string, unknown>>>({});
+  const [trBusy, setTrBusy] = useState(false);
+
+  /** "translating" older than this is a crashed job, not live work. */
+  const langIsTranslating = (code: string) => {
+    const m = tour.translationMeta?.[code];
+    return m?.status === "translating" && Date.now() - new Date(m.at ?? 0).getTime() < 10 * 60_000;
+  };
+  const anyTranslating = Object.keys(tour.translationMeta ?? {}).some(langIsTranslating);
+  const trEditsRef = useRef(trEdits);
+  trEditsRef.current = trEdits;
 
 
   const set = <K extends keyof EditorTour>(key: K, value: EditorTour[K]) =>
@@ -111,6 +126,7 @@ export default function TourEditor({
       { label: "Good to know", done: !tour.restrictions.length || !!tr?.restrictions?.length },
       { label: "What to bring", done: !tour.bring.length || !!tr?.bring?.length },
       { label: "FAQ", done: !tour.faq.length || !!tr?.faq?.length },
+      { label: "Itinerary", done: !tour.itinerary.length || tr?.itinerary?.length === tour.itinerary.length },
       {
         label: "Tour options",
         done:
@@ -124,20 +140,18 @@ export default function TourEditor({
     return { checks, done, total: checks.length, missing: checks.filter((c) => !c.done) };
   };
 
-  const setTr = (code: string, patch: Partial<TourTranslation>) =>
-    setTour((t) => ({
-      ...t,
-      translations: {
-        ...t.translations,
-        [code]: { ...(t.translations?.[code] ?? {}), ...patch },
-      },
-    }));
-
   async function save(publish?: boolean) {
     setBusy(true);
     setMessage(null);
     try {
       const payload: Record<string, unknown> = { ...tour };
+      if (!isNew) {
+        // Never send whole translation blobs: machine output may have landed
+        // since this page loaded. Send only what a human edited.
+        delete payload.translations;
+        delete payload.translationMeta;
+        payload.translationEdits = trEdits;
+      }
       if (publish !== undefined) payload.status = publish ? "published" : "draft";
       const res = await fetch(
         isNew ? "/api/admin/tours" : `/api/admin/tours/${tour.id}`,
@@ -152,6 +166,7 @@ export default function TourEditor({
         setMessage({ kind: "err", text: data.message ?? "Save failed." });
         return;
       }
+      setTrEdits({});
       setMessage({ kind: "ok", text: publish === undefined ? "Saved." : publish ? "Published." : "Saved as draft." });
       if (isNew && data.tour?.id) {
         router.replace(`/admin/tours/${data.tour.id}`);
@@ -163,6 +178,90 @@ export default function TourEditor({
       setMessage({ kind: "err", text: "Network error — nothing was saved." });
     } finally {
       setBusy(false);
+    }
+  }
+
+  /** Pull machine-translation progress from the server without touching other fields. */
+  const refreshTranslations = useCallback(async () => {
+    if (isNew) return;
+    try {
+      const res = await fetch(`/api/admin/tours/${initialTour.id}`, { cache: "no-store" });
+      if (!res.ok) return;
+      const { tour: fresh } = (await res.json()) as { tour?: EditorTour };
+      if (!fresh) return;
+      setTour((t) => {
+        const translations = { ...(fresh.translations ?? {}) };
+        const meta = { ...(fresh.translationMeta ?? {}) };
+        // Keep unsaved human edits on top of what the server has.
+        for (const [code, fields] of Object.entries(trEditsRef.current)) {
+          translations[code] = { ...(translations[code] ?? {}), ...fields } as TourTranslation;
+          const cur = meta[code] ?? { auto_fields: [], source_hashes: {} };
+          meta[code] = { ...cur, auto_fields: (cur.auto_fields ?? []).filter((f) => !(f in fields)) };
+        }
+        return { ...t, translations, translationMeta: meta };
+      });
+    } catch {
+      /* transient — next tick retries */
+    }
+  }, [isNew, initialTour.id]);
+
+  useEffect(() => {
+    if (!anyTranslating) return;
+    const timer = setInterval(refreshTranslations, 3000);
+    return () => clearInterval(timer);
+  }, [anyTranslating, refreshTranslations]);
+
+  /** A human edited a translated field: it becomes manual (locked from auto-translation) on Save. */
+  function editTranslation(code: string, field: keyof TourTranslation, value: unknown) {
+    setTour((t) => {
+      const cur = t.translationMeta?.[code] ?? { auto_fields: [], source_hashes: {} };
+      return {
+        ...t,
+        translations: { ...t.translations, [code]: { ...(t.translations?.[code] ?? {}), [field]: value } },
+        translationMeta: {
+          ...(t.translationMeta ?? {}),
+          [code]: { ...cur, auto_fields: (cur.auto_fields ?? []).filter((f) => f !== field) },
+        },
+      };
+    });
+    setTrEdits((e) => ({ ...e, [code]: { ...(e[code] ?? {}), [field]: value } }));
+  }
+
+  /** Ask the server to (re)generate translations. `force` + `fields` = "Re-translate from English". */
+  async function retranslate(opts: { langs?: string[]; fields?: string[]; force?: boolean }) {
+    setTrBusy(true);
+    setMessage(null);
+    try {
+      const res = await fetch("/api/admin/translate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tourId: tour.id, ...opts }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setMessage({ kind: "err", text: data.message ?? "Could not start translation." });
+        return;
+      }
+      if (opts.force && opts.langs?.[0] && opts.fields) {
+        // The forced fields go back to the machine; drop any pending local edit of them.
+        setTrEdits((e) => {
+          const next = { ...e };
+          const code = opts.langs![0];
+          if (next[code]) {
+            next[code] = Object.fromEntries(Object.entries(next[code]).filter(([f]) => !opts.fields!.includes(f)));
+          }
+          return next;
+        });
+      }
+      setMessage({
+        kind: "ok",
+        text: data.planned?.length ? "Translating from English… this runs in the background." : "Nothing to translate — everything is up to date.",
+      });
+      await refreshTranslations();
+    } catch {
+      setMessage({ kind: "err", text: "Network error — translation was not started." });
+    } finally {
+      setTrBusy(false);
     }
   }
 
@@ -191,7 +290,21 @@ export default function TourEditor({
       included: t.included?.length ? t.included : previewTour.included,
       excluded: t.excluded?.length ? t.excluded : previewTour.excluded,
       bring: t.bring?.length ? t.bring : previewTour.bring,
-      itinerary: t.itinerary?.length ? t.itinerary : previewTour.itinerary,
+      itinerary:
+        t.itinerary?.length === previewTour.itinerary.length
+          ? previewTour.itinerary.map((stop, i) => ({
+              ...stop,
+              time: t.itinerary?.[i]?.time?.trim() || stop.time,
+              title: t.itinerary?.[i]?.title?.trim() || stop.title,
+              detail: t.itinerary?.[i]?.detail?.trim() || stop.detail,
+            }))
+          : previewTour.itinerary,
+      duration: t.duration?.trim() || previewTour.duration,
+      addons: previewTour.addons?.map((a, i) => ({
+        ...a,
+        label: t.addons?.[i]?.label?.trim() || a.label,
+        unit: t.addons?.[i]?.unit?.trim() || a.unit,
+      })),
       importantInfo: t.importantInfo?.length ? t.importantInfo : previewTour.importantInfo,
       restrictions: t.restrictions?.length ? t.restrictions : previewTour.restrictions,
       meetingPoint: t.meetingPoint?.trim() || previewTour.meetingPoint,
@@ -280,7 +393,7 @@ export default function TourEditor({
               Live preview — same components as the public page
             </span>
             {enabledLanguages.length > 1 ? (
-              <select
+              <Select dark
                 value={lang}
                 onChange={(e) => setLang(e.target.value)}
                 className="bg-white/10 text-white text-xs rounded-lg px-2 py-1 border border-white/10"
@@ -293,12 +406,16 @@ export default function TourEditor({
                       : ""}
                   </option>
                 ))}
-              </select>
+              </Select>
             ) : null}
           </div>
           <SiteProvider settings={settings} catalogue={catalogue} currency={currency}>
             <BookingProvider>
-              <div className="max-h-[75vh] overflow-y-auto">
+              <div
+                dir={settings.languages.find((l) => l.code === lang)?.dir === "rtl" || lang === "ar" ? "rtl" : "ltr"}
+                lang={lang}
+                className="max-h-[75vh] overflow-y-auto"
+              >
                 <TourHero tour={previewTour} />
                 <TourBody tour={localizedPreview} related={[]} reviews={[]} preview />
               </div>
@@ -321,11 +438,11 @@ export default function TourEditor({
             </Field>
             <div className="grid grid-cols-2 gap-3">
               <Field label="Destination" required description="Which destination this tour belongs to. Controls the Destinations pages and the destination filter." appearsOn="Destinations → destination page · Tours listing → Destination filter">
-                <select className={input} value={tour.destination} onChange={(e) => set("destination", e.target.value)}>
+                <Select dark className={input} value={tour.destination} onChange={(e) => set("destination", e.target.value)}>
                   {DESTINATIONS.map((d) => (
                     <option key={d} value={d}>{destinationName(d)}</option>
                   ))}
-                </select>
+                </Select>
               </Field>
               <Field
                 label="Experience type"
@@ -333,7 +450,7 @@ export default function TourEditor({
                 description="The kind of day this is. The list comes from Admin → Experience Categories, so adding a category there makes it selectable here."
                 appearsOn="Experiences → category page · Tours listing → Experience filter"
               >
-                <select className={input} value={tour.category} onChange={(e) => set("category", e.target.value)}>
+                <Select dark className={input} value={tour.category} onChange={(e) => set("category", e.target.value)}>
                   {categoryOptions.map((c) => (
                     <option key={c.slug} value={c.slug}>
                       {c.name}
@@ -341,7 +458,7 @@ export default function TourEditor({
                       {c.status === "missing" ? " (not registered — create it in Experience Categories)" : ""}
                     </option>
                   ))}
-                </select>
+                </Select>
                 {unregisteredCategory ? (
                   <span className="mt-1 block text-[10.5px] leading-relaxed text-amber-300">
                     This tour is filed under “{tour.category}”, which is not in
@@ -353,11 +470,11 @@ export default function TourEditor({
             </div>
             <div className="grid grid-cols-2 gap-3">
               <Field label="Group format" required description="Shared small group, a private tour, or a transfer only." appearsOn="Tour Details → facts bar (\u201cTour type\u201d)">
-                <select className={input} value={tour.type} onChange={(e) => set("type", e.target.value as TourRecord["type"])}>
+                <Select dark className={input} value={tour.type} onChange={(e) => set("type", e.target.value as TourRecord["type"])}>
                   <option value="group">Small group</option>
                   <option value="private">Private</option>
                   <option value="transfer">Transfer</option>
-                </select>
+                </Select>
               </Field>
               <Field label="Listing order" optional description="Lower numbers appear earlier in listings. Leave at the default unless you want to push a tour up." example="10">
                 <input type="number" className={input} value={tour.priority} onChange={(e) => set("priority", Number(e.target.value))} />
@@ -384,7 +501,7 @@ export default function TourEditor({
             </Field>
             <div className="grid grid-cols-1 gap-4 rounded-xl bg-black/20 p-3.5 border border-white/5">
               <Field label="Price currency — the currency declared prices are declared in">
-                <select
+                <Select dark
                   className={input}
                   value={tour.currency}
                   onChange={(e) => set("currency", e.target.value)}
@@ -394,7 +511,7 @@ export default function TourEditor({
                       {code}
                     </option>
                   ))}
-                </select>
+                </Select>
                 <span className="block text-[10px] text-stone-500 mt-1">
                   Every price below is declared in this currency. The storefront converts
                   them into each visitor&apos;s display currency at the site rates.
@@ -451,13 +568,24 @@ export default function TourEditor({
                   onChange={(e) => set("priceOriginal", e.target.value === "" ? null : Number(e.target.value))}
                 />
               </Field>
-              <Field label="Price applies per" required description="Whether the headline price is per person, per boat or per car." appearsOn="Tour Details → price bar">
-                <select className={cn(input, "h-[40px]")} value={tour.priceUnit ?? ""} onChange={(e) => set("priceUnit", e.target.value || undefined)}>
-                  <option value="">per person (default)</option>
-                  <option value="per boat">per boat</option>
-                  <option value="per car">per car</option>
-                  <option value="per group">per group</option>
-                </select>
+              <Field label="Price applies per" optional translatable description="Type whatever the headline price is charged per — leave empty for per person. Anything other than person/group shows one flat price instead of adult/child/infant rates." appearsOn="Tour Details → price bar" example="boat">
+                <input
+                  className={cn(input, "h-[40px]")}
+                  list="price-unit-suggestions"
+                  placeholder="person (default) — or boat, buggy, car, jet ski…"
+                  value={(tour.priceUnit ?? "").replace(/^per\s+/i, "")}
+                  onChange={(e) => {
+                    const noun = e.target.value.replace(/^per\s+/i, "");
+                    set("priceUnit", noun.trim() && noun.trim().toLowerCase() !== "person" ? `per ${noun}` : undefined);
+                  }}
+                />
+                <datalist id="price-unit-suggestions">
+                  <option value="person" />
+                  <option value="boat" />
+                  <option value="car" />
+                  <option value="buggy" />
+                  <option value="group" />
+                </datalist>
               </Field>
             </div>
             <Field label="Pinned display prices (override conversion, e.g. GBP 35)">
@@ -509,7 +637,7 @@ export default function TourEditor({
             </Field>
             <div className="grid grid-cols-2 gap-3">
               <Field label="Booking availability" required description="Open takes bookings normally. On request shows the tour but asks guests to enquire. Closed hides booking.">
-                <select
+                <Select dark
                   className={input}
                   value={tour.availability ?? "open"}
                   onChange={(e) => set("availability", e.target.value as TourRecord["availability"])}
@@ -517,7 +645,7 @@ export default function TourEditor({
                   <option value="open">Open for booking</option>
                   <option value="on_request">On request</option>
                   <option value="closed">Closed / sold out</option>
-                </select>
+                </Select>
               </Field>
               <Field label="Departure days" optional translatable description="When this tour runs." example="Daily except Friday">
                 <input className={input} value={tour.schedule ?? ""} onChange={(e) => set("schedule", e.target.value || undefined)} />
@@ -624,8 +752,39 @@ export default function TourEditor({
                     />
                   </Field>
 
-                  <div className="grid grid-cols-3 gap-3">
-                    <Field label={`Adult Price (${tour.currency || "USD"}) *`}>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Field label="Priced by" description="Per person = adults / children / infants. Per unit = one price per boat, buggy, car… with a single quantity counter.">
+                      <Select dark
+                        className={input}
+                        value={pkg.pricingMode === "unit" ? "unit" : "person"}
+                        onChange={(e) => {
+                          const next = [...(tour.tripPackages ?? [])];
+                          next[i] = { ...pkg, pricingMode: e.target.value === "unit" ? "unit" : "person" };
+                          set("tripPackages", next);
+                        }}
+                      >
+                        <option value="person">Per person (adult / child / infant)</option>
+                        <option value="unit">Per unit (boat, buggy, car…)</option>
+                      </Select>
+                    </Field>
+                    {pkg.pricingMode === "unit" ? (
+                      <Field label="Unit name" required description="Singular name shown next to the price." example="boat">
+                        <input
+                          className={input}
+                          placeholder="e.g. boat, buggy, car, jet ski"
+                          value={pkg.unitLabel ?? ""}
+                          onChange={(e) => {
+                            const next = [...(tour.tripPackages ?? [])];
+                            next[i] = { ...pkg, unitLabel: e.target.value };
+                            set("tripPackages", next);
+                          }}
+                        />
+                      </Field>
+                    ) : null}
+                  </div>
+
+                  <div className={pkg.pricingMode === "unit" ? "grid grid-cols-1 gap-3" : "grid grid-cols-3 gap-3"}>
+                    <Field label={pkg.pricingMode === "unit" ? `Price per ${pkg.unitLabel?.trim() || "unit"} (${tour.currency || "USD"}) *` : `Adult Price (${tour.currency || "USD"}) *`}>
                       <input
                         type="number"
                         className={input}
@@ -641,38 +800,42 @@ export default function TourEditor({
                         }}
                       />
                     </Field>
-                    <Field label={`Child Price (${tour.currency || "USD"})`}>
-                      <input
-                        type="number"
-                        className={input}
-                        placeholder="Child price"
-                        value={pkg.childPrice ?? ""}
-                        onChange={(e) => {
-                          const next = [...(tour.tripPackages ?? [])];
-                          next[i] = {
-                            ...pkg,
-                            childPrice: e.target.value === "" ? null : Number(e.target.value),
-                          };
-                          set("tripPackages", next);
-                        }}
-                      />
-                    </Field>
-                    <Field label={`Infant Price (${tour.currency || "USD"})`}>
-                      <input
-                        type="number"
-                        className={input}
-                        placeholder="Infant price"
-                        value={pkg.infantPrice ?? ""}
-                        onChange={(e) => {
-                          const next = [...(tour.tripPackages ?? [])];
-                          next[i] = {
-                            ...pkg,
-                            infantPrice: e.target.value === "" ? null : Number(e.target.value),
-                          };
-                          set("tripPackages", next);
-                        }}
-                      />
-                    </Field>
+                    {pkg.pricingMode === "unit" ? null : (
+                      <>
+                        <Field label={`Child Price (${tour.currency || "USD"})`}>
+                          <input
+                            type="number"
+                            className={input}
+                            placeholder="Child price"
+                            value={pkg.childPrice ?? ""}
+                            onChange={(e) => {
+                              const next = [...(tour.tripPackages ?? [])];
+                              next[i] = {
+                                ...pkg,
+                                childPrice: e.target.value === "" ? null : Number(e.target.value),
+                              };
+                              set("tripPackages", next);
+                            }}
+                          />
+                        </Field>
+                        <Field label={`Infant Price (${tour.currency || "USD"})`}>
+                          <input
+                            type="number"
+                            className={input}
+                            placeholder="Infant price"
+                            value={pkg.infantPrice ?? ""}
+                            onChange={(e) => {
+                              const next = [...(tour.tripPackages ?? [])];
+                              next[i] = {
+                                ...pkg,
+                                infantPrice: e.target.value === "" ? null : Number(e.target.value),
+                              };
+                              set("tripPackages", next);
+                            }}
+                          />
+                        </Field>
+                      </>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
@@ -903,7 +1066,7 @@ export default function TourEditor({
 
           <Section
             title="Important information & requirements"
-            description="Conditions guests must know before choosing an option. Important information is shown directly above the package selector, so visitors read it before they commit."
+            description="Conditions, essentials and guidelines for guests (what to bring, rules, important details)."
             appearsOn="Tour Details → Important information · What to bring · Good to know"
           >
             <ListEditor
@@ -933,8 +1096,8 @@ export default function TourEditor({
               itemLabel="note"
               optional
               translatable
-              description="Conditions, policies and warnings the guest must read. This block is shown immediately ABOVE the package selector on the tour page, so guests read it before choosing an option."
-              appearsOn="Tour Details → Important information (directly above Tour Options & Packages)"
+              description="Conditions, policies and warnings the guest must read. This block is shown under What to bring and Good to know on the tour page."
+              appearsOn="Tour Details → Important information (under What to bring)"
               items={tour.importantInfo}
               onChange={(v) => set("importantInfo", v)}
               newItem={() => ""}
@@ -1100,9 +1263,26 @@ export default function TourEditor({
           {/* ── Translations ── */}
           <Section
             title="Translations"
-            description="English is the original. For every other language you can supply your own wording — anything you leave blank falls back to the English version, so the page always works."
+            description="Write in English only. Other languages are translated automatically. Edit a translation only if you want to override it."
             appearsOn="Public website, whenever a visitor switches language"
           >
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <p className="text-[11px] text-stone-400">
+                {isNew
+                  ? "Save the tour first — translations are generated after the first save."
+                  : "Save your English changes first; translation always works from the saved English."}
+              </p>
+              <button
+                type="button"
+                disabled={isNew || trBusy || anyTranslating}
+                onClick={() => retranslate({})}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-teal-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-teal-500 disabled:opacity-50"
+              >
+                <RefreshCw className={`size-3.5 ${anyTranslating ? "animate-spin" : ""}`} />
+                {anyTranslating ? "Translating…" : "Auto-translate missing"}
+              </button>
+            </div>
+            <TranslationProviderStatus refreshKey={anyTranslating} />
             <div className="flex gap-2 flex-wrap">
               {enabledLanguages.map((l) => {
                 const st = l.code === "en" ? null : translationStatus(l.code);
@@ -1117,17 +1297,24 @@ export default function TourEditor({
                   >
                     {l.label}
                     {st ? (
-                      <span
-                        className={`rounded px-1.5 py-0.5 text-[9.5px] font-bold ${
-                          complete
+                      (() => {
+                        const live = langIsTranslating(l.code);
+                        const failed = tour.translationMeta?.[l.code]?.status === "failed" && !complete;
+                        const tone = live
+                          ? "bg-sky-500/15 text-sky-300"
+                          : complete
                             ? "bg-emerald-500/15 text-emerald-300"
-                            : st.done === 0
+                            : failed
                               ? "bg-red-500/15 text-red-300"
-                              : "bg-amber-500/15 text-amber-300"
-                        }`}
-                      >
-                        {st.done}/{st.total}
-                      </span>
+                              : st.done === 0
+                                ? "bg-red-500/15 text-red-300"
+                                : "bg-amber-500/15 text-amber-300";
+                        return (
+                          <span className={`rounded px-1.5 py-0.5 text-[9.5px] font-bold ${tone}`}>
+                            {live ? "translating…" : failed ? `failed ${st.done}/${st.total}` : `${st.done}/${st.total}`}
+                          </span>
+                        );
+                      })()
                     ) : null}
                   </button>
                 );
@@ -1152,187 +1339,14 @@ export default function TourEditor({
               })()
             ) : null}
             {lang !== "en" ? (
-              <div className="space-y-3 pt-2 border-t border-white/10">
-                <Field label="Tour name" description="Leave blank to show the English name." appearsOn="Tour Details → main heading · tour cards">
-                  <input className={input} placeholder={tour.title} value={tour.translations?.[lang]?.title ?? ""} onChange={(e) => setTr(lang, { title: e.target.value })} />
-                </Field>
-                <Field label="Short description" description="Leave blank to show the English short description." appearsOn="Tours listing → tour card">
-                  <textarea rows={2} className={input} placeholder={tour.summary} value={tour.translations?.[lang]?.summary ?? ""} onChange={(e) => setTr(lang, { summary: e.target.value })} />
-                </Field>
-                <ListEditor
-                  label="Full description"
-                  itemLabel="paragraph"
-                  description={`English has ${tour.description.length} paragraph(s). Leave empty to show the English text.`}
-                  appearsOn="Tour Details → Overview"
-                  items={tour.translations?.[lang]?.description ?? []}
-                  onChange={(v) => setTr(lang, { description: v })}
-                  newItem={() => ""}
-                  textarea
-                />
-                <ListEditor
-                  label="Highlights"
-                  itemLabel="highlight"
-                  description={`English has ${tour.highlights.length} highlight(s).`}
-                  appearsOn="Tour Details → Highlights"
-                  items={tour.translations?.[lang]?.highlights ?? []}
-                  onChange={(v) => setTr(lang, { highlights: v })}
-                  newItem={() => ""}
-                />
-                <ListEditor
-                  label="What's included in the price"
-                  itemLabel="inclusion"
-                  description={`English has ${tour.included.length} line(s).`}
-                  appearsOn="Tour Details → What's included"
-                  items={tour.translations?.[lang]?.included ?? []}
-                  onChange={(v) => setTr(lang, { included: v })}
-                  newItem={() => ""}
-                />
-                <ListEditor
-                  label="What's not included"
-                  itemLabel="exclusion"
-                  description={`English has ${tour.excluded.length} line(s).`}
-                  appearsOn="Tour Details → Not included"
-                  items={tour.translations?.[lang]?.excluded ?? []}
-                  onChange={(v) => setTr(lang, { excluded: v })}
-                  newItem={() => ""}
-                />
-                <ListEditor
-                  label="What to bring"
-                  itemLabel="item"
-                  description={`English has ${tour.bring.length} line(s).`}
-                  appearsOn="Tour Details → What to bring"
-                  items={tour.translations?.[lang]?.bring ?? []}
-                  onChange={(v) => setTr(lang, { bring: v })}
-                  newItem={() => ""}
-                />
-                <ListEditor
-                  label="Important information"
-                  itemLabel="note"
-                  description={`English has ${tour.importantInfo.length} line(s). Shown directly above the package selector.`}
-                  appearsOn="Tour Details → Important information"
-                  items={tour.translations?.[lang]?.importantInfo ?? []}
-                  onChange={(v) => setTr(lang, { importantInfo: v })}
-                  newItem={() => ""}
-                  textarea
-                />
-                <ListEditor
-                  label="Restrictions & who should not join"
-                  itemLabel="restriction"
-                  description={`English has ${tour.restrictions.length} line(s).`}
-                  appearsOn="Tour Details → Good to know"
-                  items={tour.translations?.[lang]?.restrictions ?? []}
-                  onChange={(v) => setTr(lang, { restrictions: v })}
-                  newItem={() => ""}
-                />
-                <Field
-                  label="Meeting point & pickup"
-                  description="Leave blank to show the English version."
-                  appearsOn="Tour Details → Meeting & pickup"
-                >
-                  <textarea
-                    rows={2}
-                    className={input}
-                    placeholder={tour.meetingPoint}
-                    value={tour.translations?.[lang]?.meetingPoint ?? ""}
-                    onChange={(e) => setTr(lang, { meetingPoint: e.target.value })}
-                  />
-                </Field>
-
-                {tour.faq.length > 0 ? (
-                  <div className="pt-3 border-t border-white/10 space-y-3">
-                    <p className="text-xs font-semibold text-teal-400">
-                      Frequently asked questions ({lang.toUpperCase()})
-                    </p>
-                    <AppearsOn where="Tour Details → Before you book" />
-                    {tour.faq.map((item, i) => {
-                      const trFaq = tour.translations?.[lang]?.faq ?? [];
-                      const cur = trFaq[i] ?? { question: "", answer: "" };
-                      const writeFaq = (patch: { question?: string; answer?: string }) => {
-                        const next = tour.faq.map((base, j) => ({
-                          question: trFaq[j]?.question ?? "",
-                          answer: trFaq[j]?.answer ?? "",
-                          ...(j === i ? patch : {}),
-                        }));
-                        setTr(lang, { faq: next });
-                      };
-                      return (
-                        <div key={i} className="bg-black/20 border border-white/10 rounded-xl p-3 space-y-2">
-                          <p className="text-[11px] text-stone-400">English: {item.question}</p>
-                          <Field label="Question">
-                            <input
-                              className={input}
-                              placeholder={item.question}
-                              value={cur.question}
-                              onChange={(e) => writeFaq({ question: e.target.value })}
-                            />
-                          </Field>
-                          <Field label="Answer">
-                            <textarea
-                              rows={2}
-                              className={input}
-                              placeholder={item.answer}
-                              value={cur.answer}
-                              onChange={(e) => writeFaq({ answer: e.target.value })}
-                            />
-                          </Field>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : null}
-
-                {(tour.tripPackages ?? []).length > 0 ? (
-                  <div className="pt-3 border-t border-white/10 space-y-3">
-                    <p className="text-xs font-semibold text-teal-400">
-                      Tour options & packages ({lang.toUpperCase()})
-                    </p>
-                    {(tour.tripPackages ?? []).map((tp) => {
-                      const trList = tour.translations?.[lang]?.tripPackages ?? [];
-                      const curTr = trList.find((x) => x.id === tp.id) ?? { id: tp.id };
-                      return (
-                        <div key={tp.id} className="bg-black/20 border border-white/10 rounded-xl p-3 space-y-2">
-                          <p className="text-[11px] text-stone-400">English: {tp.title}</p>
-                          <Field label="Option name" description="Leave blank to show the English option name." appearsOn="Tour Details → Select your package → option card">
-                            <input
-                              className={input}
-                              value={curTr.title ?? ""}
-                              placeholder={tp.title}
-                              onChange={(e) => {
-                                const nextList = [
-                                  ...trList.filter((x) => x.id !== tp.id),
-                                  { ...curTr, title: e.target.value },
-                                ];
-                                setTr(lang, { tripPackages: nextList });
-                              }}
-                            />
-                          </Field>
-                          <Field label="Option description" description="Leave blank to show the English description." appearsOn="Tour Details → Select your package → option card">
-                            <textarea
-                              rows={2}
-                              className={input}
-                              value={curTr.description ?? ""}
-                              placeholder={tp.description ?? ""}
-                              onChange={(e) => {
-                                const nextList = [
-                                  ...trList.filter((x) => x.id !== tp.id),
-                                  { ...curTr, description: e.target.value },
-                                ];
-                                setTr(lang, { tripPackages: nextList });
-                              }}
-                            />
-                          </Field>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : null}
-                <Field label="Search engine title" description="Leave blank to use the English search title." appearsOn="Google search results">
-                  <input className={input} value={tour.translations?.[lang]?.seoTitle ?? ""} onChange={(e) => setTr(lang, { seoTitle: e.target.value })} />
-                </Field>
-                <Field label="Search engine description" description="Leave blank to use the English search description." appearsOn="Google search results">
-                  <textarea rows={2} className={input} value={tour.translations?.[lang]?.seoDescription ?? ""} onChange={(e) => setTr(lang, { seoDescription: e.target.value })} />
-                </Field>
-              </div>
+              <TranslationReview
+                tour={tour}
+                lang={lang}
+                meta={tour.translationMeta?.[lang]}
+                busy={trBusy}
+                onEdit={(field, value) => editTranslation(lang, field, value)}
+                onRetranslate={(field) => retranslate(field ? { langs: [lang], fields: [field], force: true } : { langs: [lang] })}
+              />
             ) : (
               <p className="text-[11px] text-stone-500">
                 English is the base content — edit it in the fields above.

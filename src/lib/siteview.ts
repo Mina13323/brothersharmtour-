@@ -6,7 +6,7 @@
 
 import { cookies } from "next/headers";
 import type { CurrencyContext } from "@/lib/currency";
-import { approvedReviews, buildCatalogue, ensureDbLoadedFromSupabase, getSettings, tourBySlug } from "@/lib/store/repo";
+import { activeExperiences, approvedReviews, buildCatalogue, ensureDbLoadedFromSupabase, getSettings, tourBySlug } from "@/lib/store/repo";
 import type { ReviewRecord } from "@/lib/store/types";
 import type { CatalogueTour } from "@/lib/store/types";
 import type { PublicSettings } from "@/components/SiteProvider";
@@ -85,7 +85,15 @@ export interface PublicReview {
   photos: { src: string; alt: string }[];
 }
 
+/** A published, admin-managed category (Admin → Experience Categories). */
+export interface PublicExperience {
+  slug: string;
+  name: string;
+  tagline: string;
+}
+
 export interface SiteView {
+  experiences: PublicExperience[];
   settings: PublicSettings;
   currency: CurrencyContext;
   /** Content language (cookie → settings → "en"). */
@@ -134,5 +142,10 @@ export async function getSiteView(): Promise<SiteView> {
           count,
         }
       : { average: null, count: 0 };
-  return { settings, currency, lang, catalogue: buildCatalogue(lang), reviews, reviewStats };
+  const experiences = activeExperiences().map((e) => ({
+    slug: e.slug,
+    name: e.name,
+    tagline: e.tagline ?? "",
+  }));
+  return { settings, currency, lang, catalogue: buildCatalogue(lang), experiences, reviews, reviewStats };
 }

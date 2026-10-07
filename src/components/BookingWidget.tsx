@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { Select } from "@/components/Select";
 import Link from "next/link";
 import { WhatsAppIcon } from "./sections";
 import { useSite, useCatalogue } from "./SiteProvider";
@@ -13,6 +14,7 @@ import {
   childAgeBand,
   infantAgeBand,
   tourPriceUnit,
+  isFlatPriceUnit,
   tourRating,
   tourReviewCount,
 } from "@/lib/utils";
@@ -39,33 +41,18 @@ export function BookingWidget({
     return (tour?.tripPackages ?? []).filter((p) => p.active !== false);
   }, [tour?.tripPackages]);
 
-  const [selectedPackageId, setSelectedPackageId] = useState<string>(
-    initialOptions?.tripPackageId ?? ""
+  /** Party per trip option — several options can be booked together. */
+  type Party = { adults: number; children: number; infants: number };
+  const [party, setParty] = useState<Record<string, Party>>(() =>
+    seedParty(initialOptions),
   );
-
-  useEffect(() => {
-    if (activeTripPackages.length > 0) {
-      const matchInitial =
-        initialOptions?.tripPackageId &&
-        activeTripPackages.some((p) => p.id === initialOptions.tripPackageId);
-      const exists = activeTripPackages.some((p) => p.id === selectedPackageId);
-      if (matchInitial) {
-        setSelectedPackageId(initialOptions!.tripPackageId!);
-      } else if (!exists) {
-        setSelectedPackageId(activeTripPackages[0].id);
-      }
-    } else {
-      setSelectedPackageId("");
-    }
-  }, [activeTripPackages, initialOptions?.tripPackageId, selectedPackageId]);
-
-  const selectedPackage = useMemo(() => {
-    if (!activeTripPackages.length) return null;
-    return (
-      activeTripPackages.find((p) => p.id === selectedPackageId) ??
-      activeTripPackages[0]
-    );
-  }, [activeTripPackages, selectedPackageId]);
+  const partyOf = (id: string): Party =>
+    party[id] ?? { adults: 0, children: 0, infants: 0 };
+  const setPartyField = (id: string, field: keyof Party, value: number) =>
+    setParty((prev) => ({
+      ...prev,
+      [id]: { ...(prev[id] ?? { adults: 0, children: 0, infants: 0 }), [field]: Math.max(0, value) },
+    }));
 
   // Booking Parameters
   const [date, setDate] = useState<string | null>(null);
@@ -86,7 +73,8 @@ export function BookingWidget({
       if (initialOptions.adults !== undefined) setAdults(initialOptions.adults);
       if (initialOptions.children !== undefined) setChildren(initialOptions.children);
       if (initialOptions.infants !== undefined) setInfants(initialOptions.infants);
-      if (initialOptions.tripPackageId) setSelectedPackageId(initialOptions.tripPackageId);
+      const seeded = seedParty(initialOptions);
+      if (Object.keys(seeded).length) setParty(seeded);
     }
   }, [initialOptions]);
 
@@ -103,25 +91,18 @@ export function BookingWidget({
   const storedCurrency = tour?.currency ?? currency.base;
 
   /** Stored adult price: the selected trip option's rate, else the tour/package "from" price. */
-  const adultPrice = selectedPackage
-    ? selectedPackage.adultPrice
-    : (tour?.priceFrom ?? null);
+  const adultPrice = tour?.priceFrom ?? null;
 
   /** Tiered adult pricing — the selected option's own tiers when one is chosen. */
   const tiers = useMemo(
     () =>
-      effectiveTieredPricing(
-        selectedPackage
-          ? selectedPackage.tieredPricing
-          : tour?.tieredPricing,
-        adultPrice,
-      ),
-    [selectedPackage, tour?.tieredPricing, adultPrice],
+      effectiveTieredPricing(tour?.tieredPricing, adultPrice),
+    [tour?.tieredPricing, adultPrice],
   );
 
   const addons = tour?.addons ?? [];
   const unit = tour ? tourPriceUnit(tour) : "per person";
-  const perBoat = /per (boat|car)/.test(unit);
+  const perBoat = isFlatPriceUnit(unit);
 
   /** Tier matching the current adults count (never for per-boat hires). */
   const activeTier = useMemo(
@@ -132,14 +113,10 @@ export function BookingWidget({
   /** Stored per-child price: option → tour → graceful 80%-of-adult fallback. */
   const baseChildPrice =
     tour?.childPrice ?? (adultPrice !== null ? Math.round(adultPrice * 0.8) : null);
-  const childPrice = selectedPackage
-    ? (selectedPackage.childPrice ?? baseChildPrice ?? 0)
-    : baseChildPrice;
+  const childPrice = baseChildPrice;
 
   /** Stored per-infant price: 0 (Free) unless the option or tour says otherwise. */
-  const infantPrice = selectedPackage
-    ? (selectedPackage.infantPrice ?? tour?.infantPrice ?? 0)
-    : (tour?.infantPrice ?? 0);
+  const infantPrice = tour?.infantPrice ?? 0;
 
   /* Unit prices in the display currency. Pinned overrides apply ONLY to the
    * base adult price (and to the solo tier, which mirrors it) — never to
@@ -147,13 +124,12 @@ export function BookingWidget({
   const adultUnitValue = useMemo(() => {
     const stored = activeTier ? activeTier.pricePerPerson : adultPrice;
     if (stored === null || stored === undefined) return null;
-    const applyOverrides =
-      !selectedPackage && (!activeTier || activeTier.minGuests <= 1);
+    const applyOverrides = !activeTier || activeTier.minGuests <= 1;
     return priceIn(stored, currency, {
       overrides: applyOverrides ? tour?.priceOverrides : undefined,
       from: storedCurrency,
     }).value;
-  }, [activeTier, adultPrice, selectedPackage, tour?.priceOverrides, currency, storedCurrency]);
+  }, [activeTier, adultPrice, tour?.priceOverrides, currency, storedCurrency]);
 
   const childUnitValue = useMemo(
     () =>
@@ -171,7 +147,51 @@ export function BookingWidget({
   const fmt = (value: number | null) =>
     value === null ? null : formatAmount(value, currency.display, lang);
 
+  const hasPackages = activeTripPackages.length > 0;
+
+  /** One priced line per trip option that has guests (own rates + tiers). */
+  const lines = useMemo(() => {
+    if (!hasPackages) return [];
+    const toDisplay = (stored: number) =>
+      priceIn(stored, currency, { from: storedCurrency }).value ?? 0;
+    return activeTripPackages.flatMap((pkg) => {
+      const g = party[pkg.id];
+      if (!g || g.adults + g.children + g.infants === 0) return [];
+      const isUnit = pkg.pricingMode === "unit";
+      const tier = isUnit ? null : resolveTier(pkg.tieredPricing, g.adults);
+      const adultUnit = toDisplay(tier ? tier.pricePerPerson : pkg.adultPrice);
+      const childUnit = toDisplay(pkg.childPrice ?? baseChildPrice ?? 0);
+      const infantStored = pkg.infantPrice ?? tour?.infantPrice ?? 0;
+      const infantUnit = toDisplay(infantStored);
+      return [
+        {
+          pkg,
+          isUnit,
+          unitLabel: pkg.unitLabel?.trim() || "item",
+          ...g,
+          children: isUnit ? 0 : g.children,
+          infants: isUnit ? 0 : g.infants,
+          adultUnit,
+          childUnit,
+          infantUnit,
+          infantFree: infantStored === 0,
+          total: isUnit
+            ? g.adults * adultUnit
+            : g.adults * adultUnit + g.children * childUnit + g.infants * infantUnit,
+        },
+      ];
+    });
+  }, [hasPackages, activeTripPackages, party, currency, storedCurrency, baseChildPrice, tour?.infantPrice]);
+
   const total = useMemo(() => {
+    if (hasPackages) {
+      let sum = lines.reduce((acc, l) => acc + l.total, 0);
+      for (const a of addons) {
+        const addUnit = priceIn(a.price, currency, { from: storedCurrency }).value ?? 0;
+        sum += (addonQty[a.label] ?? 0) * addUnit;
+      }
+      return sum;
+    }
     if (adultUnitValue === null) return null;
     let sum = perBoat ? adultUnitValue : adults * adultUnitValue;
     if (!perBoat && childUnitValue !== null) sum += children * childUnitValue;
@@ -181,43 +201,47 @@ export function BookingWidget({
       sum += (addonQty[a.label] ?? 0) * addUnit;
     }
     return sum;
-  }, [adultUnitValue, childUnitValue, infantUnitValue, adults, children, infants, addons, addonQty, perBoat, currency, storedCurrency]);
+  }, [hasPackages, lines, adultUnitValue, childUnitValue, infantUnitValue, adults, children, infants, addons, addonQty, perBoat, currency, storedCurrency]);
 
   const totalFormatted = total === null ? null : fmt(total);
 
   /** Whole-number saving of the active tier vs the solo/base rate. */
   const tierSavingPct = useMemo(() => {
     if (!activeTier || perBoat || adultUnitValue === null) return null;
-    const soloStored =
-      resolveTier(tiers, 1)?.pricePerPerson ??
-      (selectedPackage ? null : adultPrice);
+    const soloStored = resolveTier(tiers, 1)?.pricePerPerson ?? adultPrice;
     if (soloStored === null || soloStored === undefined || soloStored <= 0) return null;
     const soloValue =
       priceIn(soloStored, currency, {
-        overrides: !selectedPackage ? tour?.priceOverrides : undefined,
+        overrides: tour?.priceOverrides,
         from: storedCurrency,
       }).value ?? null;
     if (soloValue === null || activeTier.pricePerPerson >= soloStored) return null;
     const pct = Math.round((1 - adultUnitValue / soloValue) * 100);
     return pct > 0 ? pct : null;
-  }, [activeTier, perBoat, adultUnitValue, tiers, selectedPackage, adultPrice, currency, tour?.priceOverrides, storedCurrency]);
+  }, [activeTier, perBoat, adultUnitValue, tiers, adultPrice, currency, tour?.priceOverrides, storedCurrency]);
 
-  const guests = adults + children + infants;
+  const guests = hasPackages
+    ? lines.reduce((n, l) => n + l.adults + l.children + l.infants, 0)
+    : adults + children + infants;
   const dateValid = Boolean(date);
   const nameValid = name.trim().length >= 2;
   const phoneValid = phone.replace(/\D/g, "").length >= 6;
   const hotelValid = hotel.trim().length >= 2;
 
   const ready =
-    Boolean(tour) && dateValid && nameValid && phoneValid && hotelValid;
+    Boolean(tour) &&
+    (!hasPackages || lines.length > 0) &&
+    dateValid &&
+    nameValid &&
+    phoneValid &&
+    hotelValid;
 
   const message = useMemo(() => {
     if (!tour) return "";
-    const lines = [
+    const msgLines = [
       `Hello ${site.name}! I would like to reserve a tour.`,
       "",
       `• Tour: ${tour.title}`,
-      selectedPackage ? `• Selected Option: ${selectedPackage.title}` : null,
       date ? `• Date: ${prettyDate(date)}` : null,
       name.trim() ? `• Guest Name: ${name.trim()}` : null,
       phone.trim() ? `• WhatsApp / Phone: ${phone.trim()}` : null,
@@ -226,14 +250,26 @@ export function BookingWidget({
             roomNumber.trim() ? ` (Room ${roomNumber.trim()})` : ""
           }`
         : null,
-      `• Guests: ${adults} adult${adults === 1 ? "" : "s"}` +
-        (children ? `, ${children} child (${childAgeBand(tour)})` : "") +
-        (infants
-          ? `, ${infants} infant (${infantAgeBand(tour)}${infantPrice === 0 ? ", free" : ""})`
-          : ""),
-      activeTier?.label || tierSavingPct
-        ? `• Group rate: ${activeTier?.label ?? `${adults} guests`}${tierSavingPct ? ` (save ~${tierSavingPct}%)` : ""}`
-        : null,
+      ...(hasPackages
+        ? lines.map(
+            (l) =>
+              l.isUnit
+                ? `• Option: ${l.pkg.title} — ${l.adults} × ${l.unitLabel} = ${fmt(l.total)}`
+                : `• Option: ${l.pkg.title} — ${l.adults} adult${l.adults === 1 ? "" : "s"}` +
+              (l.children ? `, ${l.children} child (${childAgeBand(tour)})` : "") +
+              (l.infants ? `, ${l.infants} infant (${infantAgeBand(tour)}${l.infantFree ? ", free" : ""})` : "") +
+              ` = ${fmt(l.total)}`,
+          )
+        : [
+            `• Guests: ${adults} adult${adults === 1 ? "" : "s"}` +
+              (children ? `, ${children} child (${childAgeBand(tour)})` : "") +
+              (infants
+                ? `, ${infants} infant (${infantAgeBand(tour)}${infantPrice === 0 ? ", free" : ""})`
+                : ""),
+            activeTier?.label || tierSavingPct
+              ? `• Group rate: ${activeTier?.label ?? `${adults} guests`}${tierSavingPct ? ` (save ~${tierSavingPct}%)` : ""}`
+              : null,
+          ]),
       ...addons
         .filter((a) => (addonQty[a.label] ?? 0) > 0)
         .map((a) => `• Add-on: ${a.label} × ${addonQty[a.label]}`),
@@ -242,10 +278,11 @@ export function BookingWidget({
       "",
       "Please confirm availability and pickup schedule. Thank you!",
     ].filter(Boolean);
-    return lines.join("\n");
+    return msgLines.join("\n");
   }, [
     tour,
-    selectedPackage,
+    hasPackages,
+    lines,
     date,
     name,
     phone,
@@ -271,7 +308,12 @@ export function BookingWidget({
     }
 
     const inquiryNotes = [
-      selectedPackage ? `Option: ${selectedPackage.title}` : null,
+      ...lines.map(
+        (l) =>
+          l.isUnit
+            ? `Option: ${l.pkg.title} (${l.adults} × ${l.unitLabel})`
+            : `Option: ${l.pkg.title} (${l.adults}A${l.children ? `+${l.children}C` : ""}${l.infants ? `+${l.infants}I` : ""})`,
+      ),
       notes.trim() || null,
       roomNumber.trim() ? `Room: ${roomNumber.trim()}` : null,
     ]
@@ -288,8 +330,8 @@ export function BookingWidget({
           phone: phone.trim(),
           tourSlug: tour?.slug,
           date: date,
-          adults: adults,
-          children: children,
+          adults: hasPackages ? lines.reduce((n, l) => n + l.adults, 0) : adults,
+          children: hasPackages ? lines.reduce((n, l) => n + l.children, 0) : children,
           hotel: hotel.trim(),
           room_number: roomNumber.trim(),
           notes: inquiryNotes || undefined,
@@ -336,11 +378,11 @@ export function BookingWidget({
 
       {/* 1 · Tour */}
       <Field step={1} label={t("step_tour", "Choose your excursion")}>
-        <select
+        <Select
           value={slug}
           onChange={(e) => {
             setSlug(e.target.value);
-            setSelectedPackageId("");
+            setParty({});
           }}
           className="field"
         >
@@ -359,7 +401,7 @@ export function BookingWidget({
               ))}
             </optgroup>
           ))}
-        </select>
+        </Select>
         {tour && tourRating(tour) !== null ? (
           <div className="mt-2 flex items-center gap-2 text-[0.8rem] text-stone">
             <Stars value={tourRating(tour) ?? 0} />
@@ -368,87 +410,109 @@ export function BookingWidget({
           </div>
         ) : null}
 
-        {/* Trip Package / Tour Option selection */}
-        {activeTripPackages.length > 0 ? (
+        {/* Trip options — each can carry its own party; book several together */}
+        {hasPackages ? (
           <div className="mt-4 pt-3.5 border-t border-sand/70">
-            <p className="text-[0.78rem] font-semibold text-ink mb-2.5">
+            <p className="text-[0.78rem] font-semibold text-ink mb-1">
               {t("select_package_option", "Select Package Option")}
+            </p>
+            <p className="text-[0.72rem] text-stone mb-2.5">
+              {t("select_package_multi_hint", "Add guests to one option, or to several to book them together.")}
             </p>
             <div className="space-y-2.5">
               {activeTripPackages.map((pkg) => {
-                const isSelected = selectedPackage?.id === pkg.id;
+                const g = partyOf(pkg.id);
+                const isSelected = g.adults + g.children + g.infants > 0;
+                const line = lines.find((l) => l.pkg.id === pkg.id);
+                const pkgInfant = pkg.infantPrice ?? tour?.infantPrice ?? 0;
                 return (
-                  <button
+                  <div
                     key={pkg.id}
-                    type="button"
-                    onClick={() => setSelectedPackageId(pkg.id)}
                     className={cn(
-                      "w-full text-left p-3.5 rounded-2xl border transition-all flex flex-col gap-1.5",
+                      "w-full text-left rounded-2xl border transition-all flex flex-col",
                       isSelected
                         ? "border-reef bg-reef/[0.08] ring-1 ring-reef text-ink shadow-2xs"
-                        : "border-sand/90 bg-paper-warm/40 hover:bg-paper-warm/80 text-ink/90"
+                        : "border-sand/90 bg-paper-warm/40 text-ink/90"
                     )}
                   >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-center gap-2.5">
-                        <span
-                          className={cn(
-                            "size-4 rounded-full border flex items-center justify-center shrink-0 transition-colors",
-                            isSelected
-                              ? "border-reef bg-reef text-white"
-                              : "border-sand-deep/60 bg-paper"
-                          )}
-                        >
-                          {isSelected ? (
-                            <span className="size-1.5 rounded-full bg-white" />
-                          ) : null}
-                        </span>
+                    <div className="p-3.5 flex flex-col gap-1.5">
+                      <div className="flex items-start justify-between gap-3">
                         <span className="font-bold text-[0.875rem] text-ink leading-snug">
                           {pkg.title}
                         </span>
+                        <div className="text-right shrink-0">
+                          <span className="font-display font-bold text-sm text-reef-deep">
+                            {money(pkg.adultPrice, undefined, storedCurrency)}
+                          </span>
+                          <span className="text-[0.65rem] text-stone block -mt-0.5">
+                            /{pkg.pricingMode === "unit" ? pkg.unitLabel?.trim() || "item" : t("price_adult", "adult")}
+                          </span>
+                        </div>
                       </div>
-                      <div className="text-right shrink-0">
-                        <span className="font-display font-bold text-sm text-reef-deep">
-                          {money(pkg.adultPrice, undefined, storedCurrency)}
-                        </span>
-                        <span className="text-[0.65rem] text-stone block -mt-0.5">
-                          /{t("price_adult", "adult")}
-                        </span>
-                      </div>
-                    </div>
-                    {pkg.description ? (
-                      <p className="text-[0.75rem] text-stone leading-relaxed pl-6.5">
-                        {pkg.description}
-                      </p>
-                    ) : null}
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.72rem] text-stone pl-6.5 mt-0.5">
-                      {pkg.childPrice !== null && pkg.childPrice !== undefined ? (
-                        <span>
-                          {t("price_child", "Child")} ({childAgeBand(tour ?? {})}):{" "}
-                          <strong className="text-ink font-semibold">
-                            {money(pkg.childPrice, undefined, storedCurrency)}
-                          </strong>
-                        </span>
+                      {pkg.description ? (
+                        <p className="text-[0.75rem] text-stone leading-relaxed">{pkg.description}</p>
                       ) : null}
-                      {(() => {
-                        const pkgInfant = pkg.infantPrice ?? tour?.infantPrice ?? 0;
-                        return (
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.72rem] text-stone">
+                        {pkg.pricingMode === "unit" ? null : pkg.childPrice !== null && pkg.childPrice !== undefined ? (
+                          <span>
+                            {t("price_child", "Child")} ({childAgeBand(tour ?? {})}):{" "}
+                            <strong className="text-ink font-semibold">
+                              {money(pkg.childPrice, undefined, storedCurrency)}
+                            </strong>
+                          </span>
+                        ) : null}
+                        {pkg.pricingMode === "unit" ? null : (
                           <span>
                             {t("guests_infants", "Infant")} ({infantAgeBand(tour ?? {})}):{" "}
                             <strong className="text-ink font-semibold">
-                              {pkgInfant === 0
-                                ? t("free", "Free")
-                                : money(pkgInfant, undefined, storedCurrency)}
+                              {pkgInfant === 0 ? t("free", "Free") : money(pkgInfant, undefined, storedCurrency)}
                             </strong>
                           </span>
-                        );
-                      })()}
-                      {pkg.duration ? <span>· {pkg.duration}</span> : null}
+                        )}
+                        {pkg.duration ? <span>· {pkg.duration}</span> : null}
+                      </div>
                     </div>
-                  </button>
+                    <div className="flex flex-col divide-y divide-sand/70 border-t border-sand/70">
+                      {pkg.pricingMode === "unit" ? (
+                        <Counter
+                          label={t("quantity", "Quantity")}
+                          sub={pkg.unitLabel?.trim() || undefined}
+                          value={g.adults}
+                          onChange={(v) => setPartyField(pkg.id, "adults", v)}
+                        />
+                      ) : (
+                        <>
+                          <Counter
+                            label={t("guests_adults", "Adults")}
+                            value={g.adults}
+                            onChange={(v) => setPartyField(pkg.id, "adults", v)}
+                          />
+                          <Counter
+                            label={t("guests_children", "Children")}
+                            value={g.children}
+                            onChange={(v) => setPartyField(pkg.id, "children", v)}
+                          />
+                          <Counter
+                            label={t("guests_infants", "Infants")}
+                            value={g.infants}
+                            onChange={(v) => setPartyField(pkg.id, "infants", v)}
+                          />
+                        </>
+                      )}
+                    </div>
+                    {line ? (
+                      <div className="flex items-center justify-between border-t border-sand/70 px-4 py-2.5 text-[0.8rem]">
+                        <span className="text-stone">{t("subtotal", "Subtotal")}</span>
+                        <span className="font-semibold text-ink">{fmt(line.total)}</span>
+                      </div>
+                    ) : null}
+                  </div>
                 );
               })}
             </div>
+            {touched && lines.length === 0 ? (
+              <Warn>{t("validation_select_option", "Please add guests to at least one option.")}</Warn>
+            ) : null}
           </div>
         ) : null}
       </Field>
@@ -466,6 +530,7 @@ export function BookingWidget({
       </Field>
 
       {/* 3 · Guests & Party Size */}
+      {!hasPackages ? (
       <Field step={3} label={t("step_guests", "Guests & Party Size")}>
         <div className="flex flex-col divide-y divide-sand/70 overflow-hidden rounded-2xl border border-sand/80 bg-paper-warm/30">
           <Counter
@@ -518,10 +583,7 @@ export function BookingWidget({
                 const isActive =
                   activeTier !== null && activeTier.minGuests === tier.minGuests;
                 const tierValue = priceIn(tier.pricePerPerson, currency, {
-                  overrides:
-                    !selectedPackage && tier.minGuests <= 1
-                      ? tour?.priceOverrides
-                      : undefined,
+                  overrides: tier.minGuests <= 1 ? tour?.priceOverrides : undefined,
                   from: storedCurrency,
                 }).value;
                 const solo = resolveTier(tiers, 1);
@@ -571,10 +633,11 @@ export function BookingWidget({
           </p>
         ) : null}
       </Field>
+      ) : null}
 
       {/* Add-ons (if available) */}
       {addons.length ? (
-        <Field step={4} label={t("step_addons", "Optional Add-ons")}>
+        <Field step={hasPackages ? 3 : 4} label={t("step_addons", "Optional Add-ons")}>
           <div className="flex flex-col divide-y divide-sand/70 overflow-hidden rounded-2xl border border-sand/80 bg-paper-warm/30">
             {addons.map((a) => (
               <Counter
@@ -591,7 +654,7 @@ export function BookingWidget({
 
       {/* 4 · Personal & Hotel Details */}
       <Field
-        step={addons.length ? 5 : 4}
+        step={(hasPackages ? 2 : 3) + (addons.length ? 2 : 1)}
         label={t("step_details", "Personal & Hotel Pickup Details")}
       >
         <div className="space-y-3.5">
@@ -698,7 +761,7 @@ export function BookingWidget({
             <p className="mt-1 text-[0.75rem] text-stone">
               {tour ? `${guests} guest${guests === 1 ? "" : "s"} · ` : ""}
               {t("pay_on_day", "paid on the day")}
-              {tierSavingPct ? (
+              {!hasPackages && tierSavingPct ? (
                 <span className="ml-1.5 inline-flex items-center rounded-full bg-emerald-600/10 px-2 py-0.5 text-[0.68rem] font-bold text-emerald-700">
                   {t("group_rate_saved", "Group rate applied")} −{tierSavingPct}%
                 </span>
@@ -997,4 +1060,28 @@ function prettyDate(iso: string) {
     month: "short",
     year: "numeric",
   });
+}
+
+function seedParty(
+  opts?: BookingOptions,
+): Record<string, { adults: number; children: number; infants: number }> {
+  if (!opts) return {};
+  if (opts.selections?.length) {
+    return Object.fromEntries(
+      opts.selections.map((x) => [
+        x.tripPackageId,
+        { adults: x.adults, children: x.children, infants: x.infants },
+      ]),
+    );
+  }
+  if (opts.tripPackageId) {
+    return {
+      [opts.tripPackageId]: {
+        adults: opts.adults ?? 1,
+        children: opts.children ?? 0,
+        infants: opts.infants ?? 0,
+      },
+    };
+  }
+  return {};
 }

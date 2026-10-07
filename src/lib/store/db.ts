@@ -109,9 +109,31 @@ export function applySupabaseData(incoming: {
   tours?: Database["tours"];
   packages?: Database["packages"];
   settings?: Database["settings"];
+  experiences?: Database["experiences"];
+  destinations?: Database["destinations"];
+  reviews?: Database["reviews"];
 }): void {
   const current = loadDb();
   let changed = false;
+
+  if (incoming.experiences && incoming.experiences.length > 0) {
+    current.experiences = incoming.experiences;
+    changed = true;
+  }
+  if (incoming.destinations && incoming.destinations.length > 0) {
+    current.destinations = incoming.destinations;
+    changed = true;
+  }
+  if (incoming.reviews && incoming.reviews.length > 0) {
+    // Union by id, Supabase wins: reviews approved/moderated in production
+    // appear locally, while a review that has not reached Supabase yet is kept.
+    const remoteIds = new Set(incoming.reviews.map((r) => r.id));
+    current.reviews = [
+      ...incoming.reviews,
+      ...current.reviews.filter((r) => !remoteIds.has(r.id)),
+    ];
+    changed = true;
+  }
 
   if (incoming.tours && incoming.tours.length > 0) {
     current.tours = incoming.tours.map((inc) => {
@@ -153,7 +175,14 @@ export function applySupabaseData(incoming: {
  * Read-modify-write helper. The mutator receives the latest on-disk state, so
  * concurrent admin actions cannot clobber each other with stale reads.
  */
+let lastLocalWriteAt = 0;
+/** Timestamp of the latest local mutation; lets hydration drop stale remote reads. */
+export function localWriteAt(): number {
+  return lastLocalWriteAt;
+}
+
 export function updateDb<T>(mutator: (db: Database) => T): T {
+  lastLocalWriteAt = Date.now();
   const db = loadDb();
   const result = mutator(db);
   saveDb(db);

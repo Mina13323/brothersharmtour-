@@ -7,6 +7,7 @@
  */
 
 import { useRef, useState } from "react";
+import { Select } from "@/components/Select";
 import { Star, ImagePlus, X } from "lucide-react";
 import { useSite } from "./SiteProvider";
 
@@ -161,14 +162,14 @@ export function ReviewForm({
         </label>
         <label className="block">
           <span className="block text-[0.78rem] font-semibold text-ink mb-1.5">{t("review_which_trip", "Which trip?")}</span>
-          <select className="field" value={tourSlug} onChange={(e) => setTourSlug(e.target.value)}>
+          <Select className="field" value={tourSlug} onChange={(e) => setTourSlug(e.target.value)}>
             <option value="">{t("review_general", "General review")}</option>
             {tours.map((t) => (
               <option key={t.slug} value={t.slug}>
                 {t.title}
               </option>
             ))}
-          </select>
+          </Select>
         </label>
       </div>
 

@@ -13,15 +13,19 @@
 import "server-only";
 
 import { destinations as seedDestinations, destinationName } from "@/data/destinations";
+import { setExperienceRegistry } from "./labels";
 import { experiences as seedExperiences, experienceName } from "@/data/experiences";
 import type { Tour } from "@/lib/types";
 import { localizeGuideText } from "@/lib/i18n/guideTerms";
 import { slugify } from "@/lib/utils";
-import { applySupabaseData, loadDb, updateDb } from "./db";
+import { applySupabaseData, loadDb, localWriteAt, updateDb } from "./db";
 import {
   fetchToursFromSupabase,
   fetchPackagesFromSupabase,
   fetchSettingsFromSupabase,
+  fetchCollectionFromSupabase,
+  fetchReviewsFromSupabase,
+  syncCollectionToSupabase,
   syncTourToSupabase,
   syncPackageToSupabase,
   syncInquiryToSupabase,
@@ -51,7 +55,7 @@ const rid = () =>
   `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`;
 
 let lastHydratedAt = 0;
-const HYDRATE_INTERVAL_MS = 15000;
+const HYDRATE_INTERVAL_MS = 5000;
 
 /**
  * Ensures the CMS store is hydrated with the latest data from Supabase.
@@ -66,25 +70,41 @@ export async function ensureDbLoadedFromSupabase(force = false): Promise<void> {
   if (!force && ts - lastHydratedAt < HYDRATE_INTERVAL_MS) {
     return;
   }
+  // Give an in-flight save time to reach Supabase before reading it back.
+  if (ts - localWriteAt() < 3000) return;
   lastHydratedAt = ts;
 
   try {
-    const [tours, packages, settings] = await Promise.all([
+    const [tours, packages, settings, experiences, destinations, reviews] = await Promise.all([
       fetchToursFromSupabase(),
       fetchPackagesFromSupabase(),
       fetchSettingsFromSupabase(),
+      fetchCollectionFromSupabase<ExperienceRecord>("experiences"),
+      fetchCollectionFromSupabase<DestinationRecord>("destinations"),
+      fetchReviewsFromSupabase(),
     ]);
 
     const updates: {
       tours?: TourRecord[];
       packages?: PackageRecord[];
       settings?: Settings;
+      experiences?: ExperienceRecord[];
+      destinations?: DestinationRecord[];
+      reviews?: ReviewRecord[];
     } = {};
 
     if (tours && tours.length > 0) updates.tours = tours;
     if (packages) updates.packages = packages;
     if (settings && Object.keys(settings).length > 0) updates.settings = settings;
+    if (experiences && experiences.length > 0) updates.experiences = experiences;
+    if (destinations && destinations.length > 0) updates.destinations = destinations;
+    if (reviews && reviews.length > 0) updates.reviews = reviews;
 
+    // A CMS save landed while we were fetching: this read is stale, the next tick catches up.
+    if (localWriteAt() > ts) {
+      lastHydratedAt = 0;
+      return;
+    }
     if (Object.keys(updates).length > 0) {
       applySupabaseData(updates);
     }
@@ -120,19 +140,22 @@ export function slugTaken(slug: string, exceptId?: string): boolean {
 
 export function saveTour(input: Partial<TourRecord> & { slug: string }): TourRecord {
   return updateDb((db) => {
+    // The "new tour" form posts id: "". An empty id must never be stored (the
+    // record could not be opened for editing): treat it as "no id yet".
+    const inputId = String(input.id ?? "").trim() || undefined;
     const existing = db.tours.find(
-      (t) => t.id === input.id || (input.id === undefined && t.slug === input.slug),
+      (t) => (inputId !== undefined && t.id === inputId) || (inputId === undefined && t.slug === input.slug),
     );
     const ts = now();
     const record: TourRecord = {
       ...(existing ?? {
-        id: input.id ?? rid(),
+        id: inputId ?? rid(),
         createdAt: ts,
         status: "draft",
         translations: {},
       } as TourRecord),
       ...input,
-      id: existing?.id ?? input.id ?? rid(),
+      id: existing?.id ?? inputId ?? rid(),
       slug: input.slug,
       updatedAt: ts,
     } as TourRecord;
@@ -233,7 +256,24 @@ export function localizeTour(tour: TourRecord, lang?: string | null): Tour {
     included,
     excluded: t?.excluded?.length ? t.excluded : tour.excluded,
     bring: t?.bring?.length ? t.bring : tour.bring,
-    itinerary: t?.itinerary?.length ? t.itinerary : tour.itinerary,
+    // Only use a translated itinerary that lines up stop-for-stop with English;
+    // a half-matching list would show the wrong text under the wrong step.
+    itinerary:
+      t?.itinerary?.length === tour.itinerary.length
+        ? tour.itinerary.map((stop, i) => ({
+            ...stop,
+            time: overlay(stop.time ?? "", t.itinerary?.[i]?.time) || undefined,
+            title: overlay(stop.title, t.itinerary?.[i]?.title),
+            detail: overlay(stop.detail, t.itinerary?.[i]?.detail),
+          }))
+        : tour.itinerary,
+    duration: overlay(tour.duration ?? "", t?.duration) || null,
+    schedule: overlay(tour.schedule ?? "", t?.schedule) || undefined,
+    addons: tour.addons?.map((a, i) => ({
+      ...a,
+      label: overlay(a.label, t?.addons?.[i]?.label),
+      unit: overlay(a.unit ?? "", t?.addons?.[i]?.unit) || undefined,
+    })),
     importantInfo: t?.importantInfo?.length ? t.importantInfo : tour.importantInfo,
     restrictions: t?.restrictions?.length ? t.restrictions : tour.restrictions,
     meetingPoint: overlay(tour.meetingPoint, t?.meetingPoint),
@@ -577,14 +617,21 @@ export function destinationBySlug(slug: string): DestinationRecord | undefined {
   );
 }
 
+/** Keeps the shared label registry in step with the admin-managed categories. */
+function loadExperiences(): ExperienceRecord[] {
+  const list = loadDb().experiences;
+  setExperienceRegistry(list);
+  return list;
+}
+
 export function activeExperiences(): ExperienceRecord[] {
-  return loadDb()
-    .experiences.filter((e) => e.status === "published")
+  return loadExperiences()
+    .filter((e) => e.status === "published")
     .sort((a, b) => a.priority - b.priority);
 }
 
 export function allExperiences(): ExperienceRecord[] {
-  return loadDb().experiences;
+  return loadExperiences();
 }
 
 export function experienceBySlug(slug: string): ExperienceRecord | undefined {
@@ -611,6 +658,7 @@ export function saveDestination(input: Partial<DestinationRecord> & { slug: stri
     const idx = db.destinations.findIndex((d) => d.id === record.id);
     if (idx >= 0) db.destinations[idx] = record;
     else db.destinations.push(record);
+    syncCollectionToSupabase("destinations", db.destinations).catch(() => { });
     return record;
   });
 }
@@ -668,6 +716,7 @@ export function saveExperience(input: Partial<ExperienceRecord> & { slug: string
     const idx = db.experiences.findIndex((e) => e.id === record.id);
     if (idx >= 0) db.experiences[idx] = record;
     else db.experiences.push(record);
+    syncCollectionToSupabase("experiences", db.experiences).catch(() => { });
     return record;
   });
 }
@@ -684,7 +733,11 @@ export function deleteExperience(id: string): boolean {
   return updateDb((db) => {
     const before = db.experiences.length;
     db.experiences = db.experiences.filter((e) => e.id !== id);
-    return db.experiences.length < before;
+    const removed = db.experiences.length < before;
+    // An empty list is never pulled back (see applySupabaseData), so the last
+    // category can only be deleted locally — acceptable, categories are seeded.
+    if (removed) syncCollectionToSupabase("experiences", db.experiences).catch(() => { });
+    return removed;
   });
 }
 

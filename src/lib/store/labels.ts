@@ -179,12 +179,44 @@ export function destinationName(slug?: string | null, lang?: string | null): str
   return destinations.find((d) => d.slug === slug)?.name ?? slug.replace(/-/g, " ");
 }
 
+/**
+ * Admin-managed category names (Admin → Experience Categories), keyed by slug.
+ * Filled by the server (repo.ts) and by <SiteProvider> on the client, so every
+ * label on the site follows what the admin typed instead of the built-in seed
+ * vocabulary.
+ */
+let adminExperienceNames: Record<string, string> = {};
+
+export function setExperienceRegistry(list: { slug: string; name: string }[]) {
+  adminExperienceNames = Object.fromEntries(list.map((e) => [e.slug, e.name]));
+}
+
+/**
+ * Category slugs actually used by tours, in the admin's order (Experience
+ * Categories → sort order). Categories nobody has registered come last.
+ */
+export function orderCategorySlugs(used: string[], registered: { slug: string }[]): string[] {
+  const usedSet = new Set(used.filter(Boolean));
+  const ordered = registered.map((e) => e.slug).filter((s) => usedSet.has(s));
+  const rest = [...usedSet].filter((s) => !ordered.includes(s));
+  return [...ordered, ...rest];
+}
+
 export function experienceName(slug?: string | null, lang?: string | null): string {
   if (!slug) return lang === "ar" ? "رحلات وجولات" : "Excursion";
   const code = (lang || "en").toLowerCase();
-  const localized = LOCALIZED_EXPERIENCES[slug]?.[code];
-  if (localized) return localized;
-  return experiences.find((e) => e.slug === slug)?.name ?? slug.replace(/-/g, " ");
+  const seedName = experiences.find((e) => e.slug === slug)?.name;
+  const adminName = adminExperienceNames[slug];
+  // The built-in translations only apply while the admin has not renamed the
+  // category — a renamed category must show its new name in every language.
+  // English always shows exactly what the admin typed.
+  if (adminName && code === "en") return adminName;
+  const untouched = !adminName || adminName === seedName || adminName === LOCALIZED_EXPERIENCES[slug]?.en;
+  if (untouched) {
+    const localized = LOCALIZED_EXPERIENCES[slug]?.[code];
+    if (localized) return localized;
+  }
+  return adminName ?? seedName ?? slug.replace(/-/g, " ");
 }
 
 /** Duration buckets used by the tours filter bar (mirrors data/tours). */

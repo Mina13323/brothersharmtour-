@@ -1010,3 +1010,198 @@ body {
 
   --sidebar-ring: oklch(0.556 0 0);
 }
+/* ───────────────────────── Dropdowns (site-wide) ─────────────────────────
+   Every <select> gets the same chevron, spacing and readable option list, so
+   the storefront, the booking drawer and the admin all look like one product.
+   Kept unlayered on purpose: it must win over per-component utilities. */
+select:not([multiple]) {
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  text-overflow: ellipsis;
+  color-scheme: light;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none'><path d='M1 1.5 6 6.5l5-5' stroke='%236f6a60' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+  background-size: 12px 8px;
+  padding-right: 2.25rem;
+}
+select:not([multiple]):focus-visible {
+  outline: 2px solid var(--color-reef);
+  outline-offset: 2px;
+}
+select:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+select option,
+select optgroup {
+  background-color: #fff;
+  color: var(--color-ink);
+  font-size: 0.9375rem;
+  padding: 0.5rem 0.75rem;
+}
+select optgroup {
+  font-weight: 700;
+  color: var(--color-stone);
+}
+select option:checked {
+  background-color: color-mix(in srgb, var(--color-reef) 14%, #fff);
+}
+
+/* Admin (dark) variant */
+.admin-scope select:not([multiple]) {
+  color-scheme: dark;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none'><path d='M1 1.5 6 6.5l5-5' stroke='%23a8a29e' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+}
+.admin-scope select option,
+.admin-scope select optgroup {
+  background-color: #101c1f;
+  color: #e7e5e4;
+}
+.admin-scope select option:checked {
+  background-color: #0f766e;
+  color: #fff;
+}
+
+@keyframes select-pop {
+  from { opacity: 0; transform: translateY(-4px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ───────────────────────────── Preloader ───────────────────────────── */
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  background: var(--color-ink);
+  color: #fff;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+  /* No-JS / failed-hydration fallback: always leaves on its own. */
+  animation: preloader-failsafe 0.6s ease 5s forwards;
+}
+.preloader[data-hidden="true"] {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.preloader__scene {
+  position: relative;
+  width: min(15rem, 62vw);
+  height: 8.5rem;
+  overflow: hidden;
+  border-radius: 1.25rem;
+}
+.preloader__sun {
+  position: absolute;
+  left: 50%;
+  bottom: 1.6rem;
+  width: 4.5rem;
+  height: 4.5rem;
+  margin-left: -2.25rem;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgb(255 255 255 / 0.28), rgb(255 255 255 / 0.04) 70%);
+  opacity: 1;
+  animation: preloader-sun 2.4s ease-out both;
+}
+.preloader__boat {
+  position: absolute;
+  left: 50%;
+  bottom: 1.1rem;
+  width: 5.4rem;
+  margin-left: -2.7rem;
+  color: #fff;
+  transform-origin: 50% 90%;
+  animation: preloader-bob 2s ease-in-out infinite;
+}
+.preloader__waves {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 2.6rem;
+}
+.preloader__wave {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 200%;
+  height: 100%;
+}
+.preloader__wave--back {
+  color: color-mix(in srgb, var(--color-reef) 70%, var(--color-ink));
+  opacity: 0.9;
+  animation: preloader-wave 5s linear infinite reverse;
+}
+.preloader__wave--front {
+  color: var(--color-reef);
+  height: 78%;
+  animation: preloader-wave 3.2s linear infinite;
+}
+.preloader__name {
+  font-family: var(--font-display, inherit);
+  font-size: 0.8rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  opacity: 0.85;
+  animation: preloader-fade 1s ease 0.2s both;
+}
+.preloader__bar {
+  width: min(9rem, 40vw);
+  height: 3px;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: rgb(255 255 255 / 0.15);
+}
+.preloader__bar span {
+  display: block;
+  width: 45%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-sun);
+  animation: preloader-slide 1.25s ease-in-out infinite;
+}
+@keyframes preloader-bob {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-7px) rotate(3deg); }
+}
+@keyframes preloader-wave {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes preloader-sun {
+  from { transform: translateY(2.5rem); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+@keyframes preloader-slide {
+  from { transform: translateX(-110%); }
+  to { transform: translateX(260%); }
+}
+@keyframes preloader-fade {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 0.85; transform: none; }
+}
+@keyframes preloader-failsafe {
+  to { opacity: 0; visibility: hidden; pointer-events: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .preloader__boat,
+  .preloader__wave,
+  .preloader__bar span,
+  .preloader__sun { animation: none; }
+  .preloader__bar span { width: 100%; }
+}
+
+.install-prompt {
+  animation: install-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes install-in {
+  from { opacity: 0; transform: translateY(1.5rem); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .install-prompt { animation: none; }
+}

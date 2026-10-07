@@ -10,6 +10,9 @@ import { BookingProvider } from "@/components/BookingProvider";
 import { FloatingActions } from "@/components/FloatingActions";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { SiteProvider } from "@/components/SiteProvider";
+import { Preloader } from "@/components/Preloader";
+import { InstallPrompt } from "@/components/InstallPrompt";
+import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { OG_IMAGE } from "@/lib/media";
 import { getSiteView } from "@/lib/siteview";
 import { translatorFor } from "@/lib/i18n/server";
@@ -125,7 +128,7 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     icons: {
       icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
-      apple: [{ url: "/icon.svg" }],
+      apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180" }],
     },
   };
 }
@@ -178,7 +181,7 @@ export default async function RootLayout({
   return (
     <html
       lang={view.lang}
-      dir={view.lang === "ar" ? "rtl" : "ltr"}
+      dir={view.settings.languages.find((l) => l.code === view.lang)?.dir === "rtl" || view.lang === "ar" ? "rtl" : "ltr"}
       className={augsburg.variable}
     >
       <head>
@@ -208,6 +211,7 @@ export default async function RootLayout({
         />
       </head>
       <body>
+        <GoogleAnalytics />
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:rounded-pill focus:bg-ink focus:px-5 focus:py-3 focus:text-sm focus:text-paper"
@@ -218,15 +222,18 @@ export default async function RootLayout({
         <SiteProvider
           settings={view.settings}
           catalogue={view.catalogue}
+          experiences={view.experiences}
           currency={view.currency}
           lang={view.lang}
         >
+          <Preloader />
           <BookingProvider>
             <SmoothScroll />
             <Navbar />
             <main id="main">{children}</main>
             <Footer />
             <FloatingActions />
+            <InstallPrompt />
           </BookingProvider>
         </SiteProvider>
       </body>

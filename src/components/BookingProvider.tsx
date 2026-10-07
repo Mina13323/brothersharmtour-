@@ -11,12 +11,15 @@ import {
 } from "react";
 import { BookingWidget } from "./BookingWidget";
 import { useSite } from "./SiteProvider";
+import type { PackageSelection } from "@/lib/types";
 
 export interface BookingOptions {
   tripPackageId?: string;
   adults?: number;
   children?: number;
   infants?: number;
+  /** Several options booked together, each with its own party. */
+  selections?: PackageSelection[];
 }
 
 interface BookingContextValue {

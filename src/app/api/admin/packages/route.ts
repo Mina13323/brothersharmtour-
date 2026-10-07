@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { isAdmin } from "@/lib/auth";
-import { allPackages, savePackage } from "@/lib/store/repo";
+import { allPackages, packageById, savePackage } from "@/lib/store/repo";
 import { syncPackageToSupabase } from "@/lib/store/supabaseSync";
+import { queuePackageTranslation } from "@/lib/translate/packageServer";
 import { slugify } from "@/lib/utils";
 
 /** Admin packages: list (incl. drafts) + create. */
@@ -45,7 +46,8 @@ export async function POST(request: Request) {
   });
 
   await syncPackageToSupabase(pkg).catch(() => {});
+  queuePackageTranslation(pkg.id);
 
-  return NextResponse.json({ ok: true, package: pkg }, { status: 201 });
+  return NextResponse.json({ ok: true, package: packageById(pkg.id) ?? pkg }, { status: 201 });
 }
 

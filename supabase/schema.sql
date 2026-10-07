@@ -157,6 +157,7 @@ UPDATE public.reviews SET submitted_at = created_at WHERE submitted_at IS NULL;
 
 ALTER TABLE public.tours ADD COLUMN IF NOT EXISTS child_price numeric;
 ALTER TABLE public.tours ADD COLUMN IF NOT EXISTS translations jsonb DEFAULT '{}'::jsonb;
+ALTER TABLE public.tours ADD COLUMN IF NOT EXISTS translation_meta jsonb NOT NULL DEFAULT '{}'::jsonb;
 ALTER TABLE public.tours ADD COLUMN IF NOT EXISTS price_overrides jsonb DEFAULT '{}'::jsonb;
 ALTER TABLE public.tours ADD COLUMN IF NOT EXISTS video jsonb;
 ALTER TABLE public.tours ADD COLUMN IF NOT EXISTS pickup_time text;

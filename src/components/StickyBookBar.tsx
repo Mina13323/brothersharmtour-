@@ -33,6 +33,7 @@ export function StickyBookBar({
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  const isUnit = selectedPackage?.pricingMode === "unit";
   const price = selectedPackage ? selectedPackage.adultPrice : tour.priceFrom;
   const childPrice = selectedPackage
     ? (selectedPackage.childPrice ?? null)
@@ -62,8 +63,10 @@ export function StickyBookBar({
                       resolved from the record's own stored currency. */}
                   {money(price, selectedPackage ? undefined : tour.priceOverrides, tour.currency)}
                 </span>{" "}
-                <span className="text-stone/90 text-xs">({t("price_adult", "Adult")})</span>
-                {typeof childPrice === "number" && childPrice >= 0 && (
+                <span className="text-stone/90 text-xs">
+                  {isUnit ? `/ ${selectedPackage?.unitLabel?.trim() || "item"}` : `(${t("price_adult", "Adult")})`}
+                </span>
+                {!isUnit && typeof childPrice === "number" && childPrice >= 0 && (
                   <span className="inline-flex items-center gap-1">
                     <span className="text-sand/90">·</span>
                     <span className="font-display font-semibold text-ink text-sm">
@@ -74,7 +77,7 @@ export function StickyBookBar({
                     </span>
                   </span>
                 )}
-                {(() => {
+                {isUnit ? null : (() => {
                   const infant = selectedPackage
                     ? (selectedPackage.infantPrice ?? tour.infantPrice ?? 0)
                     : (tour.infantPrice ?? 0);

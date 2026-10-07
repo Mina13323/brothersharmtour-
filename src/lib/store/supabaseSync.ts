@@ -132,6 +132,7 @@ export function tourToRow(tour: TourRecord): Record<string, unknown> {
     faq: tour.faq || [],
     related: tour.related || [],
     translations: tour.translations || {},
+    translation_meta: tour.translationMeta || {},
     verified: Boolean(tour.verified),
     featured: Boolean(tour.featured),
     priority: tour.priority || 100,
@@ -153,7 +154,8 @@ export function rowToTour(r: Record<string, unknown>): TourRecord {
       : [];
 
   return {
-    id: String(r.id),
+    // A row saved with an empty id could never be opened in the admin: use the slug instead.
+    id: String(r.id || r.slug),
     slug: String(r.slug),
     title: String(r.title || ""),
     destination: (r.destination as string) || "sharm-el-sheikh",
@@ -193,6 +195,7 @@ export function rowToTour(r: Record<string, unknown>): TourRecord {
     faq: Array.isArray(r.faq) ? (r.faq as TourRecord["faq"]) : [],
     related: Array.isArray(r.related) ? (r.related as string[]) : [],
     translations: r.translations && typeof r.translations === "object" ? (r.translations as TourRecord["translations"]) : {},
+    translationMeta: r.translation_meta && typeof r.translation_meta === "object" ? (r.translation_meta as TourRecord["translationMeta"]) : {},
     verified: Boolean(r.verified),
     featured: Boolean(r.featured),
     priority: r.priority != null ? Number(r.priority) : 100,
@@ -234,6 +237,8 @@ export function pkgToRow(pkg: PackageRecord): Record<string, unknown> {
       category: pkg.category || "sea-water",
       categories: pkg.categories || [pkg.category || "sea-water"],
       includedTours: pkg.includedTours || [],
+      // No dedicated column: the seo JSON already carries package overflow fields.
+      translationMeta: pkg.translationMeta || {},
       ...agePricingToColumns(pkg),
     },
     updated_at: new Date().toISOString(),
@@ -252,7 +257,8 @@ export function rowToPackage(r: Record<string, unknown>): PackageRecord {
       : [];
 
   return {
-    id: String(r.id),
+    // A row saved with an empty id could never be opened in the admin: use the slug instead.
+    id: String(r.id || r.slug),
     slug: String(r.slug),
     tourId: (r.tour_id as string) || null,
     tourSlug: (r.tour_slug as string) || null,
@@ -281,6 +287,10 @@ export function rowToPackage(r: Record<string, unknown>): PackageRecord {
     priority: r.priority != null ? Number(r.priority) : 100,
     createdAt: (r.created_at as string) || new Date().toISOString(),
     updatedAt: (r.updated_at as string) || new Date().toISOString(),
+    translationMeta:
+      seo.translationMeta && typeof seo.translationMeta === "object"
+        ? (seo.translationMeta as PackageRecord["translationMeta"])
+        : {},
     seo: (r.seo as PackageRecord["seo"]) || undefined,
   };
 }
@@ -297,6 +307,8 @@ const NEW_AGE_PRICING_COLS = [
 
 function stripPendingColumns(row: Record<string, unknown>): Record<string, unknown> {
   const clone = { ...row };
+  // Added by supabase/migrations/20261005_translation_meta.sql — optional until applied.
+  delete clone.translation_meta;
   for (const c of NEW_AGE_PRICING_COLS) {
     delete clone[c];
   }
@@ -321,15 +333,28 @@ async function postToSupabase(endpoint: string, body: unknown, preferMerge = tru
       if (res.status === 404 && err.includes("PGRST205")) {
         console.warn(`[Supabase Sync] Table not yet created in Supabase schema. Run supabase/schema.sql in Supabase SQL editor.`);
       } else if (res.status === 400 && err.includes("PGRST204") && typeof body === "object" && body !== null && !Array.isArray(body)) {
-        // Schema cache missing column: retry with legacy columns (fields are preserved in .seo)
-        const stripped = stripPendingColumns(body as Record<string, unknown>);
-        const retryRes = await fetch(url, {
-          method: "POST",
-          headers,
-          body: JSON.stringify(stripped),
-        });
-        if (!retryRes.ok) {
-          console.warn(`[Supabase Sync Note] ${endpoint} returned status ${retryRes.status}:`, (await retryRes.text().catch(() => "")).slice(0, 150));
+        // Schema cache missing column(s): the live table is older than schema.sql.
+        // Drop the named column and retry (up to 8 times) so the record still
+        // saves; run the supabase/migrations SQL to add the columns for good.
+        let row = stripPendingColumns(body as Record<string, unknown>);
+        let lastErr = err;
+        for (let attempt = 0; attempt < 8; attempt++) {
+          const retryRes = await fetch(url, { method: "POST", headers, body: JSON.stringify(row) });
+          if (retryRes.ok) {
+            lastErr = "";
+            break;
+          }
+          lastErr = await retryRes.text().catch(() => "");
+          const missing = lastErr.match(/Could not find the '([a-z_]+)' column/)?.[1];
+          if (retryRes.status === 400 && missing && missing in row) {
+            const { [missing]: _dropped, ...rest } = row;
+            row = rest;
+            continue;
+          }
+          break;
+        }
+        if (lastErr) {
+          console.warn(`[Supabase Sync Note] ${endpoint} could not be saved:`, lastErr.slice(0, 150));
         }
       } else {
         console.warn(`[Supabase Sync Note] ${endpoint} returned status ${res.status}:`, err.slice(0, 150));
@@ -391,6 +416,75 @@ export async function fetchSettingsFromSupabase(): Promise<Settings | null> {
     const rows = await res.json();
     if (!Array.isArray(rows) || rows.length === 0) return null;
     return rows[0].data as Settings;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Collections with no table of their own (experience categories, destinations)
+ * are stored as one JSON document each in the existing `settings` table, under
+ * ids "experiences" / "destinations". No schema migration is required, and the
+ * CMS edits survive serverless cold starts and redeploys exactly like tours do.
+ */
+export type SyncedCollection = "experiences" | "destinations";
+
+export async function fetchCollectionFromSupabase<T>(id: SyncedCollection): Promise<T[] | null> {
+  if (!isSupabaseConfigured()) return null;
+  try {
+    const url = `${SUPABASE_URL.replace(/\/+$/, "")}/rest/v1/settings?id=eq.${id}&select=*`;
+    const res = await fetch(url, { method: "GET", headers: getHeaders(false), cache: "no-store" });
+    if (!res.ok) return null;
+    const rows = await res.json();
+    if (!Array.isArray(rows) || rows.length === 0) return null;
+    const data = rows[0].data;
+    return Array.isArray(data) ? (data as T[]) : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function syncCollectionToSupabase(id: SyncedCollection, items: unknown[]): Promise<void> {
+  await postToSupabase(
+    "settings?on_conflict=id",
+    { id, data: items, updated_at: new Date().toISOString() },
+    true,
+  );
+}
+
+export function rowToReview(r: Record<string, unknown>): ReviewRecord {
+  const iso = (v: unknown) => (typeof v === "string" && v ? v : undefined);
+  const status =
+    r.status === "approved" || r.status === "rejected" || r.status === "hidden" ? r.status : "pending";
+  return {
+    id: String(r.id),
+    tourSlug: (r.tour_slug as string) || null,
+    name: String(r.name || ""),
+    email: (r.email as string) || "",
+    country: (r.country as string) || undefined,
+    rating: r.rating != null ? Number(r.rating) : 5,
+    title: (r.title as string) || undefined,
+    body: String(r.body || ""),
+    bookingRef: (r.booking_ref as string) || undefined,
+    photos: Array.isArray(r.photos) ? (r.photos as string[]) : [],
+    status: status as ReviewRecord["status"],
+    verified: Boolean(r.verified),
+    adminNotes: (r.admin_notes as string) || undefined,
+    submittedAt: iso(r.submitted_at) ?? iso(r.created_at) ?? new Date().toISOString(),
+    reviewedAt: iso(r.reviewed_at),
+    publishedAt: iso(r.published_at),
+  };
+}
+
+export async function fetchReviewsFromSupabase(): Promise<ReviewRecord[] | null> {
+  if (!isSupabaseConfigured()) return null;
+  try {
+    const url = `${SUPABASE_URL.replace(/\/+$/, "")}/rest/v1/reviews?select=*&limit=1000`;
+    const res = await fetch(url, { method: "GET", headers: getHeaders(false), cache: "no-store" });
+    if (!res.ok) return null;
+    const rows = await res.json();
+    if (!Array.isArray(rows)) return null;
+    return rows.map(rowToReview);
   } catch {
     return null;
   }

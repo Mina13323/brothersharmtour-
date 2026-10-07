@@ -23,6 +23,18 @@ export interface TranslationDictionary {
   nav_search: string;
   nav_tours: string;
   nav_packages: string;
+
+  install_title: string;
+
+  install_text: string;
+
+  install_button: string;
+
+  install_dismiss: string;
+
+  install_ios_tap: string;
+
+  install_ios_then: string;
   nav_contact: string;
   nav_about: string;
   nav_videos: string;
@@ -110,6 +122,7 @@ export interface TranslationDictionary {
   section_included: string;
   section_excluded: string;
   section_itinerary: string;
+  itinerary_step: string;
   section_meeting: string;
   pickup_time_hint: string;
   section_bring: string;
@@ -145,6 +158,9 @@ export interface TranslationDictionary {
 
   // Tiered Pricing, Guests & Packages additions
   select_package_option: string;
+  subtotal: string;
+  select_package_multi_hint: string;
+  validation_select_option: string;
   free: string;
   party_group: string;
   party_couples: string;
@@ -612,6 +628,18 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     nav_search: "Search",
     nav_tours: "Tours",
     nav_packages: "Packages",
+
+    install_title: "Get our app",
+
+    install_text: "Add {name} to your home screen — open it like an app, with one tap, even on a slow connection.",
+
+    install_button: "Install app",
+
+    install_dismiss: "Not now",
+
+    install_ios_tap: "Tap",
+
+    install_ios_then: "then “Add to Home Screen”",
     nav_contact: "Contact",
     nav_about: "About",
     nav_videos: "Videos",
@@ -700,6 +728,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     section_included: "What's included",
     section_excluded: "Not included",
     section_itinerary: "Itinerary",
+    itinerary_step: "Step",
     section_meeting: "Meeting & pickup",
     pickup_time_hint: "We confirm your exact pickup time once we know your hotel — usually the evening before.",
     section_bring: "What to bring",
@@ -722,7 +751,10 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     tab_transfers: "Transfers",
     no_tours_found_in_category: "No tours currently available in this category.",
 
-    select_package_option: "Select Package Option",
+    select_package_option: "Select Package Option",
+    subtotal: "Subtotal",
+    select_package_multi_hint: "Add guests to one option, or to several to book them together.",
+    validation_select_option: "Please add guests to at least one option.",
     free: "Free",
     party_group: "Group",
     party_couples: "Couples",
@@ -1189,6 +1221,18 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     nav_search: "بحث",
     nav_tours: "رحلاتنا",
     nav_packages: "الباقات",
+
+    install_title: "حمّل تطبيقنا",
+
+    install_text: "أضِف {name} إلى شاشتك الرئيسية — افتحه كتطبيق بلمسة واحدة حتى مع الإنترنت البطيء.",
+
+    install_button: "تثبيت التطبيق",
+
+    install_dismiss: "ليس الآن",
+
+    install_ios_tap: "اضغط",
+
+    install_ios_then: "ثم «إضافة إلى الشاشة الرئيسية»",
     nav_contact: "اتصل بنا",
     nav_about: "من نحن",
     nav_videos: "فيديوهات",
@@ -1277,6 +1321,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     section_included: "البرنامج يشمل",
     section_excluded: "البرنامج لا يشمل",
     section_itinerary: "خط سير الرحلة والمحطات",
+    itinerary_step: "الخطوة",
     section_meeting: "نقطة التجمع وموعد التحرك",
     pickup_time_hint: "نؤكد لك موعد التحرك المحدد من فندقك بمجرد معرفة الفندق — عادةً في المساء السابق للرحلة.",
     section_bring: "ما يجب إحضاره معك",
@@ -1299,7 +1344,10 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     tab_transfers: "التوصيلات",
     no_tours_found_in_category: "لا توجد رحلات متاحة حالياً في هذا القسم.",
 
-    select_package_option: "اختر باقة الرحلة",
+    select_package_option: "اختر باقة الرحلة",
+    subtotal: "المجموع الفرعي",
+    select_package_multi_hint: "أضف ضيوفًا إلى خيار واحد أو عدة خيارات لحجزها معًا.",
+    validation_select_option: "يرجى إضافة ضيوف إلى خيار واحد على الأقل.",
     free: "مجاناً",
     party_group: "مجموعة",
     party_couples: "شخصين (كابلز)",
@@ -1766,6 +1814,18 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     nav_search: "Suche",
     nav_tours: "Touren",
     nav_packages: "Pakete",
+
+    install_title: "Unsere App holen",
+
+    install_text: "Fügen Sie {name} Ihrem Startbildschirm hinzu — öffnen Sie es wie eine App, mit einem Tipp, auch bei langsamer Verbindung.",
+
+    install_button: "App installieren",
+
+    install_dismiss: "Nicht jetzt",
+
+    install_ios_tap: "Tippen Sie auf",
+
+    install_ios_then: "dann „Zum Home-Bildschirm“",
     nav_contact: "Kontakt",
     nav_about: "Über uns",
     nav_videos: "Videos",
@@ -1854,6 +1914,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     section_included: "Inbegriffen",
     section_excluded: "Nicht inbegriffen",
     section_itinerary: "Ablauf & Stationen",
+    itinerary_step: "Schritt",
     section_meeting: "Treffpunkt & Abholung",
     pickup_time_hint: "Wir bestätigen Ihre genaue Abholzeit am Vorabend, sobald wir Ihr Hotel kennen.",
     section_bring: "Mitzubringen",
@@ -1876,7 +1937,10 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     tab_transfers: "Transfers",
     no_tours_found_in_category: "In dieser Kategorie sind derzeit keine Touren verfügbar.",
 
-    select_package_option: "Paket-Option wählen",
+    select_package_option: "Paket-Option wählen",
+    subtotal: "Zwischensumme",
+    select_package_multi_hint: "Fügen Sie Gäste zu einer oder mehreren Optionen hinzu, um sie zusammen zu buchen.",
+    validation_select_option: "Bitte fügen Sie mindestens einer Option Gäste hinzu.",
     free: "Kostenlos",
     party_group: "Gruppe",
     party_couples: "Paare",
@@ -2343,6 +2407,18 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     nav_search: "Cerca",
     nav_tours: "Tour",
     nav_packages: "Pacchetti",
+
+    install_title: "Scarica la nostra app",
+
+    install_text: "Aggiungi {name} alla schermata Home — aprila come un'app, con un tocco, anche con connessione lenta.",
+
+    install_button: "Installa l'app",
+
+    install_dismiss: "Non ora",
+
+    install_ios_tap: "Tocca",
+
+    install_ios_then: "poi «Aggiungi alla schermata Home»",
     nav_contact: "Contatti",
     nav_about: "Chi siamo",
     nav_videos: "Video",
@@ -2431,6 +2507,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     section_included: "Cosa è incluso",
     section_excluded: "Non incluso",
     section_itinerary: "Itinerario",
+    itinerary_step: "Fase",
     section_meeting: "Punto di incontro e ritiro",
     pickup_time_hint: "Confermiamo l'orario esatto di ritiro la sera prima una volta noto il tuo hotel.",
     section_bring: "Cosa portare",
@@ -2453,7 +2530,10 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     tab_transfers: "Transfer",
     no_tours_found_in_category: "Nessun tour attualmente disponibile in questa categoria.",
 
-    select_package_option: "Seleziona opzione pacchetto",
+    select_package_option: "Seleziona opzione pacchetto",
+    subtotal: "Subtotale",
+    select_package_multi_hint: "Aggiungi ospiti a una o più opzioni per prenotarle insieme.",
+    validation_select_option: "Aggiungi ospiti ad almeno un'opzione.",
     free: "Gratis",
     party_group: "Gruppo",
     party_couples: "Coppie",
@@ -2920,6 +3000,18 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     nav_search: "Szukaj",
     nav_tours: "Wycieczki",
     nav_packages: "Pakiety",
+
+    install_title: "Pobierz naszą aplikację",
+
+    install_text: "Dodaj {name} do ekranu głównego — otwieraj jak aplikację jednym dotknięciem, nawet przy wolnym łączu.",
+
+    install_button: "Zainstaluj aplikację",
+
+    install_dismiss: "Nie teraz",
+
+    install_ios_tap: "Stuknij",
+
+    install_ios_then: "a potem „Dodaj do ekranu głównego”",
     nav_contact: "Kontakt",
     nav_about: "O nas",
     nav_videos: "Wideo",
@@ -3008,6 +3100,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     section_included: "Co jest w cenie",
     section_excluded: "Nie wliczone w cenę",
     section_itinerary: "Plan wycieczki",
+    itinerary_step: "Krok",
     section_meeting: "Zbiórka i transfer",
     pickup_time_hint: "Dokładną godzinę odbioru z hotelu potwierdzamy zazwyczaj wieczorem dzień wcześniej.",
     section_bring: "Co zabrać ze sobą",
@@ -3030,7 +3123,10 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     tab_transfers: "Transfery",
     no_tours_found_in_category: "Brak dostępnych wycieczek w tej kategorii.",
 
-    select_package_option: "Wybierz opcję pakietu",
+    select_package_option: "Wybierz opcję pakietu",
+    subtotal: "Suma częściowa",
+    select_package_multi_hint: "Dodaj gości do jednej lub kilku opcji, aby zarezerwować je razem.",
+    validation_select_option: "Dodaj gości do co najmniej jednej opcji.",
     free: "Bezpłatnie",
     party_group: "Grupa",
     party_couples: "Pary",
@@ -3497,6 +3593,18 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     nav_search: "Поиск",
     nav_tours: "Экскурсии",
     nav_packages: "Пакеты",
+
+    install_title: "Установите наше приложение",
+
+    install_text: "Добавьте {name} на главный экран — открывайте как приложение одним касанием, даже при медленном интернете.",
+
+    install_button: "Установить",
+
+    install_dismiss: "Не сейчас",
+
+    install_ios_tap: "Нажмите",
+
+    install_ios_then: "затем «На экран «Домой»»",
     nav_contact: "Контакты",
     nav_about: "О нас",
     nav_videos: "Видео",
@@ -3585,6 +3693,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     section_included: "В стоимость включено",
     section_excluded: "В стоимость не включено",
     section_itinerary: "Программа и маршрут",
+    itinerary_step: "Шаг",
     section_meeting: "Встреча и трансфер",
     pickup_time_hint: "Точное время выезда из отеля мы подтверждаем накануне вечером.",
     section_bring: "Что взять с собой",
@@ -3607,7 +3716,10 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     tab_transfers: "Трансферы",
     no_tours_found_in_category: "В этой категории пока нет доступных экскурсий.",
 
-    select_package_option: "Выберите вариант пакета",
+    select_package_option: "Выберите вариант пакета",
+    subtotal: "Промежуточный итог",
+    select_package_multi_hint: "Добавьте гостей к одному или нескольким вариантам, чтобы забронировать их вместе.",
+    validation_select_option: "Добавьте гостей хотя бы к одному варианту.",
     free: "Бесплатно",
     party_group: "Группа",
     party_couples: "Пара (2 чел.)",
@@ -4074,6 +4186,18 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     nav_search: "Пошук",
     nav_tours: "Екскурсії",
     nav_packages: "Пакети",
+
+    install_title: "Встановіть наш застосунок",
+
+    install_text: "Додайте {name} на головний екран — відкривайте як застосунок одним дотиком, навіть при повільному інтернеті.",
+
+    install_button: "Встановити",
+
+    install_dismiss: "Не зараз",
+
+    install_ios_tap: "Натисніть",
+
+    install_ios_then: "потім «На початковий екран»",
     nav_contact: "Контакти",
     nav_about: "Про нас",
     nav_videos: "Відео",
@@ -4162,6 +4286,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     section_included: "У вартість включено",
     section_excluded: "Не входить у вартість",
     section_itinerary: "Маршрут та зупинки",
+    itinerary_step: "Крок",
     section_meeting: "Зустріч та трансфер",
     pickup_time_hint: "Точний час виїзду з готелю ми підтверджуємо напередодні ввечері.",
     section_bring: "Що взяти з собою",
@@ -4184,7 +4309,10 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     tab_transfers: "Трансфери",
     no_tours_found_in_category: "У цій категорії наразі немає доступних екскурсій.",
 
-    select_package_option: "Оберіть варіант пакета",
+    select_package_option: "Оберіть варіант пакета",
+    subtotal: "Проміжна сума",
+    select_package_multi_hint: "Додайте гостей до одного або кількох варіантів, щоб забронювати їх разом.",
+    validation_select_option: "Додайте гостей принаймні до одного варіанта.",
     free: "Безкоштовно",
     party_group: "Група",
     party_couples: "Пара (2 особи)",
@@ -4651,6 +4779,18 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     nav_search: "Recherche",
     nav_tours: "Excursions",
     nav_packages: "Forfaits",
+
+    install_title: "Installez notre appli",
+
+    install_text: "Ajoutez {name} à votre écran d'accueil — ouvrez-le comme une appli, en un geste, même avec une connexion lente.",
+
+    install_button: "Installer l'appli",
+
+    install_dismiss: "Pas maintenant",
+
+    install_ios_tap: "Appuyez sur",
+
+    install_ios_then: "puis « Sur l'écran d'accueil »",
     nav_contact: "Contact",
     nav_about: "À propos",
     nav_videos: "Vidéos",
@@ -4739,6 +4879,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     section_included: "Ce qui est inclus",
     section_excluded: "Non inclus",
     section_itinerary: "Itinéraire",
+    itinerary_step: "Étape",
     section_meeting: "Point de rencontre et prise en charge",
     pickup_time_hint: "Nous confirmons l'heure exacte de départ de votre hôtel la veille au soir.",
     section_bring: "Ce qu'il faut apporter",
@@ -4761,7 +4902,10 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     tab_transfers: "Transferts",
     no_tours_found_in_category: "Aucune excursion disponible dans cette catégorie pour le moment.",
 
-    select_package_option: "Choisir une formule",
+    select_package_option: "Choisir une formule",
+    subtotal: "Sous-total",
+    select_package_multi_hint: "Ajoutez des voyageurs à une ou plusieurs formules pour les réserver ensemble.",
+    validation_select_option: "Veuillez ajouter des voyageurs à au moins une formule.",
     free: "Gratuit",
     party_group: "Groupe",
     party_couples: "Couples",
@@ -5228,6 +5372,18 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     nav_search: "Căutare",
     nav_tours: "Excursii",
     nav_packages: "Pachete",
+
+    install_title: "Instalează aplicația",
+
+    install_text: "Adaugă {name} pe ecranul principal — deschide-l ca pe o aplicație, dintr-o atingere, chiar și cu internet lent.",
+
+    install_button: "Instalează aplicația",
+
+    install_dismiss: "Nu acum",
+
+    install_ios_tap: "Atinge",
+
+    install_ios_then: "apoi „Adaugă pe ecranul principal”",
     nav_contact: "Contact",
     nav_about: "Despre noi",
     nav_videos: "Video",
@@ -5316,6 +5472,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     section_included: "Ce este inclus",
     section_excluded: "Nu este inclus",
     section_itinerary: "Itinerariu",
+    itinerary_step: "Pasul",
     section_meeting: "Punct de întâlnire și preluare",
     pickup_time_hint: "Confirmăm ora exactă de preluare de la hotel în seara dinaintea excursiei.",
     section_bring: "Ce să aduceți cu dvs.",
@@ -5338,7 +5495,10 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     tab_transfers: "Transferuri",
     no_tours_found_in_category: "Nu există excursii disponibile în această categorie în prezent.",
 
-    select_package_option: "Selectați opțiunea de pachet",
+    select_package_option: "Selectați opțiunea de pachet",
+    subtotal: "Subtotal",
+    select_package_multi_hint: "Adăugați participanți la una sau mai multe opțiuni pentru a le rezerva împreună.",
+    validation_select_option: "Adăugați participanți la cel puțin o opțiune.",
     free: "Gratuit",
     party_group: "Grup",
     party_couples: "Cupluri",
@@ -5805,6 +5965,18 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     nav_search: "Zoeken",
     nav_tours: "Tours",
     nav_packages: "Pakketten",
+
+    install_title: "Haal onze app",
+
+    install_text: "Zet {name} op je beginscherm — open het als een app, met één tik, ook bij een trage verbinding.",
+
+    install_button: "App installeren",
+
+    install_dismiss: "Niet nu",
+
+    install_ios_tap: "Tik op",
+
+    install_ios_then: "en dan „Zet op beginscherm”",
     nav_contact: "Contact",
     nav_about: "Over ons",
     nav_videos: "Video's",
@@ -5893,6 +6065,7 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     section_included: "Wat is inbegrepen",
     section_excluded: "Niet inbegrepen",
     section_itinerary: "Programma & route",
+    itinerary_step: "Stap",
     section_meeting: "Ontmoetingspunt & ophaalservice",
     pickup_time_hint: "We bevestigen uw exacte ophaaltijd bij uw hotel de avond ervoor.",
     section_bring: "Wat mee te nemen",
@@ -5915,7 +6088,10 @@ export const TRANSLATIONS: Record<SupportedLanguage, TranslationDictionary> = {
     tab_transfers: "Transfers",
     no_tours_found_in_category: "Momenteel geen tours beschikbaar in deze categorie.",
 
-    select_package_option: "Kies pakketoptie",
+    select_package_option: "Kies pakketoptie",
+    subtotal: "Subtotaal",
+    select_package_multi_hint: "Voeg gasten toe aan één of meerdere opties om ze samen te boeken.",
+    validation_select_option: "Voeg gasten toe aan minstens één optie.",
     free: "Gratis",
     party_group: "Groep",
     party_couples: "Koppels",

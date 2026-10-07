@@ -6,41 +6,47 @@
  * Packages follow the tour design language on the public site.
  */
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Select } from "@/components/Select";
 import { useRouter } from "next/navigation";
-import { Save, Plus, Trash2, ArrowUp, ArrowDown, Sparkles } from "lucide-react";
+import { Save, Plus, Trash2, ArrowUp, ArrowDown, Sparkles, RefreshCw } from "lucide-react";
 
 import type { PackageRecord, TourRecord, Settings } from "@/lib/store/types";
 import { destinationName, experienceName } from "@/lib/store/labels";
 import { MediaGalleryEditor, SingleImageUploader } from "./MediaGalleryEditor";
 import { AgePricingFields, MoneyHint, TieredPricingEditor } from "./PricingControls";
 import { input, Section, Field, ListEditor, AppearsOn } from "./fields";
+import { TranslationProviderStatus } from "./TranslationProviderStatus";
 
 const DESTINATIONS = ["sharm-el-sheikh", "cairo"];
-const CATEGORIES = [
-  "sea-water",
-  "desert",
-  "adventure",
-  "culture",
-  "wildlife",
-  "leisure",
-  "private-transfers",
-];
 
 export default function PackageEditor({
   initialPackage,
   baseCurrency,
   settings,
   tours = [],
+  categories = [],
   isNew,
 }: {
   initialPackage: PackageRecord;
   baseCurrency: string;
   settings?: Settings;
   tours?: TourRecord[];
+  /** Admin-managed categories (Admin → Experience Categories). */
+  categories?: { slug: string; name: string }[];
   isNew: boolean;
 }) {
   const router = useRouter();
+  // Registered categories first, plus any slug this package already uses.
+  const CATEGORIES = Array.from(
+    new Set([
+      ...categories.map((c) => c.slug),
+      ...(initialPackage.categories ?? []),
+      ...(initialPackage.category ? [initialPackage.category] : []),
+    ]),
+  ).filter(Boolean) as string[];
+  const catLabel = (slug: string) =>
+    categories.find((c) => c.slug === slug)?.name ?? experienceName(slug);
   const [pkg, setPkg] = useState<PackageRecord>(() => ({
     ...initialPackage,
     destination: initialPackage.destination || "sharm-el-sheikh",
@@ -62,6 +68,19 @@ export default function PackageEditor({
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
   const [lang, setLang] = useState("en");
+  /** Fields a human edited this session, per language: sent on Save so the server keeps them manual. */
+  const [trEdits, setTrEdits] = useState<Record<string, Partial<PackageRecord>>>({});
+  const [trBusy, setTrBusy] = useState(false);
+  const trEditsRef = useRef(trEdits);
+  trEditsRef.current = trEdits;
+
+  /** "translating" older than this is a crashed job, not live work. */
+  const langIsTranslating = (code: string) => {
+    const m = pkg.translationMeta?.[code];
+    return m?.status === "translating" && Date.now() - new Date(m.at ?? 0).getTime() < 10 * 60_000;
+  };
+  const anyTranslating = Object.keys(pkg.translationMeta ?? {}).some(langIsTranslating);
+  const failedLangs = Object.entries(pkg.translationMeta ?? {}).filter(([, m]) => m.status === "failed" && m.error);
 
 
   const set = <K extends keyof PackageRecord>(key: K, value: PackageRecord[K]) =>
@@ -84,6 +103,7 @@ export default function PackageEditor({
   };
 
   const setTr = (langCode: string, patch: Partial<PackageRecord>) => {
+    setTrEdits((e) => ({ ...e, [langCode]: { ...(e[langCode] ?? {}), ...patch } }));
     setPkg((p) => ({
       ...p,
       translations: {
@@ -188,6 +208,13 @@ export default function PackageEditor({
     setMessage(null);
     try {
       const payload: Record<string, unknown> = { ...pkg };
+      if (!isNew) {
+        // Never send whole translation blobs: machine output may have landed
+        // since this page loaded. Send only what a human edited.
+        delete payload.translations;
+        delete payload.translationMeta;
+        payload.translationEdits = trEdits;
+      }
       if (publish !== undefined) payload.status = publish ? "published" : "draft";
       const res = await fetch(
         isNew ? "/api/admin/packages" : `/api/admin/packages/${pkg.id}`,
@@ -202,6 +229,7 @@ export default function PackageEditor({
         setMessage({ kind: "err", text: data.message ?? "Save failed." });
         return;
       }
+      setTrEdits({});
       setMessage({ kind: "ok", text: "Saved successfully." });
       if (isNew && data.package?.id) {
         router.replace(`/admin/packages/${data.package.id}`);
@@ -213,6 +241,62 @@ export default function PackageEditor({
       setMessage({ kind: "err", text: "Network error — nothing was saved." });
     } finally {
       setBusy(false);
+    }
+  }
+
+  /** Pull machine-translation progress without touching other fields. */
+  const refreshTranslations = useCallback(async () => {
+    if (isNew) return;
+    try {
+      const res = await fetch(`/api/admin/packages/${initialPackage.id}`, { cache: "no-store" });
+      if (!res.ok) return;
+      const { package: fresh } = (await res.json()) as { package?: PackageRecord };
+      if (!fresh) return;
+      setPkg((p) => {
+        const translations = { ...(fresh.translations ?? {}) };
+        const meta = { ...(fresh.translationMeta ?? {}) };
+        // Keep unsaved human edits on top of what the server has.
+        for (const [code, fields] of Object.entries(trEditsRef.current)) {
+          translations[code] = { ...(translations[code] ?? {}), ...fields };
+          const cur = meta[code] ?? { auto_fields: [], source_hashes: {} };
+          meta[code] = { ...cur, auto_fields: (cur.auto_fields ?? []).filter((f) => !(f in fields)) };
+        }
+        return { ...p, translations, translationMeta: meta };
+      });
+    } catch {
+      /* transient: next tick retries */
+    }
+  }, [isNew, initialPackage.id]);
+
+  useEffect(() => {
+    if (!anyTranslating) return;
+    const timer = setInterval(refreshTranslations, 3000);
+    return () => clearInterval(timer);
+  }, [anyTranslating, refreshTranslations]);
+
+  async function autoTranslate() {
+    setTrBusy(true);
+    setMessage(null);
+    try {
+      const res = await fetch("/api/admin/translate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ packageId: pkg.id }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setMessage({ kind: "err", text: data.message ?? "Could not start translation." });
+        return;
+      }
+      setMessage({
+        kind: "ok",
+        text: data.planned?.length ? "Translating from English… this runs in the background." : "Nothing to translate: everything is up to date.",
+      });
+      await refreshTranslations();
+    } catch {
+      setMessage({ kind: "err", text: "Network error: translation was not started." });
+    } finally {
+      setTrBusy(false);
     }
   }
 
@@ -414,7 +498,7 @@ export default function PackageEditor({
           {/* Category selection - aligns with public filter architecture */}
           <div className="space-y-3 pt-1">
             <Field label="Main category" required description="The badge shown on the card and the package\u2019s primary filter placement." appearsOn="Packages listing → card badge">
-              <select
+              <Select dark
                 className={input}
                 value={pkg.category || "sea-water"}
                 onChange={(e) => {
@@ -425,9 +509,9 @@ export default function PackageEditor({
                 }}
               >
                 {CATEGORIES.map((c) => (
-                  <option key={c} value={c}>{experienceName(c)}</option>
+                  <option key={c} value={c}>{catLabel(c)}</option>
                 ))}
-              </select>
+              </Select>
             </Field>
 
             <Field label="Also show under these categories" optional description="Additional filters this package should appear in." appearsOn="Tours & Packages listing → filters">
@@ -448,7 +532,7 @@ export default function PackageEditor({
                         }}
                         className="size-4 rounded accent-teal-500"
                       />
-                      <span>{experienceName(c)}</span>
+                      <span>{catLabel(c)}</span>
                     </label>
                   );
                 })}
@@ -458,11 +542,11 @@ export default function PackageEditor({
 
           <div className="grid grid-cols-2 gap-3 pt-2">
             <Field label="Destination" required description="Which destination page this package belongs to." appearsOn="Destinations → destination page">
-              <select className={input} value={pkg.destination} onChange={(e) => set("destination", e.target.value)}>
+              <Select dark className={input} value={pkg.destination} onChange={(e) => set("destination", e.target.value)}>
                 {DESTINATIONS.map((d) => (
                   <option key={d} value={d}>{destinationName(d)}</option>
                 ))}
-              </select>
+              </Select>
             </Field>
             <Field label="Duration" required translatable description="How long the package runs, written for guests." appearsOn="Package page → facts bar" example="3 Days / 2 Nights">
               <input className={input} value={pkg.duration} onChange={(e) => set("duration", e.target.value)} />
@@ -499,7 +583,7 @@ export default function PackageEditor({
         >
           <div className="grid grid-cols-1 gap-4 rounded-xl bg-black/20 p-3.5 border border-white/5">
             <Field label="Price currency — the currency declared prices are declared in">
-              <select
+              <Select dark
                 className={input}
                 value={pkgCurrency}
                 onChange={(e) => set("currency", e.target.value)}
@@ -509,7 +593,7 @@ export default function PackageEditor({
                     {code}
                   </option>
                 ))}
-              </select>
+              </Select>
               <span className="block text-[10px] text-stone-500 mt-1">
                 Every price below is declared in this currency. The storefront converts
                 them into each visitor&apos;s display currency at the site rates.
@@ -770,6 +854,28 @@ export default function PackageEditor({
             <p className="text-[11px] text-stone-500 leading-relaxed">
               Per-language package fields. Empty fields fall back to the base English content.
             </p>
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <p className="text-[11px] text-stone-400">
+                {isNew
+                  ? "Save the package first: translations are generated after the first save."
+                  : "Save your English changes first; translation always works from the saved English. Edited translations are never overwritten."}
+              </p>
+              <button
+                type="button"
+                disabled={isNew || trBusy || anyTranslating}
+                onClick={autoTranslate}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-teal-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-teal-500 disabled:opacity-50"
+              >
+                <RefreshCw className={`size-3.5 ${anyTranslating ? "animate-spin" : ""}`} />
+                {anyTranslating ? "Translating…" : "Auto-translate missing"}
+              </button>
+            </div>
+            <TranslationProviderStatus refreshKey={anyTranslating} />
+            {failedLangs.length ? (
+              <p className="rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2 text-[11px] leading-relaxed text-red-200">
+                <strong>Translation failed:</strong> {failedLangs.map(([c]) => c.toUpperCase()).join(", ")}. {failedLangs[0][1].error}
+              </p>
+            ) : null}
             <div className="flex gap-2 flex-wrap">
               {enabledLanguages.map((l) => {
                 const st = l.code === "en" ? null : translationStatus(l.code);

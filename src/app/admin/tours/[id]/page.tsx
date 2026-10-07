@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import TourEditor from "@/components/admin/TourEditor";
 import { requireAdmin } from "@/lib/auth";
-import { tourById } from "@/lib/store/repo";
+import { ensureDbLoadedFromSupabase, tourById } from "@/lib/store/repo";
 import { getSiteView } from "@/lib/siteview";
 import { categoryOptions } from "@/lib/store/categories";
 
@@ -13,6 +13,8 @@ export default async function AdminTourEditPage({
   params: Promise<{ id: string }>;
 }) {
   await requireAdmin();
+  // Category list + tour must reflect what is stored in Supabase, not a stale instance.
+  await ensureDbLoadedFromSupabase(true);
   const { id } = await params;
   const tour = tourById(id);
   if (!tour) notFound();

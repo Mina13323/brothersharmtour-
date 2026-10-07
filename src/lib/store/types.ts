@@ -66,6 +66,25 @@ export interface TourTranslation {
   infantAgeLabel?: string;
   seoTitle?: string;
   seoDescription?: string;
+  /** Short labels such as "Full day". */
+  duration?: string;
+  schedule?: string;
+  /** Index-aligned with the tour's add-ons. */
+  addons?: Array<{ label?: string; unit?: string }>;
+}
+
+/** Machine-vs-human bookkeeping for one language of a tour. */
+export interface TourTranslationMeta {
+  /** Fields filled by the machine (anything else non-blank is human-owned). */
+  auto_fields: string[];
+  /** Hash of the English text each machine translation came from. */
+  source_hashes: Record<string, string>;
+  status?: "translating" | "done" | "failed";
+  error?: string;
+  at?: string;
+  /** Provider id and model that produced the latest machine output. */
+  provider?: string;
+  model?: string;
 }
 
 /**
@@ -126,6 +145,8 @@ export interface TourRecord {
   faq: FaqItem[];
   related: string[];
   translations: Record<string, TourTranslation>;
+  /** Per-language auto-translation tracking (see lib/translate). */
+  translationMeta?: Record<string, TourTranslationMeta>;
   verified: boolean;
   featured: boolean;
   priority: number;
@@ -182,6 +203,8 @@ export interface PackageRecord {
   excluded: string[];
   bring: string[];
   translations?: Record<string, Partial<PackageRecord>>;
+  /** Per-language auto-translation tracking (see lib/translate). Stored inside the Supabase `seo` JSON. */
+  translationMeta?: Record<string, TourTranslationMeta>;
   status: PublishStatus;
   featured: boolean;
   priority: number;

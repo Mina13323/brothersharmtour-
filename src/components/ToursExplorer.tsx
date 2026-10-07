@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { Select } from "@/components/Select";
 import { durationBuckets, durationBucketLabel } from "@/lib/store/labels";
-import { destinationName, experienceName } from "@/lib/store/labels";
+import { destinationName, experienceName, orderCategorySlugs } from "@/lib/store/labels";
 import type { Tour } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { TourCard } from "./cards";
@@ -54,7 +55,7 @@ export function ToursExplorer({
     type?: string;
   };
 }) {
-  const { t, lang } = useSite();
+  const { t, lang, experiences } = useSite();
   const [query, setQuery] = useState("");
   const [destination, setDestination] = useState(
     lockedDestination ?? initial?.destination ?? "all",
@@ -230,7 +231,7 @@ export function ToursExplorer({
             <span className="text-[0.6875rem] uppercase tracking-[0.16em] text-stone">
               {t("filter_sort", "Sort")}
             </span>
-            <select
+            <Select
               value={sort}
               onChange={(e) => setSort(e.target.value as SortKey)}
               aria-label={t("filter_sort", "Sort")}
@@ -241,7 +242,7 @@ export function ToursExplorer({
                   {t(o.key, o.fallback)}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
         </div>
       </div>
@@ -329,7 +330,7 @@ export function ToursExplorer({
                   onChange={setCategory}
                   options={[
                     { id: "all", label: t("filter_all", "All") },
-                    ...Array.from(new Set(tours.map((t) => t.category))).map((slug) => ({
+                    ...orderCategorySlugs(tours.map((t) => t.category), experiences).map((slug) => ({
                       id: slug,
                       label: experienceName(slug, lang),
                     })),
@@ -384,7 +385,7 @@ export function ToursExplorer({
 
             <label className="lg:hidden">
               <span className="label">{t("filter_sort", "Sort")}</span>
-              <select
+              <Select
                 value={sort}
                 onChange={(e) => setSort(e.target.value as SortKey)}
                 className="field"
@@ -394,7 +395,7 @@ export function ToursExplorer({
                     {t(o.key, o.fallback)}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
           </div>
 

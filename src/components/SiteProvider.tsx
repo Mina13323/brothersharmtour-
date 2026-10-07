@@ -19,6 +19,8 @@ import {
 import type { CatalogueTour } from "@/lib/store/types";
 import type { CurrencyContext } from "@/lib/currency";
 import { moneyIn } from "@/lib/currency";
+import { setExperienceRegistry } from "@/lib/store/labels";
+import type { PublicExperience } from "@/lib/siteview";
 
 export interface PublicSettings {
   name: string;
@@ -50,6 +52,8 @@ import { getTranslation } from "@/lib/i18n/translations";
 interface SiteContextValue {
   settings: PublicSettings;
   catalogue: CatalogueTour[];
+  /** Published admin-managed categories, in display order. */
+  experiences: PublicExperience[];
   currency: CurrencyContext;
   lang: string;
   /**
@@ -88,16 +92,20 @@ export function useCatalogue() {
 export function SiteProvider({
   settings,
   catalogue,
+  experiences = [],
   currency,
   lang = "en",
   children,
 }: {
   settings: PublicSettings;
   catalogue: CatalogueTour[];
+  experiences?: PublicExperience[];
   currency: CurrencyContext;
   lang?: string;
   children: ReactNode;
 }) {
+  // Labels follow the admin-managed category names (also during SSR).
+  setExperienceRegistry(experiences);
   const money = useCallback(
     (value: number | null | undefined, overrides?: Record<string, number>, from?: string) =>
       moneyIn(value, currency, { overrides, from, lang }),
@@ -125,7 +133,7 @@ export function SiteProvider({
 
   return (
     <SiteContext.Provider
-      value={{ settings, catalogue, currency, lang, money, whatsappLink, t }}
+      value={{ settings, catalogue, experiences, currency, lang, money, whatsappLink, t }}
     >
       {children}
     </SiteContext.Provider>

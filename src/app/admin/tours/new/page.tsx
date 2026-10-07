@@ -2,6 +2,7 @@ import TourEditor from "@/components/admin/TourEditor";
 import { requireAdmin } from "@/lib/auth";
 import { getSiteView } from "@/lib/siteview";
 import { categoryOptions } from "@/lib/store/categories";
+import { ensureDbLoadedFromSupabase } from "@/lib/store/repo";
 import type { TourRecord } from "@/lib/store/types";
 
 export const dynamic = "force-dynamic";
@@ -9,6 +10,7 @@ export const dynamic = "force-dynamic";
 /** New tour — starts from a minimal, honest draft (nothing invented). */
 export default async function AdminNewTourPage() {
   await requireAdmin();
+  await ensureDbLoadedFromSupabase(true);
   const view = await getSiteView();
 
   const draft: TourRecord = {

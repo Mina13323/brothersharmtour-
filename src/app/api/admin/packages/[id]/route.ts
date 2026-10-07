@@ -2,6 +2,25 @@ import { NextResponse } from "next/server";
 import { isAdmin } from "@/lib/auth";
 import { deletePackage, packageById, savePackage } from "@/lib/store/repo";
 import { syncPackageToSupabase } from "@/lib/store/supabaseSync";
+import type { PackageRecord, TourTranslationMeta } from "@/lib/store/types";
+import { queuePackageTranslation } from "@/lib/translate/packageServer";
+
+/** Human edits sent by the editor: those fields become manual (never auto-overwritten). */
+function applyTranslationEdits(existing: PackageRecord, patch: Record<string, unknown>) {
+  const edits = (patch.translationEdits ?? {}) as Record<string, Record<string, unknown>>;
+  delete patch.translationEdits;
+  delete patch.translations;
+  delete patch.translationMeta;
+  const translations: Record<string, Partial<PackageRecord>> = { ...(existing.translations ?? {}) };
+  const meta: Record<string, TourTranslationMeta> = { ...(existing.translationMeta ?? {}) };
+  for (const [lang, fields] of Object.entries(edits)) {
+    translations[lang] = { ...(translations[lang] ?? {}), ...fields } as Partial<PackageRecord>;
+    const cur = meta[lang] ?? { auto_fields: [], source_hashes: {} };
+    meta[lang] = { ...cur, auto_fields: (cur.auto_fields ?? []).filter((f) => !(f in fields)) };
+  }
+  patch.translations = translations;
+  patch.translationMeta = meta;
+}
 
 /** Admin single package: read, update, delete. */
 
@@ -42,6 +61,8 @@ export async function PATCH(
     return NextResponse.json({ ok: false, message: "Child price cannot be negative." }, { status: 422 });
   }
 
+  if ("translationEdits" in patch) applyTranslationEdits(existing, patch);
+
   const pkg = savePackage({
     ...patch,
     id: existing.id,
@@ -50,8 +71,10 @@ export async function PATCH(
   });
 
   await syncPackageToSupabase(pkg).catch(() => {});
+  // Only blank fields / changed English are translated; human edits are kept.
+  queuePackageTranslation(pkg.id);
 
-  return NextResponse.json({ ok: true, package: pkg });
+  return NextResponse.json({ ok: true, package: packageById(pkg.id) ?? pkg });
 }
 
 

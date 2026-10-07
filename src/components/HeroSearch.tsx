@@ -1,12 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { Select } from "@/components/Select";
 import { useState } from "react";
 
 import { durationBuckets, durationBucketLabel } from "@/lib/store/labels";
 import { cn } from "@/lib/utils";
 import { useCatalogue, useSite } from "./SiteProvider";
-import { destinationName, experienceName } from "@/lib/store/labels";
+import { destinationName, experienceName, orderCategorySlugs } from "@/lib/store/labels";
 
 /**
  * BROTHER SHARM TOUR — hero search
@@ -22,10 +23,10 @@ import { destinationName, experienceName } from "@/lib/store/labels";
 type TabId = "tours" | "experiences" | "transfers";
 
 export function HeroSearch() {
-  const { t, lang } = useSite();
+  const { t, lang, experiences } = useSite();
   const catalogue = useCatalogue();
   const destinationOptions = Array.from(new Set(catalogue.map((t) => t.destination)));
-  const categoryOptions = Array.from(new Set(catalogue.map((t) => t.category)));
+  const categoryOptions = orderCategorySlugs(catalogue.map((t) => t.category), experiences);
   const router = useRouter();
   const [tab, setTab] = useState<TabId>("tours");
 
@@ -124,7 +125,7 @@ export function HeroSearch() {
             <span className="block text-[10px] font-bold uppercase tracking-[0.16em] text-stone">
               {t("search_where", "Where")}
             </span>
-            <select
+            <Select
               value={destination}
               onChange={(e) => setDestination(e.target.value)}
               aria-label={t("search_where", "Where")}
@@ -136,7 +137,7 @@ export function HeroSearch() {
                   {destinationName(slug, lang)}
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
         </div>
 
@@ -164,7 +165,7 @@ export function HeroSearch() {
               <span className="block text-[10px] font-bold uppercase tracking-[0.16em] text-stone">
                 {t("search_experience", "Experience")}
               </span>
-              <select
+              <Select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
                 aria-label={t("search_experience", "Experience")}
@@ -176,7 +177,7 @@ export function HeroSearch() {
                     {experienceName(slug, lang)}
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
           </div>
         ) : (
@@ -232,7 +233,7 @@ export function HeroSearch() {
             <span className="block text-[10px] font-bold uppercase tracking-[0.16em] text-stone">
               {t("label_duration", "Duration")}
             </span>
-            <select
+            <Select
               value={duration}
               onChange={(e) => setDuration(e.target.value)}
               aria-label={t("label_duration", "Duration")}
@@ -244,7 +245,7 @@ export function HeroSearch() {
                   {durationBucketLabel(b.id, lang)}
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
         </div>
 

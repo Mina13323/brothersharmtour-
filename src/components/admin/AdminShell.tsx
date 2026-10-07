@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Compass,
   Package,
@@ -50,6 +50,22 @@ export default function AdminShell({
 
   const isLoginPage = pathname === "/admin/login";
 
+  /*
+   * The CMS is an English, left-to-right tool. The root layout derives <html dir>
+   * from the visitor's language cookie, so without this an admin who browsed the
+   * site in Arabic would get a mirrored CMS. Pin it here and restore on leave.
+   */
+  useEffect(() => {
+    const html = document.documentElement;
+    const prev = { dir: html.dir, lang: html.lang };
+    html.dir = "ltr";
+    html.lang = "en";
+    return () => {
+      html.dir = prev.dir;
+      html.lang = prev.lang;
+    };
+  }, []);
+
   const handleLogout = async () => {
     await fetch("/api/admin/auth", { method: "DELETE" });
     router.push("/admin/login");
@@ -57,11 +73,15 @@ export default function AdminShell({
   };
 
   if (isLoginPage) {
-    return <div className="min-h-screen bg-stone-900 text-stone-100">{children}</div>;
+    return (
+      <div dir="ltr" lang="en" className="admin-scope min-h-screen bg-stone-900 text-stone-100">
+        {children}
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-[#0d1618] text-stone-100 flex flex-col md:flex-row antialiased font-sans">
+    <div dir="ltr" lang="en" className="admin-scope min-h-screen bg-[#0d1618] text-stone-100 flex flex-col md:flex-row antialiased font-sans">
       {/* ─── Mobile Header ─── */}
       <div className="md:hidden flex items-center justify-between px-5 py-4 border-b border-white/10 bg-[#0a1214]">
         <Link href="/admin" className="flex items-center gap-2.5">

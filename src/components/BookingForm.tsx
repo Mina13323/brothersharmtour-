@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { Select } from "@/components/Select";
 import Link from "next/link";
 import { useCatalogue, useSite } from "./SiteProvider";
 import { destinationName } from "@/lib/store/labels";
@@ -149,7 +150,7 @@ export function BookingForm({
         <label className="label" htmlFor="bf-tour">
           {t("form_selected_experience", "Selected experience")}
         </label>
-        <select
+        <Select
           id="bf-tour"
           name="tourSlug"
           className="field"
@@ -166,7 +167,7 @@ export function BookingForm({
               ))}
             </optgroup>
           ))}
-        </select>
+        </Select>
       </div>
 
       <div className="grid grid-cols-2 gap-5">

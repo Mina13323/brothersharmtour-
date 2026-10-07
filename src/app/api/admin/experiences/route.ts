@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { isAdmin } from "@/lib/auth";
-import { allExperiences, saveExperience } from "@/lib/store/repo";
+import { allExperiences, ensureDbLoadedFromSupabase, saveExperience } from "@/lib/store/repo";
 import type { ExperienceRecord } from "@/lib/store/types";
 import { slugify } from "@/lib/utils";
 
@@ -38,6 +38,7 @@ export async function POST(request: Request) {
   if (!slug)
     return NextResponse.json({ ok: false, message: "Slug is required." }, { status: 422 });
 
+  await ensureDbLoadedFromSupabase(true);
   if (allExperiences().some((e) => e.slug === slug))
     return NextResponse.json(
       { ok: false, message: `A category with the web address “${slug}” already exists.` },

@@ -1,4 +1,5 @@
 import PackageEditor from "@/components/admin/PackageEditor";
+import { categoryOptions } from "@/lib/store/categories";
 import { requireAdmin } from "@/lib/auth";
 import { allTours, getSettings } from "@/lib/store/repo";
 import type { PackageRecord } from "@/lib/store/types";
@@ -44,6 +45,7 @@ export default async function AdminNewPackagePage() {
       baseCurrency={base}
       settings={settings}
       tours={tours}
+      categories={categoryOptions()}
       isNew
     />
   );

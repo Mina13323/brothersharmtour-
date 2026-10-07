@@ -139,6 +139,16 @@ export interface TripPackage {
   id: string;
   title: string;
   description?: string;
+  /**
+   * "person" (default): priced per adult / child / infant.
+   * "unit": one flat price per custom unit (boat, buggy, car…) with a single
+   * quantity counter. The price is `adultPrice`; the quantity is stored in the
+   * selection's `adults` field.
+   */
+  pricingMode?: "person" | "unit";
+  /** Singular unit name for pricingMode "unit", e.g. "boat", "buggy". */
+  unitLabel?: string;
+  /** Price per adult — or per unit when pricingMode is "unit". */
   adultPrice: number;
   childPrice?: number | null;
   /** Price per infant. 0 (the default) renders as "Free". */
@@ -266,9 +276,18 @@ export interface BookingInquiry {
   notes?: string;
 }
 
+export interface PackageSelection {
+  tripPackageId: string;
+  adults: number;
+  children: number;
+  infants: number;
+}
+
 export interface BookingOptions {
   tripPackageId?: string;
   adults?: number;
   children?: number;
   infants?: number;
+  /** Several options booked together, each with its own party. */
+  selections?: PackageSelection[];
 }

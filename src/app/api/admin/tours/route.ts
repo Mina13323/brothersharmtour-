@@ -3,6 +3,7 @@ import { isAdmin } from "@/lib/auth";
 import { allTours, saveTour, slugTaken } from "@/lib/store/repo";
 import { syncTourToSupabase } from "@/lib/store/supabaseSync";
 import { slugify } from "@/lib/utils";
+import { queueTranslation } from "@/lib/translate/server";
 
 /** Admin tours: list (full records incl. drafts) + create. */
 
@@ -50,6 +51,8 @@ export async function POST(request: Request) {
   });
 
   await syncTourToSupabase(tour).catch(() => {});
+  // English is saved; translate the other languages in the background.
+  queueTranslation(tour.id);
 
   return NextResponse.json({ ok: true, tour }, { status: 201 });
 }
